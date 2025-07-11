@@ -1,0 +1,27 @@
+{
+  "name": "com-financial-website",
+  "version": "1.0.0",
+  "description": "Com Financial Services Website & Admin Dashboard",
+  "main": "index.js",
+  "scripts": {
+    "frontend": "cd frontend && npm run dev",
+    "backend": "cd backend && npm run dev",
+    "dev": "concurrently \"npm run frontend\" \"npm run backend\"",
+    "install-all": "npm install && cd frontend && npm install && cd ../backend && npm install"
+  },
+  "keywords": [
+    "nextjs",
+    "express",
+    "mongodb",
+    "financial-services",
+    "admin-dashboard"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "dependencies": {
+    "framer-motion": "^12.23.0"
+  }
+}
