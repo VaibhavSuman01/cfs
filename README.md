@@ -116,12 +116,4 @@ project/
 - Submissions list with filters
 - Detailed view of submissions with file downloads
 - Status update functionality
-
-## 🔐 Admin Access
-
-Default admin credentials:
-
-- Email: admin@comfinancial.com
-- Password: admin123
-
-_Note: Change these credentials in production._
+s
