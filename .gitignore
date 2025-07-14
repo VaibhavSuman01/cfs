@@ -10,7 +10,7 @@ backend/node_modules/
 /coverage
 
 # Next.js
-/.next/
+/frontend/.next/
 /out/
 
 # Production

@@ -2,8 +2,7 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/login": "pages/login.js",
-  "/otp-login": "pages/otp-login.js",
-  "/user/dashboard": "pages/user/dashboard.js",
-  "/": "pages/index.js"
+  "/user/submissions": "pages/user/submissions.js",
+  "/admin/tax-forms/[id]": "pages/admin/tax-forms/[id].js",
+  "/user/submission/[id]": "pages/user/submission/[id].js"
 }
