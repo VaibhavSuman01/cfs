@@ -76,6 +76,7 @@ router.post(
             message:
               "This account uses OTP authentication. Please request an OTP.",
             authMethod: "otp",
+            code: "OTP_REQUIRED"
           });
         }
 
@@ -88,7 +89,7 @@ router.post(
           }
         } else {
           console.log("Login failed: OTP required but not provided");
-          return res.status(400).json({ message: "OTP is required" });
+          return res.status(400).json({ message: "OTP is required", code: "OTP_REQUIRED" });
         }
       } else {
         // User is using password authentication
@@ -99,6 +100,7 @@ router.post(
             message:
               "This account uses password authentication. Please provide your password.",
             authMethod: "password",
+            code: "PASSWORD_REQUIRED"
           });
         }
 
@@ -241,6 +243,12 @@ router.put("/password", protect, async (req, res) => {
 
     // Update password
     user.password = newPassword;
+    
+    // Make sure OTP is disabled for password auth
+    if (user.useOTP) {
+      user.useOTP = false;
+    }
+    
     await user.save();
 
     res.json({ message: "Password updated successfully" });
@@ -340,26 +348,40 @@ router.post(
 // @desc    Request a new OTP for login
 // @access  Public
 router.post("/request-otp", async (req, res) => {
+  console.log("OTP request received for:", req.body);
   const { email } = req.body;
 
   if (!email) {
+    console.log("OTP request missing email");
     return res.status(400).json({ message: "Email is required" });
   }
 
   try {
+    console.log("Processing OTP request for email:", email);
     // Check if user exists
     const user = await User.findOne({ email });
+    console.log("User found:", !!user);
 
     // If user doesn't exist, return success anyway to prevent email enumeration
     if (!user) {
       // For security reasons, don't reveal that the user doesn't exist
+      console.log(`OTP requested for non-existent user: ${email}`);
       return res.status(200).json({
         message: "If your email is registered, you will receive an OTP",
       });
     }
 
     // Generate and save OTP
-    await otpUtils.generateAndSaveOTP(email);
+    console.log("Generating OTP for user:", email);
+    try {
+      await otpUtils.generateAndSaveOTP(email);
+      console.log("OTP generated and saved successfully for:", email);
+    } catch (otpError) {
+      console.error("Error generating or saving OTP:", otpError);
+      return res.status(500).json({
+        message: "Error processing your request. Please try again later.",
+      });
+    }
 
     res.status(200).json({ message: "OTP sent successfully" });
   } catch (error) {

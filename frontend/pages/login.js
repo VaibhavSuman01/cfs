@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import httpClient, { API_PATHS } from "../utils/httpClient";
 import { setAuth } from "../utils/auth";
 import Layout from "../components/Layout";
-import { handleApiErrorWithToast, handleApiError } from "../utils/errorHandler";
+import { handleApiError } from "../utils/errorHandler";
 import LoadingButton from "../components/LoadingButton";
 
 // Schema for login
@@ -18,12 +18,11 @@ const LoginSchema = Yup.object().shape({
   password: Yup.string().required("Password is required"),
 });
 
-
 export default function Login() {
   const router = useRouter();
   const { returnUrl } = router.query;
   const [showPassword, setShowPassword] = useState(false);
-  const [loginMethod, setLoginMethod] = useState(null);
+  const [setLoginMethod] = useState(null);
 
   // Handle login form submission
   const handleSubmit = async (values, { setSubmitting, setErrors }) => {
@@ -69,33 +68,43 @@ export default function Login() {
         data: error.response?.data,
         headers: error.response?.headers,
       });
-      
+
       // Check if the error is due to wrong authentication method
       if (error.response?.data?.authMethod) {
         setLoginMethod(error.response.data.authMethod);
+
+        // If OTP authentication is required, redirect to OTP login page
+        if (error.response.data.authMethod === "otp") {
+          router.push(`/otp-login?email=${encodeURIComponent(values.email)}`);
+          return;
+        }
+
         setErrors({
           auth: error.response.data.message,
         });
       } else {
         // Use the improved error handler to get a user-friendly message
-        const errorMessage = handleApiError(error, "Failed to sign in. Please try again.");
-        
+        const errorMessage = handleApiError(
+          error,
+          "Failed to sign in. Please try again."
+        );
+
         // Don't show toast for validation errors, only for unexpected errors
-        if (!error.response?.data?.code && 
-            error.response?.data?.message !== "Invalid credentials") {
+        if (
+          !error.response?.data?.code &&
+          error.response?.data?.message !== "Invalid credentials"
+        ) {
           toast.error(errorMessage);
         }
-        
+
         setErrors({
-          auth: errorMessage
+          auth: errorMessage,
         });
       }
     } finally {
       setSubmitting(false);
     }
   };
-
-
 
   return (
     <Layout>
@@ -112,6 +121,13 @@ export default function Login() {
             >
               create a new account
             </Link>
+            {/* {" | "}
+            <Link
+              href="/otp-login"
+              className="font-medium text-primary-600 hover:text-primary-500"
+            >
+              sign in with OTP
+            </Link> */}
           </p>
         </div>
 
@@ -214,8 +230,6 @@ export default function Login() {
                       </Link>
                     </div>
                   </div>
-
-
 
                   <div>
                     <LoadingButton

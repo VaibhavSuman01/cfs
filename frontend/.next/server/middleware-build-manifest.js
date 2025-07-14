@@ -20,20 +20,20 @@ globalThis.__BUILD_MANIFEST = {
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
-    "/admin/contact-messages": [
+    "/login": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/admin/contact-messages.js"
+      "static/chunks/pages/login.js"
     ],
-    "/admin/dashboard": [
+    "/otp-login": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/admin/dashboard.js"
+      "static/chunks/pages/otp-login.js"
     ],
-    "/contact": [
+    "/user/dashboard": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/contact.js"
+      "static/chunks/pages/user/dashboard.js"
     ]
   },
   "ampFirstPages": []

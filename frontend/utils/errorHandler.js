@@ -36,6 +36,8 @@ export const handleApiError = (error, defaultMessage = "An error occurred") => {
       "INVALID_PASSWORD": "The password you entered is incorrect. Please try again.",
       "EMAIL_IN_USE": "An account with this email already exists. Please use a different email or sign in.",
       "INVALID_OTP": "The verification code you entered is invalid or has expired. Please try again.",
+      "OTP_REQUIRED": "This account uses OTP authentication. Please request an OTP.",
+      "PASSWORD_REQUIRED": "This account uses password authentication. Please provide your password.",
       "SERVER_ERROR": "We're experiencing technical difficulties. Please try again later."
     };
     

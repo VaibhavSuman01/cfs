@@ -11,34 +11,62 @@ const generateOTP = () => {
 };
 
 /**
- * Create a nodemailer transporter
+ * Create a nodemailer transporter for Google Workspace
  * @returns {object} Nodemailer transporter
  */
 const createTransporter = () => {
-  // For production, use actual SMTP credentials
-  // For development, you can use services like Mailtrap or Ethereal
-  return nodemailer.createTransport({
-    host: process.env.EMAIL_HOST || "smtp.ethereal.email",
-    port: process.env.EMAIL_PORT || 587,
+  const config = {
+    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
+      user: process.env.GMAIL_USER,
+      pass: process.env.GMAIL_APP_PASSWORD, // App password, not regular Gmail password
     },
+    tls: {
+      rejectUnauthorized: false
+    },
+    debug: true, // Enable debug output
+  };
+  
+  console.log("Creating email transporter with config:", {
+    ...config,
+    auth: {
+      user: config.auth.user,
+      passProvided: !!config.auth.pass,
+      passLength: config.auth.pass ? config.auth.pass.length : 0
+    }
   });
+  
+  return nodemailer.createTransport(config);
 };
 
 /**
- * Send OTP via email
+ * Send OTP via email using Google Workspace
  * @param {string} email - Recipient email
  * @param {string} otp - OTP to send
  * @returns {Promise} Email sending result
  */
 const sendOTPByEmail = async (email, otp) => {
   try {
+    console.log("Attempting to send OTP email to:", email);
+    console.log("OTP value being sent:", otp);
     const transporter = createTransporter();
 
+    // Verify SMTP connection configuration
+    try {
+      console.log("Verifying SMTP connection...");
+      const verifyResult = await transporter.verify();
+      console.log("SMTP connection verified:", verifyResult);
+    } catch (verifyError) {
+      console.error("SMTP connection verification failed:", verifyError);
+      console.error("Error details:", JSON.stringify(verifyError, null, 2));
+      // Continue anyway to see the specific sending error
+    }
+
     const mailOptions = {
-      from: process.env.EMAIL_FROM || "noreply@comfinancial.com",
+      from: process.env.GMAIL_USER,
       to: email,
       subject: "Your OTP for Com Financial Services Authentication",
       html: `
@@ -54,9 +82,39 @@ const sendOTPByEmail = async (email, otp) => {
       `,
     };
 
-    return await transporter.sendMail(mailOptions);
+    console.log("Sending email with options:", {
+      to: email,
+      from: process.env.GMAIL_USER,
+      subject: mailOptions.subject,
+      htmlLength: mailOptions.html.length,
+      contentPreview: mailOptions.html.substring(0, 50) + '...'
+    });
+
+    console.log("Sending email now...");
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email sent successfully!");
+    console.log("Email response:", info.response);
+    console.log("Message ID:", info.messageId);
+    return info;
   } catch (error) {
     console.error("Error sending OTP email:", error);
+    console.error("Error details:", JSON.stringify(error, Object.getOwnPropertyNames(error).reduce((acc, key) => {
+      acc[key] = error[key];
+      return acc;
+    }, {}), 2));
+    console.error("Email configuration:", {
+      user: process.env.GMAIL_USER,
+      passProvided: !!process.env.GMAIL_APP_PASSWORD,
+      passLength: process.env.GMAIL_APP_PASSWORD ? process.env.GMAIL_APP_PASSWORD.length : 0
+    });
+    if (error.code === "EAUTH") {
+      console.error(
+        "Authentication error - likely need an App Password for Gmail"
+      );
+      console.error(
+        "See: https://support.google.com/mail/?p=InvalidSecondFactor"
+      );
+    }
     throw new Error("Failed to send OTP email");
   }
 };

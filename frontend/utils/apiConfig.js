@@ -7,6 +7,7 @@
 export const API_PATHS = {
   AUTH: {
     LOGIN: "/api/auth/login",
+    OTP_LOGIN: "/api/auth/login", // Same endpoint but used for OTP login
     REGISTER: "/api/auth/register",
     ME: "/api/auth/me",
     PROFILE: "/api/auth/profile",
