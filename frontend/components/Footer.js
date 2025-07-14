@@ -310,7 +310,7 @@ export default function Footer() {
                         href="tel:0612 4535607"
                         className="text-sm text-gray-500 hover:text-primary-600 transition-colors duration-200"
                       >
-                        Landline: 0612-4535607
+                        Landline: 0612-4535604
                       </a>
                     </motion.div>
                   </li>

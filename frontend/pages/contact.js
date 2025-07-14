@@ -79,7 +79,7 @@ export default function Contact() {
                   </div>
                   <div className="ml-3 text-base text-gray-600">
                     <p>Mobile: +91 9263 123455</p>
-                    <p>Landline: 0612-4535607</p>
+                    <p>Landline: 0612-4535604</p>
                     <p className="mt-1">Mon-Sat 10am to 7pm</p>
                   </div>
                 </div>
