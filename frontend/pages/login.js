@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -20,9 +20,18 @@ const LoginSchema = Yup.object().shape({
 
 export default function Login() {
   const router = useRouter();
-  const { returnUrl } = router.query;
+  const { returnUrl, resetSuccess } = router.query;
   const [showPassword, setShowPassword] = useState(false);
   const [setLoginMethod] = useState(null);
+  
+  // Show success message if user has reset their password
+  useEffect(() => {
+    if (resetSuccess === 'true') {
+      toast.success('Your password has been reset. You can now login with your new password.');
+      // Remove the query parameter to prevent showing the message again on refresh
+      router.replace('/login', undefined, { shallow: true });
+    }
+  }, [resetSuccess, router]);
 
   // Handle login form submission
   const handleSubmit = async (values, { setSubmitting, setErrors }) => {
@@ -69,12 +78,12 @@ export default function Login() {
         headers: error.response?.headers,
       });
 
-      // Check if the error is due to wrong authentication method
-      if (error.response?.data?.authMethod) {
+      // Check if the error is due to wrong authentication method or no password set
+      if (error.response?.data?.authMethod || error.response?.data?.code === "NO_PASSWORD_SET") {
         setLoginMethod(error.response.data.authMethod);
 
-        // If OTP authentication is required, redirect to OTP login page
-        if (error.response.data.authMethod === "otp") {
+        // If OTP authentication is required or no password is set, redirect to OTP login page
+        if (error.response.data.authMethod === "otp" || error.response?.data?.code === "NO_PASSWORD_SET") {
           router.push(`/otp-login?email=${encodeURIComponent(values.email)}`);
           return;
         }

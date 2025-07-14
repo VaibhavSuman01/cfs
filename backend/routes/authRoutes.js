@@ -68,16 +68,37 @@ router.post(
       let isAuthenticated = false;
 
       // Check if user is using OTP authentication
-      if (user.useOTP) {
+      if (user.canUseOTPAuth()) {
         // If user is using OTP but password was provided
         if (password && !otp) {
-          console.log("Login failed: Password provided for OTP account");
-          return res.status(400).json({
-            message:
-              "This account uses OTP authentication. Please request an OTP.",
-            authMethod: "otp",
-            code: "OTP_REQUIRED"
-          });
+          // Check if the user has a password set
+          if (!user.password) {
+            console.log("Login failed: Password provided for OTP-only account with no password set");
+            return res.status(400).json({
+              message: "This account uses OTP authentication. Please request an OTP.",
+              authMethod: "otp",
+              code: "OTP_REQUIRED"
+            });
+          }
+          
+          // Check if the password is valid despite OTP being enabled
+          // This handles cases where password was reset but useOTP flag wasn't properly updated
+          const isPasswordValid = await user.comparePassword(password);
+          if (isPasswordValid) {
+            // Password is valid, update user to disable OTP authentication
+            user.useOTP = false;
+            await user.save();
+            console.log("Automatically disabled OTP for user with valid password");
+            isAuthenticated = true;
+          } else {
+            console.log("Login failed: Password provided for OTP account");
+            return res.status(400).json({
+              message:
+                "This account uses OTP authentication. Please request an OTP.",
+              authMethod: "otp",
+              code: "OTP_REQUIRED"
+            });
+          }
         }
 
         // Verify OTP
@@ -93,6 +114,15 @@ router.post(
         }
       } else {
         // User is using password authentication
+        // Verify user can authenticate with password
+        if (!user.canUsePasswordAuth()) {
+          console.log("Login failed: User cannot use password authentication");
+          return res.status(400).json({ 
+            message: "This account has no password set. Please use OTP authentication.", 
+            code: "NO_PASSWORD_SET",
+            authMethod: "otp"
+          });
+        }
         // If user is using password but OTP was provided
         if (otp && !password) {
           console.log("Login failed: OTP provided for password account");
@@ -104,6 +134,15 @@ router.post(
           });
         }
 
+        // Check if user has a password set
+        if (!user.password) {
+          console.log("Login failed: User has no password set");
+          return res.status(400).json({ 
+            message: "This account has no password set. Please contact support.", 
+            code: "NO_PASSWORD_SET" 
+          });
+        }
+        
         // Check password
         if (password) {
           isAuthenticated = await user.comparePassword(password);
@@ -241,12 +280,11 @@ router.put("/password", protect, async (req, res) => {
       return res.status(400).json({ message: "Current password is incorrect" });
     }
 
-    // Update password
-    user.password = newPassword;
-    
-    // Make sure OTP is disabled for password auth
-    if (user.useOTP) {
-      user.useOTP = false;
+    // Update password and disable OTP
+    try {
+      user.disableOTPAuth(newPassword);
+    } catch (error) {
+      return res.status(400).json({ message: error.message });
     }
     
     await user.save();
@@ -298,10 +336,17 @@ router.post(
       user = new User({
         name,
         email,
-        password: useOTP ? undefined : password, // Only set password if not using OTP
-        role,
-        useOTP,
+        role
       });
+      
+      // Set authentication method
+      if (useOTP) {
+        user.enableOTPAuth();
+      } else {
+        // For non-OTP users, set password directly
+        user.password = password;
+        user.useOTP = false;
+      }
 
       // Save user to database
       await user.save();
@@ -370,6 +415,15 @@ router.post("/request-otp", async (req, res) => {
         message: "If your email is registered, you will receive an OTP",
       });
     }
+    
+    // Check if user can use OTP authentication
+    if (!user.canUseOTPAuth()) {
+      console.log(`OTP requested for user without OTP authentication: ${email}`);
+      // For security reasons, don't reveal that the user doesn't use OTP
+      return res.status(200).json({
+        message: "If your email is registered, you will receive an OTP",
+      });
+    }
 
     // Generate and save OTP
     console.log("Generating OTP for user:", email);
@@ -412,6 +466,12 @@ router.post("/verify-otp", async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
+    }
+    
+    // Check if user can use OTP authentication
+    if (!user.canUseOTPAuth()) {
+      console.log(`OTP verification attempted for user without OTP authentication: ${email}`);
+      return res.status(400).json({ message: "This account does not use OTP authentication" });
     }
 
     // Create a temporary token for password reset
@@ -460,12 +520,11 @@ router.post("/toggle-otp", protect, async (req, res) => {
         return res.status(400).json({ message: "New password is required" });
       }
 
-      // Set the new password
-      user.password = req.body.password;
-      
-      // Make sure OTP is disabled for password auth
-      if (user.useOTP) {
-        user.useOTP = false;
+      // Set the new password and disable OTP
+      try {
+        user.disableOTPAuth(req.body.password);
+      } catch (error) {
+        return res.status(400).json({ message: error.message });
       }
 
       await user.save();
@@ -476,24 +535,23 @@ router.post("/toggle-otp", protect, async (req, res) => {
       });
     } else {
       // Regular toggle OTP functionality
-      // Toggle useOTP flag
-      user.useOTP = !user.useOTP;
-
-      // If enabling OTP, clear password
-      if (user.useOTP) {
-        user.password = undefined;
-        // Generate and send OTP
-        await otpUtils.generateAndSaveOTP(user.email);
-      } else {
-        // If disabling OTP, require password
-        if (!req.body.password) {
-          return res
-            .status(400)
-            .json({ message: "Password is required when disabling OTP" });
+      try {
+        if (user.canUseOTPAuth()) {
+          // Currently using OTP, switch to password
+          if (!req.body.password) {
+            return res
+              .status(400)
+              .json({ message: "Password is required when disabling OTP" });
+          }
+          user.disableOTPAuth(req.body.password);
+        } else {
+          // Currently using password, switch to OTP
+          user.enableOTPAuth();
+          // Generate and send OTP
+          await otpUtils.generateAndSaveOTP(user.email);
         }
-
-        // Set password
-        user.password = req.body.password;
+      } catch (error) {
+        return res.status(400).json({ message: error.message });
       }
 
       await user.save();

@@ -84,8 +84,8 @@ export default function ForgotPassword() {
           },
         });
 
-        toast.success("Password reset successfully");
-        router.push("/login");
+        toast.success("Password reset successfully. You can now login with your new password.");
+        router.push("/login?resetSuccess=true");
       }
     } catch (error) {
       handleApiErrorWithToast(
