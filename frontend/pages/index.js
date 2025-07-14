@@ -81,8 +81,8 @@ export default function Home() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6, duration: 0.6 }}
                 >
-                  We provide comprehensive financial, tax, and advisory
-                  services to individuals and businesses of all sizes.
+                  "We provide comprehensive financial, tax, and advisory
+                  services to individuals and businesses of all sizes."
                 </motion.p>
                 <motion.div
                   className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start"
@@ -160,8 +160,8 @@ export default function Home() {
               Comprehensive Financial Solutions
             </p>
             <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
-              We offer a wide range of financial services
-              tailored to meet your specific needs.
+              We offer a wide range of financial services tailored to meet your
+              specific needs.
             </p>
           </motion.div>
 
@@ -320,9 +320,9 @@ export default function Home() {
                 Why Choose <span className="text-primary-600">US</span>
               </h2>
               <p className="text-lg text-gray-500 mb-6 leading-relaxed">
-                With over 15 years of experience, our team of certified
-                financial advisors provides personalized financial solutions that help
-                you achieve your goals.
+                With over 5 years of experience, our team of certified financial
+                advisors provides personalized financial solutions that help you
+                achieve your goals.
               </p>
 
               <div className="space-y-4">

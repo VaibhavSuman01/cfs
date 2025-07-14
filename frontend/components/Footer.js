@@ -39,7 +39,7 @@ export default function Footer() {
             >
               Professional financial services for individuals and businesses.
             </motion.p>
-            <motion.div
+            {/* <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
@@ -102,7 +102,7 @@ export default function Footer() {
                   />
                 </svg>
               </motion.a>
-            </motion.div>
+            </motion.div> */}
           </div>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -278,7 +278,7 @@ export default function Footer() {
                     transition={{ delay: 0.4, duration: 0.5 }}
                     className="text-sm text-gray-500"
                   >
-                    211, NARAYAN PLAZA
+                    H.O. 211, NP
                     <br />
                     EXHIBITION ROAD
                     <br />
@@ -292,10 +292,25 @@ export default function Footer() {
                       transition={{ delay: 0.5, duration: 0.5 }}
                     >
                       <a
-                        href="tel:+91 9525239747"
+                        href="tel:+91 92631 23455"
                         className="text-sm text-gray-500 hover:text-primary-600 transition-colors duration-200"
                       >
-                        +91 95252 39747
+                        Mobile: +91 9263-123455
+                      </a>
+                    </motion.div>
+                  </li>
+                  <li>
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.5, duration: 0.5 }}
+                    >
+                      <a
+                        href="tel:0612 4535607"
+                        className="text-sm text-gray-500 hover:text-primary-600 transition-colors duration-200"
+                      >
+                        Landline: 0612-4535607
                       </a>
                     </motion.div>
                   </li>
@@ -307,10 +322,10 @@ export default function Footer() {
                       transition={{ delay: 0.6, duration: 0.5 }}
                     >
                       <a
-                        href="mailto:krishoberoi1@gmail.com"
+                        href="mailto:info@comfinserv.co"
                         className="text-sm text-gray-500 hover:text-primary-600 transition-colors duration-200"
                       >
-                        krishoberoi1@gmail.com
+                        info@comfinserv.co
                       </a>
                     </motion.div>
                   </li>
@@ -370,16 +385,6 @@ export default function Footer() {
         >
           <p className="text-sm text-gray-400 text-center">
             &copy; {currentYear} Com Financial Services. All rights reserved.
-          </p>
-          <p className="text-sm text-gray-400 text-center">
-            Create by
-            <a
-              href="https://www.linkedin.com/in/vaibhav-suman/"
-              target="_blank"
-              className="px-1 text-gray-800 hover:underline"
-            >
-              Vaibhav Suman
-            </a>
           </p>
         </motion.div>
       </div>
