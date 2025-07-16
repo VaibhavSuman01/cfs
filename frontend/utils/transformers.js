@@ -35,6 +35,7 @@ export const transformDashboardStats = (apiResponse) => {
     taxFormsReviewed: apiResponse.taxForms?.reviewed || 0,
     taxFormsFiled: apiResponse.taxForms?.filed || 0,
     contactMessages: apiResponse.contacts || 0,
+    totalUsers: apiResponse.users || 0,
     recentForms: apiResponse.recent || [],
   };
 };
@@ -44,6 +45,20 @@ export const transformDashboardStats = (apiResponse) => {
  * @param {Object} apiResponse - The raw API response with pagination
  * @returns {Object} Standardized pagination object
  */
+/**
+ * Transforms users data from API response to frontend format
+ * @param {Object} apiResponse - The raw API response
+ * @returns {Object} Transformed users data for frontend display
+ */
+export const transformUsersData = (apiResponse) => {
+  if (!apiResponse) return { users: [], pagination: { currentPage: 1, totalPages: 1 } };
+
+  return {
+    users: apiResponse.users || [],
+    pagination: transformPagination(apiResponse),
+  };
+};
+
 export const transformPagination = (apiResponse) => {
   if (!apiResponse?.pagination) return { currentPage: 1, totalPages: 1 };
 

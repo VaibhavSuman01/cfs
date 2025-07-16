@@ -22,6 +22,8 @@ export const API_PATHS = {
     FORM_STATUS: (id) => `/api/admin/forms/${id}/status`,
     CONTACTS: "/api/admin/contacts",
     STATS: "/api/admin/stats",
+    USERS: "/api/admin/users",
+    USERS_DOWNLOAD: "/api/admin/users/download",
   },
   FORMS: {
     TAX: "/api/forms/tax",

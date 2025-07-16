@@ -97,6 +97,74 @@ export const apiRequest = async (
 // Export the client and API paths
 export { httpClient, API_PATHS };
 
+/**
+ * Downloads a file from the given URL
+ * @param {string} url - The URL to download from
+ * @param {string} filename - The filename to save as
+ */
+export const downloadFile = (url, filename) => {
+  // Create a link element
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename || "download";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+/**
+ * Downloads a file with authentication
+ * @param {string} url - The URL to download from
+ * @param {string} filename - The filename to save as
+ */
+export const downloadFileWithAuth = async (url, filename) => {
+  try {
+    // Get the token from localStorage
+    const token = localStorage.getItem("token");
+    
+    if (!token) {
+      console.error("Authentication token not found");
+      return;
+    }
+    
+    // Create a fetch request with the authorization header and prepend the base URL
+    const baseUrl = getConfig("api.baseUrl");
+    const fullUrl = `${baseUrl}${url}`;
+    console.log("Downloading from URL:", fullUrl);
+    
+    const response = await fetch(fullUrl, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    
+    if (!response.ok) {
+      const errorMessage = `Download failed: ${response.status} ${response.statusText}`;
+      console.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+    
+    // Get the blob from the response
+    const blob = await response.blob();
+    
+    // Create a download link
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = filename || `download-${new Date().toISOString().split('T')[0]}`;
+    
+    // Append to the document, click it, and clean up
+    document.body.appendChild(link);
+    link.click();
+    window.URL.revokeObjectURL(downloadUrl);
+    document.body.removeChild(link);
+    return true; // Return success
+  } catch (error) {
+    console.error("Error downloading file:", error);
+    throw error; // Re-throw to allow caller to handle the error
+  }
+};
+
 // Export convenience methods
 export default {
   get: (url, config) => httpClient.get(url, config),
@@ -104,4 +172,6 @@ export default {
   put: (url, data, config) => httpClient.put(url, data, config),
   delete: (url, config) => httpClient.delete(url, config),
   apiRequest,
+  downloadFile,
+  downloadFileWithAuth
 };

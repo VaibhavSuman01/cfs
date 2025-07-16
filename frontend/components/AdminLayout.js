@@ -8,6 +8,7 @@ import {
   DocumentTextIcon,
   ChatBubbleLeftRightIcon,
   UserIcon,
+  UserGroupIcon,
   ArrowLeftOnRectangleIcon,
   Bars3Icon,
   XMarkIcon,
@@ -21,6 +22,7 @@ const navigation = [
     href: "/admin/contact-messages",
     icon: ChatBubbleLeftRightIcon,
   },
+  { name: "Users", href: "/admin/users", icon: UserGroupIcon },
   { name: "Profile", href: "/admin/profile", icon: UserIcon },
 ];
 
