@@ -95,13 +95,21 @@ const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
 // Document types mapping
 const DOCUMENT_TYPES = [
-  { value: "form16", label: "Form 16" },
-  { value: "bankStatement", label: "Bank Statements" },
+  { value: "form16", label: "Form 16 A/B" },
+  {
+    value: "bankStatement",
+    label: "Bank Statements(From 01/04/2024 to 31.03/2025)",
+  },
   { value: "investmentProof", label: "Investment Proof (FY 2024-25)" },
   { value: "salarySlip", label: "Salary Slip (March 2025)" },
   { value: "aadharCard", label: "AADHAR Card (Both Sides)" },
+  { value: "panCard", label: "PAN Card" },
   { value: "homeLoanCertificate", label: "Home Loan Certificate" },
-  { value: "tradingSummary", label: "Trading Summary" },
+  {
+    value: "tradingSummary",
+    label:
+      "Trading Summary/ PL Account of DEMAT Documents (from 01-04-2024 to 31-03-2025)",
+  },
   { value: "other", label: "Other Documents" },
 ];
 
@@ -278,7 +286,7 @@ function TaxFilingForm(): React.ReactElement {
         </div>
         <div className="mb-5 text-center">
           <h2 className="text-3xl md:text-3xl font-extrabold text-purple-900 mb-2">
-            Filing For A.Y 2025
+            Filing For A.Y 2025 - 2026
           </h2>
         </div>
 
@@ -464,7 +472,7 @@ function TaxFilingForm(): React.ReactElement {
                                 Income Tax Login Password
                               </label>
                               <Field
-                                type="password"
+                                type="text"
                                 name="incomeTaxLoginPassword"
                                 id="incomeTaxLoginPassword"
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
@@ -566,7 +574,7 @@ function TaxFilingForm(): React.ReactElement {
                                 htmlFor="homeLoanTotalInterest"
                                 className="block text-sm font-medium text-gray-700 mb-1"
                               >
-                                Total Interest Paid (FY 2023-24)
+                                Total Interest Paid (FY 2024-25)
                               </label>
                               <Field
                                 type="text"
@@ -598,7 +606,8 @@ function TaxFilingForm(): React.ReactElement {
                             htmlFor="hasTradingSummary"
                             className="ml-2 block text-sm font-medium text-gray-700"
                           >
-                            I have Trading/Investment Activities
+                            I have Trading summary / PL ACCOUNT of Demat account
+                            (if trading in stock from 01-04-2024 to 31-03-2025)
                           </label>
                         </div>
                       </div>

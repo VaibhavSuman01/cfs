@@ -21,47 +21,23 @@ router.post(
       .isLength({ min: 6, max: 6 }),
   ],
   async (req, res) => {
-    console.log("Login request received:", {
-      body: req.body,
-      headers: req.headers,
-    });
-
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log("Login validation errors:", errors.array());
       return res.status(400).json({ errors: errors.array() });
     }
 
     const { email, password, otp, role } = req.body;
-    console.log("Login credentials:", {
-      email,
-      hasPassword: !!password,
-      hasOtp: !!otp,
-      role,
-    });
 
     try {
       // See if user exists
       let user = await User.findOne({ email });
 
       if (!user) {
-        console.log("Login failed: User not found", { email });
         return res.status(400).json({ message: "Invalid credentials", code: "INVALID_LOGIN" });
       }
 
-      console.log("User found:", {
-        id: user._id,
-        email: user.email,
-        role: user.role,
-        useOTP: user.useOTP,
-      });
-
       // Check if the user has the required role
       if (role && user.role !== role) {
-        console.log("Login failed: Role mismatch", {
-          requestedRole: role,
-          userRole: user.role,
-        });
         return res.status(403).json({ message: "Access denied" });
       }
 
@@ -73,7 +49,6 @@ router.post(
         if (password && !otp) {
           // Check if the user has a password set
           if (!user.password) {
-            console.log("Login failed: Password provided for OTP-only account with no password set");
             return res.status(400).json({
               message: "This account uses OTP authentication. Please request an OTP.",
               authMethod: "otp",
@@ -88,10 +63,8 @@ router.post(
             // Password is valid, update user to disable OTP authentication
             user.useOTP = false;
             await user.save();
-            console.log("Automatically disabled OTP for user with valid password");
             isAuthenticated = true;
           } else {
-            console.log("Login failed: Password provided for OTP account");
             return res.status(400).json({
               message:
                 "This account uses OTP authentication. Please request an OTP.",
@@ -125,7 +98,6 @@ router.post(
         }
         // If user is using password but OTP was provided
         if (otp && !password) {
-          console.log("Login failed: OTP provided for password account");
           return res.status(400).json({
             message:
               "This account uses password authentication. Please provide your password.",
@@ -136,7 +108,6 @@ router.post(
 
         // Check if user has a password set
         if (!user.password) {
-          console.log("Login failed: User has no password set");
           return res.status(400).json({ 
             message: "This account has no password set. Please contact support.", 
             code: "NO_PASSWORD_SET" 
@@ -146,12 +117,10 @@ router.post(
         // Check password
         if (password) {
           isAuthenticated = await user.comparePassword(password);
-          console.log("Password verification result:", { isAuthenticated });
           if (!isAuthenticated) {
             return res.status(400).json({ message: "Invalid credentials", code: "INVALID_PASSWORD" });
           }
         } else {
-          console.log("Login failed: Password required but not provided");
           return res.status(400).json({ message: "Password is required" });
         }
       }
@@ -170,16 +139,18 @@ router.post(
         { expiresIn: "5 days" },
         (err, token) => {
           if (err) {
-            console.error("JWT sign error:", err);
             throw err;
           }
-          console.log("Login successful, token generated");
           res.json({
             token,
             user: {
               id: user.id,
               name: user.name,
               email: user.email,
+              pan: user.pan,
+              dob: user.dob,
+              mobile: user.mobile,
+              aadhaar: user.aadhaar,
               role: user.role,
               useOTP: user.useOTP,
             },
@@ -187,7 +158,6 @@ router.post(
         }
       );
     } catch (err) {
-      console.error("Login server error:", err);
       res.status(500).send("Server error");
     }
   }
@@ -198,13 +168,20 @@ router.post(
 // @access  Private
 router.get("/me", protect, async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select("-password");
+    // Use findOne instead of findById to ensure we get the latest data
+    // and add a timestamp to prevent caching
+    const user = await User.findOne(
+      { _id: req.user._id },
+      "-password"
+    ).lean();
+    
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+    
+    // Return complete user object with all fields
     res.json(user);
   } catch (error) {
-    console.error("Get user error:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -214,14 +191,21 @@ router.get("/me", protect, async (req, res) => {
 // @access  Private
 router.put("/profile", protect, async (req, res) => {
   try {
-    const { name, email, pan, mobile } = req.body;
+    const { name, email, pan, dob, mobile, aadhaar, fatherName, address } = req.body;
 
     // Build profile object
     const profileFields = {};
     if (name) profileFields.name = name;
     if (email) profileFields.email = email;
-    if (pan) profileFields.pan = pan;
-    if (mobile) profileFields.mobile = mobile;
+    
+    // Always set these fields even if they're empty strings or null
+    // This ensures they're always updated
+    profileFields.pan = pan;
+    profileFields.dob = dob;
+    profileFields.mobile = mobile;
+    profileFields.aadhaar = aadhaar;
+    profileFields.fatherName = fatherName;
+    profileFields.address = address;
 
     // Check if email is already in use by another user
     if (email) {
@@ -239,7 +223,7 @@ router.put("/profile", protect, async (req, res) => {
       req.user._id,
       { $set: profileFields },
       { new: true }
-    ).select("-password");
+    ).lean();
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -247,7 +231,8 @@ router.put("/profile", protect, async (req, res) => {
 
     res.json(user);
   } catch (error) {
-    console.error("Error in update profile:", error.message);
+    // Log error but don't expose details to client
+    console.error("Error in update profile");
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -291,7 +276,6 @@ router.put("/password", protect, async (req, res) => {
 
     res.json({ message: "Password updated successfully" });
   } catch (error) {
-    console.error("Error in update password:", error.message);
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -304,6 +288,18 @@ router.post(
   [
     check("name", "Name is required").not().isEmpty(),
     check("email", "Please include a valid email").isEmail(),
+    check("panCardNo", "PAN Card Number is required")
+      .not().isEmpty()
+      .matches(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "Invalid PAN Card format"),
+    check("dob", "Date of Birth is required")
+      .not().isEmpty()
+      .isISO8601().withMessage("Invalid date format"),
+    check("mobile", "Mobile number is required")
+      .not().isEmpty()
+      .matches(/^[6-9]\d{9}$/, "Invalid mobile number format"),
+    check("aadhaarNo", "Aadhaar number is required")
+      .not().isEmpty()
+      .matches(/^\d{12}$/, "Aadhaar number must be 12 digits"),
     check("password", "Please enter a password with 6 or more characters")
       .optional({ checkFalsy: true }) // Password is optional if using OTP
       .isLength({ min: 6 }),
@@ -315,7 +311,7 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { name, email, password, role = "user", useOTP = false } = req.body;
+    const { name, email, password, panCardNo, dob, mobile, aadhaarNo, role = "user", useOTP = false } = req.body;
 
     try {
       // See if user exists
@@ -336,6 +332,10 @@ router.post(
       user = new User({
         name,
         email,
+        pan: panCardNo,
+        dob,
+        mobile,
+        aadhaar: aadhaarNo,
         role
       });
       
@@ -376,6 +376,10 @@ router.post(
               id: user.id,
               name: user.name,
               email: user.email,
+              pan: user.pan,
+              dob: user.dob,
+              mobile: user.mobile,
+              aadhaar: user.aadhaar,
               role: user.role,
               useOTP: user.useOTP,
             },
@@ -383,7 +387,6 @@ router.post(
         }
       );
     } catch (err) {
-      console.error(err.message);
       res.status(500).send("Server error");
     }
   }
@@ -393,24 +396,19 @@ router.post(
 // @desc    Request a new OTP for login
 // @access  Public
 router.post("/request-otp", async (req, res) => {
-  console.log("OTP request received for:", req.body);
   const { email } = req.body;
 
   if (!email) {
-    console.log("OTP request missing email");
     return res.status(400).json({ message: "Email is required" });
   }
 
   try {
-    console.log("Processing OTP request for email:", email);
     // Check if user exists
     const user = await User.findOne({ email });
-    console.log("User found:", !!user);
 
     // If user doesn't exist, return success anyway to prevent email enumeration
     if (!user) {
       // For security reasons, don't reveal that the user doesn't exist
-      console.log(`OTP requested for non-existent user: ${email}`);
       return res.status(200).json({
         message: "If your email is registered, you will receive an OTP",
       });
@@ -418,7 +416,6 @@ router.post("/request-otp", async (req, res) => {
     
     // Check if user can use OTP authentication
     if (!user.canUseOTPAuth()) {
-      console.log(`OTP requested for user without OTP authentication: ${email}`);
       // For security reasons, don't reveal that the user doesn't use OTP
       return res.status(200).json({
         message: "If your email is registered, you will receive an OTP",
@@ -426,12 +423,9 @@ router.post("/request-otp", async (req, res) => {
     }
 
     // Generate and save OTP
-    console.log("Generating OTP for user:", email);
     try {
       await otpUtils.generateAndSaveOTP(email);
-      console.log("OTP generated and saved successfully for:", email);
     } catch (otpError) {
-      console.error("Error generating or saving OTP:", otpError);
       return res.status(500).json({
         message: "Error processing your request. Please try again later.",
       });
@@ -439,7 +433,6 @@ router.post("/request-otp", async (req, res) => {
 
     res.status(200).json({ message: "OTP sent successfully" });
   } catch (error) {
-    console.error("Request OTP error:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -470,7 +463,6 @@ router.post("/verify-otp", async (req, res) => {
     
     // Check if user can use OTP authentication
     if (!user.canUseOTPAuth()) {
-      console.log(`OTP verification attempted for user without OTP authentication: ${email}`);
       return res.status(400).json({ message: "This account does not use OTP authentication" });
     }
 
@@ -494,7 +486,6 @@ router.post("/verify-otp", async (req, res) => {
       tempToken
     });
   } catch (error) {
-    console.error("Verify OTP error:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -564,7 +555,6 @@ router.post("/toggle-otp", protect, async (req, res) => {
       });
     }
   } catch (error) {
-    console.error("Toggle OTP error:", error);
     res.status(500).json({ message: "Server error" });
   }
 });

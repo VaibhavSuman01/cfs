@@ -39,7 +39,22 @@ const UserSchema = new mongoose.Schema(
       trim: true,
       uppercase: true,
     },
+    dob: {
+      type: Date,
+    },
     mobile: {
+      type: String,
+      trim: true,
+    },
+    aadhaar: {
+      type: String,
+      trim: true,
+    },
+    fatherName: {
+      type: String,
+      trim: true,
+    },
+    address: {
       type: String,
       trim: true,
     },

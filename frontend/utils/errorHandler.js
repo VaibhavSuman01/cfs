@@ -12,16 +12,10 @@ import toast from "react-hot-toast";
  * @returns {string} The error message to display
  */
 export const handleApiError = (error, defaultMessage = "An error occurred") => {
-  // Log detailed error information
-  console.error(`API Error Details:`, {
-    message: error.message,
-    status: error.response?.status,
-    statusText: error.response?.statusText,
-    data: error.response?.data,
-    url: error.config?.url,
-    method: error.config?.method,
-    headers: error.config?.headers,
-  });
+  // Only log errors in development environment
+  if (process.env.NODE_ENV === 'development') {
+    console.error(`API Error: ${error.message}`);
+  }
 
   // Extract the most useful error message
   let message = defaultMessage;

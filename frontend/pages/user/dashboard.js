@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import toast from "react-hot-toast";
 import Layout from "../../components/Layout";
 import { withAuth } from "../../utils/auth";
 import httpClient, { API_PATHS } from "../../utils/httpClient";
@@ -17,9 +16,15 @@ function UserDashboard() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await httpClient.get(API_PATHS.AUTH.ME);
+        // Add a timestamp to prevent caching
+        const timestamp = new Date().getTime();
+        const response = await httpClient.get(
+          `${API_PATHS.AUTH.ME}?_=${timestamp}`
+        );
         setUser(response.data);
+        // Toast removed to prevent showing on every page reload
       } catch (error) {
+        console.error("Error fetching user data:", error);
         handleApiErrorWithToast(error, "Failed to load user data");
         setError("Failed to load user data. Please try again.");
       } finally {
@@ -28,7 +33,7 @@ function UserDashboard() {
     };
 
     fetchUserData();
-    
+
     // This ensures user data is refreshed when returning from profile page
   }, [router.asPath]);
 
@@ -92,7 +97,9 @@ function UserDashboard() {
                     PAN Number
                   </dt>
                   <dd className="mt-1 text-sm text-gray-900">
-                    {user?.pan ? user.pan : (
+                    {user?.pan ? (
+                      user.pan
+                    ) : (
                       <span className="text-gray-400 italic">Not provided</span>
                     )}
                   </dd>
@@ -102,7 +109,57 @@ function UserDashboard() {
                     Mobile Number
                   </dt>
                   <dd className="mt-1 text-sm text-gray-900">
-                    {user?.mobile ? user.mobile : (
+                    {user?.mobile ? (
+                      user.mobile
+                    ) : (
+                      <span className="text-gray-400 italic">Not provided</span>
+                    )}
+                  </dd>
+                </div>
+                <div className="sm:col-span-1">
+                  <dt className="text-sm font-medium text-gray-500">
+                    Aadhaar Number
+                  </dt>
+                  <dd className="mt-1 text-sm text-gray-900">
+                    {user?.aadhaar ? (
+                      user.aadhaar
+                    ) : (
+                      <span className="text-gray-400 italic">Not provided</span>
+                    )}
+                  </dd>
+                </div>
+                <div className="sm:col-span-1">
+                  <dt className="text-sm font-medium text-gray-500">
+                    Date of Birth
+                  </dt>
+                  <dd className="mt-1 text-sm text-gray-900">
+                    {user?.dob ? (
+                      new Date(user.dob).toLocaleDateString()
+                    ) : (
+                      <span className="text-gray-400 italic">Not provided</span>
+                    )}
+                  </dd>
+                </div>
+                <div className="sm:col-span-1">
+                  <dt className="text-sm font-medium text-gray-500">
+                    Father Name
+                  </dt>
+                  <dd className="mt-1 text-sm text-gray-900">
+                    {user?.fatherName ? (
+                      user.fatherName
+                    ) : (
+                      <span className="text-gray-400 italic">Not provided</span>
+                    )}
+                  </dd>
+                </div>
+                <div className="sm:col-span-2">
+                  <dt className="text-sm font-medium text-gray-500">
+                    Full Address
+                  </dt>
+                  <dd className="mt-1 text-sm text-gray-900">
+                    {user?.address ? (
+                      user.address
+                    ) : (
                       <span className="text-gray-400 italic">Not provided</span>
                     )}
                   </dd>
