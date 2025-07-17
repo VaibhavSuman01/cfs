@@ -27,6 +27,12 @@ httpClient.interceptors.request.use(
         config.headers.Authorization = `Bearer ${token}`;
       }
     }
+    
+    // Don't override Content-Type for FormData (multipart/form-data) requests
+    // Let the browser set the correct boundary parameter automatically
+    if (config.data instanceof FormData) {
+      delete config.headers["Content-Type"];
+    }
 
     // Only log in development environment
     if (process.env.NODE_ENV === 'development') {

@@ -238,9 +238,26 @@ function TaxFilingForm(): React.ReactElement {
       files.forEach((file, index) => {
         formData.append(`documents`, file);
         formData.append(`fileId_${index}`, `file_${index}`);
+        
+        // Get the document type from the data attribute of the select element
+        let documentType = "other";
+        const fileElement = document.getElementById(`file-${index}`);
+        if (fileElement && fileElement.dataset.documentType) {
+          documentType = fileElement.dataset.documentType;
+        } else {
+          // Fallback to default document types based on index
+          if (index === 0) documentType = "form16";
+          else if (index === 1) documentType = "bankStatement";
+          else if (index === 2) documentType = "investmentProof";
+          else if (index === 3) documentType = "salarySlip";
+          else if (index === 4) documentType = "aadharCard";
+          else if (index === 5) documentType = "homeLoanCertificate";
+          else if (index === 6) documentType = "tradingSummary";
+        }
+        
         formData.append(
           `documentType_file_${index}`,
-          "other" // Set default document type to "other" since dropdown was removed
+          documentType
         );
       });
 
@@ -746,6 +763,30 @@ function TaxFilingForm(): React.ReactElement {
                                     </span>
                                   </div>
                                   <div className="ml-4 flex-shrink-0 flex items-center space-x-4">
+                                    <select
+                                      className="text-xs border-gray-300 rounded-md"
+                                      onChange={(e) => {
+                                        // Store the selected document type in a data attribute
+                                        const fileElement = document.getElementById(`file-${index}`);
+                                        if (fileElement) {
+                                          fileElement.dataset.documentType = e.target.value;
+                                        }
+                                      }}
+                                      id={`file-${index}`}
+                                      defaultValue={index === 0 ? "form16" : 
+                                                  index === 1 ? "bankStatement" : 
+                                                  index === 2 ? "investmentProof" : 
+                                                  index === 3 ? "salarySlip" : 
+                                                  index === 4 ? "aadharCard" : 
+                                                  index === 5 ? "homeLoanCertificate" : 
+                                                  index === 6 ? "tradingSummary" : "other"}
+                                    >
+                                      {DOCUMENT_TYPES.map((docType) => (
+                                        <option key={docType.value} value={docType.value}>
+                                          {docType.label}
+                                        </option>
+                                      ))}
+                                    </select>
                                     <span className="text-xs text-gray-500">
                                       {formatFileSize(file.size)}
                                     </span>

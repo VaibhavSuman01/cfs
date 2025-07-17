@@ -30,6 +30,8 @@ export const API_PATHS = {
     CONTACT: "/api/forms/contact",
     USER_SUBMISSIONS: "/api/forms/user-submissions",
     USER_SUBMISSION_DETAIL: (id) => `/api/forms/user-submissions/${id}`,
+    DELETE_DOCUMENT: (documentId) => `/api/forms/document/${documentId}`,
+    UPLOAD_DOCUMENT: (formId) => `/api/forms/document/${formId}`,
   },
 };
 

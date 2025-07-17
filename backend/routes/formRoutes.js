@@ -237,8 +237,20 @@ router.get("/user-submissions/:id", protect, async (req, res) => {
     if (submission.email !== req.user.email) {
       return res.status(403).json({ message: "Not authorized to view this submission" });
     }
+    
+    // Process documents by document type for easier frontend access
+    const processedSubmission = submission.toObject();
+    
+    // Create document objects by type for easier frontend access
+    if (processedSubmission.documents && processedSubmission.documents.length > 0) {
+      processedSubmission.documents.forEach(doc => {
+        // Add each document directly to the submission object by its type
+        // This makes it accessible as submission.form16, submission.bankStatement, etc.
+        processedSubmission[doc.documentType] = doc;
+      });
+    }
 
-    res.json(submission);
+    res.json(processedSubmission);
   } catch (error) {
     console.error("Error fetching submission details:", error);
     res.status(500).json({ message: "Server error" });
@@ -298,6 +310,126 @@ router.get("/download/:documentId", protect, async (req, res) => {
     
   } catch (error) {
     console.error("Error downloading document:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// @route   DELETE /api/forms/document/:documentId
+// @desc    Delete a document from a tax form submission
+// @access  Private
+router.delete("/document/:documentId", protect, async (req, res) => {
+  try {
+    const documentId = req.params.documentId;
+    
+    if (!isValidObjectId(documentId)) {
+      return res.status(400).json({ 
+        message: "Invalid document ID format. Must be a 24-character hex string." 
+      });
+    }
+    
+    // Find the tax form containing the document
+    const taxForm = await TaxForm.findOne({ "documents._id": documentId });
+    
+    if (!taxForm) {
+      return res.status(404).json({ message: "Document not found" });
+    }
+    
+    // Check if the tax form belongs to the logged-in user
+    if (taxForm.email !== req.user.email && req.user.role !== "admin") {
+      return res.status(403).json({ message: "Not authorized to delete this document" });
+    }
+    
+    // Find the document index and type before removing it
+    const documentIndex = taxForm.documents.findIndex(doc => doc._id.toString() === documentId);
+    
+    if (documentIndex === -1) {
+      return res.status(404).json({ message: "Document not found" });
+    }
+    
+    const documentType = taxForm.documents[documentIndex].documentType;
+    
+    // Remove the document from the array
+    taxForm.documents.splice(documentIndex, 1);
+    
+    // Save the updated tax form
+    await taxForm.save();
+    
+    res.json({ 
+      success: true, 
+      message: "Document deleted successfully",
+      documentType: documentType
+    });
+    
+  } catch (error) {
+    console.error("Error deleting document:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// @route   POST /api/forms/document/:formId
+// @desc    Upload a new document to an existing tax form submission
+// @access  Private
+router.post("/document/:formId", protect, upload.single("document"), handleMulterError, async (req, res) => {
+  try {
+    const formId = req.params.formId;
+    const { documentType } = req.body;
+    
+    if (!isValidObjectId(formId)) {
+      return res.status(400).json({ 
+        message: "Invalid form ID format. Must be a 24-character hex string." 
+      });
+    }
+    
+    // Find the tax form
+    const taxForm = await TaxForm.findById(formId);
+    
+    if (!taxForm) {
+      return res.status(404).json({ message: "Tax form not found" });
+    }
+    
+    // Check if the tax form belongs to the logged-in user
+    if (taxForm.email !== req.user.email && req.user.role !== "admin") {
+      return res.status(403).json({ message: "Not authorized to update this form" });
+    }
+    
+    // Check if file was uploaded
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+    
+    // Create new document object
+    const newDocument = {
+      documentType: documentType || "other",
+      fileName: Date.now() + "-" + Math.round(Math.random() * 1e9) + path.extname(req.file.originalname),
+      originalName: req.file.originalname,
+      fileType: req.file.mimetype,
+      fileSize: req.file.size,
+      fileData: req.file.buffer,
+      contentType: req.file.mimetype
+    };
+    
+    // Add the new document to the documents array
+    taxForm.documents.push(newDocument);
+    
+    // Save the updated tax form
+    await taxForm.save();
+    
+    // Return the new document without the file data
+    const responseDocument = {
+      _id: taxForm.documents[taxForm.documents.length - 1]._id,
+      documentType: newDocument.documentType,
+      originalName: newDocument.originalName,
+      fileSize: newDocument.fileSize
+    };
+    
+    res.status(201).json({
+      success: true,
+      message: "Document uploaded successfully",
+      document: responseDocument
+    });
+    
+  } catch (error) {
+    console.error("Error uploading document:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
