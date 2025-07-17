@@ -30,7 +30,8 @@ function SubmissionDetail() {
   useEffect(() => {
     // Fetch submission details
     const fetchSubmission = async () => {
-      if (!id) return;
+      // Only proceed if router is ready and id exists
+      if (!router.isReady || !id) return;
 
       try {
         setLoading(true);
@@ -47,7 +48,7 @@ function SubmissionDetail() {
     };
 
     fetchSubmission();
-  }, [id]);
+  }, [router.isReady, id]);
 
   // Helper function to get status badge
   const getStatusBadge = (status) => {

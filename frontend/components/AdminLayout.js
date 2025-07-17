@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { Fragment, useState, useEffect, memo } from "react";
+import { Dialog, Transition } from "@headlessui/react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { logout } from "../utils/auth";
-import RunningBanner from "./RunningBanner";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   HomeIcon,
   DocumentTextIcon,
@@ -13,6 +13,9 @@ import {
   Bars3Icon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
+import { removeAuthToken } from "../utils/auth";
+import RunningBanner from "./RunningBanner";
+import { prefetchNextLikelyRoutes } from "../utils/prefetchData";
 
 const navigation = [
   { name: "Dashboard", href: "/admin/dashboard", icon: HomeIcon },
@@ -26,7 +29,33 @@ const navigation = [
   { name: "Profile", href: "/admin/profile", icon: UserIcon },
 ];
 
-export default function AdminLayout({ children }) {
+// Memoized NavLink component to prevent unnecessary re-renders
+const NavLink = memo(({ item, isMobile }) => {
+  const router = useRouter();
+  const isActive = router.pathname === item.href;
+  const baseClasses = `group flex items-center px-2 py-2 font-medium rounded-md ${
+    isActive
+      ? "bg-primary-800 text-white"
+      : "text-primary-100 hover:bg-primary-600 hover:text-white"
+  }`;
+  
+  return (
+    <Link
+      href={item.href}
+      className={`${baseClasses} ${isMobile ? 'text-base' : 'text-sm'}`}
+    >
+      <item.icon
+        className={`${isMobile ? 'mr-4' : 'mr-3'} h-6 w-6 ${
+          isActive ? "text-primary-300" : "text-primary-300"
+        }`}
+        aria-hidden="true"
+      />
+      {item.name}
+    </Link>
+  );
+});
+
+const AdminLayout = ({ children }) => {
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userName, setUserName] = useState("");
@@ -47,8 +76,13 @@ export default function AdminLayout({ children }) {
     }
   }, []);
 
+  // Prefetch data for likely next routes when the route changes
+  useEffect(() => {
+    prefetchNextLikelyRoutes(router.pathname);
+  }, [router.pathname]);
+
   const handleLogout = () => {
-    logout();
+    removeAuthToken();
     router.push("/admin/login");
   };
 
@@ -82,32 +116,7 @@ export default function AdminLayout({ children }) {
                 </div>
                 <nav className="mt-5 px-2 space-y-1">
                   {navigation.map((item) => (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className={`group flex items-center px-2 py-2 text-base font-medium rounded-md ${
-                        router.pathname === item.href
-                          ? "bg-primary-800 text-white"
-                          : "text-primary-100 hover:bg-primary-600 hover:text-white"
-                      }`}
-                      legacyBehavior
-                    >
-                      <a className={`group flex items-center px-2 py-2 text-base font-medium rounded-md ${
-                        router.pathname === item.href
-                          ? "bg-primary-800 text-white"
-                          : "text-primary-100 hover:bg-primary-600 hover:text-white"
-                      }`}>
-                        <item.icon
-                          className={`mr-4 h-6 w-6 ${
-                            router.pathname === item.href
-                              ? "text-primary-300"
-                              : "text-primary-300"
-                          }`}
-                          aria-hidden="true"
-                        />
-                        {item.name}
-                      </a>
-                    </Link>
+                    <NavLink key={item.name} item={item} isMobile={true} />
                   ))}
                   <button
                     onClick={handleLogout}
@@ -155,32 +164,7 @@ export default function AdminLayout({ children }) {
             </div>
             <nav className="mt-5 flex-1 px-2 space-y-1">
               {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
-                    router.pathname === item.href
-                      ? "bg-primary-800 text-white"
-                      : "text-primary-100 hover:bg-primary-600 hover:text-white"
-                  }`}
-                  legacyBehavior
-                >
-                  <a className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
-                    router.pathname === item.href
-                      ? "bg-primary-800 text-white"
-                      : "text-primary-100 hover:bg-primary-600 hover:text-white"
-                  }`}>
-                    <item.icon
-                      className={`mr-3 h-6 w-6 ${
-                        router.pathname === item.href
-                          ? "text-primary-300"
-                          : "text-primary-300"
-                      }`}
-                      aria-hidden="true"
-                    />
-                    {item.name}
-                  </a>
-                </Link>
+                <NavLink key={item.name} item={item} isMobile={false} />
               ))}
               <button
                   onClick={handleLogout}
@@ -227,10 +211,24 @@ export default function AdminLayout({ children }) {
             <Bars3Icon className="h-6 w-6" aria-hidden="true" />
           </button>
         </div>
-        <main className="flex-1 pb-10">{children}</main>
+        <main className="flex-1 pb-10">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={router.pathname}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
+        </main>
         {/* Import at the top of the file */}
         {typeof window !== "undefined" && <RunningBanner />}
       </div>
     </div>
   );
-}
+};
+
+export default AdminLayout;

@@ -6,6 +6,7 @@ const Contact = require("../models/Contact");
 const upload = require("../middleware/upload");
 const { handleMulterError } = require("../middleware/upload");
 const { protect } = require("../middleware/auth");
+const { isValidObjectId } = require("../utils/validation");
 
 // @route   POST /api/forms/tax
 // @desc    Submit tax filing form with documents
@@ -251,8 +252,24 @@ router.get("/download/:documentId", protect, async (req, res) => {
   try {
     const documentId = req.params.documentId;
     
+    // Find documents that match the document ID string
+    // This approach avoids ObjectId casting errors
+    let query;
+    
+    if (isValidObjectId(documentId)) {
+      // If it's a valid ObjectId, we can use it directly
+      query = { "documents._id": documentId };
+    } else {
+      // If it's not a valid ObjectId, we need to use string comparison
+      // This is a fallback and should be avoided in production
+      // by ensuring all document IDs are valid ObjectIds
+      return res.status(400).json({ 
+        message: "Invalid document ID format. Must be a 24-character hex string." 
+      });
+    }
+    
     // Find the tax form containing the document
-    const taxForm = await TaxForm.findOne({ "documents._id": documentId });
+    const taxForm = await TaxForm.findOne(query);
     
     if (!taxForm) {
       return res.status(404).json({ message: "Document not found" });

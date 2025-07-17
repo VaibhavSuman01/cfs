@@ -4,6 +4,7 @@ import Head from "next/head";
 import { useEffect } from "react";
 import { setAuthToken } from "../utils/auth";
 import { httpClient } from "../utils/httpClient";
+import { StorageMonitorProvider, AutoStorageManager } from "../components/StorageMonitorProvider";
 
 function MyApp({ Component, pageProps }) {
   useEffect(() => {
@@ -20,7 +21,7 @@ function MyApp({ Component, pageProps }) {
   }, []);
 
   return (
-    <>
+    <StorageMonitorProvider threshold={75} checkInterval={120000}>
       <Head>
         <title>Com Financial Services</title>
         <meta
@@ -32,9 +33,12 @@ function MyApp({ Component, pageProps }) {
       </Head>
 
       <Toaster position="top-right" />
+      
+      {/* Auto storage management to prevent quota errors */}
+      {typeof window !== "undefined" && <AutoStorageManager />}
 
       <Component {...pageProps} />
-    </>
+    </StorageMonitorProvider>
   );
 }
 

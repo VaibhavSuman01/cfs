@@ -26,12 +26,15 @@ export default function Login() {
   
   // Show success message if user has reset their password
   useEffect(() => {
+    // Only proceed if router is ready
+    if (!router.isReady) return;
+    
     if (resetSuccess === 'true') {
       toast.success('Your password has been reset. You can now login with your new password.');
       // Remove the query parameter to prevent showing the message again on refresh
       router.replace('/login', undefined, { shallow: true });
     }
-  }, [resetSuccess, router]);
+  }, [router.isReady, resetSuccess, router]);
 
   // Handle login form submission
   const handleSubmit = async (values, { setSubmitting, setErrors }) => {

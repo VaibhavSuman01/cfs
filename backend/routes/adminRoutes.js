@@ -7,6 +7,7 @@ const { protect, admin } = require("../middleware/auth");
 const path = require("path");
 const fs = require("fs");
 const ExcelJS = require("exceljs");
+const { isValidObjectId, validateObjectId } = require("../utils/validation");
 
 // Apply auth middleware to all admin routes
 router.use(protect);
@@ -72,9 +73,11 @@ router.get("/forms", async (req, res) => {
 // @route   GET /api/admin/forms/:id
 // @desc    Get single tax form submission
 // @access  Private/Admin
-router.get("/forms/:id", async (req, res) => {
+router.get("/forms/:id", validateObjectId(), async (req, res) => {
   try {
-    const form = await TaxForm.findById(req.params.id)
+    const id = req.params.id;
+    
+    const form = await TaxForm.findById(id)
       .select("-documents.fileData"); // Exclude file data to reduce payload size
 
     if (!form) {
@@ -91,16 +94,17 @@ router.get("/forms/:id", async (req, res) => {
 // @route   PUT /api/admin/forms/:id/status
 // @desc    Update form status
 // @access  Private/Admin
-router.put("/forms/:id/status", async (req, res) => {
+router.put("/forms/:id/status", validateObjectId(), async (req, res) => {
   try {
     const { status } = req.body;
+    const id = req.params.id;
 
     // Validate status
     if (!["Pending", "Reviewed", "Filed"].includes(status)) {
       return res.status(400).json({ message: "Invalid status" });
     }
 
-    const form = await TaxForm.findById(req.params.id);
+    const form = await TaxForm.findById(id);
 
     if (!form) {
       return res.status(404).json({ message: "Form not found" });
