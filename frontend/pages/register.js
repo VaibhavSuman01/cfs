@@ -16,6 +16,19 @@ const RegisterSchema = Yup.object().shape({
   email: Yup.string()
     .email("Invalid email address")
     .required("Email is required"),
+  panCardNo: Yup.string()
+    .required("PAN Card Number is required")
+    .matches(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "Invalid PAN Card format")
+    .uppercase(),
+  dob: Yup.date()
+    .required("Date of Birth is required")
+    .max(new Date(), "Date of Birth cannot be in the future"),
+  mobile: Yup.string()
+    .required("Mobile number is required")
+    .matches(/^[6-9]\d{9}$/, "Invalid mobile number format"),
+  aadhaarNo: Yup.string()
+    .required("Aadhaar number is required")
+    .matches(/^\d{12}$/, "Aadhaar number must be 12 digits"),
   password: Yup.string()
     .min(8, "Password must be at least 8 characters")
     .required("Password is required"),
@@ -35,6 +48,9 @@ export default function Register() {
       const payload = {
         name: values.name,
         email: values.email,
+        panCardNo: values.panCardNo,
+        dob: values.dob,
+        mobile: values.mobile,
         password: values.password,
         role: "user", // Specify user role
       };
@@ -49,6 +65,17 @@ export default function Register() {
         router.push("/user/dashboard");
       }
     } catch (error) {
+      // Check for network connection issues
+      if (!error.response) {
+        console.error("Network error:", error.message);
+        const networkErrorMessage = "Network connection error. Please check your internet connection and try again. If the problem persists, the server might be temporarily unavailable.";
+        toast.error(networkErrorMessage);
+        setErrors({
+          auth: networkErrorMessage
+        });
+        return;
+      }
+      
       console.error("Registration API error:", {
         message: error.message,
         status: error.response?.status,
@@ -99,6 +126,9 @@ export default function Register() {
               initialValues={{
                 name: "",
                 email: "",
+                panCardNo: "",
+                dob: "",
+                mobile: "",
                 password: "",
                 confirmPassword: "",
               }}
@@ -164,6 +194,77 @@ export default function Register() {
                       />
                     </div>
                   </div>
+
+                  <div>
+                    <label
+                      htmlFor="panCardNo"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      PAN Card Number
+                    </label>
+                    <div className="mt-1">
+                      <Field
+                        id="panCardNo"
+                        name="panCardNo"
+                        type="text"
+                        autoComplete="off"
+                        placeholder="ABCDE1234F"
+                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                      />
+                      <ErrorMessage
+                        name="panCardNo"
+                        component="div"
+                        className="mt-1 text-sm text-red-600"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="dob"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Date of Birth
+                    </label>
+                    <div className="mt-1">
+                      <Field
+                        id="dob"
+                        name="dob"
+                        type="date"
+                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                      />
+                      <ErrorMessage
+                        name="dob"
+                        component="div"
+                        className="mt-1 text-sm text-red-600"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="mobile"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Mobile Number
+                    </label>
+                    <div className="mt-1">
+                      <Field
+                        id="mobile"
+                        name="mobile"
+                        type="tel"
+                        placeholder="10-digit mobile number"
+                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                      />
+                      <ErrorMessage
+                        name="mobile"
+                        component="div"
+                        className="mt-1 text-sm text-red-600"
+                      />
+                    </div>
+                  </div>
+
+
 
                   <div>
                     <label

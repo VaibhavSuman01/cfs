@@ -27,8 +27,16 @@ function TaxForms() {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [status, setStatus] = useState(initialStatus || "");
-  const [search, setSearch] = useState(initialSearch || "");
+  const [status, setStatus] = useState("");
+  const [search, setSearch] = useState("");
+  
+  // Update filters when router is ready
+  useEffect(() => {
+    if (router.isReady) {
+      if (initialStatus) setStatus(initialStatus);
+      if (initialSearch) setSearch(initialSearch);
+    }
+  }, [router.isReady, initialStatus, initialSearch]);
 
   // Fetch tax forms with filters
   useEffect(() => {

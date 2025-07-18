@@ -12,22 +12,20 @@ import toast from "react-hot-toast";
  * @returns {string} The error message to display
  */
 export const handleApiError = (error, defaultMessage = "An error occurred") => {
-  // Log detailed error information
-  console.error(`API Error Details:`, {
-    message: error.message,
-    status: error.response?.status,
-    statusText: error.response?.statusText,
-    data: error.response?.data,
-    url: error.config?.url,
-    method: error.config?.method,
-    headers: error.config?.headers,
-  });
+  // Only log errors in development environment
+  if (process.env.NODE_ENV === 'development') {
+    console.error(`API Error: ${error.message}`);
+  }
 
   // Extract the most useful error message
   let message = defaultMessage;
   
+  // Handle specific HTTP status codes
+  if (error.response?.status === 409) {
+    message = "This PAN number has already been used for a tax form submission. Each PAN can only be used once.";
+  }
   // First check for error codes, then fall back to message mapping
-  if (error.response?.data?.code) {
+  else if (error.response?.data?.code) {
     const errorCode = error.response.data.code;
     
     // Map of error codes to user-friendly messages
@@ -53,7 +51,8 @@ export const handleApiError = (error, defaultMessage = "An error occurred") => {
       "Invalid credentials": "The email or password you entered is incorrect. Please try again.",
       "User already exists": "An account with this email already exists. Please use a different email or sign in.",
       "Server error": "We're experiencing technical difficulties. Please try again later.",
-      "Email already in use": "This email is already registered. Please use a different email or sign in."
+      "Email already in use": "This email is already registered. Please use a different email or sign in.",
+      "A tax form with this PAN number has already been submitted. Duplicate submissions are not allowed.": "This PAN number has already been used for a tax form submission. Each PAN can only be used once."
     };
     
     message = errorMessageMap[serverMessage] || serverMessage;
@@ -62,7 +61,7 @@ export const handleApiError = (error, defaultMessage = "An error occurred") => {
   } else if (error.message && !error.message.includes("Network Error")) {
     message = error.message;
   } else if (error.message && error.message.includes("Network Error")) {
-    message = "Unable to connect to the server. Please check your internet connection and try again.";
+    message = "Unable to connect to the server. Please check your internet connection and try again. If the problem persists, the server might be temporarily unavailable.";
   }
 
   return message;

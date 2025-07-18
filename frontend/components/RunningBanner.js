@@ -36,7 +36,7 @@ export default function RunningBanner() {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 text-white py-2 overflow-hidden shadow-lg">
       <div className="flex items-center justify-center">
-        <div className="animate-marquee duration-100ms inline-block">
+        <div className="animate-marquee inline-block">
           <div className="flex items-center">
             <ExclamationTriangleIcon className="h-5 w-5 mr-2 text-amber-100" />
             <span className="font-medium">

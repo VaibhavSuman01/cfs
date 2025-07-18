@@ -32,7 +32,8 @@ function TaxFormDetail() {
   useEffect(() => {
     // Fetch tax form details
     const fetchTaxForm = async () => {
-      if (!id) return;
+      // Only proceed if router is ready and id exists
+      if (!router.isReady || !id) return;
 
       try {
         setLoading(true);
@@ -50,7 +51,7 @@ function TaxFormDetail() {
     };
 
     fetchTaxForm();
-  }, [id]);
+  }, [router.isReady, id]);
 
   // Format date
   const formatDate = (dateString) => {

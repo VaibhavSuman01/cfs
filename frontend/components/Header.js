@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { Disclosure } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon, UserIcon } from "@heroicons/react/24/outline";
-import { isAuthenticated, logout } from "../utils/auth";
+import { isAuthenticated, logout, getUser } from "../utils/auth";
 import { motion } from "framer-motion";
 
 const navigation = [
@@ -15,14 +15,37 @@ const navigation = [
 export default function Header() {
   const router = useRouter();
   const [authenticated, setAuthenticated] = useState(false);
+  const [userName, setUserName] = useState("");
+
+  // Get first name from full name
+  const getFirstName = (fullName) => {
+    if (!fullName) return "";
+    return fullName.split(" ")[0];
+  };
 
   useEffect(() => {
     // Check authentication status when component mounts
     setAuthenticated(isAuthenticated());
+    
+    // Get user's name if authenticated
+    if (isAuthenticated()) {
+      const user = getUser();
+      if (user && user.name) {
+        setUserName(getFirstName(user.name));
+      }
+    }
 
     // Listen for storage events (for when user logs in/out in another tab)
     const handleStorageChange = () => {
       setAuthenticated(isAuthenticated());
+      if (isAuthenticated()) {
+        const user = getUser();
+        if (user && user.name) {
+          setUserName(getFirstName(user.name));
+        }
+      } else {
+        setUserName("");
+      }
     };
 
     window.addEventListener("storage", handleStorageChange);
@@ -114,7 +137,7 @@ export default function Header() {
                         className="text-primary-600 hover:text-primary-700 transition-colors duration-200 flex items-center"
                       >
                         <UserIcon className="h-5 w-5 mr-1" />
-                        <span>Dashboard</span>
+                        <span>{userName ? `Hi ${userName}` : "Dashboard"}</span>
                       </Link>
                     </motion.div>
                     <motion.button
@@ -235,7 +258,7 @@ export default function Header() {
                       >
                         <span className="flex items-center">
                           <UserIcon className="h-5 w-5 mr-2" />
-                          Dashboard
+                          {userName ? `Hi ${userName}` : "Dashboard"}
                         </span>
                       </Link>
                     </motion.div>

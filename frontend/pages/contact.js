@@ -34,10 +34,15 @@ export default function Contact() {
       setSubmitSuccess(true);
       toast.success("Message sent successfully!");
     } catch (error) {
-      handleApiErrorWithToast(
-        error,
-        "Failed to send message. Please try again."
-      );
+      // Check for network connection issues
+      if (!error.response) {
+        toast.error("Network connection error. Please check your internet connection and try again. If the problem persists, the server might be temporarily unavailable.");
+      } else {
+        handleApiErrorWithToast(
+          error,
+          "Failed to send message. Please try again."
+        );
+      }
     } finally {
       setIsSubmitting(false);
     }

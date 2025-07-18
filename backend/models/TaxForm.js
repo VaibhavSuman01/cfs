@@ -43,6 +43,11 @@ const FileSchema = new mongoose.Schema({
 });
 
 const TaxFormSchema = new mongoose.Schema({
+  // Reference to the user who submitted this form
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  },
   fullName: {
     type: String,
     required: true,
@@ -64,6 +69,8 @@ const TaxFormSchema = new mongoose.Schema({
     required: true,
     trim: true,
     uppercase: true,
+    index: true, // Add index for faster queries
+    unique: true, // Ensure PAN numbers are unique across all tax forms
   },
   // Conditional fields
   hasIncomeTaxLogin: {

@@ -51,10 +51,15 @@ export default function ForgotPassword() {
         "If your email is registered, you will receive an OTP shortly"
       );
     } catch (error) {
-      handleApiErrorWithToast(
-        error,
-        "Failed to send OTP. Please try again."
-      );
+      // Check for network connection issues
+      if (!error.response) {
+        toast.error("Network connection error. Please check your internet connection and try again. If the problem persists, the server might be temporarily unavailable.");
+      } else {
+        handleApiErrorWithToast(
+          error,
+          "Failed to send OTP. Please try again."
+        );
+      }
     } finally {
       setSubmitting(false);
     }
@@ -88,10 +93,15 @@ export default function ForgotPassword() {
         router.push("/login?resetSuccess=true");
       }
     } catch (error) {
-      handleApiErrorWithToast(
-        error,
-        "Failed to reset password. Please verify your OTP and try again."
-      );
+      // Check for network connection issues
+      if (!error.response) {
+        toast.error("Network connection error. Please check your internet connection and try again. If the problem persists, the server might be temporarily unavailable.");
+      } else {
+        handleApiErrorWithToast(
+          error,
+          "Failed to reset password. Please verify your OTP and try again."
+        );
+      }
     } finally {
       setSubmitting(false);
     }

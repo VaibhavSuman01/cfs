@@ -27,18 +27,24 @@ httpClient.interceptors.request.use(
         config.headers.Authorization = `Bearer ${token}`;
       }
     }
+    
+    // Don't override Content-Type for FormData (multipart/form-data) requests
+    // Let the browser set the correct boundary parameter automatically
+    if (config.data instanceof FormData) {
+      delete config.headers["Content-Type"];
+    }
 
-    // Log request details
-    console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`, {
-      headers: config.headers,
-      data: config.data,
-      params: config.params,
-    });
+    // Only log in development environment
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
+    }
 
     return config;
   },
   (error) => {
-    console.error("API Request Error:", error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error("API Request Error:", error);
+    }
     return Promise.reject(error);
   }
 );
@@ -46,21 +52,18 @@ httpClient.interceptors.request.use(
 // Response interceptor for handling common errors
 httpClient.interceptors.response.use(
   (response) => {
-    // Log response details
-    console.log(`API Response: ${response.status} ${response.config.url}`, {
-      data: response.data,
-      headers: response.headers,
-    });
+    // Only log in development environment
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`API Response: ${response.status} ${response.config.url}`);
+    }
 
     return response;
   },
   (error) => {
-    // Log error details
-    console.error(`API Response Error: ${error.config?.url}`, {
-      message: error.message,
-      status: error.response?.status,
-      data: error.response?.data,
-    });
+    // Only log in development environment
+    if (process.env.NODE_ENV === 'development') {
+      console.error(`API Response Error: ${error.config?.url}`);
+    }
 
     // Handle 401 Unauthorized errors (token expired)
     if (error.response && error.response.status === 401) {
@@ -100,6 +103,74 @@ export const apiRequest = async (
 // Export the client and API paths
 export { httpClient, API_PATHS };
 
+/**
+ * Downloads a file from the given URL
+ * @param {string} url - The URL to download from
+ * @param {string} filename - The filename to save as
+ */
+export const downloadFile = (url, filename) => {
+  // Create a link element
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename || "download";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+/**
+ * Downloads a file with authentication
+ * @param {string} url - The URL to download from
+ * @param {string} filename - The filename to save as
+ */
+export const downloadFileWithAuth = async (url, filename) => {
+  try {
+    // Get the token from localStorage
+    const token = localStorage.getItem("token");
+    
+    if (!token) {
+      console.error("Authentication token not found");
+      return;
+    }
+    
+    // Create a fetch request with the authorization header and prepend the base URL
+    const baseUrl = getConfig("api.baseUrl");
+    const fullUrl = `${baseUrl}${url}`;
+    console.log("Downloading from URL:", fullUrl);
+    
+    const response = await fetch(fullUrl, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    
+    if (!response.ok) {
+      const errorMessage = `Download failed: ${response.status} ${response.statusText}`;
+      console.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+    
+    // Get the blob from the response
+    const blob = await response.blob();
+    
+    // Create a download link
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = filename || `download-${new Date().toISOString().split('T')[0]}`;
+    
+    // Append to the document, click it, and clean up
+    document.body.appendChild(link);
+    link.click();
+    window.URL.revokeObjectURL(downloadUrl);
+    document.body.removeChild(link);
+    return true; // Return success
+  } catch (error) {
+    console.error("Error downloading file:", error);
+    throw error; // Re-throw to allow caller to handle the error
+  }
+};
+
 // Export convenience methods
 export default {
   get: (url, config) => httpClient.get(url, config),
@@ -107,4 +178,6 @@ export default {
   put: (url, data, config) => httpClient.put(url, data, config),
   delete: (url, config) => httpClient.delete(url, config),
   apiRequest,
+  downloadFile,
+  downloadFileWithAuth
 };

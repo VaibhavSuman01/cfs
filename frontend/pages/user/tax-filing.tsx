@@ -10,6 +10,7 @@ import { httpClient, API_PATHS } from "../../utils/httpClient";
 import { handleApiErrorWithToast } from "../../utils/errorHandler";
 import LoadingButton from "../../components/LoadingButton";
 import { formatFileSize, isAllowedFileType } from "../../utils/fileUtils";
+import Link from "next/link";
 
 // Define types for form values
 interface TaxFilingFormValues {
@@ -28,6 +29,18 @@ interface TaxFilingFormValues {
   hasTradingSummary: boolean;
   hasPranNumber: boolean;
   pranNumber: string;
+}
+
+// Define user profile interface
+interface UserProfile {
+  name: string;
+  email: string;
+  pan?: string;
+  dob?: Date | string;
+  mobile?: string;
+  aadhaar?: string;
+  fatherName?: string;
+  address?: string;
 }
 
 // Define validation schema
@@ -95,13 +108,21 @@ const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
 // Document types mapping
 const DOCUMENT_TYPES = [
-  { value: "form16", label: "Form 16" },
-  { value: "bankStatement", label: "Bank Statements" },
+  { value: "form16", label: "Form 16 A/B" },
+  {
+    value: "bankStatement",
+    label: "Bank Statements(From 01/04/2024 to 31.03/2025)",
+  },
   { value: "investmentProof", label: "Investment Proof (FY 2024-25)" },
   { value: "salarySlip", label: "Salary Slip (March 2025)" },
   { value: "aadharCard", label: "AADHAR Card (Both Sides)" },
+  { value: "panCard", label: "PAN Card" },
   { value: "homeLoanCertificate", label: "Home Loan Certificate" },
-  { value: "tradingSummary", label: "Trading Summary" },
+  {
+    value: "tradingSummary",
+    label:
+      "Trading Summary/ PL Account of DEMAT Documents (from 01-04-2024 to 31-03-2025)",
+  },
   { value: "other", label: "Other Documents" },
 ];
 
@@ -116,6 +137,23 @@ function TaxFilingForm(): React.ReactElement {
   const [fileError, setFileError] = useState<string>("");
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [profileComplete, setProfileComplete] = useState<boolean>(false);
+
+  // Check if user profile is complete
+  const checkProfileComplete = (user: UserProfile): boolean => {
+    // Check if all required fields are filled
+    return !!(
+      user &&
+      user.name &&
+      user.email &&
+      user.pan &&
+      user.dob &&
+      user.mobile &&
+      user.aadhaar &&
+      user.fatherName &&
+      user.address
+    );
+  };
 
   // Fetch user data when component mounts
   useEffect(() => {
@@ -124,6 +162,20 @@ function TaxFilingForm(): React.ReactElement {
         setLoading(true);
         const response = await httpClient.get(API_PATHS.AUTH.ME);
         setUserData(response.data);
+
+        // Check if profile is complete
+        const isComplete = checkProfileComplete(response.data);
+        setProfileComplete(isComplete);
+
+        // Check if user has already submitted a tax form
+        if (response.data.hasTaxFormSubmission) {
+          toast.error(
+            "You have already submitted a tax form. Only one submission is allowed per user."
+          );
+          // Redirect to submissions page
+          router.push("/user/submissions");
+          return;
+        }
       } catch (error) {
         console.error("Failed to fetch user data:", error);
         // Fallback to localStorage if API fails
@@ -133,6 +185,19 @@ function TaxFilingForm(): React.ReactElement {
           );
           if (localUserData) {
             setUserData(localUserData);
+            // Check if profile is complete using localStorage data
+            const isComplete = checkProfileComplete(localUserData);
+            setProfileComplete(isComplete);
+
+            // Check if user has already submitted a tax form from localStorage
+            if (localUserData.hasTaxFormSubmission) {
+              toast.error(
+                "You have already submitted a tax form. Only one submission is allowed per user."
+              );
+              // Redirect to submissions page
+              router.push("/user/submissions");
+              return;
+            }
           }
         }
       } finally {
@@ -208,6 +273,39 @@ function TaxFilingForm(): React.ReactElement {
     { setSubmitting, resetForm }: FormikHelpers<TaxFilingFormValues>
   ): Promise<void> => {
     try {
+      // Check if profile is complete
+      if (!profileComplete) {
+        toast.error("Please complete your profile before submitting the form");
+        router.push("/user/profile");
+        setSubmitting(false);
+        return;
+      }
+
+      // Check if user already has a tax form submission
+      if (userData?.hasTaxFormSubmission) {
+        toast.error(
+          "You have already submitted a tax form. Only one submission is allowed per user."
+        );
+        router.push("/user/submissions");
+        setSubmitting(false);
+        return;
+      }
+      
+      // Check if PAN is already used in another submission
+      if (values.pan) {
+        try {
+          const panCheckResponse = await httpClient.get(API_PATHS.FORMS.CHECK_PAN(values.pan));
+          if (panCheckResponse.data.exists) {
+            toast.error("This PAN number has already been used for a tax form submission");
+            setSubmitting(false);
+            return;
+          }
+        } catch (error) {
+          console.error("Error checking PAN:", error);
+          // Continue with submission if PAN check fails
+        }
+      }
+
       // Check if files were uploaded
       if (files.length === 0) {
         setFileError("Please upload at least one document");
@@ -230,10 +328,24 @@ function TaxFilingForm(): React.ReactElement {
       files.forEach((file, index) => {
         formData.append(`documents`, file);
         formData.append(`fileId_${index}`, `file_${index}`);
-        formData.append(
-          `documentType_file_${index}`,
-          "other" // Set default document type to "other" since dropdown was removed
-        );
+
+        // Get the document type from the data attribute of the select element
+        let documentType = "other";
+        const fileElement = document.getElementById(`file-${index}`);
+        if (fileElement && fileElement.dataset.documentType) {
+          documentType = fileElement.dataset.documentType;
+        } else {
+          // Fallback to default document types based on index
+          if (index === 0) documentType = "form16";
+          else if (index === 1) documentType = "bankStatement";
+          else if (index === 2) documentType = "investmentProof";
+          else if (index === 3) documentType = "salarySlip";
+          else if (index === 4) documentType = "aadharCard";
+          else if (index === 5) documentType = "homeLoanCertificate";
+          else if (index === 6) documentType = "tradingSummary";
+        }
+
+        formData.append(`documentType_file_${index}`, documentType);
       });
 
       // Submit form
@@ -265,6 +377,41 @@ function TaxFilingForm(): React.ReactElement {
   return (
     <Layout>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Profile Check Alert */}
+        {!profileComplete && (
+          <div className="mb-6 bg-yellow-50 border-l-4 border-yellow-400 p-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg
+                  className="h-5 w-5 text-yellow-400"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-yellow-700">
+                  Your profile is incomplete. Please update your profile before
+                  filing taxes.
+                  <Link
+                    href="/user/profile"
+                    className="font-medium underline text-yellow-700 hover:text-yellow-600 ml-1"
+                  >
+                    Update Profile
+                  </Link>
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Hero Section */}
         <div className="mb-8 text-center">
           <h1 className="text-3xl md:text-4xl font-extrabold text-primary-800 mb-4">
@@ -278,7 +425,7 @@ function TaxFilingForm(): React.ReactElement {
         </div>
         <div className="mb-5 text-center">
           <h2 className="text-3xl md:text-3xl font-extrabold text-purple-900 mb-2">
-            Filing For A.Y 2025
+            Filing For A.Y 2025 - 2026
           </h2>
         </div>
 
@@ -464,7 +611,7 @@ function TaxFilingForm(): React.ReactElement {
                                 Income Tax Login Password
                               </label>
                               <Field
-                                type="password"
+                                type="text"
                                 name="incomeTaxLoginPassword"
                                 id="incomeTaxLoginPassword"
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
@@ -566,7 +713,7 @@ function TaxFilingForm(): React.ReactElement {
                                 htmlFor="homeLoanTotalInterest"
                                 className="block text-sm font-medium text-gray-700 mb-1"
                               >
-                                Total Interest Paid (FY 2023-24)
+                                Total Interest Paid (FY 2024-25)
                               </label>
                               <Field
                                 type="text"
@@ -598,7 +745,8 @@ function TaxFilingForm(): React.ReactElement {
                             htmlFor="hasTradingSummary"
                             className="ml-2 block text-sm font-medium text-gray-700"
                           >
-                            I have Trading/Investment Activities
+                            I have Trading summary / PL ACCOUNT of Demat account
+                            (if trading in stock from 01-04-2024 to 31-03-2025)
                           </label>
                         </div>
                       </div>
@@ -737,6 +885,47 @@ function TaxFilingForm(): React.ReactElement {
                                     </span>
                                   </div>
                                   <div className="ml-4 flex-shrink-0 flex items-center space-x-4">
+                                    <select
+                                      className="text-xs border-gray-300 rounded-md"
+                                      onChange={(e) => {
+                                        // Store the selected document type in a data attribute
+                                        const fileElement =
+                                          document.getElementById(
+                                            `file-${index}`
+                                          );
+                                        if (fileElement) {
+                                          fileElement.dataset.documentType =
+                                            e.target.value;
+                                        }
+                                      }}
+                                      id={`file-${index}`}
+                                      defaultValue={
+                                        index === 0
+                                          ? "form16"
+                                          : index === 1
+                                          ? "bankStatement"
+                                          : index === 2
+                                          ? "investmentProof"
+                                          : index === 3
+                                          ? "salarySlip"
+                                          : index === 4
+                                          ? "aadharCard"
+                                          : index === 5
+                                          ? "homeLoanCertificate"
+                                          : index === 6
+                                          ? "tradingSummary"
+                                          : "other"
+                                      }
+                                    >
+                                      {DOCUMENT_TYPES.map((docType) => (
+                                        <option
+                                          key={docType.value}
+                                          value={docType.value}
+                                        >
+                                          {docType.label}
+                                        </option>
+                                      ))}
+                                    </select>
                                     <span className="text-xs text-gray-500">
                                       {formatFileSize(file.size)}
                                     </span>

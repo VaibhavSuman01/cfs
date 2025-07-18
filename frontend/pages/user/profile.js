@@ -38,12 +38,18 @@ function UserProfile() {
 
   const handleProfileUpdate = async (values, { setSubmitting }) => {
     try {
-      const response = await httpClient.put("/api/auth/profile", {
+      const payload = {
         name: values.name,
         email: values.email,
         pan: values.pan,
+        dob: values.dob,
         mobile: values.mobile,
-      });
+        aadhaar: values.aadhaar,
+        fatherName: values.fatherName,
+        address: values.address,
+      };
+      
+      const response = await httpClient.put("/api/auth/profile", payload);
 
       setUser(response.data);
       toast.success("Profile updated successfully");
@@ -125,7 +131,11 @@ function UserProfile() {
                   name: user?.name || "",
                   email: user?.email || "",
                   pan: user?.pan || "",
+                  dob: user?.dob ? new Date(user.dob).toISOString().split('T')[0] : "",
                   mobile: user?.mobile || "",
+                  aadhaar: user?.aadhaar || "",
+                  fatherName: user?.fatherName || "",
+                  address: user?.address || "",
                 }}
                 validationSchema={ProfileSchema}
                 onSubmit={handleProfileUpdate}
@@ -202,6 +212,51 @@ function UserProfile() {
 
                     <div>
                       <label
+                        htmlFor="dob"
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        Date of Birth
+                      </label>
+                      <div className="mt-1">
+                        <Field
+                          id="dob"
+                          name="dob"
+                          type="date"
+                          className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                        />
+                        <ErrorMessage
+                          name="dob"
+                          component="div"
+                          className="mt-1 text-sm text-red-600"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="aadhaar"
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        Aadhaar Number
+                      </label>
+                      <div className="mt-1">
+                        <Field
+                          id="aadhaar"
+                          name="aadhaar"
+                          type="text"
+                          placeholder="1234 5678 9012"
+                          className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                        />
+                        <ErrorMessage
+                          name="aadhaar"
+                          component="div"
+                          className="mt-1 text-sm text-red-600"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label
                         htmlFor="mobile"
                         className="block text-sm font-medium text-gray-700"
                       >
@@ -217,6 +272,53 @@ function UserProfile() {
                         />
                         <ErrorMessage
                           name="mobile"
+                          component="div"
+                          className="mt-1 text-sm text-red-600"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="fatherName"
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        Father Name
+                      </label>
+                      <div className="mt-1">
+                        <Field
+                          id="fatherName"
+                          name="fatherName"
+                          type="text"
+                          placeholder="Enter your father's name"
+                          className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                        />
+                        <ErrorMessage
+                          name="fatherName"
+                          component="div"
+                          className="mt-1 text-sm text-red-600"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="address"
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        Full Address
+                      </label>
+                      <div className="mt-1">
+                        <Field
+                          as="textarea"
+                          id="address"
+                          name="address"
+                          rows="3"
+                          placeholder="Enter your full address"
+                          className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                        />
+                        <ErrorMessage
+                          name="address"
                           component="div"
                           className="mt-1 text-sm text-red-600"
                         />

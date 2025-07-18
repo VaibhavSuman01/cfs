@@ -26,12 +26,15 @@ export default function Login() {
   
   // Show success message if user has reset their password
   useEffect(() => {
+    // Only proceed if router is ready
+    if (!router.isReady) return;
+    
     if (resetSuccess === 'true') {
       toast.success('Your password has been reset. You can now login with your new password.');
       // Remove the query parameter to prevent showing the message again on refresh
       router.replace('/login', undefined, { shallow: true });
     }
-  }, [resetSuccess, router]);
+  }, [router.isReady, resetSuccess, router]);
 
   // Handle login form submission
   const handleSubmit = async (values, { setSubmitting, setErrors }) => {
@@ -62,6 +65,13 @@ export default function Login() {
           }
         }
       } catch (apiError) {
+        // Check for network connection issues
+        if (!apiError.response) {
+          console.error("Network error:", apiError.message);
+          // Show a more helpful message for network issues
+          throw new Error("Network connection error. Please check your internet connection and try again. If the problem persists, the server might be temporarily unavailable.");
+        }
+        
         console.error("Login API error:", {
           message: apiError.message,
           status: apiError.response?.status,
@@ -78,38 +88,23 @@ export default function Login() {
         headers: error.response?.headers,
       });
 
-      // Check if the error is due to wrong authentication method or no password set
-      if (error.response?.data?.authMethod || error.response?.data?.code === "NO_PASSWORD_SET") {
-        setLoginMethod(error.response.data.authMethod);
+      // Use the improved error handler to get a user-friendly message
+      const errorMessage = handleApiError(
+        error,
+        "Failed to sign in. Please try again."
+      );
 
-        // If OTP authentication is required or no password is set, redirect to OTP login page
-        if (error.response.data.authMethod === "otp" || error.response?.data?.code === "NO_PASSWORD_SET") {
-          router.push(`/otp-login?email=${encodeURIComponent(values.email)}`);
-          return;
-        }
-
-        setErrors({
-          auth: error.response.data.message,
-        });
-      } else {
-        // Use the improved error handler to get a user-friendly message
-        const errorMessage = handleApiError(
-          error,
-          "Failed to sign in. Please try again."
-        );
-
-        // Don't show toast for validation errors, only for unexpected errors
-        if (
-          !error.response?.data?.code &&
-          error.response?.data?.message !== "Invalid credentials"
-        ) {
-          toast.error(errorMessage);
-        }
-
-        setErrors({
-          auth: errorMessage,
-        });
+      // Don't show toast for validation errors, only for unexpected errors
+      if (
+        !error.response?.data?.code &&
+        error.response?.data?.message !== "Invalid credentials"
+      ) {
+        toast.error(errorMessage);
       }
+
+      setErrors({
+        auth: errorMessage,
+      });
     } finally {
       setSubmitting(false);
     }

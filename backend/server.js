@@ -11,7 +11,7 @@ const authRoutes = require("./routes/authRoutes");
 
 // Initialize express app
 const app = express();
-const PORT = process.env.PORT || 5001; // Changed to 5001 to avoid port conflict
+const PORT = process.env.PORT || 5001; // Use environment variable or default to 5001
 
 // Middleware
 app.use(cors());
