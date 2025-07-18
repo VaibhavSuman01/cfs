@@ -13,7 +13,7 @@ import {
   Bars3Icon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { removeAuthToken } from "../utils/auth";
+import { logout } from "../utils/auth";
 import RunningBanner from "./RunningBanner";
 import { prefetchNextLikelyRoutes } from "../utils/prefetchData";
 
@@ -82,7 +82,7 @@ const AdminLayout = ({ children }) => {
   }, [router.pathname]);
 
   const handleLogout = () => {
-    removeAuthToken();
+    logout();
     router.push("/admin/login");
   };
 
