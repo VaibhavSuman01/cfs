@@ -51,7 +51,6 @@ export default function Register() {
         panCardNo: values.panCardNo,
         dob: values.dob,
         mobile: values.mobile,
-        aadhaarNo: values.aadhaarNo,
         password: values.password,
         role: "user", // Specify user role
       };
@@ -66,6 +65,17 @@ export default function Register() {
         router.push("/user/dashboard");
       }
     } catch (error) {
+      // Check for network connection issues
+      if (!error.response) {
+        console.error("Network error:", error.message);
+        const networkErrorMessage = "Network connection error. Please check your internet connection and try again. If the problem persists, the server might be temporarily unavailable.";
+        toast.error(networkErrorMessage);
+        setErrors({
+          auth: networkErrorMessage
+        });
+        return;
+      }
+      
       console.error("Registration API error:", {
         message: error.message,
         status: error.response?.status,
@@ -119,7 +129,6 @@ export default function Register() {
                 panCardNo: "",
                 dob: "",
                 mobile: "",
-                aadhaarNo: "",
                 password: "",
                 confirmPassword: "",
               }}
@@ -255,28 +264,7 @@ export default function Register() {
                     </div>
                   </div>
 
-                  <div>
-                    <label
-                      htmlFor="aadhaarNo"
-                      className="block text-sm font-medium text-gray-700"
-                    >
-                      Aadhaar Number
-                    </label>
-                    <div className="mt-1">
-                      <Field
-                        id="aadhaarNo"
-                        name="aadhaarNo"
-                        type="text"
-                        placeholder="12-digit Aadhaar number"
-                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                      />
-                      <ErrorMessage
-                        name="aadhaarNo"
-                        component="div"
-                        className="mt-1 text-sm text-red-600"
-                      />
-                    </div>
-                  </div>
+
 
                   <div>
                     <label

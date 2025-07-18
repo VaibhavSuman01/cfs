@@ -31,19 +31,38 @@ function SubmissionDetail() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploadingDocument, setUploadingDocument] = useState(false);
   const [documentType, setDocumentType] = useState("");
+  const [editCount, setEditCount] = useState(0);
+  const [maxEditsReached, setMaxEditsReached] = useState(false);
 
   useEffect(() => {
-    // Fetch submission details
-    const fetchSubmission = async () => {
+    // Fetch submission details and user data
+    const fetchData = async () => {
       // Only proceed if router is ready and id exists
       if (!router.isReady || !id) return;
 
       try {
         setLoading(true);
-        const response = await httpClient.get(
+        
+        // Fetch submission details
+        const submissionResponse = await httpClient.get(
           API_PATHS.FORMS.USER_SUBMISSION_DETAIL(id)
         );
-        setSubmission(response.data);
+        setSubmission(submissionResponse.data);
+        
+        // Fetch user data to get edit count
+        const userResponse = await httpClient.get(API_PATHS.AUTH.ME);
+        const userData = userResponse.data;
+        
+        // Check if documentEditCounts exists and has an entry for this submission
+        if (userData.documentEditCounts && userData.documentEditCounts[id]) {
+          const count = userData.documentEditCounts[id];
+          setEditCount(count);
+          
+          // Check if max edits reached
+          if (count >= 2) {
+            setMaxEditsReached(true);
+          }
+        }
       } catch (error) {
         handleApiErrorWithToast(error, "Failed to load submission details");
         setError("Failed to load submission details. Please try again.");
@@ -52,7 +71,7 @@ function SubmissionDetail() {
       }
     };
 
-    fetchSubmission();
+    fetchData();
   }, [router.isReady, id]);
 
   // Helper function to get status badge
@@ -150,6 +169,11 @@ function SubmissionDetail() {
   // Handle document deletion
   const handleDeleteDocument = async (documentId, documentType) => {
     if (!confirm("Are you sure you want to delete this document?")) return;
+    
+    if (maxEditsReached) {
+      toast.error("You've reached the maximum number of edits");
+      return;
+    }
 
     try {
       const response = await httpClient.delete(
@@ -167,6 +191,13 @@ function SubmissionDetail() {
         updatedSubmission[documentType] = null;
         return updatedSubmission;
       });
+      
+      // Update edit count
+      const newCount = editCount + 1;
+      setEditCount(newCount);
+      if (newCount >= 2) {
+        setMaxEditsReached(true);
+      }
 
       toast.success("Document deleted successfully");
     } catch (error) {
@@ -185,6 +216,11 @@ function SubmissionDetail() {
   const handleUploadDocument = async () => {
     if (!selectedFile || !documentType) {
       toast.error("Please select a file and document type");
+      return;
+    }
+
+    if (maxEditsReached) {
+      toast.error("You've reached the maximum number of edits");
       return;
     }
 
@@ -216,6 +252,13 @@ function SubmissionDetail() {
         updatedSubmission[newDocument.documentType] = newDocument;
         return updatedSubmission;
       });
+
+      // Update edit count
+      const newCount = editCount + 1;
+      setEditCount(newCount);
+      if (newCount >= 2) {
+        setMaxEditsReached(true);
+      }
 
       // Reset form
       setSelectedFile(null);
@@ -263,10 +306,11 @@ function SubmissionDetail() {
           </button>
           {editMode && (
             <button
-              onClick={() => handleDeleteDocument(file._id, file.documentType)}
-              className="text-red-600 hover:text-red-800 ml-2"
-              title="Delete document"
-            >
+                onClick={() => handleDeleteDocument(file._id, file.documentType)}
+                disabled={maxEditsReached}
+                className={`text-red-600 hover:text-red-800 ml-2 ${maxEditsReached ? 'opacity-50 cursor-not-allowed' : ''}`}
+                title="Delete document"
+              >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
               </svg>
@@ -381,57 +425,77 @@ function SubmissionDetail() {
                   Click on a document to download
                 </p>
               </div>
-              <button
-                onClick={() => setEditMode(!editMode)}
-                className={`px-4 py-2 rounded-md text-sm font-medium ${editMode ? 'bg-gray-200 text-gray-800' : 'bg-primary-600 text-white hover:bg-primary-700'}`}
-              >
-                {editMode ? 'Cancel Edit' : 'Edit Documents'}
-              </button>
+              <div className="flex flex-col items-end">
+                <button
+                  onClick={() => setEditMode(!editMode)}
+                  disabled={maxEditsReached && !editMode}
+                  className={`px-4 py-2 rounded-md text-sm font-medium ${editMode ? 'bg-gray-200 text-gray-800' : maxEditsReached ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-primary-600 text-white hover:bg-primary-700'}`}
+                >
+                  {editMode ? 'Cancel Edit' : 'Edit Documents'}
+                </button>
+                <div className="text-xs text-gray-500 mt-1">
+                  {maxEditsReached ? 
+                    "You've reached the maximum number of edits (2)" : 
+                    `${editCount}/2 edits used`}
+                </div>
+              </div>
             </div>
             <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
               {editMode && (
                 <div className="mb-6 p-4 bg-gray-50 rounded-md">
                   <h4 className="text-md font-medium text-gray-900 mb-2">Upload New Document</h4>
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div>
-                      <label htmlFor="documentType" className="block text-sm font-medium text-gray-700 mb-1">
-                        Document Type
-                      </label>
-                      <select
-                        id="documentType"
-                        value={documentType}
-                        onChange={(e) => setDocumentType(e.target.value)}
-                        className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md"
-                      >
-                        <option value="">Select document type</option>
-                        {documentTypes.map((type) => (
-                          <option key={type.value} value={type.value}>
-                            {type.label}
-                          </option>
-                        ))}
-                      </select>
+                  {maxEditsReached ? (
+                    <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                      <p className="text-sm text-yellow-700">
+                        You've reached the maximum number of edits (2) allowed for this submission.
+                      </p>
                     </div>
-                    <div>
-                      <label htmlFor="document" className="block text-sm font-medium text-gray-700 mb-1">
-                        Document File
-                      </label>
-                      <input
-                        type="file"
-                        id="document"
-                        onChange={handleFileChange}
-                        className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
-                      />
-                    </div>
-                  </div>
-                  <div className="mt-4 flex justify-end">
-                    <button
-                      onClick={handleUploadDocument}
-                      disabled={uploadingDocument || !selectedFile || !documentType}
-                      className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${uploadingDocument || !selectedFile || !documentType ? 'bg-gray-300 cursor-not-allowed' : 'bg-primary-600 hover:bg-primary-700'}`}
-                    >
-                      {uploadingDocument ? 'Uploading...' : 'Upload Document'}
-                    </button>
-                  </div>
+                  ) : (
+                    <>
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                          <label htmlFor="documentType" className="block text-sm font-medium text-gray-700 mb-1">
+                            Document Type
+                          </label>
+                          <select
+                            id="documentType"
+                            value={documentType}
+                            onChange={(e) => setDocumentType(e.target.value)}
+                            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md"
+                            disabled={maxEditsReached}
+                          >
+                            <option value="">Select document type</option>
+                            {documentTypes.map((type) => (
+                              <option key={type.value} value={type.value}>
+                                {type.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label htmlFor="document" className="block text-sm font-medium text-gray-700 mb-1">
+                            Document File
+                          </label>
+                          <input
+                            type="file"
+                            id="document"
+                            onChange={handleFileChange}
+                            className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
+                            disabled={maxEditsReached}
+                          />
+                        </div>
+                      </div>
+                      <div className="mt-4 flex justify-end">
+                        <button
+                          onClick={handleUploadDocument}
+                          disabled={uploadingDocument || !selectedFile || !documentType || maxEditsReached}
+                          className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${uploadingDocument || !selectedFile || !documentType || maxEditsReached ? 'bg-gray-300 cursor-not-allowed' : 'bg-primary-600 hover:bg-primary-700'}`}
+                        >
+                          {uploadingDocument ? 'Uploading...' : 'Upload Document'}
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
               <div className="sm:divide-y sm:divide-gray-200">

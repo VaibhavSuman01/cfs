@@ -222,6 +222,12 @@ function Users() {
                         scope="col"
                         className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
                       >
+                        PAN
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                      >
                         Registered On
                       </th>
                     </tr>
@@ -269,6 +275,11 @@ function Users() {
                               {user.address || "Not provided"}
                             </div>
                           </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm text-gray-700">
+                              {user.pan || "Not provided"}
+                            </div>
+                          </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {formatDate(user.createdAt)}
                           </td>
@@ -277,7 +288,7 @@ function Users() {
                     ) : (
                       <tr>
                         <td
-                          colSpan="6"
+                          colSpan="7"
                           className="px-6 py-10 text-center"
                         >
                           <div className="flex flex-col items-center justify-center text-gray-500">

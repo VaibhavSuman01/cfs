@@ -14,10 +14,7 @@ const UserSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: function () {
-        // Password is required only if not using OTP
-        return !this.useOTP;
-      },
+      required: true,
     },
     role: {
       type: String,
@@ -57,6 +54,17 @@ const UserSchema = new mongoose.Schema(
     address: {
       type: String,
       trim: true,
+    },
+    // Track if user has submitted a tax form
+    hasTaxFormSubmission: {
+      type: Boolean,
+      default: false,
+    },
+    // Track document edit counts for each tax form submission
+    documentEditCounts: {
+      type: Map,
+      of: Number,
+      default: new Map(),
     },
   },
   {

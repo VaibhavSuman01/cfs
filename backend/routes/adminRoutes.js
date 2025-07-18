@@ -7,7 +7,7 @@ const { protect, admin } = require("../middleware/auth");
 const path = require("path");
 const fs = require("fs");
 const ExcelJS = require("exceljs");
-const { isValidObjectId, validateObjectId } = require("../utils/validation");
+const { validateObjectId } = require("../utils/validation");
 
 // Apply auth middleware to all admin routes
 router.use(protect);
@@ -202,7 +202,7 @@ router.get("/users", async (req, res) => {
     const skip = (page - 1) * limit;
 
     const users = await User.find({ role: "user" })
-      .select("name fatherName mobile email address createdAt")
+      .select("name fatherName mobile email address pan createdAt")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit));
@@ -231,7 +231,7 @@ router.get("/users/download", async (req, res) => {
   try {
     // Fetch all users with role "user"
     const users = await User.find({ role: "user" })
-      .select("name fatherName mobile email address pan dob aadhaar createdAt")
+      .select("name fatherName mobile email address pan dob createdAt")
       .sort({ createdAt: -1 });
 
     // Create a new Excel workbook and worksheet
@@ -247,7 +247,6 @@ router.get("/users/download", async (req, res) => {
       { header: "Address", key: "address", width: 30 },
       { header: "PAN", key: "pan", width: 15 },
       { header: "Date of Birth", key: "dob", width: 15 },
-      { header: "Aadhaar", key: "aadhaar", width: 15 },
       { header: "Registered On", key: "createdAt", width: 15 }
     ];
 
@@ -265,15 +264,17 @@ router.get("/users/download", async (req, res) => {
         name: user.name || "N/A",
         fatherName: user.fatherName || "N/A",
         mobile: user.mobile || "N/A",
-        email: user.email,
+        email: user.email || "N/A",
         address: user.address || "N/A",
         pan: user.pan || "N/A",
         dob: user.dob ? new Date(user.dob).toLocaleDateString() : "N/A",
-        aadhaar: user.aadhaar || "N/A",
         createdAt: new Date(user.createdAt).toLocaleDateString()
       });
     });
 
+    // Generate buffer instead of writing directly to response
+    const buffer = await workbook.xlsx.writeBuffer();
+    
     // Set response headers
     res.setHeader(
       "Content-Type",
@@ -283,13 +284,13 @@ router.get("/users/download", async (req, res) => {
       "Content-Disposition",
       `attachment; filename=registered_users_${new Date().toISOString().split('T')[0]}.xlsx`
     );
+    res.setHeader("Content-Length", buffer.length);
 
-    // Write to response
-    await workbook.xlsx.write(res);
-    res.end();
+    // Send the buffer
+    res.send(buffer);
   } catch (error) {
     console.error("Download users error:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error generating Excel file" });
   }
 });
 

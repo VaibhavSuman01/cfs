@@ -11,7 +11,30 @@ function UserDashboard() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [profileComplete, setProfileComplete] = useState(false);
   const router = useRouter();
+
+  // Check if user profile is complete
+  const checkProfileComplete = (user) => {
+    // Check if all required fields are filled
+    return !!(
+      user &&
+      user.name &&
+      user.email &&
+      user.pan &&
+      user.dob &&
+      user.mobile &&
+      user.aadhaar &&
+      user.fatherName &&
+      user.address
+    );
+  };
+  
+  // Get first name from full name
+  const getFirstName = (fullName) => {
+    if (!fullName) return "";
+    return fullName.split(" ")[0];
+  };
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -22,6 +45,9 @@ function UserDashboard() {
           `${API_PATHS.AUTH.ME}?_=${timestamp}`
         );
         setUser(response.data);
+        // Check if profile is complete
+        const isComplete = checkProfileComplete(response.data);
+        setProfileComplete(isComplete);
         // Toast removed to prevent showing on every page reload
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -69,10 +95,30 @@ function UserDashboard() {
     <Layout>
       <div className="min-h-screen bg-gray-50 py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {!profileComplete && (
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-yellow-700">
+                    Your profile is incomplete. Please
+                    <Link href="/user/profile" className="font-medium underline text-yellow-700 hover:text-yellow-600 ml-1">
+                      update your profile
+                    </Link>
+                    <span className="ml-1">before filing taxes or using other services.</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
           <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
             <div className="px-4 py-5 sm:px-6 bg-primary-50">
               <h3 className="text-lg leading-6 font-medium text-gray-900">
-                Welcome, {user?.name}!
+                Hi {getFirstName(user?.name)}
               </h3>
               <p className="mt-1 max-w-2xl text-sm text-gray-500">
                 Your personal dashboard

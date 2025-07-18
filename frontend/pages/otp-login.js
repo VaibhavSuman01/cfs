@@ -52,6 +52,13 @@ export default function OTPLogin() {
           }
         }
       } catch (apiError) {
+        // Check for network connection issues
+        if (!apiError.response) {
+          console.error("Network error:", apiError.message);
+          // Show a more helpful message for network issues
+          throw new Error("Network connection error. Please check your internet connection and try again. If the problem persists, the server might be temporarily unavailable.");
+        }
+        
         console.error("Login API error:", {
           message: apiError.message,
           status: apiError.response?.status,
@@ -110,7 +117,12 @@ export default function OTPLogin() {
       await httpClient.post(API_PATHS.AUTH.REQUEST_OTP, { email });
       toast.success("OTP sent to your email");
     } catch (error) {
-      handleApiErrorWithToast(error, "Failed to send OTP. Please try again.");
+      // Check for network connection issues
+      if (!error.response) {
+        toast.error("Network connection error. Please check your internet connection and try again. If the problem persists, the server might be temporarily unavailable.");
+      } else {
+        handleApiErrorWithToast(error, "Failed to send OTP. Please try again.");
+      }
     }
   };
 

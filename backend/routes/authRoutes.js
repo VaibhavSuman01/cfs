@@ -43,86 +43,23 @@ router.post(
 
       let isAuthenticated = false;
 
-      // Check if user is using OTP authentication
-      if (user.canUseOTPAuth()) {
-        // If user is using OTP but password was provided
-        if (password && !otp) {
-          // Check if the user has a password set
-          if (!user.password) {
-            return res.status(400).json({
-              message: "This account uses OTP authentication. Please request an OTP.",
-              authMethod: "otp",
-              code: "OTP_REQUIRED"
-            });
-          }
-          
-          // Check if the password is valid despite OTP being enabled
-          // This handles cases where password was reset but useOTP flag wasn't properly updated
-          const isPasswordValid = await user.comparePassword(password);
-          if (isPasswordValid) {
-            // Password is valid, update user to disable OTP authentication
-            user.useOTP = false;
-            await user.save();
-            isAuthenticated = true;
-          } else {
-            return res.status(400).json({
-              message:
-                "This account uses OTP authentication. Please request an OTP.",
-              authMethod: "otp",
-              code: "OTP_REQUIRED"
-            });
-          }
-        }
-
-        // Verify OTP
-        if (otp) {
-          isAuthenticated = await otpUtils.verifyOTP(email, otp);
-          console.log("OTP verification result:", { isAuthenticated });
-          if (!isAuthenticated) {
-            return res.status(400).json({ message: "Invalid or expired OTP", code: "INVALID_OTP" });
-          }
-        } else {
-          console.log("Login failed: OTP required but not provided");
-          return res.status(400).json({ message: "OTP is required", code: "OTP_REQUIRED" });
+      // User is using password authentication
+      // Check if user has a password set
+      if (!user.password) {
+        return res.status(400).json({ 
+          message: "This account has no password set. Please contact support.", 
+          code: "NO_PASSWORD_SET" 
+        });
+      }
+      
+      // Check password
+      if (password) {
+        isAuthenticated = await user.comparePassword(password);
+        if (!isAuthenticated) {
+          return res.status(400).json({ message: "Invalid credentials", code: "INVALID_PASSWORD" });
         }
       } else {
-        // User is using password authentication
-        // Verify user can authenticate with password
-        if (!user.canUsePasswordAuth()) {
-          console.log("Login failed: User cannot use password authentication");
-          return res.status(400).json({ 
-            message: "This account has no password set. Please use OTP authentication.", 
-            code: "NO_PASSWORD_SET",
-            authMethod: "otp"
-          });
-        }
-        // If user is using password but OTP was provided
-        if (otp && !password) {
-          return res.status(400).json({
-            message:
-              "This account uses password authentication. Please provide your password.",
-            authMethod: "password",
-            code: "PASSWORD_REQUIRED"
-          });
-        }
-
-        // Check if user has a password set
-        if (!user.password) {
-          return res.status(400).json({ 
-            message: "This account has no password set. Please contact support.", 
-            code: "NO_PASSWORD_SET" 
-          });
-        }
-        
-        // Check password
-        if (password) {
-          isAuthenticated = await user.comparePassword(password);
-          if (!isAuthenticated) {
-            return res.status(400).json({ message: "Invalid credentials", code: "INVALID_PASSWORD" });
-          }
-        } else {
-          return res.status(400).json({ message: "Password is required" });
-        }
+        return res.status(400).json({ message: "Password is required" });
       }
 
       // Return jsonwebtoken
@@ -290,16 +227,16 @@ router.post(
     check("email", "Please include a valid email").isEmail(),
     check("panCardNo", "PAN Card Number is required")
       .not().isEmpty()
-      .matches(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "Invalid PAN Card format"),
+      .matches(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/).withMessage("Invalid PAN Card format"),
     check("dob", "Date of Birth is required")
       .not().isEmpty()
       .isISO8601().withMessage("Invalid date format"),
     check("mobile", "Mobile number is required")
       .not().isEmpty()
-      .matches(/^[6-9]\d{9}$/, "Invalid mobile number format"),
+      .matches(/^[6-9]\d{9}$/).withMessage("Invalid mobile number format"),
     check("aadhaarNo", "Aadhaar number is required")
       .not().isEmpty()
-      .matches(/^\d{12}$/, "Aadhaar number must be 12 digits"),
+      .matches(/^\d{12}$/).withMessage("Aadhaar number must be 12 digits"),
     check("password", "Please enter a password with 6 or more characters")
       .optional({ checkFalsy: true }) // Password is optional if using OTP
       .isLength({ min: 6 }),
