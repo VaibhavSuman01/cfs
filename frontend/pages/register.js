@@ -26,9 +26,6 @@ const RegisterSchema = Yup.object().shape({
   mobile: Yup.string()
     .required("Mobile number is required")
     .matches(/^[6-9]\d{9}$/, "Invalid mobile number format"),
-  aadhaarNo: Yup.string()
-    .required("Aadhaar number is required")
-    .matches(/^\d{12}$/, "Aadhaar number must be 12 digits"),
   password: Yup.string()
     .min(8, "Password must be at least 8 characters")
     .required("Password is required"),
@@ -263,8 +260,6 @@ export default function Register() {
                       />
                     </div>
                   </div>
-
-
 
                   <div>
                     <label

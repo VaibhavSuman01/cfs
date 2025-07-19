@@ -234,8 +234,8 @@ router.post(
     check("mobile", "Mobile number is required")
       .not().isEmpty()
       .matches(/^[6-9]\d{9}$/).withMessage("Invalid mobile number format"),
-    check("aadhaarNo", "Aadhaar number is required")
-      .not().isEmpty()
+    check("aadhaarNo", "Aadhaar number must be 12 digits if provided")
+      .optional()
       .matches(/^\d{12}$/).withMessage("Aadhaar number must be 12 digits"),
     check("password", "Please enter a password with 6 or more characters")
       .optional({ checkFalsy: true }) // Password is optional if using OTP
