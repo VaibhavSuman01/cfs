@@ -9,7 +9,7 @@
 export const config = {
   // API configuration
   api: {
-    baseUrl: process.env.BACKEND_API_URL || "http://localhost:5001",
+    baseUrl: process.env.BACKEND_API_URL,
     timeout: 30000, // 30 seconds
   },
 

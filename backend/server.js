@@ -8,6 +8,7 @@ require("dotenv").config();
 const formRoutes = require("./routes/formRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const authRoutes = require("./routes/authRoutes");
+const passwordResetRoutes = require("./routes/passwordResetRoutes");
 
 // Initialize express app
 const app = express();
@@ -24,6 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/forms", formRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/auth", passwordResetRoutes);
 
 // Connect to MongoDB
 mongoose

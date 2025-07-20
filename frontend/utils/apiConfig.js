@@ -7,14 +7,12 @@
 export const API_PATHS = {
   AUTH: {
     LOGIN: "/api/auth/login",
-    OTP_LOGIN: "/api/auth/login", // Same endpoint but used for OTP login
     REGISTER: "/api/auth/register",
     ME: "/api/auth/me",
     PROFILE: "/api/auth/profile",
     PASSWORD: "/api/auth/password",
-    REQUEST_OTP: "/api/auth/request-otp",
-    VERIFY_OTP: "/api/auth/verify-otp",
-    TOGGLE_OTP: "/api/auth/toggle-otp",
+    REQUEST_PASSWORD_RESET: "/api/auth/request-password-reset",
+    RESET_PASSWORD: "/api/auth/reset-password",
   },
   ADMIN: {
     FORMS: "/api/admin/forms",
