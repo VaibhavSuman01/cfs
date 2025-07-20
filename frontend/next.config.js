@@ -5,8 +5,7 @@ const nextConfig = {
     domains: ["localhost"],
   },
   env: {
-    BACKEND_API_URL:
-      process.env.BACKEND_API_URL || "http://localhost:5001",
+    BACKEND_API_URL: process.env.BACKEND_API_URL,
   },
   eslint: {
     ignoreDuringBuilds: true,

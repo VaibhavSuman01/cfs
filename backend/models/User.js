@@ -21,16 +21,7 @@ const UserSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user",
     },
-    useOTP: {
-      type: Boolean,
-      default: false,
-    },
-    otp: {
-      type: String,
-    },
-    otpExpiry: {
-      type: Date,
-    },
+    // OTP fields removed
     pan: {
       type: String,
       trim: true,
@@ -103,61 +94,6 @@ UserSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// Method to check if user can authenticate with password
-UserSchema.methods.canUsePasswordAuth = function () {
-  return !this.useOTP && !!this.password;
-};
-
-// Method to check if user can authenticate with OTP
-UserSchema.methods.canUseOTPAuth = function () {
-  return this.useOTP === true;
-};
-
-// Method to safely enable OTP authentication
-UserSchema.methods.enableOTPAuth = function () {
-  this.useOTP = true;
-  this.password = undefined;
-  return this;
-};
-
-// Method to safely disable OTP authentication and set password
-UserSchema.methods.disableOTPAuth = function (newPassword) {
-  if (!newPassword) {
-    throw new Error('Password is required when disabling OTP authentication');
-  }
-  this.useOTP = false;
-  this.password = newPassword;
-  return this;
-};
-
-// Method to validate authentication configuration consistency
-UserSchema.methods.validateAuthConfig = function () {
-  // Case 1: OTP enabled but password exists
-  if (this.useOTP && this.password) {
-    throw new Error('Inconsistent auth config: OTP enabled but password exists');
-  }
-  
-  // Case 2: OTP disabled but no password
-  if (!this.useOTP && !this.password) {
-    throw new Error('Inconsistent auth config: Password authentication enabled but no password set');
-  }
-  
-  return true;
-};
-
-// Add a pre-save hook to validate auth config
-UserSchema.pre('save', function(next) {
-  try {
-    // Skip validation for new users (they're configured in the registration process)
-    if (this.isNew) {
-      return next();
-    }
-    
-    this.validateAuthConfig();
-    next();
-  } catch (error) {
-    next(error);
-  }
-});
+// OTP-related methods removed
 
 module.exports = mongoose.model("User", UserSchema);

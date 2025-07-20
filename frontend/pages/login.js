@@ -22,7 +22,6 @@ export default function Login() {
   const router = useRouter();
   const { returnUrl, resetSuccess } = router.query;
   const [showPassword, setShowPassword] = useState(false);
-  const [setLoginMethod] = useState(null);
   
   // Show success message if user has reset their password
   useEffect(() => {
@@ -125,13 +124,6 @@ export default function Login() {
             >
               create a new account
             </Link>
-            {/* {" | "}
-            <Link
-              href="/otp-login"
-              className="font-medium text-primary-600 hover:text-primary-500"
-            >
-              sign in with OTP
-            </Link> */}
           </p>
         </div>
 
