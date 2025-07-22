@@ -311,21 +311,19 @@ function Users() {
                     }
                   </div>
                   <div className="flex items-center space-x-4">
-                    <motion.a
+                    <motion.span
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
+                      onClick={() => {
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
-                      className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700"
+                      className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 cursor-pointer"
                     >
                       <svg className="mr-1 w-4 h-4 rotate-270" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
                       </svg>
                       Top
-                    </motion.a>
+                    </motion.span>
                     
                     <motion.button
                       whileHover={{ scale: 1.05 }}

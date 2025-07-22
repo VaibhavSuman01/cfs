@@ -12,7 +12,7 @@ const { check, validationResult } = require("express-validator");
 router.post(
   "/login",
   [
-    check("email", "Please include a valid email").isEmail(),
+    check("identifier", "Please include a valid email or PAN").not().isEmpty(),
     check("password", "Password is required").not().isEmpty(),
   ],
   async (req, res) => {
@@ -21,11 +21,20 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { email, password, role } = req.body;
+    const { identifier, password, role } = req.body;
 
     try {
-      // See if user exists
-      let user = await User.findOne({ email });
+      // Check if identifier is email or PAN
+      const isEmail = identifier.includes('@');
+      
+      // Find user by email or PAN
+      let user;
+      if (isEmail) {
+        user = await User.findOne({ email: identifier });
+      } else {
+        // Assuming PAN is stored in uppercase
+        user = await User.findOne({ pan: identifier.toUpperCase() });
+      }
 
       if (!user) {
         return res.status(400).json({ message: "Invalid credentials", code: "INVALID_LOGIN" });
@@ -138,7 +147,18 @@ router.put("/profile", protect, async (req, res) => {
         existingUser &&
         existingUser._id.toString() !== req.user._id.toString()
       ) {
-        return res.status(400).json({ message: "Email already in use" });
+        return res.status(400).json({ message: "Email already in use", code: "EMAIL_IN_USE" });
+      }
+    }
+    
+    // Check if PAN is already in use by another user
+    if (pan) {
+      const existingUserWithPan = await User.findOne({ pan });
+      if (
+        existingUserWithPan &&
+        existingUserWithPan._id.toString() !== req.user._id.toString()
+      ) {
+        return res.status(400).json({ message: "PAN number already in use", code: "PAN_IN_USE" });
       }
     }
 
@@ -232,11 +252,16 @@ router.post(
     const { name, email, password, panCardNo, dob, mobile, aadhaarNo, role = "user" } = req.body;
 
     try {
-      // See if user exists
-      let user = await User.findOne({ email });
+      // Check if user exists with the same email or PAN
+      let userByEmail = await User.findOne({ email });
+      let userByPan = await User.findOne({ pan: panCardNo });
 
-      if (user) {
-        return res.status(400).json({ message: "User already exists", code: "EMAIL_IN_USE" });
+      if (userByEmail) {
+        return res.status(400).json({ message: "User with this email already exists", code: "EMAIL_IN_USE" });
+      }
+
+      if (userByPan) {
+        return res.status(400).json({ message: "User with this PAN number already exists", code: "PAN_IN_USE" });
       }
 
       // Create user

@@ -83,15 +83,25 @@ export default function Register() {
       // Use the improved error handler to get a user-friendly message
       const errorMessage = handleApiError(error, "Failed to register. Please try again.");
       
-      // Don't show toast for validation errors, only for unexpected errors
-      if (!error.response?.data?.code && 
-          error.response?.data?.message !== "User already exists") {
-        toast.error(errorMessage);
+      // Handle specific error codes
+      if (error.response?.data?.code === "EMAIL_IN_USE") {
+        setErrors({
+          auth: "A user with this email already exists. Please use a different email or login to your existing account."
+        });
+      } else if (error.response?.data?.code === "PAN_IN_USE") {
+        setErrors({
+          auth: "A user with this PAN number already exists. Please check your PAN number or contact support if you believe this is an error."
+        });
+      } else {
+        // Don't show toast for validation errors, only for unexpected errors
+        if (!error.response?.data?.code) {
+          toast.error(errorMessage);
+        }
+        
+        setErrors({
+          auth: errorMessage
+        });
       }
-      
-      setErrors({
-        auth: errorMessage
-      });
     } finally {
       setSubmitting(false);
     }
