@@ -17,7 +17,8 @@ export default function Login() {
     setIsSubmitting(true);
     try {
       const response = await httpClient.post(API_PATHS.AUTH.LOGIN, {
-        ...values,
+        identifier: values.email, // Use email as identifier
+        password: values.password,
         role: "admin", // Specify admin role
       });
 

@@ -12,9 +12,8 @@ import LoadingButton from "../components/LoadingButton";
 
 // Schema for login
 const LoginSchema = Yup.object().shape({
-  email: Yup.string()
-    .email("Invalid email address")
-    .required("Email is required"),
+  identifier: Yup.string()
+    .required("Email or PAN is required"),
   password: Yup.string().required("Password is required"),
 });
 
@@ -40,7 +39,7 @@ export default function Login() {
     try {
       // Prepare login payload
       const payload = {
-        email: values.email,
+        identifier: values.identifier,
         password: values.password,
         role: "user", // Specify user role
       };
@@ -130,7 +129,7 @@ export default function Login() {
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
           <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
             <Formik
-              initialValues={{ email: "", password: "" }}
+              initialValues={{ identifier: "", password: "" }}
               validationSchema={LoginSchema}
               onSubmit={handleSubmit}
             >
@@ -150,24 +149,28 @@ export default function Login() {
 
                   <div>
                     <label
-                      htmlFor="email"
+                      htmlFor="identifier"
                       className="block text-sm font-medium text-gray-700"
                     >
-                      Email address
+                      Email or PAN Number
                     </label>
                     <div className="mt-1">
                       <Field
-                        id="email"
-                        name="email"
-                        type="email"
-                        autoComplete="email"
+                        id="identifier"
+                        name="identifier"
+                        type="text"
+                        autoComplete="username"
+                        placeholder="Enter your email or PAN number"
                         className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                       />
                       <ErrorMessage
-                        name="email"
+                        name="identifier"
                         component="div"
                         className="mt-1 text-sm text-red-600"
                       />
+                      <p className="mt-1 text-xs text-gray-500">
+                        You can sign in using either your registered email address or PAN number
+                      </p>
                     </div>
                   </div>
 

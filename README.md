@@ -7,13 +7,19 @@ A full-featured, modern, responsive website for a Financial Services firm with a
 - **Frontend**: Next.js with Tailwind CSS
 - **Backend**: Node.js + Express.js
 - **Database**: MongoDB with Mongoose
-- **Authentication**: JWT-based Auth (for Admin login)
+- **Authentication**: JWT-based Auth with email/PAN login support
 - **File Upload**: Multer for secure file upload (PDF, ZIP, DOCX, JPG)
 
 ## 🎯 Project Structure
 
 - A public-facing website for clients
 - A secure admin dashboard for internal use
+
+## 🔐 Authentication Features
+
+- **Flexible Login**: Users can sign in using either their registered email address or PAN number
+- **Role-based Access Control**: Different access levels for users and administrators
+- **Secure Token Management**: JWT-based authentication with proper expiration and refresh mechanisms
 
 ## 📂 Directory Structure
 
@@ -98,8 +104,6 @@ project/
    npm run dev
    ```
 
-8. Access the website at `http://localhost:3000` and the admin dashboard at `http://localhost:3000/admin`
-
 ## 📱 Features
 
 ### Public Website
@@ -116,4 +120,3 @@ project/
 - Submissions list with filters
 - Detailed view of submissions with file downloads
 - Status update functionality
-s

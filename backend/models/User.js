@@ -26,6 +26,7 @@ const UserSchema = new mongoose.Schema(
       type: String,
       trim: true,
       uppercase: true,
+      unique: true,
     },
     dob: {
       type: Date,
@@ -81,13 +82,11 @@ UserSchema.pre("save", async function (next) {
 UserSchema.methods.comparePassword = async function (candidatePassword) {
   // If password is undefined or null, return false
   if (!this.password) {
-    console.log('Password comparison failed: User has no password set');
     return false;
   }
   
   // If candidate password is undefined or null, return false
   if (!candidatePassword) {
-    console.log('Password comparison failed: No candidate password provided');
     return false;
   }
   

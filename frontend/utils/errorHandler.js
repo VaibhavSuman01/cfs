@@ -33,6 +33,7 @@ export const handleApiError = (error, defaultMessage = "An error occurred") => {
       "INVALID_LOGIN": "The email or password you entered is incorrect. Please try again.",
       "INVALID_PASSWORD": "The password you entered is incorrect. Please try again.",
       "EMAIL_IN_USE": "An account with this email already exists. Please use a different email or sign in.",
+      "PAN_IN_USE": "An account with this PAN number already exists. Please check your PAN number or contact support.",
       "SERVER_ERROR": "We're experiencing technical difficulties. Please try again later."
     };
     

@@ -36,7 +36,7 @@ function UserProfile() {
     fetchUserData();
   }, []);
 
-  const handleProfileUpdate = async (values, { setSubmitting }) => {
+  const handleProfileUpdate = async (values, { setSubmitting, setFieldError }) => {
     try {
       const payload = {
         name: values.name,
@@ -57,7 +57,14 @@ function UserProfile() {
       // Redirect to dashboard to show updated information
       router.push("/user/dashboard");
     } catch (error) {
-      handleApiErrorWithToast(error, "Failed to update profile");
+      // Handle specific error codes
+      if (error.response?.data?.code === "EMAIL_IN_USE") {
+        setFieldError("email", "This email is already in use by another account");
+      } else if (error.response?.data?.code === "PAN_IN_USE") {
+        setFieldError("pan", "This PAN number is already in use by another account");
+      } else {
+        handleApiErrorWithToast(error, "Failed to update profile");
+      }
     } finally {
       setSubmitting(false);
     }
