@@ -30,7 +30,8 @@ router.post(
       // Find user by email or PAN
       let user;
       if (isEmail) {
-        user = await User.findOne({ email: identifier });
+        // Case-insensitive email search using regex
+        user = await User.findOne({ email: { $regex: new RegExp('^' + identifier + '$', 'i') } });
       } else {
         // Assuming PAN is stored in uppercase
         user = await User.findOne({ pan: identifier.toUpperCase() });
@@ -67,27 +68,39 @@ router.post(
         },
       };
 
+      // Create access token (shorter expiration)
       jwt.sign(
         payload,
         process.env.JWT_SECRET,
-        { expiresIn: "5 days" },
+        { expiresIn: 60 * 60 * 24 }, // 1 day for access token
         (err, token) => {
           if (err) {
             throw err;
           }
-          res.json({
-            token,
-            user: {
-              id: user.id,
-              name: user.name,
-              email: user.email,
-              pan: user.pan,
-              dob: user.dob,
-              mobile: user.mobile,
-              aadhaar: user.aadhaar,
-              role: user.role,
-            },
-          });
+          
+          // Create refresh token (longer expiration)
+          jwt.sign(
+            payload,
+            process.env.JWT_REFRESH_SECRET,
+            { expiresIn: 60 * 60 * 24 * 30 }, // 30 days for refresh token
+            (err, refreshToken) => {
+              if (err) throw err;
+              res.json({
+                token,
+                refreshToken,
+                user: {
+                  id: user.id,
+                  name: user.name,
+                  email: user.email,
+                  pan: user.pan,
+                  dob: user.dob,
+                  mobile: user.mobile,
+                  aadhaar: user.aadhaar,
+                  role: user.role,
+                },
+              });
+            }
+          );
         }
       );
     } catch (err) {
@@ -95,6 +108,49 @@ router.post(
     }
   }
 );
+
+// @route   POST /api/auth/refresh-token
+// @desc    Refresh access token using refresh token
+// @access  Public
+router.post("/refresh-token", async (req, res) => {
+  const { refreshToken } = req.body;
+  
+  if (!refreshToken) {
+    return res.status(401).json({ msg: "No refresh token provided" });
+  }
+  
+  try {
+    // Verify the refresh token
+    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+    
+    // Get user from database
+    const user = await User.findById(decoded.user.id).select("-password");
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+    
+    // Create new access token
+    const payload = {
+      user: {
+        id: user.id,
+        role: user.role,
+      },
+    };
+    
+    jwt.sign(
+      payload,
+      process.env.JWT_SECRET,
+      { expiresIn: 60 * 60 * 24 }, // 1 day for access token
+      (err, token) => {
+        if (err) throw err;
+        res.json({ token });
+      }
+    );
+  } catch (err) {
+    console.error("Error refreshing token:", err);
+    return res.status(401).json({ msg: "Invalid refresh token" });
+  }
+});
 
 // @route   GET /api/auth/me
 // @desc    Get current user
@@ -140,15 +196,17 @@ router.put("/profile", protect, async (req, res) => {
     profileFields.fatherName = fatherName;
     profileFields.address = address;
 
-    // Check if email is already in use by another user
+    // Check if email is already in use by another user (case-insensitive)
     if (email) {
-      const existingUser = await User.findOne({ email });
-      if (
-        existingUser &&
-        existingUser._id.toString() !== req.user._id.toString()
-      ) {
+      const existingUser = await User.findOne({ 
+        email: { $regex: new RegExp('^' + email + '$', 'i') },
+        _id: { $ne: req.user._id } // Exclude current user
+      });
+      if (existingUser) {
         return res.status(400).json({ message: "Email already in use", code: "EMAIL_IN_USE" });
       }
+      // Store email in lowercase for consistency
+      profileFields.email = email.toLowerCase();
     }
     
     // Check if PAN is already in use by another user
@@ -252,8 +310,8 @@ router.post(
     const { name, email, password, panCardNo, dob, mobile, aadhaarNo, role = "user" } = req.body;
 
     try {
-      // Check if user exists with the same email or PAN
-      let userByEmail = await User.findOne({ email });
+      // Check if user exists with the same email or PAN (case-insensitive for email)
+      let userByEmail = await User.findOne({ email: { $regex: new RegExp('^' + email + '$', 'i') } });
       let userByPan = await User.findOne({ pan: panCardNo });
 
       if (userByEmail) {
@@ -264,10 +322,10 @@ router.post(
         return res.status(400).json({ message: "User with this PAN number already exists", code: "PAN_IN_USE" });
       }
 
-      // Create user
+      // Create user - store email in lowercase for consistency
       user = new User({
         name,
-        email,
+        email: email.toLowerCase(), // Store email in lowercase
         password,
         pan: panCardNo,
         dob,
@@ -287,26 +345,37 @@ router.post(
         },
       };
 
+      // Create access token (shorter expiration)
       jwt.sign(
         payload,
         process.env.JWT_SECRET,
-        { expiresIn: "5 days" },
+        { expiresIn: 60 * 60 * 24 }, // 1 day for access token
         (err, token) => {
           if (err) throw err;
-          res.json({
-            token,
-            user: {
-              id: user.id,
-              name: user.name,
-              email: user.email,
-              pan: user.pan,
-              dob: user.dob,
-              mobile: user.mobile,
-              aadhaar: user.aadhaar,
-              role: user.role,
-
-            },
-          });
+          
+          // Create refresh token (longer expiration)
+          jwt.sign(
+            payload,
+            process.env.JWT_REFRESH_SECRET,
+            { expiresIn: 60 * 60 * 24 * 30 }, // 30 days for refresh token
+            (err, refreshToken) => {
+              if (err) throw err;
+              res.json({
+                token,
+                refreshToken,
+                user: {
+                  id: user.id,
+                  name: user.name,
+                  email: user.email,
+                  pan: user.pan,
+                  dob: user.dob,
+                  mobile: user.mobile,
+                  aadhaar: user.aadhaar,
+                  role: user.role
+                }
+              });
+            }
+          );
         }
       );
     } catch (err) {

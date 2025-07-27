@@ -500,7 +500,8 @@ router.post("/document/:formId", protect, upload.single("document"), handleMulte
       fileType: req.file.mimetype,
       fileSize: req.file.size,
       fileData: req.file.buffer,
-      contentType: req.file.mimetype
+      contentType: req.file.mimetype,
+      isEdited: true // Mark this document as edited since it's being added after initial submission
     };
     
     // Add the new document to the documents array

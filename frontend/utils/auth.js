@@ -3,9 +3,10 @@ import { useRouter } from "next/router";
 import { httpClient } from "./httpClient";
 
 // Set auth token and user info
-export const setAuth = (token, user) => {
+export const setAuth = (token, refreshToken, user) => {
   if (token) {
     localStorage.setItem("token", token);
+    localStorage.setItem("refreshToken", refreshToken);
     localStorage.setItem("user", JSON.stringify(user));
     httpClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   }
@@ -57,12 +58,51 @@ export const getUserRole = () => {
 export const logout = () => {
   if (typeof window !== "undefined") {
     localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
     setAuthToken(null);
   }
 };
 
 // Auth middleware for protected routes
+// Setup token refresh before expiration
+export const setupTokenRefresh = () => {
+  const token = localStorage.getItem('token');
+  if (!token) return;
+  
+  try {
+    // Decode token to get expiration time
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const expiresIn = payload.exp * 1000 - Date.now(); // Convert to milliseconds
+    
+    // Set up refresh 5 minutes before expiration
+    const refreshTime = expiresIn - (5 * 60 * 1000);
+    
+    if (refreshTime > 0) {
+      setTimeout(async () => {
+        try {
+          const refreshToken = localStorage.getItem('refreshToken');
+          if (!refreshToken) return;
+          
+          const response = await httpClient.post('/api/auth/refresh-token', { refreshToken });
+          const { token } = response.data;
+          
+          localStorage.setItem('token', token);
+          httpClient.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+          
+          // Set up the next refresh
+          setupTokenRefresh();
+        } catch (error) {
+          console.error('Failed to refresh token:', error);
+          // Handle refresh failure
+        }
+      }, refreshTime);
+    }
+  } catch (error) {
+    console.error('Error setting up token refresh:', error);
+  }
+};
+
 export const withAuth = (WrappedComponent, requiredRole) => {
   const Wrapper = (props) => {
     const router = useRouter();
@@ -84,6 +124,9 @@ export const withAuth = (WrappedComponent, requiredRole) => {
         } else {
           // Set auth token for axios requests
           setAuthToken(token);
+          
+          // Setup token refresh mechanism
+          setupTokenRefresh();
 
           // Check if user has required role (if specified)
           if (requiredRole && userRole !== requiredRole) {

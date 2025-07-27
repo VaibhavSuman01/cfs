@@ -22,8 +22,8 @@ export default function Login() {
         role: "admin", // Specify admin role
       });
 
-      // Store the token and user info
-      setAuth(response.data.token, response.data.user);
+      // Store the token, refresh token and user info
+      setAuth(response.data.token, response.data.refreshToken, response.data.user);
       toast.success("Login successful!");
       router.push("/admin/dashboard");
     } catch (error) {

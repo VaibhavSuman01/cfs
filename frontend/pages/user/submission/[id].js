@@ -7,7 +7,10 @@ import { withAuth } from "../../../utils/auth";
 import httpClient, { API_PATHS } from "../../../utils/httpClient";
 import { handleApiErrorWithToast } from "../../../utils/errorHandler";
 import { SectionLoading } from "../../../components/LoadingState";
-import { getFileUrl, formatFileSize, downloadDocumentWithAuth } from "../../../utils/fileUtils";
+import {
+  formatFileSize,
+  downloadDocumentWithAuth,
+} from "../../../utils/fileUtils";
 import {
   DocumentTextIcon,
   ClockIcon,
@@ -42,22 +45,22 @@ function SubmissionDetail() {
 
       try {
         setLoading(true);
-        
+
         // Fetch submission details
         const submissionResponse = await httpClient.get(
           API_PATHS.FORMS.USER_SUBMISSION_DETAIL(id)
         );
         setSubmission(submissionResponse.data);
-        
+
         // Fetch user data to get edit count
         const userResponse = await httpClient.get(API_PATHS.AUTH.ME);
         const userData = userResponse.data;
-        
+
         // Check if documentEditCounts exists and has an entry for this submission
         if (userData.documentEditCounts && userData.documentEditCounts[id]) {
           const count = userData.documentEditCounts[id];
           setEditCount(count);
-          
+
           // Check if max edits reached
           if (count >= 2) {
             setMaxEditsReached(true);
@@ -154,8 +157,8 @@ function SubmissionDetail() {
         <div className="min-h-screen bg-gray-50 flex justify-center items-center">
           <div className="text-center">
             <p className="text-gray-500 mb-4">Submission not found</p>
-            <Link 
-              href="/user/submissions" 
+            <Link
+              href="/user/submissions"
               className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
             >
               Back to Submissions
@@ -166,44 +169,7 @@ function SubmissionDetail() {
     );
   }
 
-  // Handle document deletion
-  const handleDeleteDocument = async (documentId, documentType) => {
-    if (!confirm("Are you sure you want to delete this document?")) return;
-    
-    if (maxEditsReached) {
-      toast.error("You've reached the maximum number of edits");
-      return;
-    }
-
-    try {
-      const response = await httpClient.delete(
-        API_PATHS.FORMS.DELETE_DOCUMENT(documentId)
-      );
-
-      // Update the submission state to remove the deleted document
-      setSubmission(prevSubmission => {
-        const updatedSubmission = { ...prevSubmission };
-        // Remove the document from the documents array
-        updatedSubmission.documents = updatedSubmission.documents.filter(
-          doc => doc._id !== documentId
-        );
-        // Remove the document from the specific document type field
-        updatedSubmission[documentType] = null;
-        return updatedSubmission;
-      });
-      
-      // Update edit count
-      const newCount = editCount + 1;
-      setEditCount(newCount);
-      if (newCount >= 2) {
-        setMaxEditsReached(true);
-      }
-
-      toast.success("Document deleted successfully");
-    } catch (error) {
-      handleApiErrorWithToast(error, "Failed to delete document");
-    }
-  };
+  // Document deletion functionality removed as per requirement
 
   // Handle file selection for upload
   const handleFileChange = (e) => {
@@ -240,8 +206,8 @@ function SubmissionDetail() {
 
       // Update the submission state to include the new document
       const newDocument = response.data.document;
-      
-      setSubmission(prevSubmission => {
+
+      setSubmission((prevSubmission) => {
         const updatedSubmission = { ...prevSubmission };
         // Add the document to the documents array
         if (!updatedSubmission.documents) {
@@ -295,7 +261,9 @@ function SubmissionDetail() {
         <div className="w-1/4 text-gray-500">{label}</div>
         <div className="w-3/4 text-gray-900 flex justify-between items-center">
           <button
-            onClick={() => downloadDocumentWithAuth(file._id, file.originalName)}
+            onClick={() =>
+              downloadDocumentWithAuth(file._id, file.originalName)
+            }
             className="inline-flex items-center text-primary-600 hover:text-primary-900"
           >
             <span className="truncate">{file.originalName}</span>
@@ -304,18 +272,7 @@ function SubmissionDetail() {
             </span>
             <ArrowDownTrayIcon className="ml-1 h-4 w-4" />
           </button>
-          {editMode && (
-            <button
-                onClick={() => handleDeleteDocument(file._id, file.documentType)}
-                disabled={maxEditsReached}
-                className={`text-red-600 hover:text-red-800 ml-2 ${maxEditsReached ? 'opacity-50 cursor-not-allowed' : ''}`}
-                title="Delete document"
-              >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-            </button>
-          )}
+          {/* Delete button removed as per requirement */}
         </div>
       </div>
     );
@@ -338,8 +295,8 @@ function SubmissionDetail() {
       <div className="min-h-screen bg-gray-50 py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-6">
-            <Link 
-              href="/user/submissions" 
+            <Link
+              href="/user/submissions"
               className="inline-flex items-center text-sm text-primary-600 hover:text-primary-900 mb-4"
             >
               <ArrowLeftIcon className="mr-1 h-4 w-4" />
@@ -429,32 +386,44 @@ function SubmissionDetail() {
                 <button
                   onClick={() => setEditMode(!editMode)}
                   disabled={maxEditsReached && !editMode}
-                  className={`px-4 py-2 rounded-md text-sm font-medium ${editMode ? 'bg-gray-200 text-gray-800' : maxEditsReached ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-primary-600 text-white hover:bg-primary-700'}`}
+                  className={`px-4 py-2 rounded-md text-sm font-medium ${
+                    editMode
+                      ? "bg-gray-200 text-gray-800"
+                      : maxEditsReached
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      : "bg-primary-600 text-white hover:bg-primary-700"
+                  }`}
                 >
-                  {editMode ? 'Cancel Edit' : 'Edit Documents'}
+                  {editMode ? "Cancel Edit" : "Edit Documents"}
                 </button>
                 <div className="text-xs text-gray-500 mt-1">
-                  {maxEditsReached ? 
-                    "You've reached the maximum number of edits (2)" : 
-                    `${editCount}/2 edits used`}
+                  {maxEditsReached
+                    ? "You've reached the maximum number of edits (2)"
+                    : `${editCount}/2 edits used`}
                 </div>
               </div>
             </div>
             <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
               {editMode && (
                 <div className="mb-6 p-4 bg-gray-50 rounded-md">
-                  <h4 className="text-md font-medium text-gray-900 mb-2">Upload New Document</h4>
+                  <h4 className="text-md font-medium text-gray-900 mb-2">
+                    Upload New Document
+                  </h4>
                   {maxEditsReached ? (
                     <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
                       <p className="text-sm text-yellow-700">
-                        You've reached the maximum number of edits (2) allowed for this submission.
+                        You've reached the maximum number of edits (2) allowed
+                        for this submission.
                       </p>
                     </div>
                   ) : (
                     <>
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
-                          <label htmlFor="documentType" className="block text-sm font-medium text-gray-700 mb-1">
+                          <label
+                            htmlFor="documentType"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                          >
                             Document Type
                           </label>
                           <select
@@ -473,7 +442,10 @@ function SubmissionDetail() {
                           </select>
                         </div>
                         <div>
-                          <label htmlFor="document" className="block text-sm font-medium text-gray-700 mb-1">
+                          <label
+                            htmlFor="document"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                          >
                             Document File
                           </label>
                           <input
@@ -488,10 +460,24 @@ function SubmissionDetail() {
                       <div className="mt-4 flex justify-end">
                         <button
                           onClick={handleUploadDocument}
-                          disabled={uploadingDocument || !selectedFile || !documentType || maxEditsReached}
-                          className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${uploadingDocument || !selectedFile || !documentType || maxEditsReached ? 'bg-gray-300 cursor-not-allowed' : 'bg-primary-600 hover:bg-primary-700'}`}
+                          disabled={
+                            uploadingDocument ||
+                            !selectedFile ||
+                            !documentType ||
+                            maxEditsReached
+                          }
+                          className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${
+                            uploadingDocument ||
+                            !selectedFile ||
+                            !documentType ||
+                            maxEditsReached
+                              ? "bg-gray-300 cursor-not-allowed"
+                              : "bg-primary-600 hover:bg-primary-700"
+                          }`}
                         >
-                          {uploadingDocument ? 'Uploading...' : 'Upload Document'}
+                          {uploadingDocument
+                            ? "Uploading..."
+                            : "Upload Document"}
                         </button>
                       </div>
                     </>
@@ -500,10 +486,7 @@ function SubmissionDetail() {
               )}
               <div className="sm:divide-y sm:divide-gray-200">
                 {renderFileDownload(submission.form16, "Form 16")}
-                {renderFileDownload(
-                  submission.bankStatement,
-                  "Bank Statement"
-                )}
+                {renderFileDownload(submission.bankStatement, "Bank Statement")}
                 {renderFileDownload(
                   submission.investmentProof,
                   "Investment Proof"

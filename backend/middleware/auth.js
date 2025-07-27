@@ -14,8 +14,16 @@ const protect = async (req, res, next) => {
       // Get token from header
       token = req.headers.authorization.split(" ")[1];
 
-      // Verify token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      // Verify token with ignoreExpiration option to handle clock sync issues
+      // This will allow us to check the expiration manually
+      const decoded = jwt.verify(token, process.env.JWT_SECRET, { ignoreExpiration: true });
+      
+      // Check if token is expired
+      const currentTime = Math.floor(Date.now() / 1000);
+      if (decoded.exp && decoded.exp < currentTime) {
+        console.log(`Token expired: exp=${decoded.exp}, current=${currentTime}`);
+        return res.status(401).json({ message: "Not authorized, token expired" });
+      }
 
       // Get user from token
       req.user = await User.findById(decoded.user.id).select("-password");

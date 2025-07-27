@@ -55,8 +55,8 @@ export default function Register() {
       const response = await httpClient.post(API_PATHS.AUTH.REGISTER, payload);
 
       if (response.data.token) {
-        // Store the token and user info
-        setAuth(response.data.token, response.data.user);
+        // Store the token, refresh token and user info
+        setAuth(response.data.token, response.data.refreshToken, response.data.user);
         toast.success("Registration successful!");
 
         router.push("/user/dashboard");

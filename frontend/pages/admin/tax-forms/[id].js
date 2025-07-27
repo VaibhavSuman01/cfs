@@ -15,9 +15,6 @@ import {
   ArrowLeftIcon,
   ExclamationCircleIcon,
   CheckCircleIcon,
-  PhoneIcon,
-  EnvelopeIcon,
-  IdentificationIcon,
 } from "@heroicons/react/24/outline";
 
 function TaxFormDetail() {
@@ -470,6 +467,11 @@ function TaxFormDetail() {
                           key={index}
                           className="relative rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:shadow-md transition-shadow duration-200"
                         >
+                          {doc.isEdited && (
+                            <span className="absolute top-0 right-0 -mt-2 -mr-2 px-2 py-1 text-xs font-medium rounded-full bg-amber-100 text-amber-800">
+                              Edited
+                            </span>
+                          )}
                           <div className="flex items-start space-x-3">
                             <div
                               className={`flex-shrink-0 rounded-md bg-${

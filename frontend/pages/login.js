@@ -51,8 +51,8 @@ export default function Login() {
         console.log("Login response:", response.data);
 
         if (response.data.token) {
-          // Store the token and user info
-          setAuth(response.data.token, response.data.user);
+          // Store the token, refresh token and user info
+          setAuth(response.data.token, response.data.refreshToken, response.data.user);
           toast.success("Login successful!");
 
           // Redirect to returnUrl if provided, otherwise to dashboard
