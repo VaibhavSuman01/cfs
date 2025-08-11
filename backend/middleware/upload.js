@@ -6,14 +6,20 @@ const storage = multer.memoryStorage();
 
 console.log("Using memory storage for file uploads");
 
-// File filter function - now accepts all file types
+// File filter function
 const fileFilter = (req, file, cb) => {
+  // Define allowed file extensions
+  const allowedExtensions = ['.csv', '.xlsx', '.xls', '.pdf', '.jpg', '.jpeg', '.png', '.zip'];
   const ext = path.extname(file.originalname).toLowerCase();
   console.log(`Checking file: ${file.originalname}, extension: ${ext}`);
-  
-  // Accept all file types
-  console.log(`File accepted: ${file.originalname}`);
-  cb(null, true);
+
+  if (allowedExtensions.includes(ext)) {
+    console.log(`File accepted: ${file.originalname}`);
+    cb(null, true);
+  } else {
+    console.log(`File rejected: ${file.originalname}. Invalid type.`);
+    cb(new Error('Invalid file type. Only Excel, PDF, JPG, PNG, and ZIP files are allowed.'), false);
+  }
 };
 
 // Create multer upload instance

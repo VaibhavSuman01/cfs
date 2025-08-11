@@ -15,11 +15,18 @@ const app = express();
 const PORT = process.env.PORT || 5001; // Use environment variable or default to 5001
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://localhost:3001', process.env.FRONTEND_URL, process.env.FRONTEND_URL_ALT].filter(Boolean),
+
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// No longer using uploads folder for file storage
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
 app.use("/api/forms", formRoutes);

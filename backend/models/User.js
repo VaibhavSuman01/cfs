@@ -49,6 +49,9 @@ const UserSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    avatarUrl: {
+      type: String,
+    },
     // Track if user has submitted a tax form
     hasTaxFormSubmission: {
       type: Boolean,
