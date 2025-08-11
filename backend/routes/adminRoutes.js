@@ -8,6 +8,10 @@ const path = require("path");
 const fs = require("fs");
 const ExcelJS = require("exceljs");
 const { validateObjectId } = require("../utils/validation");
+const upload = require("../middleware/upload");
+const sendEmail = require("../utils/email");
+const mongoose = require("mongoose");
+const isValidObjectId = mongoose.Types.ObjectId.isValid;
 
 // Apply auth middleware to all admin routes
 router.use(protect);
@@ -84,9 +88,127 @@ router.get("/forms/:id", validateObjectId(), async (req, res) => {
       return res.status(404).json({ message: "Form not found" });
     }
 
-    res.json(form);
+    res.json({ data: form });
   } catch (error) {
     console.error("Get form error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// @route   GET /api/admin/forms/:id/documents/:documentId
+// @desc    Download a document from a tax form submission (admin access)
+// @access  Private/Admin
+router.get("/forms/:id/documents/:documentId", validateObjectId('id'), async (req, res) => {
+  try {
+    const formId = req.params.id;
+    const documentId = req.params.documentId;
+    
+    // Validate documentId
+    if (!isValidObjectId(documentId)) {
+      return res.status(400).json({ 
+        message: "Invalid document ID format. Must be a 24-character hex string." 
+      });
+    }
+    
+    // Find the tax form containing the document
+    const taxForm = await TaxForm.findById(formId);
+    
+    if (!taxForm) {
+      return res.status(404).json({ message: "Form not found" });
+    }
+    
+    // Find the specific document in the documents array
+    const document = taxForm.documents.find(doc => doc._id.toString() === documentId);
+    
+    if (!document) {
+      return res.status(404).json({ message: "Document not found" });
+    }
+    
+    // Set response headers
+    res.set({
+      'Content-Type': document.contentType,
+      'Content-Disposition': `attachment; filename="${document.originalName || document.fileName || 'document'}"`
+    });
+    
+    // Send the file data
+    res.send(document.fileData);
+    
+  } catch (error) {
+    console.error("Error downloading document:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// @route   POST /api/admin/forms/:id/send-report
+// @desc    Send a report to the user
+// @access  Private/Admin
+router.post("/forms/:id/send-report", validateObjectId(), upload.single('reportFile'), async (req, res) => {
+  try {
+    const { reportType, message, attachmentIds } = req.body;
+    const id = req.params.id;
+    
+    // Find the tax form
+    const form = await TaxForm.findById(id);
+    
+    if (!form) {
+      return res.status(404).json({ message: "Form not found" });
+    }
+    
+    // Get user email from the form
+    const userEmail = form.email;
+    
+    // TODO: Implement email sending functionality
+    // This would typically involve:
+    // 1. Creating an email with the message
+    // 2. Attaching any documents specified by attachmentIds
+    // 3. Sending the email to the user
+    
+        let newReportDocument = null;
+    if (req.file) {
+      newReportDocument = {
+        documentType: 'admin-report',
+        fileName: req.file.originalname,
+        originalName: req.file.originalname,
+        fileType: req.file.mimetype,
+        fileSize: req.file.size,
+        fileData: req.file.buffer,
+        contentType: req.file.mimetype,
+        uploadedBy: 'admin',
+      };
+      form.documents.push(newReportDocument);
+    }
+
+    // Update the form to record that a report was sent and add the new document
+    form.reports.push({
+      type: reportType,
+      message: message,
+      sentAt: new Date(),
+      sentBy: req.user._id,
+      documentId: newReportDocument ? form.documents[form.documents.length - 1]._id : undefined
+    });
+
+    await form.save();
+
+    // Send an email to the user
+    try {
+      const emailSubject = `A new report has been sent to you: ${reportType}`;
+      const emailMessage = `Hello ${form.fullName},\n\nA new report of type '${reportType}' has been sent to you by the admin.\n\nMessage from admin: ${message}\n\nYou can view and download the report from your dashboard.\n\nThank you,\nCom Finserv Team`;
+
+      await sendEmail({
+        email: userEmail,
+        subject: emailSubject,
+        message: emailMessage,
+      });
+
+      console.log(`Report email sent to ${userEmail}`);
+    } catch (emailError) {
+      console.error(`Failed to send report email to ${userEmail}:`, emailError);
+      // Don't block the response for email failure, just log it
+    }
+    
+    res.json({ success: true, message: "Report sent successfully" });
+  } catch (error) {
+    console.error("Send report error:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -198,16 +320,37 @@ router.get("/contacts", async (req, res) => {
 // @access  Private/Admin
 router.get("/users", async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
+    const { page = 1, limit = 10, search, startDate, endDate } = req.query;
     const skip = (page - 1) * limit;
 
-    const users = await User.find({ role: "user" })
+    let filter = { role: "user" };
+
+    if (search) {
+      const searchRegex = { $regex: search, $options: "i" };
+      filter.$or = [
+        { name: searchRegex },
+        { email: searchRegex },
+        { mobile: searchRegex },
+        { fatherName: searchRegex },
+        { pan: searchRegex },
+        { aadhar: searchRegex },
+        { address: searchRegex },
+      ];
+    }
+
+    if (startDate || endDate) {
+      filter.createdAt = {};
+      if (startDate) filter.createdAt.$gte = new Date(startDate);
+      if (endDate) filter.createdAt.$lte = new Date(endDate);
+    }
+
+    const users = await User.find(filter)
       .select("name fatherName mobile email address pan createdAt")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit));
 
-    const total = await User.countDocuments({ role: "user" });
+    const total = await User.countDocuments(filter);
 
     res.json({
       users,
@@ -229,9 +372,31 @@ router.get("/users", async (req, res) => {
 // @access  Private/Admin
 router.get("/users/download", async (req, res) => {
   try {
-    // Fetch all users with role "user"
-    const users = await User.find({ role: "user" })
-      .select("name fatherName mobile email address pan dob createdAt")
+    const { search, startDate, endDate } = req.query;
+
+    let filter = { role: "user" };
+
+    if (search) {
+      const searchRegex = { $regex: search, $options: "i" };
+      filter.$or = [
+        { name: searchRegex },
+        { email: searchRegex },
+        { mobile: searchRegex },
+        { fatherName: searchRegex },
+        { pan: searchRegex },
+        { aadhar: searchRegex },
+        { address: searchRegex },
+      ];
+    }
+
+    if (startDate || endDate) {
+      filter.createdAt = {};
+      if (startDate) filter.createdAt.$gte = new Date(startDate);
+      if (endDate) filter.createdAt.$lte = new Date(endDate);
+    }
+
+    const users = await User.find(filter)
+      .select("name fatherName mobile email address pan aadhar dob createdAt")
       .sort({ createdAt: -1 });
 
     // Create a new Excel workbook and worksheet
@@ -291,6 +456,39 @@ router.get("/users/download", async (req, res) => {
   } catch (error) {
     console.error("Download users error:", error);
     res.status(500).json({ message: "Server error generating Excel file" });
+  }
+});
+
+// @route   POST /api/admin/contacts/:id/reply
+// @desc    Reply to a contact message
+// @access  Private/Admin
+router.post("/contacts/:id/reply", validateObjectId(), async (req, res) => {
+  try {
+    const { message } = req.body;
+    const contact = await Contact.findById(req.params.id);
+
+    if (!contact) {
+      return res.status(404).json({ message: "Contact not found" });
+    }
+
+    try {
+      await sendEmail({
+        email: contact.email,
+        subject: `Re: Your inquiry about ${contact.service}`,
+        message: `Dear ${contact.name},\n\nThank you for reaching out to us. Here is the response to your query:\n\n${message}\n\nBest regards,\nThe Com Finserv Team`,
+      });
+
+      contact.replied = true;
+      await contact.save();
+
+      res.json({ success: true, message: "Reply sent successfully" });
+    } catch (emailError) {
+      console.error("Send email error:", emailError);
+      res.status(500).json({ message: "Failed to send reply email." });
+    }
+  } catch (error) {
+    console.error("Reply to contact error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 });
 

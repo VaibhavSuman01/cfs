@@ -12,10 +12,23 @@ const ContactSchema = new mongoose.Schema({
     trim: true,
     lowercase: true,
   },
-  message: {
+  phone: {
     type: String,
     required: true,
     trim: true,
+  },
+  service: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  message: {
+    type: String,
+    required: [true, "Message is required"],
+  },
+  replied: {
+    type: Boolean,
+    default: false,
   },
   createdAt: {
     type: Date,

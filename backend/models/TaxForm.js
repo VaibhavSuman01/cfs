@@ -1,143 +1,52 @@
 const mongoose = require("mongoose");
 
-// File schema for document uploads
-const FileSchema = new mongoose.Schema({
-  documentType: {
-    type: String,
-    required: true,
-    enum: [
-      "form16",
-      "bankStatement",
-      "investmentProof",
-      "tradingSummary",
-      "homeLoanCertificate",
-      "salarySlip",
-      "aadharCard",
-      "other"
-    ]
-  },
-  fileName: {
-    type: String,
-    required: true,
-  },
-  originalName: {
-    type: String,
-    required: true,
-  },
-  fileType: {
-    type: String,
-    required: true,
-  },
-  fileSize: {
-    type: Number,
-    required: true,
-  },
-  fileData: {
-    type: Buffer,
-    required: true
-  },
-  contentType: {
-    type: String,
-    required: true
-  },
-  isEdited: {
-    type: Boolean,
-    default: false
-  }
+const documentSchema = new mongoose.Schema({
+  documentType: { type: String, required: true },
+  fileName: { type: String, required: true },
+  originalName: { type: String, required: true },
+  fileType: { type: String, required: true },
+  fileSize: { type: Number, required: true },
+  fileData: { type: Buffer, required: true },
+  contentType: { type: String, required: true },
+  uploadedBy: { type: String, enum: ["user", "admin"], default: "user" },
+  uploadDate: { type: Date, default: Date.now },
 });
 
-const TaxFormSchema = new mongoose.Schema({
-  // Reference to the user who submitted this form
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-  },
-  fullName: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  email: {
-    type: String,
-    required: true,
-    trim: true,
-    lowercase: true,
-  },
-  phone: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  pan: {
-    type: String,
-    required: true,
-    trim: true,
-    uppercase: true,
-    index: true, // Add index for faster queries
-    unique: true, // Ensure PAN numbers are unique across all tax forms
-  },
-  // Conditional fields
-  hasIncomeTaxLogin: {
-    type: Boolean,
-    default: false,
-  },
-  incomeTaxLoginId: {
-    type: String,
-    trim: true,
-  },
-  incomeTaxLoginPassword: {
-    type: String,
-    trim: true,
-  },
-  hasHomeLoan: {
-    type: Boolean,
-    default: false,
-  },
-  homeLoanSanctionDate: {
-    type: String,
-    trim: true,
-  },
-  homeLoanAmount: {
-    type: String,
-    trim: true,
-  },
-  homeLoanCurrentDue: {
-    type: String,
-    trim: true,
-  },
-  homeLoanTotalInterest: {
-    type: String,
-    trim: true,
-  },
-  hasPranNumber: {
-    type: Boolean,
-    default: false,
-  },
-  pranNumber: {
-    type: String,
-    trim: true,
-  },
-  // Document uploads - consolidated into a single array
-  documents: [FileSchema],
-  status: {
-    type: String,
-    enum: ["Pending", "Reviewed", "Filed"],
-    default: "Pending"
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
+const reportSchema = new mongoose.Schema({
+  type: { type: String, required: true },
+  message: { type: String, required: true },
+  sentAt: { type: Date, default: Date.now },
+  sentBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  documentId: { type: mongoose.Schema.Types.ObjectId },
 });
 
-// Update the updatedAt field before saving
-TaxFormSchema.pre("save", function (next) {
-  this.updatedAt = Date.now();
-  next();
+const editHistorySchema = new mongoose.Schema({
+  editedAt: { type: Date, default: Date.now },
+  editorId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 });
 
-module.exports = mongoose.model("TaxForm", TaxFormSchema);
+const taxFormSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  fullName: { type: String, required: true },
+  email: { type: String, required: true },
+  phone: { type: String, required: true },
+  pan: { type: String, required: true, uppercase: true },
+  service: { type: String, required: true },
+  year: { type: String, required: true },
+  hasIncomeTaxLogin: { type: Boolean, default: false },
+  incomeTaxLoginId: { type: String },
+  incomeTaxLoginPassword: { type: String },
+  hasHomeLoan: { type: Boolean, default: false },
+  homeLoanSanctionDate: { type: String },
+  homeLoanAmount: { type: String },
+  homeLoanCurrentDue: { type: String },
+  homeLoanTotalInterest: { type: String },
+  hasPranNumber: { type: Boolean, default: false },
+  pranNumber: { type: String },
+  documents: [documentSchema],
+  status: { type: String, enum: ["Pending", "In Progress", "Completed", "Cancelled"], default: "Pending" },
+  reports: [reportSchema],
+  editHistory: [editHistorySchema],
+}, { timestamps: true });
+
+module.exports = mongoose.model("TaxForm", taxFormSchema);

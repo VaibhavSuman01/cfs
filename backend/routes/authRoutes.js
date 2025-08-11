@@ -4,6 +4,9 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const { protect, admin } = require("../middleware/auth");
+const upload = require("../middleware/upload");
+const path = require("path");
+const fs = require("fs");
 const { check, validationResult } = require("express-validator");
 
 // @route   POST api/auth/login
@@ -168,8 +171,8 @@ router.get("/me", protect, async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
     
-    // Return complete user object with all fields
-    res.json(user);
+    // Return complete user object with all fields wrapped in a data property
+    res.json({ data: user });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
@@ -231,7 +234,7 @@ router.put("/profile", protect, async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.json(user);
+    res.json({ data: user });
   } catch (error) {
     // Log error but don't expose details to client
     console.error("Error in update profile");
@@ -385,5 +388,54 @@ router.post(
 );
 
 // Password reset endpoint will be implemented here
+
+// @route   PUT /api/auth/profile/avatar
+// @desc    Update user avatar
+// @access  Private
+router.put("/profile/avatar", protect, upload.single("avatar"), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: "Please upload a file" });
+  }
+
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Create a unique filename
+    const filename = `avatar-${user._id}${path.extname(req.file.originalname)}`;
+    const uploadsDir = path.join(__dirname, "..", "public", "uploads");
+    const filePath = path.join(uploadsDir, filename);
+
+    // Ensure the uploads directory exists
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+
+    // Write the file from buffer to the uploads directory
+    fs.writeFileSync(filePath, req.file.buffer);
+
+    // Set the avatar URL (relative path for client access)
+    const avatarUrl = `/uploads/${filename}`;
+    user.avatarUrl = avatarUrl;
+
+    await user.save();
+
+    res.json({ 
+      message: "Avatar updated successfully", 
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        avatarUrl: user.avatarUrl,
+      }
+    });
+  } catch (error) {
+    console.error("Avatar upload error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 module.exports = router;

@@ -8,6 +8,7 @@ const upload = require("../middleware/upload");
 const { handleMulterError } = require("../middleware/upload");
 const { protect } = require("../middleware/auth");
 const { isValidObjectId } = require("../utils/validation");
+const { validate, validateObjectId } = require('../utils/validation');
 
 // @route   GET /api/forms/check-pan/:pan
 // @desc    Check if a PAN number already exists in the system
@@ -59,19 +60,15 @@ router.post(
         req.files ? req.files.length : "No files"
       );
 
-      // Check if user already has a tax form submission
-      const user = await mongoose.model("User").findById(req.user._id);
-      if (user.hasTaxFormSubmission) {
-        return res.status(400).json({
-          message: "You have already submitted a tax form. Only one submission is allowed per user."
-        });
-      }
+
 
       const {
         fullName,
         email,
         phone,
         pan,
+        service,
+        year,
         hasIncomeTaxLogin,
         incomeTaxLoginId,
         incomeTaxLoginPassword,
@@ -85,7 +82,7 @@ router.post(
       } = req.body;
 
       // Validate required fields
-      if (!fullName || !email || !phone || !pan) {
+      if (!fullName || !email || !phone || !pan || !service) {
         console.log("Missing required fields");
         return res
           .status(400)
@@ -99,14 +96,7 @@ router.post(
         return res.status(400).json({ message: "Invalid PAN format" });
       }
       
-      // Check if a tax form with this PAN already exists
-      const existingFormWithPAN = await TaxForm.findOne({ pan: pan.toUpperCase() });
-      if (existingFormWithPAN) {
-        console.log("Duplicate PAN submission attempt:", pan);
-        return res.status(409).json({
-          message: "A tax form with this PAN number has already been submitted. Duplicate submissions are not allowed."
-        });
-      }
+
 
       // Validate conditional fields
       if (hasIncomeTaxLogin === "true" && (!incomeTaxLoginId || !incomeTaxLoginPassword)) {
@@ -135,6 +125,8 @@ router.post(
         email,
         phone,
         pan,
+        service,
+        year,
         hasIncomeTaxLogin: hasIncomeTaxLogin === "true",
         incomeTaxLoginId: incomeTaxLoginId || "",
         incomeTaxLoginPassword: incomeTaxLoginPassword || "",
@@ -217,6 +209,12 @@ router.post(
         formId: taxForm._id,
       });
     } catch (error) {
+      // Handle duplicate key error for the compound index (user, service, year)
+      if (error.code === 11000) {
+        return res.status(409).json({
+          message: `You have already submitted a form for this service for the year ${new Date().getFullYear()}. You can only submit one form per service each year.`,
+        });
+      }
       console.error("Error in tax form submission:", error);
       res.status(500).json({
         message: "Server error while processing tax form",
@@ -231,21 +229,23 @@ router.post(
 // @access  Public
 router.post("/contact", async (req, res) => {
   try {
-    const { name, email, message } = req.body;
+    const { name, email, phone, service, message } = req.body;
 
     // Validate required fields
-    if (!name || !email || !message) {
+    if (!name || !email || !phone || !service || !message) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
     // Create new contact submission
-    const contact = new Contact({
+    const newContact = new Contact({
       name,
       email,
+      phone,
+      service,
       message,
     });
 
-    await contact.save();
+    await newContact.save();
 
     res.status(201).json({
       success: true,
@@ -270,7 +270,7 @@ router.get("/user-submissions", protect, async (req, res) => {
       .sort({ createdAt: -1 }) // Sort by newest first
       .select("-incomeTaxLoginCredentials -documents.fileData"); // Exclude sensitive data and file data
 
-    res.json(submissions);
+    res.json({ data: submissions });
   } catch (error) {
     console.error("Error fetching user submissions:", error);
     res.status(500).json({ message: "Server error" });
@@ -306,7 +306,7 @@ router.get("/user-submissions/:id", protect, async (req, res) => {
       });
     }
 
-    res.json(processedSubmission);
+    res.json({ data: processedSubmission });
   } catch (error) {
     console.error("Error fetching submission details:", error);
     res.status(500).json({ message: "Server error" });
