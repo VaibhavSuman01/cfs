@@ -1,10 +1,19 @@
-'use client';
+"use client";
 
-import { createContext, ReactNode, useContext, useEffect, useState, useRef, useCallback } from 'react';
-import { Toaster } from 'sonner';
-import { usePathname } from 'next/navigation';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthProvider } from '../providers/auth-provider';
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+} from "react";
+import { Toaster } from "sonner";
+import { usePathname } from "next/navigation";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AuthProvider } from "../providers/auth-provider";
+import { isStorageNearQuota, clearOldestItems } from "../utils/storageManager";
 
 interface StorageMonitorContextType {
   isNearQuota: boolean;
@@ -33,19 +42,36 @@ export function Providers({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const isMountedRef = useRef(true);
 
+  // Function to check storage status
+  const checkStorage = useCallback(() => {
+    try {
+      if (typeof window === "undefined") return false;
+      const nearQuota = isStorageNearQuota(80);
+      setIsNearQuota(nearQuota);
+      return nearQuota;
+    } catch (error) {
+      console.error("Error checking storage:", error);
+      return false;
+    }
+  }, []);
 
   // Function to clear cache
-  const clearCache = useCallback((percentToClear = 20) => {
-    try {
-      if (typeof window === 'undefined') return 0;
-      const itemsCleared = clearOldestItems(percentToClear, 'api_cache_');
+  const clearCache = useCallback(
+    (percentToClear = 20) => {
+      try {
+        if (typeof window === "undefined") return 0;
+        const itemsCleared = clearOldestItems(percentToClear, "api_cache_");
 
-      return itemsCleared;
-    } catch (error) {
-      console.error('Error clearing cache:', error);
-      return 0;
-    }
-  }, [checkStorage]);
+        // Re-evaluate storage status after clearing
+        checkStorage();
+        return itemsCleared;
+      } catch (error) {
+        console.error("Error clearing cache:", error);
+        return 0;
+      }
+    },
+    [checkStorage]
+  );
 
   // Auto-cleanup when storage is near quota
   const autoCleanup = useCallback(() => {
@@ -57,18 +83,18 @@ export function Providers({ children }: { children: ReactNode }) {
   // Set up periodic checking
   useEffect(() => {
     // Only run on client
-    if (typeof window === 'undefined') return;
-    
+    if (typeof window === "undefined") return;
+
     // Initial check
     checkStorage();
-    
+
     // Set up interval
     const intervalId = setInterval(() => {
       if (isMountedRef.current) {
         autoCleanup();
       }
     }, 120000); // Check every 2 minutes
-    
+
     // Clean up on unmount
     return () => {
       clearInterval(intervalId);
@@ -77,26 +103,27 @@ export function Providers({ children }: { children: ReactNode }) {
 
   // Set up error listener for quota exceeded errors
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    
+    if (typeof window === "undefined") return;
+
     const handleStorageError = (event: ErrorEvent) => {
       // Check if it's a storage error
-      if (event.message && 
-          (event.message.includes('QuotaExceededError') || 
-           event.message.includes('exceeded the quota') || 
-           event.message.includes('NS_ERROR_DOM_QUOTA_REACHED'))) {
-        
+      if (
+        event.message &&
+        (event.message.includes("QuotaExceededError") ||
+          event.message.includes("exceeded the quota") ||
+          event.message.includes("NS_ERROR_DOM_QUOTA_REACHED"))
+      ) {
         // Aggressively clear cache
         clearCache(30);
       }
     };
-    
+
     // Add global error listener
-    window.addEventListener('error', handleStorageError);
-    
+    window.addEventListener("error", handleStorageError);
+
     // Clean up
     return () => {
-      window.removeEventListener('error', handleStorageError);
+      window.removeEventListener("error", handleStorageError);
       isMountedRef.current = false;
     };
   }, [clearCache]);
@@ -116,7 +143,9 @@ export function Providers({ children }: { children: ReactNode }) {
 export const useStorageMonitor = () => {
   const context = useContext(StorageMonitorContext);
   if (context === undefined) {
-    throw new Error('useStorageMonitor must be used within a StorageMonitorProvider');
+    throw new Error(
+      "useStorageMonitor must be used within a StorageMonitorProvider"
+    );
   }
   return context;
 };

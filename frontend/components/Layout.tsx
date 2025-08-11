@@ -1,5 +1,5 @@
-import React, { ReactNode } from 'react';
-import Header from "./Header";
+import React, { ReactNode } from "react";
+import { Header } from "./header";
 import Footer from "./Footer";
 import RunningBanner from "./RunningBanner";
 

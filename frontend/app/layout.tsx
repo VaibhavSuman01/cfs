@@ -1,20 +1,24 @@
-import type { Metadata } from 'next';
-import { EnhancedFooter } from '@/components/enhanced-footer';
-import { Inter } from 'next/font/google';
-import './globals.css';
-import { ClientProviders } from './client-providers';
-import { AuthProvider } from '@/providers/auth-provider';
+import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import { ClientProviders } from "./client-providers";
+import { AuthProvider } from "@/providers/auth-provider";
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'ComfinServ - Your Business Registration Partner',
-  description: 'Getting your business started with simple, swift and reasonably priced legal services, online.',
-  generator: 'v0.dev',
-  viewport: 'width=device-width, initial-scale=1',
+  title: "ComfinServ - Your Business Registration Partner",
+  description:
+    "Getting your business started with simple, swift and reasonably priced legal services, online.",
+  generator: "v0.dev",
   icons: {
-    icon: '/favicon.ico',
+    icon: "/favicon.ico",
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
@@ -25,14 +29,14 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <meta name="description" content="Professional financial services including tax filing, GST registration, company incorporation, and financial auditing." />
+        <meta
+          name="description"
+          content="Professional financial services including tax filing, GST registration, company incorporation, and financial auditing."
+        />
       </head>
       <body className={`${inter.className} min-h-screen`}>
         <ClientProviders>
-          <AuthProvider>
-            {children}
-            <EnhancedFooter />
-          </AuthProvider>
+          <AuthProvider>{children}</AuthProvider>
         </ClientProviders>
       </body>
     </html>

@@ -1,15 +1,30 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { useAuth } from '@/providers/auth-provider';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Loader2, FileText, ArrowLeft, Download, Clock, CheckCircle, AlertCircle } from 'lucide-react';
-import { toast } from 'sonner';
-import api from '@/lib/api-client';
+import React, { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useAuth } from "@/providers/auth-provider";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import {
+  Loader2,
+  FileText,
+  ArrowLeft,
+  Download,
+  Clock,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
+import { toast } from "sonner";
+import api from "@/lib/api-client";
 
 interface TaxForm {
   _id: string;
@@ -19,13 +34,15 @@ interface TaxForm {
   grossIncome: string;
   deductions: string;
   additionalNotes: string;
-  status: 'Pending' | 'Reviewed' | 'Filed';
+  status: "Pending" | "Reviewed" | "Filed";
   createdAt: string;
   updatedAt: string;
   documents?: {
     _id: string;
-    filename: string;
-    path: string;
+    originalName?: string;
+    fileName?: string;
+    fileType?: string;
+    fileSize?: number;
   }[];
   comments?: {
     _id: string;
@@ -42,18 +59,18 @@ export default function FormDetailPage() {
   const { user, isLoading } = useAuth();
   const [form, setForm] = useState<TaxForm | null>(null);
   const [isLoadingForm, setIsLoadingForm] = useState(true);
-  const [comment, setComment] = useState('');
+  const [comment, setComment] = useState("");
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
 
   useEffect(() => {
     const fetchFormDetails = async () => {
       try {
         setIsLoadingForm(true);
-                const response = await api.get(`/api/forms/user-submissions/${id}`);
+        const response = await api.get(`/api/forms/user-submissions/${id}`);
         setForm(response.data.data);
       } catch (error) {
-        console.error('Failed to fetch form details:', error);
-        toast.error('Failed to load form details. Please try again.');
+        console.error("Failed to fetch form details:", error);
+        toast.error("Failed to load form details. Please try again.");
       } finally {
         setIsLoadingForm(false);
       }
@@ -71,15 +88,15 @@ export default function FormDetailPage() {
     try {
       setIsSubmittingComment(true);
       await api.post(`/api/forms/${id}/comments`, { text: comment });
-      
+
       // Refresh form data to get the new comment
       const response = await api.get(`/api/forms/user-submissions/${id}`);
       setForm(response.data);
-      setComment('');
-      toast.success('Comment added successfully');
+      setComment("");
+      toast.success("Comment added successfully");
     } catch (error) {
-      console.error('Failed to add comment:', error);
-      toast.error('Failed to add comment. Please try again.');
+      console.error("Failed to add comment:", error);
+      toast.error("Failed to add comment. Please try again.");
     } finally {
       setIsSubmittingComment(false);
     }
@@ -87,44 +104,43 @@ export default function FormDetailPage() {
 
   const downloadDocument = async (documentId: string, filename: string) => {
     try {
-      const response = await api.get(`/api/forms/${id}/documents/${documentId}`, {
-        responseType: 'blob',
+      const response = await api.get(`/api/forms/download/${documentId}`, {
+        responseType: "blob",
       });
-      
-      // Create a download link
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
+      const blob = response.data as Blob;
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
       link.href = url;
-      link.setAttribute('download', filename);
+      link.setAttribute("download", filename || "document");
       document.body.appendChild(link);
       link.click();
       link.remove();
     } catch (error) {
-      console.error('Failed to download document:', error);
-      toast.error('Failed to download document. Please try again.');
+      console.error("Failed to download document:", error);
+      toast.error("Failed to download document. Please try again.");
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Pending':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'Reviewed':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'Filed':
-        return 'bg-green-100 text-green-800 border-green-200';
+      case "Pending":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "Reviewed":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "Filed":
+        return "bg-green-100 text-green-800 border-green-200";
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'Pending':
+      case "Pending":
         return <Clock className="h-4 w-4" />;
-      case 'Reviewed':
+      case "Reviewed":
         return <AlertCircle className="h-4 w-4" />;
-      case 'Filed':
+      case "Filed":
         return <CheckCircle className="h-4 w-4" />;
       default:
         return null;
@@ -133,10 +149,10 @@ export default function FormDetailPage() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
@@ -152,7 +168,11 @@ export default function FormDetailPage() {
     return (
       <div className="container mx-auto p-6">
         <div className="flex items-center mb-6">
-          <Button variant="ghost" onClick={() => router.push('/dashboard')} className="mr-4">
+          <Button
+            variant="ghost"
+            onClick={() => router.push("/dashboard")}
+            className="mr-4"
+          >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
           </Button>
@@ -161,8 +181,12 @@ export default function FormDetailPage() {
           <CardContent className="flex flex-col items-center justify-center py-12">
             <FileText className="h-16 w-16 text-muted-foreground opacity-50 mb-4" />
             <h2 className="text-xl font-semibold mb-2">Form Not Found</h2>
-            <p className="text-muted-foreground mb-6">The requested tax form could not be found.</p>
-            <Button onClick={() => router.push('/dashboard')}>Return to Dashboard</Button>
+            <p className="text-muted-foreground mb-6">
+              The requested tax form could not be found.
+            </p>
+            <Button onClick={() => router.push("/dashboard")}>
+              Return to Dashboard
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -172,20 +196,26 @@ export default function FormDetailPage() {
   return (
     <div className="container mx-auto p-6">
       <div className="flex items-center mb-6">
-        <Button variant="ghost" onClick={() => router.push('/dashboard')} className="mr-4">
+        <Button
+          variant="ghost"
+          onClick={() => router.push("/dashboard")}
+          className="mr-4"
+        >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Dashboard
         </Button>
         <h1 className="text-3xl font-bold">Tax Form Details</h1>
       </div>
-      
+
       <div className="grid gap-6 md:grid-cols-3">
         <div className="md:col-span-2 space-y-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Tax Form Information</CardTitle>
-                <CardDescription>Submitted on {formatDate(form.createdAt)}</CardDescription>
+                <CardDescription>
+                  Submitted on {formatDate(form.createdAt)}
+                </CardDescription>
               </div>
               <Badge variant="outline" className={getStatusColor(form.status)}>
                 <span className="flex items-center">
@@ -198,56 +228,92 @@ export default function FormDetailPage() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <h3 className="text-sm font-medium text-muted-foreground">Tax Year</h3>
+                    <h3 className="text-sm font-medium text-muted-foreground">
+                      Tax Year
+                    </h3>
                     <p className="text-base">{form.taxYear}</p>
                   </div>
                   <div>
-                    <h3 className="text-sm font-medium text-muted-foreground">Income Type</h3>
-                    <p className="text-base">{form.incomeType ? form.incomeType.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'None'}</p>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <h3 className="text-sm font-medium text-muted-foreground">Gross Income</h3>
-                    <p className="text-base">₹{parseInt(form.grossIncome).toLocaleString('en-IN')}</p>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-muted-foreground">Deductions</h3>
+                    <h3 className="text-sm font-medium text-muted-foreground">
+                      Income Type
+                    </h3>
                     <p className="text-base">
-                      {form.deductions ? `₹${parseInt(form.deductions).toLocaleString('en-IN')}` : 'None'}
+                      {form.incomeType
+                        ? form.incomeType
+                            .replace("_", " ")
+                            .replace(/\b\w/g, (l) => l.toUpperCase())
+                        : "None"}
                     </p>
                   </div>
                 </div>
-                
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h3 className="text-sm font-medium text-muted-foreground">
+                      Gross Income
+                    </h3>
+                    <p className="text-base">
+                      ₹{parseInt(form.grossIncome).toLocaleString("en-IN")}
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-muted-foreground">
+                      Deductions
+                    </h3>
+                    <p className="text-base">
+                      {form.deductions
+                        ? `₹${parseInt(form.deductions).toLocaleString(
+                            "en-IN"
+                          )}`
+                        : "None"}
+                    </p>
+                  </div>
+                </div>
+
                 {form.additionalNotes && (
                   <div>
-                    <h3 className="text-sm font-medium text-muted-foreground">Additional Notes</h3>
-                    <p className="text-base whitespace-pre-line">{form.additionalNotes}</p>
+                    <h3 className="text-sm font-medium text-muted-foreground">
+                      Additional Notes
+                    </h3>
+                    <p className="text-base whitespace-pre-line">
+                      {form.additionalNotes}
+                    </p>
                   </div>
                 )}
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader>
               <CardTitle>Documents</CardTitle>
-              <CardDescription>Supporting documents for your tax form</CardDescription>
+              <CardDescription>
+                Supporting documents for your tax form
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {form.documents && form.documents.length > 0 ? (
                 <div className="space-y-2">
                   {form.documents.map((doc) => (
-                    <div key={doc._id} className="flex items-center justify-between bg-muted p-3 rounded-md">
+                    <div
+                      key={doc._id}
+                      className="flex items-center justify-between bg-muted p-3 rounded-md"
+                    >
                       <div className="flex items-center">
                         <FileText className="h-4 w-4 mr-2 text-primary" />
-                        <span className="text-sm">{doc.filename}</span>
+                        <span className="text-sm">
+                          {doc.originalName || doc.fileName || "Document"}
+                        </span>
                       </div>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={() => downloadDocument(doc._id, doc.filename)}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() =>
+                          downloadDocument(
+                            doc._id,
+                            doc.originalName || doc.fileName || "document"
+                          )
+                        }
                       >
                         <Download className="h-4 w-4" />
                       </Button>
@@ -257,26 +323,37 @@ export default function FormDetailPage() {
               ) : (
                 <div className="text-center py-6">
                   <FileText className="mx-auto h-8 w-8 text-muted-foreground opacity-50" />
-                  <p className="mt-2 text-sm text-muted-foreground">No documents attached</p>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    No documents attached
+                  </p>
                 </div>
               )}
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader>
               <CardTitle>Comments</CardTitle>
-              <CardDescription>Communication regarding your tax form</CardDescription>
+              <CardDescription>
+                Communication regarding your tax form
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {form.comments && form.comments.length > 0 ? (
                   <div className="space-y-4">
                     {form.comments.map((comment) => (
-                      <div key={comment._id} className={`p-3 rounded-md ${comment.isAdmin ? 'bg-primary/10 ml-8' : 'bg-muted mr-8'}`}>
+                      <div
+                        key={comment._id}
+                        className={`p-3 rounded-md ${
+                          comment.isAdmin
+                            ? "bg-primary/10 ml-8"
+                            : "bg-muted mr-8"
+                        }`}
+                      >
                         <div className="flex justify-between items-start mb-1">
                           <span className="text-sm font-medium">
-                            {comment.isAdmin ? 'Tax Consultant' : 'You'}
+                            {comment.isAdmin ? "Tax Consultant" : "You"}
                           </span>
                           <span className="text-xs text-muted-foreground">
                             {new Date(comment.createdAt).toLocaleString()}
@@ -288,12 +365,14 @@ export default function FormDetailPage() {
                   </div>
                 ) : (
                   <div className="text-center py-6">
-                    <p className="text-sm text-muted-foreground">No comments yet</p>
+                    <p className="text-sm text-muted-foreground">
+                      No comments yet
+                    </p>
                   </div>
                 )}
-                
+
                 <Separator className="my-4" />
-                
+
                 <form onSubmit={handleSubmitComment} className="space-y-2">
                   <textarea
                     className="w-full min-h-[100px] p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -301,14 +380,17 @@ export default function FormDetailPage() {
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
                   />
-                  <Button type="submit" disabled={isSubmittingComment || !comment.trim()}>
+                  <Button
+                    type="submit"
+                    disabled={isSubmittingComment || !comment.trim()}
+                  >
                     {isSubmittingComment ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Sending...
                       </>
                     ) : (
-                      'Add Comment'
+                      "Add Comment"
                     )}
                   </Button>
                 </form>
@@ -316,7 +398,7 @@ export default function FormDetailPage() {
             </CardContent>
           </Card>
         </div>
-        
+
         <div className="space-y-6">
           <Card>
             <CardHeader>
@@ -330,13 +412,21 @@ export default function FormDetailPage() {
                     <CheckCircle className="h-4 w-4 text-primary-foreground" />
                   </div>
                   <h3 className="text-base font-medium">Submitted</h3>
-                  <p className="text-sm text-muted-foreground">{formatDate(form.createdAt)}</p>
-                  <p className="text-sm mt-1">Your tax form has been submitted successfully.</p>
+                  <p className="text-sm text-muted-foreground">
+                    {formatDate(form.createdAt)}
+                  </p>
+                  <p className="text-sm mt-1">
+                    Your tax form has been submitted successfully.
+                  </p>
                 </div>
-                
+
                 <div className="relative">
-                  <div className={`absolute -left-[25px] p-1 rounded-full ${form.status === 'Pending' ? 'bg-muted' : 'bg-primary'}`}>
-                    {form.status !== 'Pending' ? (
+                  <div
+                    className={`absolute -left-[25px] p-1 rounded-full ${
+                      form.status === "Pending" ? "bg-muted" : "bg-primary"
+                    }`}
+                  >
+                    {form.status !== "Pending" ? (
                       <CheckCircle className="h-4 w-4 text-primary-foreground" />
                     ) : (
                       <Clock className="h-4 w-4 text-muted-foreground" />
@@ -344,18 +434,24 @@ export default function FormDetailPage() {
                   </div>
                   <h3 className="text-base font-medium">Under Review</h3>
                   <p className="text-sm text-muted-foreground">
-                    {form.status !== 'Pending' ? formatDate(form.updatedAt) : 'Pending'}
+                    {form.status !== "Pending"
+                      ? formatDate(form.updatedAt)
+                      : "Pending"}
                   </p>
                   <p className="text-sm mt-1">
-                    {form.status !== 'Pending' 
-                      ? 'Your tax form has been reviewed by our consultants.'
-                      : 'Your tax form is waiting to be reviewed by our consultants.'}
+                    {form.status !== "Pending"
+                      ? "Your tax form has been reviewed by our consultants."
+                      : "Your tax form is waiting to be reviewed by our consultants."}
                   </p>
                 </div>
-                
+
                 <div className="relative">
-                  <div className={`absolute -left-[25px] p-1 rounded-full ${form.status === 'Filed' ? 'bg-primary' : 'bg-muted'}`}>
-                    {form.status === 'Filed' ? (
+                  <div
+                    className={`absolute -left-[25px] p-1 rounded-full ${
+                      form.status === "Filed" ? "bg-primary" : "bg-muted"
+                    }`}
+                  >
+                    {form.status === "Filed" ? (
                       <CheckCircle className="h-4 w-4 text-primary-foreground" />
                     ) : (
                       <Clock className="h-4 w-4 text-muted-foreground" />
@@ -363,18 +459,20 @@ export default function FormDetailPage() {
                   </div>
                   <h3 className="text-base font-medium">Filed</h3>
                   <p className="text-sm text-muted-foreground">
-                    {form.status === 'Filed' ? formatDate(form.updatedAt) : 'Pending'}
+                    {form.status === "Filed"
+                      ? formatDate(form.updatedAt)
+                      : "Pending"}
                   </p>
                   <p className="text-sm mt-1">
-                    {form.status === 'Filed' 
-                      ? 'Your tax form has been filed with the tax authorities.'
-                      : 'Your tax form will be filed after review and approval.'}
+                    {form.status === "Filed"
+                      ? "Your tax form has been filed with the tax authorities."
+                      : "Your tax form will be filed after review and approval."}
                   </p>
                 </div>
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader>
               <CardTitle>Need Help?</CardTitle>
@@ -382,7 +480,8 @@ export default function FormDetailPage() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground mb-4">
-                If you have any questions about your tax form, please contact our support team.
+                If you have any questions about your tax form, please contact
+                our support team.
               </p>
               <Button variant="outline" className="w-full" asChild>
                 <a href="/contact">Contact Support</a>

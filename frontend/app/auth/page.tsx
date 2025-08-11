@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Eye,
   EyeOff,
@@ -15,11 +15,11 @@ import {
   ArrowRight,
   CheckCircle,
   Loader2,
-} from 'lucide-react';
-import { FadeInSection } from '@/components/fade-in-section';
-import { AnimatedBackground } from '@/components/animated-background';
-import { useAuth } from '@/providers/auth-provider';
-import { toast } from 'sonner';
+} from "lucide-react";
+import { FadeInSection } from "@/components/fade-in-section";
+import { AnimatedBackground } from "@/components/animated-background";
+import { useAuth } from "@/providers/auth-provider";
+import { toast } from "sonner";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -27,17 +27,17 @@ export default function AuthPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { login, register, isLoading, isAuthenticated } = useAuth();
   const [signupForm, setSignupForm] = useState({
-    fullName: '',
-    email: '',
-    panCard: '',
-    dateOfBirth: '',
-    mobileNumber: '',
-    password: '',
-    confirmPassword: '',
+    fullName: "",
+    email: "",
+    panCard: "",
+    dateOfBirth: "",
+    mobileNumber: "",
+    password: "",
+    confirmPassword: "",
   });
   const [loginForm, setLoginForm] = useState({
-    emailOrPan: '',
-    password: '',
+    emailOrPan: "",
+    password: "",
   });
   const [errors, setErrors] = useState<any>({});
   const router = useRouter();
@@ -45,7 +45,7 @@ export default function AuthPage() {
   // Redirect if already logged in
   useEffect(() => {
     if (isAuthenticated) {
-      router.push('/dashboard');
+      router.push("/dashboard");
     }
   }, [isAuthenticated, router]);
 
@@ -58,20 +58,23 @@ export default function AuthPage() {
   // Signup handler
   const handleSignup = async () => {
     const newErrors: any = {};
-    
+
     // Client-side validation
-    if (!signupForm.fullName.trim()) newErrors.fullName = 'Full name is required';
-    if (!signupForm.email || !validateEmail(signupForm.email)) 
-      newErrors.email = 'Valid email is required';
+    if (!signupForm.fullName.trim())
+      newErrors.fullName = "Full name is required";
+    if (!signupForm.email || !validateEmail(signupForm.email))
+      newErrors.email = "Valid email is required";
     if (!signupForm.panCard || !validatePAN(signupForm.panCard))
-      newErrors.panCard = 'Valid PAN card number is required (e.g., ABCDE1234F)';
-    if (!signupForm.dateOfBirth) newErrors.dateOfBirth = 'Date of birth is required';
+      newErrors.panCard =
+        "Valid PAN card number is required (e.g., ABCDE1234F)";
+    if (!signupForm.dateOfBirth)
+      newErrors.dateOfBirth = "Date of birth is required";
     if (!signupForm.mobileNumber || !validateMobile(signupForm.mobileNumber))
-      newErrors.mobileNumber = 'Valid 10-digit mobile number is required';
+      newErrors.mobileNumber = "Valid 10-digit mobile number is required";
     if (!signupForm.password || signupForm.password.length < 6)
-      newErrors.password = 'Password must be at least 6 characters';
+      newErrors.password = "Password must be at least 6 characters";
     if (signupForm.password !== signupForm.confirmPassword)
-      newErrors.confirmPassword = 'Passwords do not match';
+      newErrors.confirmPassword = "Passwords do not match";
 
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
@@ -84,21 +87,23 @@ export default function AuthPage() {
         pan: signupForm.panCard.toUpperCase(),
         mobile: signupForm.mobileNumber,
       });
-      
+
       // Reset form (handled by auth provider redirect)
       setSignupForm({
-        fullName: '',
-        email: '',
-        panCard: '',
-        dateOfBirth: '',
-        mobileNumber: '',
-        password: '',
-        confirmPassword: '',
+        fullName: "",
+        email: "",
+        panCard: "",
+        dateOfBirth: "",
+        mobileNumber: "",
+        password: "",
+        confirmPassword: "",
       });
     } catch (error: any) {
-      console.error('Signup error:', error);
+      console.error("Signup error:", error);
       setErrors({
-        general: error.response?.data?.message || 'Registration failed. Please try again.',
+        general:
+          error.response?.data?.message ||
+          "Registration failed. Please try again.",
       });
     }
   };
@@ -106,9 +111,10 @@ export default function AuthPage() {
   // Login handler
   const handleLogin = async () => {
     const newErrors: any = {};
-    if (!loginForm.emailOrPan) newErrors.emailOrPan = 'Email or PAN card is required';
-    if (!loginForm.password) newErrors.password = 'Password is required';
-    
+    if (!loginForm.emailOrPan)
+      newErrors.emailOrPan = "Email or PAN card is required";
+    if (!loginForm.password) newErrors.password = "Password is required";
+
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
 
@@ -116,15 +122,17 @@ export default function AuthPage() {
       // Determine if input is email or PAN
       const isEmail = validateEmail(loginForm.emailOrPan);
       const isPAN = validatePAN(loginForm.emailOrPan);
-      
+
       // Pass the emailOrPan value directly as identifier
       // The backend will determine if it's an email or PAN
       await login(loginForm.emailOrPan, loginForm.password);
       // Redirect is handled in the auth provider
     } catch (error: any) {
-      console.error('Login error:', error);
+      console.error("Login error:", error);
       setErrors({
-        general: error.response?.data?.message || 'Invalid credentials. Please try again.',
+        general:
+          error.response?.data?.message ||
+          "Invalid credentials. Please try again.",
       });
     }
   };
@@ -132,19 +140,38 @@ export default function AuthPage() {
   // Handle forgot password
   const handleForgotPassword = async () => {
     if (!loginForm.emailOrPan) {
-      setErrors({ emailOrPan: 'Please enter your email to reset password' });
+      setErrors({ emailOrPan: "Please enter your email to reset password" });
       return;
     }
-    
-    try {
-      // TODO: Implement password reset functionality using the new API client
-      // For now, just show a toast message
-      toast.success('Password reset feature will be implemented soon');
-      toast.info('Please contact support if you need immediate assistance');
-    } catch (error: any) {
-      console.error('Forgot password error:', error);
+
+    // Require an email address for reset (PAN is not valid here)
+    const isEmail = validateEmail(loginForm.emailOrPan);
+    if (!isEmail) {
       setErrors({
-        general: error.response?.data?.message || 'Failed to send reset link. Please try again.',
+        emailOrPan: "Please enter a valid email address to reset password",
+      });
+      return;
+    }
+
+    try {
+      await fetch(
+        `${
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001"
+        }/api/auth/request-password-reset`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: loginForm.emailOrPan }),
+        }
+      );
+
+      toast.success(
+        "If your email is registered, you will receive reset instructions shortly"
+      );
+    } catch (error: any) {
+      console.error("Forgot password error:", error);
+      setErrors({
+        general: "Failed to send reset link. Please try again.",
       });
     }
   };
@@ -152,7 +179,7 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
       <AnimatedBackground />
-      
+
       {/* Header */}
       <div className="relative z-10 pt-8 pb-4">
         <div className="container mx-auto px-4">
@@ -212,7 +239,7 @@ export default function AuthPage() {
                     {errors.general}
                   </div>
                 )}
-                
+
                 {/* Full Name */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -224,7 +251,10 @@ export default function AuthPage() {
                       type="text"
                       value={signupForm.fullName}
                       onChange={(e) =>
-                        setSignupForm({ ...signupForm, fullName: e.target.value })
+                        setSignupForm({
+                          ...signupForm,
+                          fullName: e.target.value,
+                        })
                       }
                       className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 ${
                         errors.fullName ? "border-red-500" : "border-gray-200"
@@ -233,7 +263,9 @@ export default function AuthPage() {
                     />
                   </div>
                   {errors.fullName && (
-                    <p className="text-red-500 text-xs mt-2">{errors.fullName}</p>
+                    <p className="text-red-500 text-xs mt-2">
+                      {errors.fullName}
+                    </p>
                   )}
                 </div>
 
@@ -285,7 +317,9 @@ export default function AuthPage() {
                     />
                   </div>
                   {errors.panCard && (
-                    <p className="text-red-500 text-xs mt-2">{errors.panCard}</p>
+                    <p className="text-red-500 text-xs mt-2">
+                      {errors.panCard}
+                    </p>
                   )}
                 </div>
 
@@ -306,7 +340,9 @@ export default function AuthPage() {
                         })
                       }
                       className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 ${
-                        errors.dateOfBirth ? "border-red-500" : "border-gray-200"
+                        errors.dateOfBirth
+                          ? "border-red-500"
+                          : "border-gray-200"
                       }`}
                     />
                   </div>
@@ -334,7 +370,9 @@ export default function AuthPage() {
                         })
                       }
                       className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 ${
-                        errors.mobileNumber ? "border-red-500" : "border-gray-200"
+                        errors.mobileNumber
+                          ? "border-red-500"
+                          : "border-gray-200"
                       }`}
                       placeholder="Enter 10-digit mobile number"
                       maxLength={10}
@@ -358,7 +396,10 @@ export default function AuthPage() {
                       type={showPassword ? "text" : "password"}
                       value={signupForm.password}
                       onChange={(e) =>
-                        setSignupForm({ ...signupForm, password: e.target.value })
+                        setSignupForm({
+                          ...signupForm,
+                          password: e.target.value,
+                        })
                       }
                       className={`w-full pl-12 pr-12 py-4 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 ${
                         errors.password ? "border-red-500" : "border-gray-200"
@@ -378,7 +419,9 @@ export default function AuthPage() {
                     </button>
                   </div>
                   {errors.password && (
-                    <p className="text-red-500 text-xs mt-2">{errors.password}</p>
+                    <p className="text-red-500 text-xs mt-2">
+                      {errors.password}
+                    </p>
                   )}
                 </div>
 
@@ -407,7 +450,9 @@ export default function AuthPage() {
                     />
                     <button
                       type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
                       className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                     >
                       {showConfirmPassword ? (
@@ -429,7 +474,7 @@ export default function AuthPage() {
                   onClick={handleSignup}
                   disabled={isLoading}
                   className={`w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center ${
-                    isLoading ? 'opacity-75 cursor-not-allowed' : ''
+                    isLoading ? "opacity-75 cursor-not-allowed" : ""
                   }`}
                 >
                   {isLoading ? (
@@ -453,7 +498,7 @@ export default function AuthPage() {
                     {errors.general}
                   </div>
                 )}
-                
+
                 {/* Email or PAN */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -465,7 +510,10 @@ export default function AuthPage() {
                       type="text"
                       value={loginForm.emailOrPan}
                       onChange={(e) =>
-                        setLoginForm({ ...loginForm, emailOrPan: e.target.value })
+                        setLoginForm({
+                          ...loginForm,
+                          emailOrPan: e.target.value,
+                        })
                       }
                       className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 ${
                         errors.emailOrPan ? "border-red-500" : "border-gray-200"
@@ -474,7 +522,9 @@ export default function AuthPage() {
                     />
                   </div>
                   {errors.emailOrPan && (
-                    <p className="text-red-500 text-xs mt-2">{errors.emailOrPan}</p>
+                    <p className="text-red-500 text-xs mt-2">
+                      {errors.emailOrPan}
+                    </p>
                   )}
                 </div>
 
@@ -519,7 +569,9 @@ export default function AuthPage() {
                     </button>
                   </div>
                   {errors.password && (
-                    <p className="text-red-500 text-xs mt-2">{errors.password}</p>
+                    <p className="text-red-500 text-xs mt-2">
+                      {errors.password}
+                    </p>
                   )}
                 </div>
 
@@ -528,7 +580,7 @@ export default function AuthPage() {
                   onClick={handleLogin}
                   disabled={isLoading}
                   className={`w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center ${
-                    isLoading ? 'opacity-75 cursor-not-allowed' : ''
+                    isLoading ? "opacity-75 cursor-not-allowed" : ""
                   }`}
                 >
                   {isLoading ? (
