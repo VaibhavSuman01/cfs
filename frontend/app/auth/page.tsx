@@ -84,8 +84,10 @@ export default function AuthPage() {
         name: signupForm.fullName.trim(),
         email: signupForm.email.toLowerCase(),
         password: signupForm.password,
-        pan: signupForm.panCard.toUpperCase(),
+        panCardNo: signupForm.panCard.toUpperCase(),
+        dob: signupForm.dateOfBirth, // must be ISO-8601, the input is type="date"
         mobile: signupForm.mobileNumber,
+        aadhaarNo: undefined,
       });
 
       // Reset form (handled by auth provider redirect)

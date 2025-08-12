@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import api, { API_PATHS } from '@/lib/api-client';
-import { User } from '@/lib/api-client';
-import { toast } from 'sonner';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import api, { API_PATHS } from "@/lib/api-client";
+import { User } from "@/lib/api-client";
+import { toast } from "sonner";
 
 interface AuthContextType {
   user: User | null;
@@ -14,15 +14,16 @@ interface AuthContextType {
   register: (userData: RegisterData) => Promise<void>;
   logout: () => void;
   refreshUserProfile: () => Promise<void>;
-  
 }
 
 interface RegisterData {
   name: string;
   email: string;
   password: string;
-  pan?: string;
-  mobile?: string;
+  panCardNo: string;
+  dob: string; // ISO date string (YYYY-MM-DD)
+  mobile: string;
+  aadhaarNo?: string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -43,14 +44,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           if (storedUser && storedUser.role) {
             setUser(storedUser);
           } else {
-            console.warn('Stored user data is invalid or missing role');
+            console.warn("Stored user data is invalid or missing role");
           }
 
           // Then verify with the server and get fresh data
           await refreshUserProfile();
         }
       } catch (error) {
-        console.error('Authentication check failed:', error);
+        console.error("Authentication check failed:", error);
         // If server verification fails, log out
         api.logout();
         setUser(null);
@@ -68,20 +69,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const response = await api.get(API_PATHS.AUTH.ME);
       // The backend returns user data in the 'data' property, not 'user'
       const userData = response.data.data;
-      
+
       if (!userData) {
-        console.error('User data is undefined in API response');
-        throw new Error('User data is undefined');
+        console.error("User data is undefined in API response");
+        throw new Error("User data is undefined");
       }
-      
+
       // Update user in state and localStorage
       setUser(userData);
-      
 
-      
       return userData;
     } catch (error) {
-      console.error('Failed to refresh user profile:', error);
+      console.error("Failed to refresh user profile:", error);
       throw error;
     }
   };
@@ -91,12 +90,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setIsLoading(true);
     try {
       // Use identifier parameter instead of email for API compatibility
-      const response = await api.post(API_PATHS.AUTH.LOGIN, { identifier: email, password });
+      const response = await api.post(API_PATHS.AUTH.LOGIN, {
+        identifier: email,
+        password,
+      });
       const { token, refreshToken, user: userData } = response.data;
 
       if (!userData) {
-        console.error('User data is undefined in login response');
-        throw new Error('User data is undefined');
+        console.error("User data is undefined in login response");
+        throw new Error("User data is undefined");
       }
 
       // Store auth data
@@ -106,11 +108,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Set cookies for middleware authentication
       document.cookie = `token=${token}; path=/`;
 
-      toast.success('Login successful!');
-      
-      router.push('/dashboard');
+      toast.success("Login successful!");
+
+      router.push("/dashboard");
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Login failed. Please try again.';
+      const errorMessage =
+        error.response?.data?.message || "Login failed. Please try again.";
       toast.error(errorMessage);
       throw error;
     } finally {
@@ -129,10 +132,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       api.setAuth(token, refreshToken, newUser);
       setUser(newUser);
 
-      toast.success('Registration successful!');
-      router.push('/dashboard');
+      toast.success("Registration successful!");
+      router.push("/dashboard");
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Registration failed. Please try again.';
+      const errorMessage =
+        error.response?.data?.message ||
+        "Registration failed. Please try again.";
       toast.error(errorMessage);
       throw error;
     } finally {
@@ -145,8 +150,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     api.logout();
     setUser(null);
     // Clear cookies for middleware authentication
-    document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-    router.push('/');
+    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    router.push("/");
   };
 
   const value = {
@@ -165,7 +170,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
