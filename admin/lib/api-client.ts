@@ -1,10 +1,19 @@
-import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
-import { jwtDecode } from 'jwt-decode';
+import axios, {
+  AxiosError,
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  InternalAxiosRequestConfig,
+} from "axios";
+import { jwtDecode } from "jwt-decode";
 
-// Define the base URL for the API
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
+// Define the base URL for the API (normalize to avoid trailing slash issues)
+const RAW_API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
+const API_BASE_URL = RAW_API_BASE_URL.replace(/\/+$/, "");
 
-const createUrl = (path: string) => `${API_BASE_URL}${path}`;
+const createUrl = (path: string) =>
+  `${API_BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
 
 // Define API paths
 export const API_PATHS = {
@@ -31,9 +40,12 @@ export const API_PATHS = {
     TAX: createUrl("/api/forms/tax"),
     CONTACT: createUrl("/api/forms/contact"),
     USER_SUBMISSIONS: createUrl("/api/forms/user-submissions"),
-    USER_SUBMISSION_DETAIL: (id: string) => createUrl(`/api/forms/user-submissions/${id}`),
-    DELETE_DOCUMENT: (documentId: string) => createUrl(`/api/forms/document/${documentId}`),
-    UPLOAD_DOCUMENT: (formId: string) => createUrl(`/api/forms/document/${formId}`),
+    USER_SUBMISSION_DETAIL: (id: string) =>
+      createUrl(`/api/forms/user-submissions/${id}`),
+    DELETE_DOCUMENT: (documentId: string) =>
+      createUrl(`/api/forms/document/${documentId}`),
+    UPLOAD_DOCUMENT: (formId: string) =>
+      createUrl(`/api/forms/document/${formId}`),
     CHECK_PAN: (pan: string) => createUrl(`/api/forms/check-pan/${pan}`),
   },
 };
@@ -77,13 +89,14 @@ class ApiClient {
       baseURL: API_BASE_URL,
       timeout: 30000,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
 
     // Add request interceptor
     this.instance.interceptors.request.use(
-      (config: InternalAxiosRequestConfig) => this.handleRequest(config) as InternalAxiosRequestConfig,
+      (config: InternalAxiosRequestConfig) =>
+        this.handleRequest(config) as InternalAxiosRequestConfig,
       this.handleRequestError
     );
 
@@ -110,8 +123,8 @@ class ApiClient {
   // Handle request interceptor
   private handleRequest = (config: AxiosRequestConfig) => {
     // Add token to request if available
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('token');
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("token");
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -119,7 +132,7 @@ class ApiClient {
 
     // Don't override Content-Type for FormData
     if (config.data instanceof FormData && config.headers) {
-      delete config.headers['Content-Type'];
+      delete config.headers["Content-Type"];
     }
 
     return config;
@@ -137,13 +150,15 @@ class ApiClient {
 
   // Handle response error
   private handleResponseError = async (error: AxiosError) => {
-    const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
+    const originalRequest = error.config as AxiosRequestConfig & {
+      _retry?: boolean;
+    };
 
     // If error is 401 and we haven't tried refreshing the token yet
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      typeof window !== 'undefined'
+      typeof window !== "undefined"
     ) {
       if (this.isRefreshing) {
         // If we're already refreshing, add this request to the queue
@@ -164,7 +179,7 @@ class ApiClient {
       originalRequest._retry = true;
       this.isRefreshing = true;
 
-      const refreshToken = localStorage.getItem('refreshToken');
+      const refreshToken = localStorage.getItem("refreshToken");
       if (!refreshToken) {
         // No refresh token available, redirect to login
         this.logout();
@@ -173,13 +188,16 @@ class ApiClient {
 
       try {
         // Try to refresh the token
-        const response = await this.instance.post(API_PATHS.AUTH.REFRESH_TOKEN, {
-          refreshToken,
-        });
+        const response = await this.instance.post(
+          API_PATHS.AUTH.REFRESH_TOKEN,
+          {
+            refreshToken,
+          }
+        );
         const { token } = response.data;
 
         // Update token in localStorage
-        localStorage.setItem('token', token);
+        localStorage.setItem("token", token);
 
         // Process any requests that were waiting for the token refresh
         this.processQueue(null, token);
@@ -206,20 +224,20 @@ class ApiClient {
 
   // Logout user
   public logout = () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('user');
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("user");
     }
   };
 
   // Check if user is authenticated
   public isAuthenticated = (): boolean => {
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return false;
     }
 
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) return false;
 
     try {
@@ -242,27 +260,27 @@ class ApiClient {
 
   // Get user from localStorage
   public getUser = (): User | null => {
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return null;
     }
 
-    const userStr = localStorage.getItem('user');
+    const userStr = localStorage.getItem("user");
     if (!userStr) return null;
 
     try {
       const userData = JSON.parse(userStr);
       // Validate that the user data has the required fields
       if (!userData || !userData.role) {
-        console.error('Invalid user data in localStorage');
+        console.error("Invalid user data in localStorage");
         // Clear invalid data
-        localStorage.removeItem('user');
+        localStorage.removeItem("user");
         return null;
       }
       return userData;
     } catch (error) {
-      console.error('Error parsing user info:', error);
+      console.error("Error parsing user info:", error);
       // Clear invalid data
-      localStorage.removeItem('user');
+      localStorage.removeItem("user");
       return null;
     }
   };
@@ -271,21 +289,21 @@ class ApiClient {
   public getUserRole = (): string | null => {
     const user = this.getUser();
     // Ensure user and role exist before returning
-    return (user && user.role) ? user.role : null;
+    return user && user.role ? user.role : null;
   };
 
   // Set auth token and user info
   public setAuth = (token: string, refreshToken: string, user: User) => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       // Validate user data before storing
       if (!user || !user.role) {
-        console.error('Invalid user data provided to setAuth');
+        console.error("Invalid user data provided to setAuth");
         return;
       }
-      
-      localStorage.setItem('token', token);
-      localStorage.setItem('refreshToken', refreshToken);
-      localStorage.setItem('user', JSON.stringify(user));
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("refreshToken", refreshToken);
+      localStorage.setItem("user", JSON.stringify(user));
     }
   };
 
@@ -294,11 +312,19 @@ class ApiClient {
     return this.instance.get<T>(url, config);
   };
 
-  public post = <T = any>(url: string, data?: any, config?: AxiosRequestConfig) => {
+  public post = <T = any>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig
+  ) => {
     return this.instance.post<T>(url, data, config);
   };
 
-  public put = <T = any>(url: string, data?: any, config?: AxiosRequestConfig) => {
+  public put = <T = any>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig
+  ) => {
     return this.instance.put<T>(url, data, config);
   };
 
@@ -310,10 +336,10 @@ class ApiClient {
   public downloadFile = async (url: string, filename: string) => {
     try {
       // Get the token from localStorage
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
 
       if (!token) {
-        console.error('Authentication token not found');
+        console.error("Authentication token not found");
         return;
       }
 
@@ -335,9 +361,10 @@ class ApiClient {
 
       // Create a download link
       const downloadUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = downloadUrl;
-      link.download = filename || `download-${new Date().toISOString().split('T')[0]}`;
+      link.download =
+        filename || `download-${new Date().toISOString().split("T")[0]}`;
 
       // Append to the document, click it, and clean up
       document.body.appendChild(link);
@@ -346,7 +373,7 @@ class ApiClient {
       document.body.removeChild(link);
       return true; // Return success
     } catch (error) {
-      console.error('Error downloading file:', error);
+      console.error("Error downloading file:", error);
       throw error; // Re-throw to allow caller to handle the error
     }
   };

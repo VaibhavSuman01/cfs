@@ -156,16 +156,14 @@ export default function AuthPage() {
     }
 
     try {
-      await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001"
-        }/api/auth/request-password-reset`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: loginForm.emailOrPan }),
-        }
-      );
+      const baseUrl = (
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001"
+      ).replace(/\/+$/, "");
+      await fetch(`${baseUrl}/api/auth/request-password-reset`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: loginForm.emailOrPan }),
+      });
 
       toast.success(
         "If your email is registered, you will receive reset instructions shortly"
