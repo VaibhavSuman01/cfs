@@ -22,11 +22,13 @@ interface TaxForm {
   status: 'Pending' | 'Reviewed' | 'Filed';
   createdAt: string;
   updatedAt: string;
-  documents?: {
+  documents?: Array<{
     _id: string;
-    filename: string;
-    path: string;
-  }[];
+    filename?: string;
+    fileName?: string;
+    originalName?: string;
+    path?: string;
+  }>;
   comments?: {
     _id: string;
     text: string;
@@ -34,6 +36,12 @@ interface TaxForm {
     createdBy: string;
     isAdmin: boolean;
   }[];
+  reports?: Array<{
+    documentId?: string;
+    type?: string;
+    message?: string;
+    sentAt?: string;
+  }>;
 }
 
 export default function FormDetailPage() {
@@ -70,13 +78,9 @@ export default function FormDetailPage() {
 
     try {
       setIsSubmittingComment(true);
-      await api.post(`/api/forms/${id}/comments`, { text: comment });
-      
-      // Refresh form data to get the new comment
-      const response = await api.get(`/api/forms/user-submissions/${id}`);
-      setForm(response.data);
+      // Comments API is not implemented on backend; avoid 404 and inform user
       setComment('');
-      toast.success('Comment added successfully');
+      toast.info('Messaging inside the form is coming soon. Please use Contact Support for now.');
     } catch (error) {
       console.error('Failed to add comment:', error);
       toast.error('Failed to add comment. Please try again.');
@@ -87,18 +91,7 @@ export default function FormDetailPage() {
 
   const downloadDocument = async (documentId: string, filename: string) => {
     try {
-      const response = await api.get(`/api/forms/${id}/documents/${documentId}`, {
-        responseType: 'blob',
-      });
-      
-      // Create a download link
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', filename);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+      await api.downloadFile(`/api/forms/download/${documentId}`, filename);
     } catch (error) {
       console.error('Failed to download document:', error);
       toast.error('Failed to download document. Please try again.');
@@ -238,16 +231,16 @@ export default function FormDetailPage() {
             <CardContent>
               {form.documents && form.documents.length > 0 ? (
                 <div className="space-y-2">
-                  {form.documents.map((doc) => (
+                  {form.documents.map((doc: { _id: string; filename?: string; fileName?: string; originalName?: string; }) => (
                     <div key={doc._id} className="flex items-center justify-between bg-muted p-3 rounded-md">
                       <div className="flex items-center">
                         <FileText className="h-4 w-4 mr-2 text-primary" />
-                        <span className="text-sm">{doc.filename}</span>
+                        <span className="text-sm">{doc.originalName || doc.fileName || doc.filename || 'Document'}</span>
                       </div>
                       <Button 
                         variant="ghost" 
                         size="sm" 
-                        onClick={() => downloadDocument(doc._id, doc.filename)}
+                        onClick={() => downloadDocument(doc._id, (doc.originalName || doc.fileName || doc.filename || `document-${doc._id}`))}
                       >
                         <Download className="h-4 w-4" />
                       </Button>
@@ -258,6 +251,39 @@ export default function FormDetailPage() {
                 <div className="text-center py-6">
                   <FileText className="mx-auto h-8 w-8 text-muted-foreground opacity-50" />
                   <p className="mt-2 text-sm text-muted-foreground">No documents attached</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Reports from Admin</CardTitle>
+              <CardDescription>Download reports shared by your consultant</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {form.reports && form.reports.length > 0 && form.reports.some((r: { documentId?: string }) => r.documentId) ? (
+                <div className="space-y-2">
+                  {form.reports.filter((r: { documentId?: string }) => r.documentId).map((r: { documentId?: string; type?: string; sentAt?: string }) => (
+                    <div key={r.documentId} className="flex items-center justify-between bg-muted p-3 rounded-md">
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium">{r.type || 'Report'}</span>
+                        <span className="text-xs text-muted-foreground">{r.sentAt ? new Date(r.sentAt).toLocaleString() : ''}</span>
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => downloadDocument(r.documentId as string, `${r.type || 'report'}-${r.documentId}.pdf`)}
+                      >
+                        <Download className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-6">
+                  <FileText className="mx-auto h-8 w-8 text-muted-foreground opacity-50" />
+                  <p className="mt-2 text-sm text-muted-foreground">No reports shared yet</p>
                 </div>
               )}
             </CardContent>

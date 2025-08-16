@@ -45,10 +45,18 @@ const OrderStatusTracker = ({ status }: { status: 'Pending' | 'Reviewed' | 'File
 
 interface TaxForm {
   _id: string;
+  service?: string;
+  year?: string;
   status: 'Pending' | 'Reviewed' | 'Filed';
   createdAt: string;
   updatedAt: string;
   editHistory: any[];
+  reports?: Array<{
+    documentId?: string;
+    type?: string;
+    message?: string;
+    sentAt?: string;
+  }>;
 }
 
 // --- [Main] Revamped User Dashboard Component ---
@@ -74,6 +82,17 @@ export default function UserDashboard() {
       fetchForms();
     }
   }, [user]);
+
+  const handleDownloadLatestReport = async (form: TaxForm) => {
+    try {
+      const latest = (form.reports || []).slice().reverse().find(r => r.documentId);
+      if (!latest || !latest.documentId) return;
+      const defaultName = latest.type ? `report-${latest.type}.pdf` : `report-${latest.documentId}`;
+      await api.downloadFile(`/api/forms/download/${latest.documentId}`, defaultName);
+    } catch (e) {
+      console.error('Failed to download report', e);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -110,6 +129,16 @@ export default function UserDashboard() {
         "Nidhi Company",
       ],
     },
+    {name:"Taxation",items:[
+      "GST Registration",
+      "Income Tax Filing",
+      "TDS Returns",
+      "Tax Planning",
+      "EPFO Filing",
+      "ESIC Filing",
+      "PT-Tax Filing",
+      "Corporate Tax Filing",
+    ]},
     {
       name: "Other Registration",
       items: [
@@ -300,8 +329,13 @@ export default function UserDashboard() {
                           <div key={form._id} className="rounded-lg border bg-white p-4 transition-all hover:shadow-md">
                             <div className="mb-4 flex items-center justify-between">
                                 <div>
-                                    <div className="font-bold text-gray-800">ITR Form - AY 2024-25</div>
-                                    <div className="text-xs text-gray-500">Submitted: {formatDate(form.createdAt)}</div>
+                                    <div className="font-bold text-gray-800">{form.service || 'Form'}{form.year ? ` - FY ${form.year}` : ''}</div>
+                                    <div className="text-xs text-gray-500">
+                                      Submitted: {formatDate(form.createdAt)}{' '}
+                                      {new Date(form.updatedAt).getTime() > new Date(form.createdAt).getTime() && (
+                                        <span className="ml-2 text-[11px] px-1.5 py-0.5 rounded bg-yellow-50 text-yellow-700 border border-yellow-200">Last updated: {formatDate(form.updatedAt)}</span>
+                                      )}
+                                    </div>
                                 </div>
                                 <div className="flex items-center space-x-2">
                                     {form.status === 'Pending' && form.editHistory && form.editHistory.length < 2 && (
@@ -311,8 +345,13 @@ export default function UserDashboard() {
                                         </Link>
                                       </Button>
                                     )}
-                                    {form.status === 'Filed' && (
-                                        <Button variant="outline" size="sm" className="border-green-600 text-green-600 hover:bg-green-50 hover:text-green-700">
+                                    {form.status === 'Filed' && (form.reports?.some(r => r.documentId)) && (
+                                        <Button
+                                          variant="outline"
+                                          size="sm"
+                                          className="border-green-600 text-green-600 hover:bg-green-50 hover:text-green-700"
+                                          onClick={() => handleDownloadLatestReport(form)}
+                                        >
                                             <Download className="mr-2 h-4 w-4"/> Download Report
                                         </Button>
                                     )}

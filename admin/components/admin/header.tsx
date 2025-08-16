@@ -9,7 +9,7 @@ export function AdminHeader() {
 
   // Get the current page title from the pathname
   const getPageTitle = () => {
-    if (pathname === '/admin') return 'Dashboard'
+    if (pathname === '/admin/dashboard') return 'Dashboard'
     const path = pathname.split('/').pop() || 'Admin'
     return path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, ' ')
   }

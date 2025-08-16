@@ -2,7 +2,7 @@ import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, In
 import { jwtDecode } from 'jwt-decode';
 
 // Define the base URL for the API
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://cfs-brrj.onrender.com';
 
 const createUrl = (path: string) => `${API_BASE_URL}${path}`;
 

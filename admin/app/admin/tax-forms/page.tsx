@@ -22,9 +22,12 @@ interface TaxForm {
   fullName: string;
   pan: string;
   email: string;
+  service?: string;
+  year?: string;
   status: 'Pending' | 'Reviewed' | 'Filed';
   documents: any[];
   createdAt: string;
+  updatedAt: string;
 }
 
 interface Pagination {
@@ -200,6 +203,8 @@ export default function TaxFormsPage() {
                   <TableRow>
                     <TableHead>Name</TableHead>
                     <TableHead>PAN</TableHead>
+                    <TableHead>Service</TableHead>
+                    <TableHead>FY</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Documents</TableHead>
                     <TableHead>Submitted On</TableHead>
@@ -214,11 +219,20 @@ export default function TaxFormsPage() {
                     >
                       <TableCell className="font-medium">{form.fullName}</TableCell>
                       <TableCell>{form.pan}</TableCell>
+                      <TableCell>{form.service || '-'}</TableCell>
+                      <TableCell>{form.year || '-'}</TableCell>
                       <TableCell>
                         <StatusBadge status={form.status} />
                       </TableCell>
                       <TableCell>{form.documents?.length || 0}</TableCell>
-                      <TableCell>{formatDate(form.createdAt)}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <span>{formatDate(form.createdAt)}</span>
+                          {new Date(form.updatedAt).getTime() > new Date(form.createdAt).getTime() && (
+                            <Badge variant="outline" className="text-xs">Edited</Badge>
+                          )}
+                        </div>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

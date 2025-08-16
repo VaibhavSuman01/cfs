@@ -19,7 +19,7 @@ import {
 } from 'lucide-react'
 
 const navigation = [
-  { name: 'Dashboard', href: '/admin', icon: Home },
+  { name: 'Dashboard', href: '/admin/dashboard', icon: Home },
   { name: 'Users', href: '/admin/users', icon: Users },
   { 
     name: 'Tax Forms', 
