@@ -44,7 +44,8 @@ const taxFormSchema = new mongoose.Schema({
   hasPranNumber: { type: Boolean, default: false },
   pranNumber: { type: String },
   documents: [documentSchema],
-  status: { type: String, enum: ["Pending", "In Progress", "Completed", "Cancelled"], default: "Pending" },
+  // Align with admin status values
+  status: { type: String, enum: ["Pending", "Reviewed", "Filed"], default: "Pending" },
   reports: [reportSchema],
   editHistory: [editHistorySchema],
 }, { timestamps: true });

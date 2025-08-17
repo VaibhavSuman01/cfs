@@ -27,7 +27,7 @@ export type NavItem = {
 };
 
 const navigation: NavItem[] = [
-  { name: 'Dashboard', href: '/admin', icon: Home },
+  { name: 'Dashboard', href: '/admin/dashboard', icon: Home },
   { name: 'Users', href: '/admin/users', icon: Users },
   { 
     name: 'Services', 
@@ -56,9 +56,9 @@ const navigation: NavItem[] = [
       { name: 'Taxation', icon: FileText,
         submenu: [
           { name: 'All Forms', href: '/admin/tax-forms' },
-          { name: 'Pending Review', href: '/admin/tax-forms?status=pending' },
-          { name: 'Reviewed', href: '/admin/tax-forms?status=reviewed' },
-          { name: 'Filed', href: '/admin/tax-forms?status=filed' },
+          { name: 'Pending Review', href: '/admin/tax-forms?status=Pending' },
+          { name: 'Reviewed', href: '/admin/tax-forms?status=Reviewed' },
+          { name: 'Filed', href: '/admin/tax-forms?status=Filed' },
         ]
       },
       

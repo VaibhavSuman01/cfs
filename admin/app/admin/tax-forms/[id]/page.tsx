@@ -39,6 +39,8 @@ interface TaxForm {
   email: string;
   phone: string;
   pan: string;
+  service?: string;
+  year?: string;
   salaryInfo?: string;
   hasIncomeTaxLogin?: boolean;
   incomeTaxLoginId?: string;
@@ -210,6 +212,13 @@ export default function TaxFormDetailPage() {
                   <InfoItem label="Phone" value={form.phone} icon={<Phone/>} href={`tel:${form.phone}`} />
                   <InfoItem label="PAN" value={form.pan} />
                 </InfoSection>
+
+                {(form.service || form.year) && (
+                  <InfoSection title="Service Details">
+                    {form.service && <InfoItem label="Service" value={form.service} />}
+                    {form.year && <InfoItem label="Financial Year" value={form.year} />}
+                  </InfoSection>
+                )}
 
                 {form.salaryInfo && (
                   <InfoSection title="Income Details">

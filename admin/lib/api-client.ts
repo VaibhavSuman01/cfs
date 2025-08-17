@@ -7,10 +7,15 @@ import axios, {
 } from "axios";
 import { jwtDecode } from "jwt-decode";
 
+<<<<<<< HEAD
 // Define the base URL for the API (normalize to avoid trailing slash issues)
 const RAW_API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
 const API_BASE_URL = RAW_API_BASE_URL.replace(/\/+$/, "");
+=======
+// Define the base URL for the API
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://cfs-brrj.onrender.com';
+>>>>>>> NEW
 
 const createUrl = (path: string) =>
   `${API_BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
