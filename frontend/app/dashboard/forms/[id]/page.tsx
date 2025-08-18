@@ -39,19 +39,11 @@ interface TaxForm {
   updatedAt: string;
   documents?: Array<{
     _id: string;
-<<<<<<< HEAD
-    originalName?: string;
-    fileName?: string;
-    fileType?: string;
-    fileSize?: number;
-  }[];
-=======
     filename?: string;
     fileName?: string;
     originalName?: string;
     path?: string;
   }>;
->>>>>>> NEW
   comments?: {
     _id: string;
     text: string;
@@ -101,19 +93,9 @@ export default function FormDetailPage() {
 
     try {
       setIsSubmittingComment(true);
-<<<<<<< HEAD
-      await api.post(`/api/forms/${id}/comments`, { text: comment });
-
-      // Refresh form data to get the new comment
-      const response = await api.get(`/api/forms/user-submissions/${id}`);
-      setForm(response.data);
-      setComment("");
-      toast.success("Comment added successfully");
-=======
       // Comments API is not implemented on backend; avoid 404 and inform user
       setComment('');
       toast.info('Messaging inside the form is coming soon. Please use Contact Support for now.');
->>>>>>> NEW
     } catch (error) {
       console.error("Failed to add comment:", error);
       toast.error("Failed to add comment. Please try again.");
@@ -124,21 +106,7 @@ export default function FormDetailPage() {
 
   const downloadDocument = async (documentId: string, filename: string) => {
     try {
-<<<<<<< HEAD
-      const response = await api.get(`/api/forms/download/${documentId}`, {
-        responseType: "blob",
-      });
-      const blob = response.data as Blob;
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", filename || "document");
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-=======
       await api.downloadFile(`/api/forms/download/${documentId}`, filename);
->>>>>>> NEW
     } catch (error) {
       console.error("Failed to download document:", error);
       toast.error("Failed to download document. Please try again.");
@@ -318,28 +286,6 @@ export default function FormDetailPage() {
             <CardContent>
               {form.documents && form.documents.length > 0 ? (
                 <div className="space-y-2">
-<<<<<<< HEAD
-                  {form.documents.map((doc) => (
-                    <div
-                      key={doc._id}
-                      className="flex items-center justify-between bg-muted p-3 rounded-md"
-                    >
-                      <div className="flex items-center">
-                        <FileText className="h-4 w-4 mr-2 text-primary" />
-                        <span className="text-sm">
-                          {doc.originalName || doc.fileName || "Document"}
-                        </span>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() =>
-                          downloadDocument(
-                            doc._id,
-                            doc.originalName || doc.fileName || "document"
-                          )
-                        }
-=======
                   {form.documents.map((doc: { _id: string; filename?: string; fileName?: string; originalName?: string; }) => (
                     <div key={doc._id} className="flex items-center justify-between bg-muted p-3 rounded-md">
                       <div className="flex items-center">
@@ -350,7 +296,6 @@ export default function FormDetailPage() {
                         variant="ghost" 
                         size="sm" 
                         onClick={() => downloadDocument(doc._id, (doc.originalName || doc.fileName || doc.filename || `document-${doc._id}`))}
->>>>>>> NEW
                       >
                         <Download className="h-4 w-4" />
                       </Button>
@@ -368,8 +313,6 @@ export default function FormDetailPage() {
             </CardContent>
           </Card>
 
-<<<<<<< HEAD
-=======
           <Card>
             <CardHeader>
               <CardTitle>Reports from Admin</CardTitle>
@@ -403,7 +346,6 @@ export default function FormDetailPage() {
             </CardContent>
           </Card>
           
->>>>>>> NEW
           <Card>
             <CardHeader>
               <CardTitle>Comments</CardTitle>

@@ -55,9 +55,91 @@ export default function TaxFormPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!service || !year || !fullName || !email || !phone || !pan) {
-      toast.error("Please fill in all required fields.");
+    // Validate required fields with specific error messages
+    const missingFields = [];
+    if (!service) missingFields.push("Service");
+    if (!year) missingFields.push("Year");
+    if (!fullName) missingFields.push("Full Name");
+    if (!email) missingFields.push("Email");
+    if (!phone) missingFields.push("Phone");
+    if (!pan) missingFields.push("PAN");
+    
+    if (missingFields.length > 0) {
+      const fieldList = missingFields.join(", ");
+      const message = missingFields.length === 1 
+        ? `Please fill in the ${fieldList} field.`
+        : `Please fill in the following required fields: ${fieldList}.`;
+      toast.error(message);
       return;
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+    
+    // Validate phone format (basic validation)
+    const phoneRegex = /^[\d\s\-\+\(\)]{10,}$/;
+    if (!phoneRegex.test(phone)) {
+      toast.error("Please enter a valid phone number (at least 10 digits).");
+      return;
+    }
+    
+    // Validate PAN format (Indian PAN format: AAAAA9999A)
+    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+    if (!panRegex.test(pan.toUpperCase())) {
+      toast.error("Please enter a valid PAN number (format: AAAAA9999A).");
+      return;
+    }
+
+    // Validate file types (PDF, PNG, JPG, ZIP, Excel formats allowed)
+    if (files) {
+      const allowedTypes = [
+        'application/pdf',
+        'image/png', 
+        'image/jpg', 
+        'image/jpeg',
+        'application/zip',
+        'application/x-zip-compressed',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+        'application/vnd.ms-excel', // .xls
+        'text/csv'
+      ];
+      const invalidFiles = [];
+      
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (!allowedTypes.includes(file.type)) {
+          invalidFiles.push(file.name);
+        }
+      }
+      
+      if (invalidFiles.length > 0) {
+        const fileList = invalidFiles.join(", ");
+        const message = invalidFiles.length === 1
+          ? `The file "${fileList}" is not supported. Please upload only PDF, PNG, JPG, ZIP, or Excel files (XLSX, XLS, CSV).`
+          : `The following files are not supported: ${fileList}. Please upload only PDF, PNG, JPG, ZIP, or Excel files (XLSX, XLS, CSV).`;
+        toast.error(message);
+        return;
+      }
+    }
+
+    // Validate total file size (50MB limit)
+    if (files) {
+      const maxTotalSize = 50 * 1024 * 1024; // 50MB in bytes
+      let totalSize = 0;
+      
+      for (let i = 0; i < files.length; i++) {
+        totalSize += files[i].size;
+      }
+      
+      if (totalSize > maxTotalSize) {
+        const totalSizeMB = (totalSize / (1024 * 1024)).toFixed(2);
+        toast.error(`Total file size (${totalSizeMB}MB) exceeds the 50MB limit. Please reduce the file sizes or remove some files.`);
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -90,14 +172,67 @@ export default function TaxFormPage() {
               .join(", ")
           : undefined;
         const fallback = "Failed to submit tax form. Please try again later.";
-        const errorMessage =
-          data?.message ||
-          messages ||
-          (status === 413 ? "Uploaded files are too large." : fallback);
-        console.error(
-          `Error submitting tax form (status ${status}): ${errorMessage}`
-        );
+        let errorMessage = data?.message || messages;
+        
+        if (!errorMessage) {
+          switch (status) {
+            case 400:
+              errorMessage = "Invalid form data. Please check your entries and try again.";
+              break;
+            case 401:
+              errorMessage = "Your session has expired. Please log in again to continue.";
+              break;
+            case 403:
+              errorMessage = "You don't have permission to submit this form. Please contact support if you believe this is an error.";
+              break;
+            case 404:
+              errorMessage = "The form submission service is currently unavailable. Please try again later.";
+              break;
+            case 409:
+              errorMessage = "You have already submitted a form for this service for the current year. You can view your existing submission in the dashboard.";
+              break;
+            case 413:
+              errorMessage = "The uploaded files are too large. Please ensure the total file size is under 50MB and try again.";
+              break;
+            case 422:
+              errorMessage = "Some required information is missing or invalid. Please review your form and try again.";
+              break;
+            case 429:
+              errorMessage = "Too many submission attempts. Please wait a few minutes before trying again.";
+              break;
+            case 500:
+            case 502:
+            case 503:
+            case 504:
+              errorMessage = "Our servers are experiencing issues. Please try again in a few minutes.";
+              break;
+            default:
+              errorMessage = fallback;
+          }
+        }
+        
+        // Only log console errors for unexpected status codes (exclude handled user-facing errors)
+        const handledStatusCodes = [400, 401, 403, 404, 409, 413, 422, 429, 500, 502, 503, 504];
+        if (!handledStatusCodes.includes(status || 0)) {
+          console.error(
+            `Error submitting tax form (status ${status}): ${errorMessage}`
+          );
+        }
+        
         toast.error(errorMessage);
+        
+        // Handle specific redirects based on error type
+        if (status === 409) {
+          // Redirect to dashboard if form already exists
+          setTimeout(() => {
+            router.push("/dashboard");
+          }, 2000); // Give user time to read the error message
+        } else if (status === 401) {
+          // Redirect to login if session expired
+          setTimeout(() => {
+            router.push("/login");
+          }, 2000); // Give user time to read the error message
+        }
       } else {
         // Handle non-Axios errors
         console.error(
@@ -198,7 +333,7 @@ export default function TaxFormPage() {
                           or drag and drop
                         </p>
                         <p className="text-xs text-gray-500">
-                          PDF, PNG, JPG (MAX. 5MB each)
+                          PDF, PNG, JPG, ZIP, Excel (XLSX, XLS, CSV) - MAX. 50MB total
                         </p>
                       </div>
                       <Input
@@ -206,14 +341,34 @@ export default function TaxFormPage() {
                         type="file"
                         className="hidden"
                         multiple
+                        accept=".pdf,.png,.jpg,.jpeg,.zip,.xlsx,.xls,.csv,application/pdf,image/png,image/jpeg,application/zip,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv"
                         onChange={(e) => setFiles(e.target.files)}
                       />
                     </label>
                   </div>
                   {files && (
-                    <p className="text-sm text-gray-500">
-                      {files.length} file(s) selected.
-                    </p>
+                    <div className="mt-3 space-y-2">
+                      <p className="text-sm font-medium text-gray-700">
+                        {files.length} file(s) selected:
+                      </p>
+                      <div className="space-y-1 max-h-32 overflow-y-auto">
+                        {Array.from(files).map((file, index) => (
+                          <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded text-xs">
+                            <span className="truncate flex-1 mr-2" title={file.name}>
+                              {file.name}
+                            </span>
+                            <span className="text-gray-500 whitespace-nowrap">
+                              {(file.size / (1024 * 1024)).toFixed(2)}MB
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="text-sm text-gray-600 font-medium pt-1 border-t">
+                        Total size: {(
+                          Array.from(files).reduce((total, file) => total + file.size, 0) / (1024 * 1024)
+                        ).toFixed(2)}MB / 50MB
+                      </div>
+                    </div>
                   )}
                 </div>
                 <Button

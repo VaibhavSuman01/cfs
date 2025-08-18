@@ -90,7 +90,7 @@ export default function AuthPage() {
         aadhaarNo: undefined,
       });
 
-      // Reset form (handled by auth provider redirect)
+      // Reset form and redirect to sign-in page
       setSignupForm({
         fullName: "",
         email: "",
@@ -100,6 +100,10 @@ export default function AuthPage() {
         password: "",
         confirmPassword: "",
       });
+      
+      // Switch to sign-in form and show success message
+      setIsLogin(true);
+      toast.success("Registration is completed.");
     } catch (error: any) {
       console.error("Signup error:", error);
       setErrors({
@@ -260,6 +264,7 @@ export default function AuthPage() {
                         errors.fullName ? "border-red-500" : "border-gray-200"
                       }`}
                       placeholder="Enter your full name"
+                      suppressHydrationWarning
                     />
                   </div>
                   {errors.fullName && (
@@ -286,6 +291,7 @@ export default function AuthPage() {
                         errors.email ? "border-red-500" : "border-gray-200"
                       }`}
                       placeholder="Enter your email"
+                      suppressHydrationWarning
                     />
                   </div>
                   {errors.email && (
@@ -314,6 +320,7 @@ export default function AuthPage() {
                       }`}
                       placeholder="ABCDE1234F"
                       maxLength={10}
+                      suppressHydrationWarning
                     />
                   </div>
                   {errors.panCard && (
@@ -344,6 +351,7 @@ export default function AuthPage() {
                           ? "border-red-500"
                           : "border-gray-200"
                       }`}
+                      suppressHydrationWarning
                     />
                   </div>
                   {errors.dateOfBirth && (
@@ -376,6 +384,7 @@ export default function AuthPage() {
                       }`}
                       placeholder="Enter 10-digit mobile number"
                       maxLength={10}
+                      suppressHydrationWarning
                     />
                   </div>
                   {errors.mobileNumber && (
@@ -405,6 +414,7 @@ export default function AuthPage() {
                         errors.password ? "border-red-500" : "border-gray-200"
                       }`}
                       placeholder="Enter your password"
+                      suppressHydrationWarning
                     />
                     <button
                       type="button"
@@ -447,6 +457,7 @@ export default function AuthPage() {
                           : "border-gray-200"
                       }`}
                       placeholder="Confirm your password"
+                      suppressHydrationWarning
                     />
                     <button
                       type="button"
@@ -518,6 +529,7 @@ export default function AuthPage() {
                       className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 ${
                         errors.emailOrPan ? "border-red-500" : "border-gray-200"
                       }`}
+                      suppressHydrationWarning
                       placeholder="Enter email or PAN card"
                     />
                   </div>
@@ -555,6 +567,7 @@ export default function AuthPage() {
                         errors.password ? "border-red-500" : "border-gray-200"
                       }`}
                       placeholder="Enter your password"
+                      suppressHydrationWarning
                     />
                     <button
                       type="button"

@@ -96,13 +96,9 @@ const OrderStatusTracker = ({
 
 interface TaxForm {
   _id: string;
-<<<<<<< HEAD
-  status: "Pending" | "Reviewed" | "Filed";
-=======
   service?: string;
   year?: string;
   status: 'Pending' | 'Reviewed' | 'Filed';
->>>>>>> NEW
   createdAt: string;
   updatedAt: string;
   editHistory: any[];
@@ -435,30 +431,6 @@ export default function UserDashboard() {
                             className="rounded-lg border bg-white p-4 transition-all hover:shadow-md"
                           >
                             <div className="mb-4 flex items-center justify-between">
-<<<<<<< HEAD
-                              <div>
-                                <div className="font-bold text-gray-800">
-                                  ITR Form - AY 2024-25
-                                </div>
-                                <div className="text-xs text-gray-500">
-                                  Submitted: {formatDate(form.createdAt)}
-                                </div>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                {form.status === "Pending" &&
-                                  form.editHistory &&
-                                  form.editHistory.length < 2 && (
-                                    <Button
-                                      variant="secondary"
-                                      size="sm"
-                                      asChild
-                                    >
-                                      <Link
-                                        href={`/dashboard/forms/edit/${form._id}`}
-                                      >
-                                        <Pencil className="mr-2 h-4 w-4" /> Edit
-                                      </Link>
-=======
                                 <div>
                                     <div className="font-bold text-gray-800">{form.service || 'Form'}{form.year ? ` - FY ${form.year}` : ''}</div>
                                     <div className="text-xs text-gray-500">
@@ -488,25 +460,8 @@ export default function UserDashboard() {
                                     )}
                                     <Button size="sm" asChild>
                                         <Link href={`/dashboard/forms/${form._id}`}>View Details</Link>
->>>>>>> NEW
                                     </Button>
-                                  )}
-                                {form.status === "Filed" && (
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="border-green-600 text-green-600 hover:bg-green-50 hover:text-green-700"
-                                  >
-                                    <Download className="mr-2 h-4 w-4" />{" "}
-                                    Download Report
-                                  </Button>
-                                )}
-                                <Button size="sm" asChild>
-                                  <Link href={`/dashboard/forms/${form._id}`}>
-                                    View Details
-                                  </Link>
-                                </Button>
-                              </div>
+                                </div>
                             </div>
                             <OrderStatusTracker
                               status={
