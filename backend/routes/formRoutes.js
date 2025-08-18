@@ -8,7 +8,7 @@ const upload = require("../middleware/upload");
 const { handleMulterError } = require("../middleware/upload");
 const { protect } = require("../middleware/auth");
 const { isValidObjectId } = require("../utils/validation");
-const { validate, validateObjectId } = require('../utils/validation');
+const { validate, validateObjectId } = require("../utils/validation");
 
 // @route   GET /api/forms/check-pan/:pan
 // @desc    Check if a PAN number already exists in the system
@@ -16,25 +16,29 @@ const { validate, validateObjectId } = require('../utils/validation');
 router.get("/check-pan/:pan", protect, async (req, res) => {
   try {
     const { pan } = req.params;
-    
+
     // Validate PAN format
     const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
     if (!panRegex.test(pan)) {
       return res.status(400).json({ message: "Invalid PAN format" });
     }
-    
+
     // Check if a tax form with this PAN already exists
-    const existingFormWithPAN = await TaxForm.findOne({ pan: pan.toUpperCase() });
-    
+    const existingFormWithPAN = await TaxForm.findOne({
+      pan: pan.toUpperCase(),
+    });
+
     return res.status(200).json({
       exists: !!existingFormWithPAN,
-      message: existingFormWithPAN ? "A tax form with this PAN already exists" : "PAN is available for submission"
+      message: existingFormWithPAN
+        ? "A tax form with this PAN already exists"
+        : "PAN is available for submission",
     });
   } catch (error) {
     console.error("Error checking PAN:", error);
     return res.status(500).json({
       message: "Server error while checking PAN",
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -55,12 +59,7 @@ router.post(
     try {
       console.log("Tax form submission received");
       console.log("Request body:", req.body);
-      console.log(
-        "Files received:",
-        req.files ? req.files.length : "No files"
-      );
-
-
+      console.log("Files received:", req.files ? req.files.length : "No files");
 
       const {
         fullName,
@@ -95,18 +94,25 @@ router.post(
         console.log("Invalid PAN format:", pan);
         return res.status(400).json({ message: "Invalid PAN format" });
       }
-      
-
 
       // Validate conditional fields
-      if (hasIncomeTaxLogin === "true" && (!incomeTaxLoginId || !incomeTaxLoginPassword)) {
+      if (
+        hasIncomeTaxLogin === "true" &&
+        (!incomeTaxLoginId || !incomeTaxLoginPassword)
+      ) {
         console.log("Missing income tax login credentials");
         return res
           .status(400)
           .json({ message: "Income tax login credentials are required" });
       }
 
-      if (hasHomeLoan === "true" && (!homeLoanSanctionDate || !homeLoanAmount || !homeLoanCurrentDue || !homeLoanTotalInterest)) {
+      if (
+        hasHomeLoan === "true" &&
+        (!homeLoanSanctionDate ||
+          !homeLoanAmount ||
+          !homeLoanCurrentDue ||
+          !homeLoanTotalInterest)
+      ) {
         console.log("Missing home loan details");
         return res
           .status(400)
@@ -138,40 +144,41 @@ router.post(
         hasPranNumber: hasPranNumber === "true",
         pranNumber: pranNumber || "",
         status: "Pending",
-        documents: []
+        documents: [],
       };
-      
+
       // Get document types from request body
       const documentTypes = {};
-      Object.keys(req.body).forEach(key => {
-        if (key.startsWith('documentType_')) {
-          const fileId = key.replace('documentType_', '');
+      Object.keys(req.body).forEach((key) => {
+        if (key.startsWith("documentType_")) {
+          const fileId = key.replace("documentType_", "");
           documentTypes[fileId] = req.body[key];
           // Remove these fields from formData
           delete formData[key];
         }
       });
-      
+
       // Process each file with its document type
       if (req.files && req.files.length > 0) {
         console.log(`Processing ${req.files.length} uploaded files`);
-        
+
         req.files.forEach((file, index) => {
           const fileId = req.body[`fileId_${index}`] || `file_${index}`;
-          const docType = documentTypes[fileId] || 'other';
-          
+          const docType = documentTypes[fileId] || "other";
+
           console.log(`Processing file: ${docType}`, {
             originalname: file.originalname,
             mimetype: file.mimetype,
             size: file.size,
-            extension: file.originalname.split('.').pop().toLowerCase()
+            extension: file.originalname.split(".").pop().toLowerCase(),
           });
-          
+
           // Generate a unique filename
-          const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+          const uniqueSuffix =
+            Date.now() + "-" + Math.round(Math.random() * 1e9);
           const ext = path.extname(file.originalname);
           const fileName = uniqueSuffix + ext;
-          
+
           // Add to documents array with file data stored in Buffer
           formData.documents.push({
             documentType: docType,
@@ -180,9 +187,9 @@ router.post(
             fileType: file.mimetype,
             fileSize: file.size,
             fileData: file.buffer,
-            contentType: file.mimetype
+            contentType: file.mimetype,
           });
-          
+
           // Remove the fileId field
           delete formData[`fileId_${index}`];
         });
@@ -200,7 +207,7 @@ router.post(
       await mongoose.model("User").findByIdAndUpdate(req.user._id, {
         hasTaxFormSubmission: true,
         // Initialize document edit count for this form
-        $set: { [`documentEditCounts.${taxForm._id}`]: 0 }
+        $set: { [`documentEditCounts.${taxForm._id}`]: 0 },
       });
 
       res.status(201).json({
@@ -282,8 +289,9 @@ router.get("/user-submissions", protect, async (req, res) => {
 // @access  Private
 router.get("/user-submissions/:id", protect, async (req, res) => {
   try {
-    const submission = await TaxForm.findById(req.params.id)
-      .select("-incomeTaxLoginCredentials -documents.fileData"); // Exclude sensitive data and file data
+    const submission = await TaxForm.findById(req.params.id).select(
+      "-incomeTaxLoginCredentials -documents.fileData"
+    ); // Exclude sensitive data and file data
 
     if (!submission) {
       return res.status(404).json({ message: "Submission not found" });
@@ -291,15 +299,20 @@ router.get("/user-submissions/:id", protect, async (req, res) => {
 
     // Check if the submission belongs to the logged-in user
     if (submission.email !== req.user.email) {
-      return res.status(403).json({ message: "Not authorized to view this submission" });
+      return res
+        .status(403)
+        .json({ message: "Not authorized to view this submission" });
     }
-    
+
     // Process documents by document type for easier frontend access
     const processedSubmission = submission.toObject();
-    
+
     // Create document objects by type for easier frontend access
-    if (processedSubmission.documents && processedSubmission.documents.length > 0) {
-      processedSubmission.documents.forEach(doc => {
+    if (
+      processedSubmission.documents &&
+      processedSubmission.documents.length > 0
+    ) {
+      processedSubmission.documents.forEach((doc) => {
         // Add each document directly to the submission object by its type
         // This makes it accessible as submission.form16, submission.bankStatement, etc.
         processedSubmission[doc.documentType] = doc;
@@ -319,11 +332,11 @@ router.get("/user-submissions/:id", protect, async (req, res) => {
 router.get("/download/:documentId", protect, async (req, res) => {
   try {
     const documentId = req.params.documentId;
-    
+
     // Find documents that match the document ID string
     // This approach avoids ObjectId casting errors
     let query;
-    
+
     if (isValidObjectId(documentId)) {
       // If it's a valid ObjectId, we can use it directly
       query = { "documents._id": documentId };
@@ -331,39 +344,43 @@ router.get("/download/:documentId", protect, async (req, res) => {
       // If it's not a valid ObjectId, we need to use string comparison
       // This is a fallback and should be avoided in production
       // by ensuring all document IDs are valid ObjectIds
-      return res.status(400).json({ 
-        message: "Invalid document ID format. Must be a 24-character hex string." 
+      return res.status(400).json({
+        message:
+          "Invalid document ID format. Must be a 24-character hex string.",
       });
     }
-    
+
     // Find the tax form containing the document
     const taxForm = await TaxForm.findOne(query);
-    
+
     if (!taxForm) {
       return res.status(404).json({ message: "Document not found" });
     }
-    
+
     // Check if the tax form belongs to the logged-in user or if user is admin
     if (taxForm.email !== req.user.email && req.user.role !== "admin") {
-      return res.status(403).json({ message: "Not authorized to access this document" });
+      return res
+        .status(403)
+        .json({ message: "Not authorized to access this document" });
     }
-    
+
     // Find the specific document in the documents array
-    const document = taxForm.documents.find(doc => doc._id.toString() === documentId);
-    
+    const document = taxForm.documents.find(
+      (doc) => doc._id.toString() === documentId
+    );
+
     if (!document) {
       return res.status(404).json({ message: "Document not found" });
     }
-    
+
     // Set response headers
     res.set({
-      'Content-Type': document.contentType,
-      'Content-Disposition': `attachment; filename="${document.originalName}"`
+      "Content-Type": document.contentType,
+      "Content-Disposition": `attachment; filename="${document.originalName}"`,
     });
-    
+
     // Send the file data
     res.send(document.fileData);
-    
   } catch (error) {
     console.error("Error downloading document:", error);
     res.status(500).json({ message: "Server error" });
@@ -376,69 +393,79 @@ router.get("/download/:documentId", protect, async (req, res) => {
 router.delete("/document/:documentId", protect, async (req, res) => {
   try {
     const documentId = req.params.documentId;
-    
+
     if (!isValidObjectId(documentId)) {
-      return res.status(400).json({ 
-        message: "Invalid document ID format. Must be a 24-character hex string." 
+      return res.status(400).json({
+        message:
+          "Invalid document ID format. Must be a 24-character hex string.",
       });
     }
-    
+
     // Find the tax form containing the document
     const taxForm = await TaxForm.findOne({ "documents._id": documentId });
-    
+
     if (!taxForm) {
       return res.status(404).json({ message: "Document not found" });
     }
-    
+
     // Check if the tax form belongs to the logged-in user
-    if ((taxForm.email !== req.user.email || (taxForm.user && !taxForm.user.equals(req.user._id))) && req.user.role !== "admin") {
-      return res.status(403).json({ message: "Not authorized to delete this document" });
+    if (
+      (taxForm.email !== req.user.email ||
+        (taxForm.user && !taxForm.user.equals(req.user._id))) &&
+      req.user.role !== "admin"
+    ) {
+      return res
+        .status(403)
+        .json({ message: "Not authorized to delete this document" });
     }
 
     // Check edit limit for regular users (not admins)
     if (req.user.role !== "admin") {
       // Get the current user with document edit counts
       const user = await mongoose.model("User").findById(req.user._id);
-      
+
       // Get the edit count for this form
-      const editCount = user.documentEditCounts.get(taxForm._id.toString()) || 0;
-      
+      const editCount =
+        user.documentEditCounts.get(taxForm._id.toString()) || 0;
+
       // Check if edit limit has been reached
       if (editCount >= 2) {
-        return res.status(403).json({ 
-          message: "You have reached the maximum number of document edits (2) for this submission." 
+        return res.status(403).json({
+          message:
+            "You have reached the maximum number of document edits (2) for this submission.",
         });
       }
     }
-    
+
     // Find the document index and type before removing it
-    const documentIndex = taxForm.documents.findIndex(doc => doc._id.toString() === documentId);
-    
+    const documentIndex = taxForm.documents.findIndex(
+      (doc) => doc._id.toString() === documentId
+    );
+
     if (documentIndex === -1) {
       return res.status(404).json({ message: "Document not found" });
     }
-    
+
     const documentType = taxForm.documents[documentIndex].documentType;
-    
+
     // Remove the document from the array
     taxForm.documents.splice(documentIndex, 1);
-    
+
     // Save the updated tax form
     await taxForm.save();
-    
+
     // Increment the document edit count for this form (for non-admin users)
     if (req.user.role !== "admin") {
       await mongoose.model("User").findByIdAndUpdate(req.user._id, {
-        $inc: { [`documentEditCounts.${taxForm._id}`]: 1 }
+        $inc: { [`documentEditCounts.${taxForm._id}`]: 1 },
       });
     }
-    
-    res.json({ 
-      success: true, 
+
+    res.json({
+      success: true,
       message: "Document deleted successfully",
-      documentType: documentType
+      documentType: documentType,
     });
-    
   } catch (error) {
     console.error("Error deleting document:", error);
     res.status(500).json({ message: "Server error" });
@@ -448,93 +475,266 @@ router.delete("/document/:documentId", protect, async (req, res) => {
 // @route   POST /api/forms/document/:formId
 // @desc    Upload a new document to an existing tax form submission
 // @access  Private
-router.post("/document/:formId", protect, upload.single("document"), handleMulterError, async (req, res) => {
-  try {
-    const formId = req.params.formId;
-    const { documentType } = req.body;
-    
-    if (!isValidObjectId(formId)) {
-      return res.status(400).json({ 
-        message: "Invalid form ID format. Must be a 24-character hex string." 
-      });
-    }
-    
-    // Find the tax form
-    const taxForm = await TaxForm.findById(formId);
-    
-    if (!taxForm) {
-      return res.status(404).json({ message: "Tax form not found" });
-    }
-    
-    // Check if the tax form belongs to the logged-in user
-    if ((taxForm.email !== req.user.email || !taxForm.user.equals(req.user._id)) && req.user.role !== "admin") {
-      return res.status(403).json({ message: "Not authorized to update this form" });
-    }
+router.post(
+  "/document/:formId",
+  protect,
+  upload.single("document"),
+  handleMulterError,
+  async (req, res) => {
+    try {
+      const formId = req.params.formId;
+      const { documentType } = req.body;
 
-    // Check edit limit for regular users (not admins)
-    if (req.user.role !== "admin") {
-      // Get the current user with document edit counts
-      const user = await mongoose.model("User").findById(req.user._id);
-      
-      // Get the edit count for this form
-      const editCount = user.documentEditCounts.get(formId.toString()) || 0;
-      
-      // Check if edit limit has been reached
-      if (editCount >= 2) {
-        return res.status(403).json({ 
-          message: "You have reached the maximum number of document edits (2) for this submission." 
+      if (!isValidObjectId(formId)) {
+        return res.status(400).json({
+          message: "Invalid form ID format. Must be a 24-character hex string.",
         });
       }
+
+      // Find the tax form
+      const taxForm = await TaxForm.findById(formId);
+
+      if (!taxForm) {
+        return res.status(404).json({ message: "Tax form not found" });
+      }
+
+      // Check if the tax form belongs to the logged-in user
+      if (
+        (taxForm.email !== req.user.email ||
+          !taxForm.user.equals(req.user._id)) &&
+        req.user.role !== "admin"
+      ) {
+        return res
+          .status(403)
+          .json({ message: "Not authorized to update this form" });
+      }
+
+      // Check edit limit for regular users (not admins)
+      if (req.user.role !== "admin") {
+        // Get the current user with document edit counts
+        const user = await mongoose.model("User").findById(req.user._id);
+
+        // Get the edit count for this form
+        const editCount = user.documentEditCounts.get(formId.toString()) || 0;
+
+        // Check if edit limit has been reached
+        if (editCount >= 2) {
+          return res.status(403).json({
+            message:
+              "You have reached the maximum number of document edits (2) for this submission.",
+          });
+        }
+      }
+
+      // Check if file was uploaded
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      // Create new document object
+      const newDocument = {
+        documentType: documentType || "other",
+        fileName:
+          Date.now() +
+          "-" +
+          Math.round(Math.random() * 1e9) +
+          path.extname(req.file.originalname),
+        originalName: req.file.originalname,
+        fileType: req.file.mimetype,
+        fileSize: req.file.size,
+        fileData: req.file.buffer,
+        contentType: req.file.mimetype,
+        isEdited: true, // Mark this document as edited since it's being added after initial submission
+      };
+
+      // Add the new document to the documents array
+      taxForm.documents.push(newDocument);
+
+      // Save the updated tax form
+      await taxForm.save();
+
+      // Increment the document edit count for this form (for non-admin users)
+      if (req.user.role !== "admin") {
+        await mongoose.model("User").findByIdAndUpdate(req.user._id, {
+          $inc: { [`documentEditCounts.${formId}`]: 1 },
+        });
+      }
+
+      // Return the new document without the file data
+      const responseDocument = {
+        _id: taxForm.documents[taxForm.documents.length - 1]._id,
+        documentType: newDocument.documentType,
+        originalName: newDocument.originalName,
+        fileSize: newDocument.fileSize,
+      };
+
+      res.status(201).json({
+        success: true,
+        message: "Document uploaded successfully",
+        document: responseDocument,
+      });
+    } catch (error) {
+      console.error("Error uploading document:", error);
+      res.status(500).json({ message: "Server error" });
     }
-    
-    // Check if file was uploaded
-    if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
-    }
-    
-    // Create new document object
-    const newDocument = {
-      documentType: documentType || "other",
-      fileName: Date.now() + "-" + Math.round(Math.random() * 1e9) + path.extname(req.file.originalname),
-      originalName: req.file.originalname,
-      fileType: req.file.mimetype,
-      fileSize: req.file.size,
-      fileData: req.file.buffer,
-      contentType: req.file.mimetype,
-      isEdited: true // Mark this document as edited since it's being added after initial submission
-    };
-    
-    // Add the new document to the documents array
-    taxForm.documents.push(newDocument);
-    
-    // Save the updated tax form
-    await taxForm.save();
-    
-    // Increment the document edit count for this form (for non-admin users)
-    if (req.user.role !== "admin") {
-      await mongoose.model("User").findByIdAndUpdate(req.user._id, {
-        $inc: { [`documentEditCounts.${formId}`]: 1 }
+  }
+);
+
+// @route   PUT /api/forms/tax/:id
+// @desc    Update tax filing form with documents
+// @access  Private
+router.put(
+  "/tax/:id",
+  protect,
+  (req, res, next) => {
+    console.log("Processing tax form update request for ID:", req.params.id);
+    next();
+  },
+  upload.array("documents", 10),
+  handleMulterError,
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user.id;
+
+      // Validate ObjectId
+      if (!isValidObjectId(id)) {
+        return res.status(400).json({ message: "Invalid form ID" });
+      }
+
+      // Find the existing form and verify ownership
+      const existingForm = await TaxForm.findOne({ _id: id, userId });
+      if (!existingForm) {
+        return res
+          .status(404)
+          .json({ message: "Tax form not found or access denied" });
+      }
+
+      // Extract form data
+      const {
+        fullName,
+        email,
+        phone,
+        pan,
+        service,
+        year,
+        hasIncomeTaxLogin,
+        incomeTaxLoginId,
+        incomeTaxLoginPassword,
+        hasHomeLoan,
+        homeLoanSanctionDate,
+        homeLoanAmount,
+        homeLoanCurrentDue,
+        homeLoanTotalInterest,
+        hasPranNumber,
+        pranNumber,
+        existingDocuments,
+      } = req.body;
+
+      // Validate required fields
+      if (!fullName || !email || !phone || !pan || !service || !year) {
+        return res.status(400).json({
+          message:
+            "Missing required fields: fullName, email, phone, pan, service, year",
+        });
+      }
+
+      // Handle existing documents to keep
+      let documentsToKeep = [];
+      if (existingDocuments) {
+        const existingDocIds = Array.isArray(existingDocuments)
+          ? existingDocuments
+          : [existingDocuments];
+        q;
+
+        documentsToKeep = existingForm.documents.filter((doc) =>
+          existingDocIds.includes(doc._id.toString())
+        );
+      }
+
+      // Handle new uploaded files
+      let newDocuments = [];
+      if (req.files && req.files.length > 0) {
+        newDocuments = req.files.map((file) => ({
+          originalName: file.originalname,
+          filename: file.filename,
+          path: file.path,
+          size: file.size,
+          mimetype: file.mimetype,
+          uploadDate: new Date(),
+        }));
+      }
+
+      // Combine existing and new documents
+      const allDocuments = [...documentsToKeep, ...newDocuments];
+
+      // Update the form
+      const updatedForm = await TaxForm.findByIdAndUpdate(
+        id,
+        {
+          fullName: fullName.trim(),
+          email: email.toLowerCase().trim(),
+          phone: phone.trim(),
+          pan: pan.toUpperCase().trim(),
+          service: service.trim(),
+          year: year.trim(),
+          hasIncomeTaxLogin: hasIncomeTaxLogin === "true",
+          incomeTaxLoginId:
+            hasIncomeTaxLogin === "true" ? incomeTaxLoginId?.trim() : undefined,
+          incomeTaxLoginPassword:
+            hasIncomeTaxLogin === "true"
+              ? incomeTaxLoginPassword?.trim()
+              : undefined,
+          hasHomeLoan: hasHomeLoan === "true",
+          homeLoanSanctionDate:
+            hasHomeLoan === "true" ? homeLoanSanctionDate : undefined,
+          homeLoanAmount:
+            hasHomeLoan === "true" ? homeLoanAmount?.trim() : undefined,
+          homeLoanCurrentDue:
+            hasHomeLoan === "true" ? homeLoanCurrentDue?.trim() : undefined,
+          homeLoanTotalInterest:
+            hasHomeLoan === "true" ? homeLoanTotalInterest?.trim() : undefined,
+          hasPranNumber: hasPranNumber === "true",
+          pranNumber: hasPranNumber === "true" ? pranNumber?.trim() : undefined,
+          documents: allDocuments,
+          updatedAt: new Date(),
+        },
+        { new: true, runValidators: true }
+      );
+
+      console.log("Tax form updated successfully:", updatedForm._id);
+
+      res.status(200).json({
+        message: "Tax form updated successfully",
+        formId: updatedForm._id,
+        documentsCount: allDocuments.length,
+      });
+    } catch (error) {
+      console.error("Error updating tax form:", error);
+
+      if (error.name === "ValidationError") {
+        const validationErrors = Object.values(error.errors).map(
+          (err) => err.message
+        );
+        return res.status(400).json({
+          message: "Validation failed",
+          errors: validationErrors,
+        });
+      }
+
+      if (error.code === 11000) {
+        return res.status(409).json({
+          message:
+            "A tax form with this PAN already exists for the selected year",
+        });
+      }
+
+      res.status(500).json({
+        message: "Server error while updating tax form",
+        error: error.message,
       });
     }
-    
-    // Return the new document without the file data
-    const responseDocument = {
-      _id: taxForm.documents[taxForm.documents.length - 1]._id,
-      documentType: newDocument.documentType,
-      originalName: newDocument.originalName,
-      fileSize: newDocument.fileSize
-    };
-    
-    res.status(201).json({
-      success: true,
-      message: "Document uploaded successfully",
-      document: responseDocument
-    });
-    
-  } catch (error) {
-    console.error("Error uploading document:", error);
-    res.status(500).json({ message: "Server error" });
   }
-});
+);
 
 module.exports = router;
