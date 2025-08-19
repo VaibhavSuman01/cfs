@@ -75,20 +75,6 @@ export default function OtherRegistrationPage() {
                   timeline: "1-2 days",
                 },
                 {
-                  icon: Building,
-                  title: "Section 8 Company",
-                  description: "Non-profit company for charitable, educational, or social welfare purposes",
-                  features: [
-                    "Non-profit organization",
-                    "Tax exemptions available",
-                    "Limited liability protection",
-                    "Perpetual succession",
-                    "Can receive donations",
-                  ],
-                  price: "₹14,999",
-                  timeline: "15-20 days",
-                },
-                {
                   icon: Shield,
                   title: "Producer Company",
                   description: "Special type of company for agricultural and rural development activities",
@@ -101,20 +87,6 @@ export default function OtherRegistrationPage() {
                   ],
                   price: "₹24,999",
                   timeline: "20-25 days",
-                },
-                {
-                  icon: Users,
-                  title: "Nidhi Company",
-                  description: "Non-banking financial company for mutual benefit of members",
-                  features: [
-                    "Minimum 7 members required",
-                    "Mutual benefit society",
-                    "Borrowing and lending to members",
-                    "Limited liability protection",
-                    "RBI regulations apply",
-                  ],
-                  price: "₹29,999",
-                  timeline: "25-30 days",
                 },
                 {
                   icon: FileText,
