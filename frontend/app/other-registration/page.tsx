@@ -4,6 +4,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { EnhancedHeader } from "@/components/enhanced-header";
+import { EnhancedFooter } from "@/components/enhanced-footer";
 import { FadeInSection } from "@/components/fade-in-section"
 import { Users, FileText, Building, Handshake, CheckCircle, ArrowRight, Shield, Clock, Globe } from "lucide-react"
 
@@ -344,6 +345,7 @@ export default function OtherRegistrationPage() {
           </div>
         </section>
       </FadeInSection>
+      <EnhancedFooter />
     </div>
   )
 }

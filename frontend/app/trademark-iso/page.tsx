@@ -4,6 +4,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { EnhancedHeader } from "@/components/enhanced-header";
+import { EnhancedFooter } from "@/components/enhanced-footer";
 import { FadeInSection } from "@/components/fade-in-section"
 import { Shield, Award, Search, FileText, CheckCircle, ArrowRight, Globe, Star, Zap } from "lucide-react"
 
@@ -339,6 +340,7 @@ export default function TrademarkISOPage() {
           </div>
         </section>
       </FadeInSection>
+      <EnhancedFooter />
     </div>
   )
 }

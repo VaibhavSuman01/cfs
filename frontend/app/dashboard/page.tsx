@@ -39,6 +39,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import api from "@/lib/api-client";
+import { EnhancedFooter } from "@/components/enhanced-footer";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -492,6 +493,7 @@ export default function UserDashboard() {
           </div>
         </div>
       </div>
+      <EnhancedFooter />
     </div>
   );
 }

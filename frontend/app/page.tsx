@@ -29,6 +29,7 @@ import {
   Clock,
   Award,
   MessageCircle,
+  BarChart3,
 } from "lucide-react";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import Link from "next/link";
@@ -151,7 +152,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-5 gap-6">
+            <div className="grid md:grid-cols-6 gap-6">
               {[
                 {
                   icon: Building2,
@@ -186,21 +187,29 @@ export default function HomePage() {
                   href: "/roc-returns",
                   description: "Annual filings and company compliance",
                 },
+                {
+                  icon: BarChart3,
+                  title: "Reports",
+                  href: "/reports",
+                  description: "Business analytics and financial reports",
+                },
               ].map((service, index) => (
                 <FadeInSection key={index} delay={index * 100}>
-                  <Card className="text-center hover:shadow-2xl transition-all duration-500 hover:-translate-y-4 cursor-pointer group border-2 border-transparent hover:border-blue-200 bg-gradient-to-br from-white to-blue-50/50">
-                    <CardContent className="p-8">
-                      <div className="mx-auto w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mb-6 group-hover:from-blue-200 group-hover:to-blue-300 transition-all duration-300 group-hover:scale-110">
-                        <service.icon className="h-10 w-10 text-blue-600 group-hover:scale-110 transition-transform" />
-                      </div>
-                      <h3 className="font-bold text-gray-900 text-lg mb-3">
-                        {service.title}
-                      </h3>
-                      <p className="text-gray-600 text-sm leading-relaxed">
-                        {service.description}
-                      </p>
-                    </CardContent>
-                  </Card>
+                  <Link href={service.href} className="block">
+                    <Card className="text-center hover:shadow-2xl transition-all duration-500 hover:-translate-y-4 cursor-pointer group border-2 border-transparent hover:border-blue-200 bg-gradient-to-br from-white to-blue-50/50">
+                      <CardContent className="p-8">
+                        <div className="mx-auto w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mb-6 group-hover:from-blue-200 group-hover:to-blue-300 transition-all duration-300 group-hover:scale-110">
+                          <service.icon className="h-10 w-10 text-blue-600 group-hover:scale-110 transition-transform" />
+                        </div>
+                        <h3 className="font-bold text-gray-900 text-lg mb-3">
+                          {service.title}
+                        </h3>
+                        <p className="text-gray-600 text-sm leading-relaxed">
+                          {service.description}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 </FadeInSection>
               ))}
             </div>

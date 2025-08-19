@@ -4,6 +4,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { EnhancedHeader } from "@/components/enhanced-header";
+import { EnhancedFooter } from "@/components/enhanced-footer";
 import { FadeInSection } from "@/components/fade-in-section"
 import {
   Users,
@@ -327,6 +328,7 @@ export default function AdvisoryPage() {
           </div>
         </section>
       </FadeInSection>
+      <EnhancedFooter />
     </div>
   )
 }
