@@ -103,7 +103,17 @@ export default function AuthPage() {
       
       // Switch to sign-in form and show success message
       setIsLogin(true);
-      toast.success("Registration is completed.");
+      toast.success("🎉 Registration Completed Successfully!", {
+        description: "Welcome to ComfinServ! You can now sign in with your credentials.",
+        duration: 6000,
+        style: {
+          background: '#10B981',
+          color: 'white',
+          border: '2px solid #059669',
+          fontSize: '16px',
+          fontWeight: '600'
+        }
+      });
     } catch (error: any) {
       console.error("Signup error:", error);
       setErrors({
