@@ -51,6 +51,7 @@ export default function AdvisoryPage() {
                 {
                   icon: TrendingUp,
                   title: "Business Strategy Consulting",
+                  slug: "business-strategy-consulting",
                   description: "Develop comprehensive business strategies for growth and market expansion",
                   features: [
                     "Market analysis and research",
@@ -65,6 +66,7 @@ export default function AdvisoryPage() {
                 {
                   icon: Shield,
                   title: "Legal & Compliance Advisory",
+                  slug: "legal-compliance-advisory",
                   description: "Navigate complex legal requirements and ensure regulatory compliance",
                   features: [
                     "Regulatory compliance audit",
@@ -79,6 +81,7 @@ export default function AdvisoryPage() {
                 {
                   icon: Users,
                   title: "HR & Organizational Development",
+                  slug: "hr-organizational-development",
                   description: "Build strong teams and optimize organizational structure",
                   features: [
                     "Organizational restructuring",
@@ -93,6 +96,7 @@ export default function AdvisoryPage() {
                 {
                   icon: Target,
                   title: "Financial Planning & Analysis",
+                  slug: "financial-planning-analysis",
                   description: "Optimize financial performance and plan for sustainable growth",
                   features: [
                     "Financial health assessment",
@@ -107,6 +111,7 @@ export default function AdvisoryPage() {
                 {
                   icon: Lightbulb,
                   title: "Digital Transformation",
+                  slug: "digital-transformation",
                   description: "Modernize operations with technology and digital solutions",
                   features: [
                     "Technology assessment",
@@ -121,6 +126,7 @@ export default function AdvisoryPage() {
                 {
                   icon: Briefcase,
                   title: "Startup Mentoring",
+                  slug: "startup-mentoring",
                   description: "Comprehensive guidance for startups from ideation to scaling",
                   features: [
                     "Business plan development",
@@ -158,7 +164,7 @@ export default function AdvisoryPage() {
                           </div>
                         ))}
                       </div>
-                      <Link href={`/contact?service=${encodeURIComponent(service.title)}`} passHref>
+                      <Link href={`/advisory/${service.slug}`} passHref>
                         <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3">
                           Book Service <ArrowRight className="ml-2 h-5 w-5" />
                         </Button>

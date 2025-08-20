@@ -16,13 +16,81 @@ import { Phone, Mail, MapPin, Clock, MessageCircle, Send, Headphones, Loader2 } 
 import { toast } from "sonner"
 import api from "@/lib/api-client"
 
+// Service -> Sub-services mapping (extend as needed)
+const SERVICE_OPTIONS: Record<string, string[]> = {
+  "Company Formation": [
+    "Private Limited Company",
+    "One Person Company",
+    "Public Limited Company",
+    "Section 8 Company",
+    "Nidhi Company",
+    "LLP Registration",
+    "Partnership Firm Registration",
+    "Other",
+  ],
+  "Taxation": [
+    "GST Filing",
+    "Income Tax Filing",
+    "TDS Returns",
+    "EPFO Filing",
+    "ESIC Filing",
+    "PT Tax Filing",
+    "Other",
+  ],
+  "ROC Returns": [
+    "ROC Annual Filing",
+    "Director Changes",
+    "Other",
+  ],
+  "Other Registration": [
+    "GST Registration",
+    "MSME Udyam Registration",
+    "IEC Registration",
+    "FSSAI Food License",
+    "Gumusta Shop Registration",
+    "Digital Signature",
+    "Industry License",
+    "PAN Apply",
+    "TAN Apply",
+    "Startup India Registration",
+    "PT Tax",
+    "Other",
+  ],
+  "Advisory": [
+    "Digital Transformation",
+    "Business Strategy Consulting",
+    "Financial Planning & Analysis",
+    "HR & Organizational Development",
+    "Assistance for Fund Raising",
+    "Tax Plan & Analysis",
+    "Other Finance Related Services",
+    "Other",
+  ],
+  "Reports": [
+    "CMA Reports",
+    "Project Reports",
+    "DSCR Reports",
+    "Bank Reconciliation",
+    "Other",
+  ],
+  "Trademark & ISO": [
+    "ISO 14001 Certification",
+    "Copyright Registration",
+    "Other",
+  ],
+  "Other": [
+    "Other",
+  ],
+}
+
 export default function ContactPage() {
   const searchParams = useSearchParams()
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
-  const [service, setService] = useState(searchParams.get('service') || '')
+  const [service, setService] = useState('')
+  const [subService, setSubService] = useState('')
   const [message, setMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
@@ -30,13 +98,29 @@ export default function ContactPage() {
   useEffect(() => {
     const serviceParam = searchParams.get('service');
     if (serviceParam) {
-      setService(serviceParam);
+      // Try to find which service this sub-service belongs to
+      const entries = Object.entries(SERVICE_OPTIONS)
+      let matchedParent: string | null = null
+      for (const [parent, subs] of entries) {
+        if (subs.includes(serviceParam)) {
+          matchedParent = parent
+          break
+        }
+      }
+      if (matchedParent) {
+        setService(matchedParent)
+        setSubService(serviceParam)
+      } else {
+        // If not found in predefined list, categorize under Other
+        setService('Other')
+        setSubService(serviceParam)
+      }
     }
   }, [searchParams]);
 
   const handleSubmit = async () => {
     // Validate form
-    if (!firstName || !lastName || !email || !phone || !service || !message) {
+    if (!firstName || !lastName || !email || !phone || !service || !subService || !message) {
       toast.error('Please fill in all required fields')
       return
     }
@@ -58,11 +142,12 @@ export default function ContactPage() {
     setIsSubmitting(true)
 
     try {
+      const composedService = `${service}${subService ? ' - ' + subService : ''}`
       await api.post('/api/forms/contact', {
         name: `${firstName} ${lastName}`,
         email,
         phone,
-        service,
+        service: composedService,
         message
       })
 
@@ -75,6 +160,7 @@ export default function ContactPage() {
       setEmail('')
       setPhone('')
       setService('')
+      setSubService('')
       setMessage('')
     } catch (error) {
       console.error('Error submitting contact form:', error)
@@ -252,9 +338,33 @@ export default function ContactPage() {
                         </div>
                       </div>
 
-                      <div className="grid gap-2">
-                        <Label htmlFor="service">Service</Label>
-                        <Input id="service" value={service} disabled />
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div className="grid gap-2">
+                          <Label htmlFor="service">Service*</Label>
+                          <Select value={service} onValueChange={(v) => { setService(v); setSubService('') }}>
+                            <SelectTrigger id="service" className="border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                              <SelectValue placeholder="Select a service" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Object.keys(SERVICE_OPTIONS).map((svc) => (
+                                <SelectItem key={svc} value={svc}>{svc}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="subService">Sub-service*</Label>
+                          <Select value={subService} onValueChange={setSubService} disabled={!service}>
+                            <SelectTrigger id="subService" className="border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                              <SelectValue placeholder={service ? 'Select a sub-service' : 'Select service first'} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {(SERVICE_OPTIONS[service] || ["Other"]).map((ss) => (
+                                <SelectItem key={ss} value={ss}>{ss}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
 
                       <div>

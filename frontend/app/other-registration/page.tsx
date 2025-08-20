@@ -35,6 +35,7 @@ export default function OtherRegistrationPage() {
                 {
                   icon: Users,
                   title: "LLP Registration",
+                  slug: "llp-registration",
                   description:
                     "Limited Liability Partnership with flexibility of partnership and benefits of limited liability",
                   features: [
@@ -50,6 +51,7 @@ export default function OtherRegistrationPage() {
                 {
                   icon: Handshake,
                   title: "Partnership Firm",
+                  slug: "partnership-firm",
                   description: "Traditional partnership structure for businesses with multiple partners",
                   features: [
                     "Minimum 2 partners required",
@@ -64,6 +66,7 @@ export default function OtherRegistrationPage() {
                 {
                   icon: FileText,
                   title: "Sole Proprietorship",
+                  slug: "sole-proprietorship",
                   description: "Simplest form of business ownership for individual entrepreneurs",
                   features: [
                     "Single person ownership",
@@ -78,6 +81,7 @@ export default function OtherRegistrationPage() {
                 {
                   icon: Shield,
                   title: "Producer Company",
+                  slug: "producer-company",
                   description: "Special type of company for agricultural and rural development activities",
                   features: [
                     "Minimum 10 members required",
@@ -92,6 +96,7 @@ export default function OtherRegistrationPage() {
                 {
                   icon: FileText,
                   title: "Digital Signature",
+                  slug: "digital-signature",
                   description: "Secure your online transactions with a Digital Signature Certificate (DSC).",
                   features: [
                     "Class 3 DSC",
@@ -106,6 +111,7 @@ export default function OtherRegistrationPage() {
                 {
                   icon: FileText,
                   title: "GST Filing",
+                  slug: "gst-registration",
                   description: "Comply with the Goods and Services Tax law in India.",
                   features: [
                     "For businesses above threshold limit",
@@ -120,6 +126,7 @@ export default function OtherRegistrationPage() {
                 {
                   icon: Building,
                   title: "Gumusta / Shop & Establishment",
+                  slug: "gumusta-shop-registration",
                   description: "A mandatory registration for all shops and commercial establishments.",
                   features: [
                     "State-specific registration",
@@ -134,6 +141,7 @@ export default function OtherRegistrationPage() {
                 {
                   icon: Users,
                   title: "EPFO Registration",
+                  slug: "epfo",
                   description: "Secure your employees' future with provident fund benefits.",
                   features: [
                     "For businesses with 20+ employees",
@@ -148,6 +156,7 @@ export default function OtherRegistrationPage() {
                 {
                   icon: Shield,
                   title: "ESIC Registration",
+                  slug: "esic",
                   description: "Provide employees with health and social security benefits.",
                   features: [
                     "For businesses with 10+ employees",
@@ -162,6 +171,7 @@ export default function OtherRegistrationPage() {
                 {
                   icon: CheckCircle,
                   title: "FSSAI Food License",
+                  slug: "fassai-food-license",
                   description: "Ensure your food business complies with food safety standards in India.",
                   features: [
                     "Mandatory for food businesses",
@@ -176,6 +186,7 @@ export default function OtherRegistrationPage() {
                 {
                   icon: Globe,
                   title: "IEC Registration",
+                  slug: "iec-registration",
                   description: "Unlock global markets with your Import Export Code.",
                   features: [
                     "Mandatory for import/export",
@@ -190,6 +201,7 @@ export default function OtherRegistrationPage() {
                 {
                   icon: Building,
                   title: "Industry License",
+                  slug: "industry-license",
                   description: "Obtain the necessary licenses to operate your industrial unit legally.",
                   features: [
                     "Permit for industrial operations",
@@ -204,6 +216,7 @@ export default function OtherRegistrationPage() {
                 {
                   icon: Building,
                   title: "MSME/Udyam Registration",
+                  slug: "msme-udyam-registration",
                   description: "Get your business recognized as a Micro, Small, or Medium Enterprise.",
                   features: [
                     "Government recognition certificate",
@@ -241,7 +254,7 @@ export default function OtherRegistrationPage() {
                           </div>
                         ))}
                       </div>
-                      <Link href={`/contact?service=${encodeURIComponent(registration.title)}`} passHref>
+                      <Link href={`/other-registration/${registration.slug}`} passHref>
                         <Button className="w-full bg-blue-600 hover:bg-blue-700">
                           Register Now <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>

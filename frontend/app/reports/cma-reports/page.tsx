@@ -5,14 +5,9 @@ import { EnhancedFooter } from '@/components/enhanced-footer';
 import { FadeInSection } from '@/components/fade-in-section';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function CmaReportsPage() {
-  const router = useRouter();
-
-  const handleBookService = () => {
-    router.push(`/contact?service=CMA+Reports`);
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -28,7 +23,9 @@ export default function CmaReportsPage() {
               <p>
                 A Credit Monitoring Arrangement (CMA) report is a detailed analysis of a company's financial performance and projections. It is a critical document required by banks and financial institutions to assess the creditworthiness of a business when considering loan applications.
               </p>
-              <Button onClick={handleBookService} className="w-full">Book This Service</Button>
+              <Link href={`/contact?service=${encodeURIComponent('CMA Reports')}`} passHref>
+                <Button className="w-full">Book This Service</Button>
+              </Link>
             </CardContent>
           </Card>
         </FadeInSection>

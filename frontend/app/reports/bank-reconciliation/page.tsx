@@ -5,14 +5,9 @@ import { EnhancedFooter } from '@/components/enhanced-footer';
 import { FadeInSection } from '@/components/fade-in-section';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function BankReconciliationPage() {
-  const router = useRouter();
-
-  const handleBookService = () => {
-    router.push(`/contact?service=Bank+Reconciliation`);
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -28,7 +23,9 @@ export default function BankReconciliationPage() {
               <p>
                 A bank reconciliation is the process of matching the balances in a company's accounting records for a cash account to the corresponding information on a bank statement. The goal of this process is to ascertain the differences between the two, and to book changes to the accounting records as appropriate.
               </p>
-              <Button onClick={handleBookService} className="w-full">Book This Service</Button>
+              <Link href={`/contact?service=${encodeURIComponent('Bank Reconciliation')}`} passHref>
+                <Button className="w-full">Book This Service</Button>
+              </Link>
             </CardContent>
           </Card>
         </FadeInSection>

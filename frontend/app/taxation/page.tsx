@@ -6,10 +6,9 @@ import { EnhancedHeader } from "@/components/enhanced-header";
 import { EnhancedFooter } from "@/components/enhanced-footer";
 import { FadeInSection } from "@/components/fade-in-section"
 import { Calculator, FileText, TrendingUp, Shield, CheckCircle, ArrowRight, Clock, Users, Building } from "lucide-react"
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function TaxationPage() {
-  const router = useRouter();
   return (
     <div className="min-h-screen bg-white">
       <EnhancedHeader />
@@ -199,9 +198,11 @@ export default function TaxationPage() {
                           </div>
                         ))}
                       </div>
-                      <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3" onClick={() => router.push(`/dashboard/new-form?service=${encodeURIComponent(service.button)}`)}>
-                        Book Service <ArrowRight className="ml-2 h-5 w-5" />
-                      </Button>
+                      <Link href={`/taxation/${service.button}`} passHref>
+                        <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3">
+                          Book Service <ArrowRight className="ml-2 h-5 w-5" />
+                        </Button>
+                      </Link>
                     </CardContent>
                   </Card>
                   {/* view more from dropdown */}

@@ -15,7 +15,6 @@ import {
   FileSpreadsheet,
   Download,
   HelpCircle,
-  LogOut
 } from 'lucide-react'
 
 export type NavItem = {
@@ -145,7 +144,6 @@ const navigation: NavItem[] = [
     ]
   },
   { name: 'Contact Messages', href: '/admin/contact-messages', icon: MessageSquare },
-  { name: 'Logout', href: '/admin/logout', icon: LogOut },
 ]
 
 export function Sidebar() {

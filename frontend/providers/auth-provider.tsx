@@ -47,6 +47,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             console.warn("Stored user data is invalid or missing role");
           }
 
+          // Ensure middleware cookie is present if we already have a valid token in localStorage
+          if (typeof window !== "undefined") {
+            const token = localStorage.getItem("token");
+            if (token) {
+              // Always (re)write cookie to keep it in sync
+              document.cookie = `token=${token}; path=/`;
+            }
+          }
+
           // Then verify with the server and get fresh data
           await refreshUserProfile();
         }
@@ -131,6 +140,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Store auth data
       api.setAuth(token, refreshToken, newUser);
       setUser(newUser);
+
+      // Set cookies for middleware authentication
+      document.cookie = `token=${token}; path=/`;
 
       toast.success("Registration successful!");
       router.push("/dashboard");

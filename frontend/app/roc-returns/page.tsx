@@ -50,6 +50,7 @@ export default function ROCReturnsPage() {
                 {
                   icon: FileText,
                   title: "Annual Filing (AOC-4 & MGT-7)",
+                  slug: "annual-filing",
                   description: "Mandatory annual return filing with ROC within prescribed timelines",
                   features: [
                     "Balance Sheet filing",
@@ -65,6 +66,7 @@ export default function ROCReturnsPage() {
                 {
                   icon: Calendar,
                   title: "Board Meeting & Resolutions",
+                  slug: "board-resolutions",
                   description: "Conduct board meetings and prepare necessary resolutions",
                   features: [
                     "Board meeting minutes",
@@ -80,6 +82,7 @@ export default function ROCReturnsPage() {
                 {
                   icon: Users,
                   title: "Director Appointment/Resignation",
+                  slug: "director-changes",
                   description: "Handle director changes and related ROC filings",
                   features: [
                     "DIR-12 filing",
@@ -95,6 +98,7 @@ export default function ROCReturnsPage() {
                 {
                   icon: Building,
                   title: "Share Transfer & Capital Changes",
+                  slug: "share-transfer",
                   description: "Manage share transfers and capital structure changes",
                   features: [
                     "Share transfer forms",
@@ -178,7 +182,7 @@ export default function ROCReturnsPage() {
                           </div>
                         ))}
                       </div>
-                      <Link href={`/contact?service=${encodeURIComponent(service.title)}`} passHref>
+                      <Link href={service.slug ? `/roc-returns/${service.slug}` : `/contact?service=${encodeURIComponent(service.title)}`} passHref>
                         <Button className="w-full bg-blue-600 hover:bg-blue-700 group-hover:scale-105 transition-transform">
                           Get Started <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>
