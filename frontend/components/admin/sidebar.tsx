@@ -50,7 +50,7 @@ const navigation = [
       
       // Taxation
       { name: 'Taxation', header: true },
-      { name: 'GST Registration', href: '/admin/services/gst' },
+      { name: 'GST Filing', href: '/admin/services/gst' },
       { name: 'Income Tax Filing', href: '/admin/services/income-tax' },
       { name: 'TDS Returns', href: '/admin/services/tds' },
       

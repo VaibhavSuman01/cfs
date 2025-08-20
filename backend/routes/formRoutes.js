@@ -67,6 +67,7 @@ router.post(
         phone,
         pan,
         service,
+        subService,
         year,
         hasIncomeTaxLogin,
         incomeTaxLoginId,
@@ -132,6 +133,7 @@ router.post(
         phone,
         pan,
         service,
+        subService: subService || service,
         year,
         hasIncomeTaxLogin: hasIncomeTaxLogin === "true",
         incomeTaxLoginId: incomeTaxLoginId || "",
@@ -188,6 +190,7 @@ router.post(
             fileSize: file.size,
             fileData: file.buffer,
             contentType: file.mimetype,
+            uploadedBy: 'user', // submissions here are always by the user
           });
 
           // Remove the fileId field
@@ -216,10 +219,10 @@ router.post(
         formId: taxForm._id,
       });
     } catch (error) {
-      // Handle duplicate key error for the compound index (user, service, year)
+      // Handle duplicate key error for the compound index (user, subService, year)
       if (error.code === 11000) {
         return res.status(409).json({
-          message: `You have already submitted a form for this service for the year ${new Date().getFullYear()}. You can only submit one form per service each year.`,
+          message: `You have already submitted a form for this sub-service (${req.body?.subService || req.body?.service || "selected"}) for the year ${req.body?.year || "the selected year"}. You can only submit one form per sub-service each year.`,
         });
       }
       console.error("Error in tax form submission:", error);
@@ -545,6 +548,7 @@ router.post(
         fileData: req.file.buffer,
         contentType: req.file.mimetype,
         isEdited: true, // Mark this document as edited since it's being added after initial submission
+        uploadedBy: req.user.role === 'admin' ? 'admin' : 'user',
       };
 
       // Add the new document to the documents array

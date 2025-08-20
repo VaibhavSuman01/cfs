@@ -65,7 +65,7 @@ export function EnhancedHeader() {
         { name: "TAN Application", href: "/other-registration/tan-apply" },
         { name: "Start-up India Registration", href: "/other-registration/startup-india-registration" },
         { name: "Digital Signature", href: "/other-registration/digital-signature" },
-        { name: "GST Registration", href: "/other-registration/gst-registration" },
+        { name: "GST Filing", href: "/other-registration/gst-registration" },
       ],
     },
     {
@@ -82,7 +82,7 @@ export function EnhancedHeader() {
       name: "Taxation",
       href: "/taxation",
       dropdown: [
-        { name: "GST Registration", href: "/taxation/gst-registration" },
+        { name: "GST Filing", href: "/taxation/gst-registration" },
         { name: "Income Tax Filing", href: "/taxation/income-tax" },
         { name: "TDS Returns", href: "/taxation/tds-returns" },
         { name: "Tax Planning", href: "/taxation/tax-planning" },

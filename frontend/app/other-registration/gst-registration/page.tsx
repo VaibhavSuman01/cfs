@@ -21,7 +21,7 @@ export default function GstRegistrationPage() {
         <FadeInSection>
           <Card className="max-w-4xl mx-auto">
             <CardHeader>
-              <CardTitle className="text-3xl font-bold text-center">GST Registration</CardTitle>
+              <CardTitle className="text-3xl font-bold text-center">GST Filing</CardTitle>
               <CardDescription className="text-center text-lg">Comply with the Goods and Services Tax law in India.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 text-center">
@@ -30,7 +30,7 @@ export default function GstRegistrationPage() {
                 <div className="text-sm text-gray-600">Starting Price</div>
               </div>
               <p className="text-left">
-                Goods and Services Tax (GST) is an indirect tax used in India on the supply of goods and services. GST Registration is mandatory for businesses whose turnover exceeds the prescribed threshold limit. It helps in consolidating multiple indirect taxes into a single tax structure.
+                Goods and Services Tax (GST) is an indirect tax used in India on the supply of goods and services. GST Filing is mandatory for businesses whose turnover exceeds the prescribed threshold limit. It helps in consolidating multiple indirect taxes into a single tax structure.
               </p>
               <Button onClick={handleBookService} className="w-full">Book This Service</Button>
             </CardContent>

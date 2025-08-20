@@ -1,14 +1,15 @@
 "use client"
 
-import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { EnhancedHeader } from "@/components/enhanced-header";
 import { EnhancedFooter } from "@/components/enhanced-footer";
 import { FadeInSection } from "@/components/fade-in-section"
 import { Calculator, FileText, TrendingUp, Shield, CheckCircle, ArrowRight, Clock, Users, Building } from "lucide-react"
+import { useRouter } from "next/navigation";
 
 export default function TaxationPage() {
+  const router = useRouter();
   return (
     <div className="min-h-screen bg-white">
       <EnhancedHeader />
@@ -39,14 +40,15 @@ export default function TaxationPage() {
               {[
                 {
                   icon: TrendingUp,
-                  title: "GST Registration",
-                  description: "Get your GST number and ensure compliance with GST regulations",
+                  title: "GST Filing",
+                  button: "gst-registration",
+                  description: "Registration and monthly/quarterly GST compliance (GSTR-1, GSTR-3B) with ITC support",
                   features: [
-                    "GST registration within 7 days",
-                    "Digital signature certificate",
-                    "Monthly/Quarterly return filing",
-                    "GST compliance support",
-                    "Input tax credit optimization",
+                    "GST registration & portal setup",
+                    "GSTR-1 (outward supplies) filing",
+                    "GSTR-3B summary return filing",
+                    "E-invoice/e-way bill guidance",
+                    "Input Tax Credit reconciliation",
                   ],
                   price: "₹2,999",
                   timeline: "3-7 days",
@@ -54,13 +56,14 @@ export default function TaxationPage() {
                 {
                   icon: FileText,
                   title: "Income Tax Filing",
-                  description: "Professional income tax return filing for individuals and businesses",
+                  button: "income-tax",
+                  description: "ITR preparation and e-filing (ITR-1 to ITR-7), refunds and compliance support",
                   features: [
-                    "ITR-1 to ITR-7 filing",
-                    "Tax computation and planning",
-                    "Refund processing support",
-                    "Notice handling",
-                    "Tax saving advice",
+                    "Form 16/AIS/26AS-based return prep",
+                    "ITR-1 to ITR-7 applicability guidance",
+                    "Old vs New regime optimization",
+                    "Advance tax and refund tracking",
+                    "Notices and rectification support",
                   ],
                   price: "₹2,499",
                   timeline: "1-3 days",
@@ -68,13 +71,14 @@ export default function TaxationPage() {
                 {
                   icon: Calculator,
                   title: "TDS Returns",
-                  description: "TDS return filing and compliance for businesses and professionals",
+                  button: "tds-returns",
+                  description: "Quarterly TDS/TCS e-returns and TRACES compliance (24Q/26Q/27Q/27EQ)",
                   features: [
-                    "Quarterly TDS return filing",
-                    "TDS certificate generation",
-                    "Late fee calculation",
-                    "Correction statements",
-                    "TDS compliance audit",
+                    "Quarterly Form 24Q/26Q/27Q/27EQ",
+                    "Challan (OIN) mapping & validation",
+                    "Deductor/deductee PAN validation",
+                    "Conso file & FVU generation",
+                    "Correction statements & Form 16/16A",
                   ],
                   price: "₹3,999",
                   timeline: "2-5 days",
@@ -82,13 +86,14 @@ export default function TaxationPage() {
                 {
                   icon: Shield,
                   title: "Tax Planning",
-                  description: "Strategic tax planning to minimize tax liability legally",
+                  button: "tax-planning",
+                  description: "Year-round planning covering 80C/80D deductions, HRA/LTA and capital gains",
                   features: [
-                    "Tax saving investment advice",
-                    "Salary structuring",
-                    "Business tax optimization",
-                    "Advance tax calculation",
-                    "Tax efficient structures",
+                    "Section 80C/80D/80G optimization",
+                    "HRA, LTA and perquisite planning",
+                    "Capital gains exemptions (54/54F)",
+                    "Business/profession tax strategy",
+                    "Advance tax and TDS planning",
                   ],
                   price: "₹7,999",
                   timeline: "5-7 days",
@@ -96,13 +101,14 @@ export default function TaxationPage() {
                 {
                   icon: Building,
                   title: "Corporate Tax",
-                  description: "Complete corporate tax compliance and advisory services",
+                  button: "corporate-tax-filing",
+                  description: "Corporate ITR, tax audit support, MAT/115BAA options and TP compliance",
                   features: [
-                    "Corporate tax return filing",
-                    "Transfer pricing compliance",
-                    "Tax audit support",
-                    "MAT credit optimization",
-                    "International taxation",
+                    "Company ITR and schedules (ROI)",
+                    "Tax audit (3CA/3CB-3CD) assistance",
+                    "MAT/AMT and section 115BAA/115BAB",
+                    "Transfer pricing documentation",
+                    "TDS/TCS and advance tax review",
                   ],
                   price: "₹19,999",
                   timeline: "7-10 days",
@@ -110,16 +116,62 @@ export default function TaxationPage() {
                 {
                   icon: Users,
                   title: "Payroll Tax",
-                  description: "Payroll tax management and compliance for businesses",
+                  button: "payroll-tax",
+                  description: "End-to-end payroll compliance: TDS on salary, PF, ESI and PT",
                   features: [
-                    "Salary tax computation",
-                    "Form 16 preparation",
-                    "PF and ESI compliance",
-                    "Professional tax filing",
-                    "Payroll audit support",
+                    "Monthly payroll and TDS (Form 24Q)",
+                    "Form 16 generation and distribution",
+                    "EPF (ECR) and ESIC contributions",
+                    "Professional Tax returns (state-wise)",
+                    "Payroll statutory registers & audit",
                   ],
                   price: "₹9,999",
                   timeline: "3-5 days",
+                },
+                {
+                  icon: Calculator,
+                  title:"EPFO Filing",
+                  button:"epfo-filing",
+                  description:"EPF registration and monthly ECR filing with challan payment support",
+                  features:[
+                    "EPF registration & code allotment",
+                    "UAN/KYC onboarding for employees",
+                    "Monthly ECR preparation & payment",
+                    "Return filing & ledger reconciliation",
+                    "Inspections and compliance advisory",
+                  ],
+                  price:"₹2,999",
+                  timeline:"3-7 days"
+                },
+                {
+                  icon: Shield,
+                  title: "ESIC Filing",
+                  button: "esic-filing",
+                  description: "ESIC registration, monthly contributions and return compliance",
+                  features: [
+                    "Employer code registration",
+                    "IP (employee) registration & KYC",
+                    "Monthly contribution challans",
+                    "Half-yearly return compliance",
+                    "Inspection/audit assistance",
+                  ],
+                  price: "₹2,499",
+                  timeline: "3-7 days",
+                },
+                {
+                  icon: FileText,
+                  title: "PT-Tax Filing",
+                  button: "pt-tax-filing",
+                  description: "Professional Tax registration and monthly/annual filing as per state rules",
+                  features: [
+                    "PT registration and enrollment",
+                    "Slab-wise employee classification",
+                    "Monthly/annual returns & challans",
+                    "State-specific compliance calendar",
+                    "Notices and assessment support",
+                  ],
+                  price: "₹1,999",
+                  timeline: "2-5 days",
                 },
               ].map((service, index) => (
                 <FadeInSection key={index} delay={index * 100}>
@@ -147,14 +199,14 @@ export default function TaxationPage() {
                           </div>
                         ))}
                       </div>
-                      <Link href={`/tax-form?service=${encodeURIComponent(service.title)}`} passHref>
-                        <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3">
-                          Book Service <ArrowRight className="ml-2 h-5 w-5" />
-                        </Button>
-                      </Link>
+                      <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3" onClick={() => router.push(`/dashboard/new-form?service=${encodeURIComponent(service.button)}`)}>
+                        Book Service <ArrowRight className="ml-2 h-5 w-5" />
+                      </Button>
                     </CardContent>
                   </Card>
+                  {/* view more from dropdown */}
                 </FadeInSection>
+
               ))}
             </div>
           </div>
@@ -166,7 +218,7 @@ export default function TaxationPage() {
         <section className="py-20 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="text-center space-y-4 mb-16">
-              <h2 className="text-4xl font-bold text-gray-900">Why GST Registration?</h2>
+              <h2 className="text-4xl font-bold text-gray-900">Why GST Filing?</h2>
               <p className="text-xl text-gray-600">Benefits of getting GST registered</p>
             </div>
 
@@ -273,7 +325,7 @@ export default function TaxationPage() {
               </p>
               <div className="flex justify-center space-x-4">
                 <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg">Get Tax Help</Button>
-                
+
               </div>
             </div>
           </div>

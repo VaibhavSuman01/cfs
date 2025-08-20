@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useMemo, useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/providers/auth-provider';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, FileText, Upload, ArrowLeft } from 'lucide-react';
+import { Loader2, FileText, Upload, ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import api from '@/lib/api-client';
 import { z } from 'zod';
@@ -42,8 +42,74 @@ type TaxFormValues = z.infer<typeof taxFormSchema>;
 export default function NewFormPage() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
+  const [customDocs, setCustomDocs] = useState<Array<{ title: string; file: File | null }>>([]);
+
+  // Suggested required documents by service
+  const serviceDocMap: Record<string, string[]> = useMemo(() => ({
+    'GST Filing': [
+      'Sales Invoices',
+      'Purchase Invoices',
+      'Debit/Credit Notes',
+      'E-Way Bills',
+      'Challan Copies',
+      'Previous GST Returns',
+    ],
+    'Income Tax Filing': [
+      'Form 16 / 16A / 16B',
+      'Form 26AS/AIS/TIS',
+      'Interest Certificates',
+      'Capital Gains Statements',
+      'Investment Proofs (LIC/PPF/ELSS/NPS)',
+      'Donation Receipts',
+      'Bank Details / Cancelled Cheque',
+      'Previous ITR (optional)',
+    ],
+    'TDS Returns': [
+      'TAN Details',
+      'Deductee PAN List',
+      'Salary/Vendor Payment Records',
+      'TDS Challan Copies',
+      'Previous TDS Returns',
+    ],
+    'Corporate Tax Filing': [
+      'Audited Financial Statements',
+      'Tax Audit Report (3CA/3CB & 3CD)',
+      'Challan Copies',
+      'Form 26AS/AIS',
+      'Board Resolutions (if any)',
+      'Previous ITR Acknowledgement',
+    ],
+    'Tax Planning': [
+      'Last Year ITR & 26AS',
+      'Salary Slips / Form 16',
+      'Investment Proofs (FD/PPF/ELSS/Bonds)',
+      'Insurance Policies',
+      'Loan Statements',
+      'Capital Gains Statements',
+    ],
+    'EPFO Filing': [
+      'PF Challans',
+      'Employee Master & Payroll Summary',
+    ],
+    'ESIC Filing': [
+      'ESI Challans',
+      'Employee Master & Payroll Summary',
+    ],
+    'PT-Tax Filing': [
+      'PT Challans',
+      'Employee Count & Salary Slabs',
+    ],
+    'Payroll Tax': [
+      'Salary Register / Payroll Records',
+      'Employee Investment Proofs',
+      'PF & ESI Challans',
+      'TDS Challans (24Q)',
+      'Form 16 (Employees)',
+    ],
+  }), []);
 
   const form = useForm<TaxFormValues>({
     resolver: zodResolver(taxFormSchema),
@@ -70,6 +136,16 @@ export default function NewFormPage() {
   const hasIncomeTaxLogin = form.watch('hasIncomeTaxLogin');
   const hasHomeLoan = form.watch('hasHomeLoan');
   const hasPranNumber = form.watch('hasPranNumber');
+  const selectedService = form.watch('service');
+
+  // Preselect service from query param
+  useEffect(() => {
+    const qpService = searchParams.get('service');
+    if (qpService) {
+      form.setValue('service', qpService);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   const onSubmit = async (data: TaxFormValues) => {
     try {
@@ -86,9 +162,27 @@ export default function NewFormPage() {
         }
       });
 
-      // Append files
-      files.forEach(file => {
+      // Append files with backend-compatible identifiers
+      // Backend expects fileId_<index> and optional documentType_<fileId>
+      let fileIndex = 0;
+
+      // Regular files (no custom title) -> default documentType handled by backend
+      files.forEach((file) => {
+        const fileId = `file_${fileIndex}`;
         formData.append('documents', file);
+        formData.append(`fileId_${fileIndex}`, fileId);
+        fileIndex += 1;
+      });
+
+      // Custom titled documents -> send documentType_<fileId> with provided title
+      customDocs.forEach((entry) => {
+        if (entry.file) {
+          const fileId = `file_${fileIndex}`;
+          formData.append('documents', entry.file);
+          formData.append(`fileId_${fileIndex}`, fileId);
+          formData.append(`documentType_${fileId}`, entry.title || entry.file.name);
+          fileIndex += 1;
+        }
       });
 
       await api.post('/api/forms/tax', formData, {
@@ -105,6 +199,22 @@ export default function NewFormPage() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const addCustomDoc = () => {
+    setCustomDocs(prev => [...prev, { title: '', file: null }]);
+  };
+
+  const updateCustomDocTitle = (idx: number, title: string) => {
+    setCustomDocs(prev => prev.map((c, i) => i === idx ? { ...c, title } : c));
+  };
+
+  const updateCustomDocFile = (idx: number, file: File | null) => {
+    setCustomDocs(prev => prev.map((c, i) => i === idx ? { ...c, file } : c));
+  };
+
+  const removeCustomDoc = (idx: number) => {
+    setCustomDocs(prev => prev.filter((_, i) => i !== idx));
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -162,14 +272,15 @@ export default function NewFormPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
+                          <SelectItem value="GST Filing">GST Filing</SelectItem>
                           <SelectItem value="Income Tax Filing">Income Tax Filing</SelectItem>
-                          <SelectItem value="GST Registration & Filing">GST Registration & Filing</SelectItem>
                           <SelectItem value="TDS Returns">TDS Returns</SelectItem>
-                          <SelectItem value="Corporate Tax Filing">Corporate Tax Filing</SelectItem>
-                          <SelectItem value="Payroll Tax">Payroll Tax</SelectItem>
+                          <SelectItem value="Tax Planning">Tax Planning</SelectItem>
                           <SelectItem value="EPFO Filing">EPFO Filing</SelectItem>
                           <SelectItem value="ESIC Filing">ESIC Filing</SelectItem>
-                          <SelectItem value="PT Tax Filing">PT Tax Filing</SelectItem>
+                          <SelectItem value="PT-Tax Filing">PT-Tax Filing</SelectItem>
+                          <SelectItem value="Corporate Tax Filing">Corporate Tax Filing</SelectItem>
+                          <SelectItem value="Payroll Tax">Payroll Tax</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -201,6 +312,18 @@ export default function NewFormPage() {
                   )}
                 />
               </div>
+
+              {/* Suggested documents per service */}
+              {selectedService && serviceDocMap[selectedService] && (
+                <div className="space-y-2">
+                  <Label>Suggested Documents for {selectedService}</Label>
+                  <ul className="list-disc pl-6 text-sm text-muted-foreground">
+                    {serviceDocMap[selectedService].map((doc) => (
+                      <li key={doc}>{doc}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               {/* Conditional Fields */}
               <div className="space-y-4">
@@ -308,6 +431,36 @@ export default function NewFormPage() {
                           className="h-8 w-8 p-0"
                         >
                           &times;
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Custom titled documents */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label>Add Custom Documents (title + file)</Label>
+                  <Button type="button" variant="secondary" size="sm" onClick={addCustomDoc}>
+                    <Plus className="h-4 w-4 mr-1" /> Add
+                  </Button>
+                </div>
+                {customDocs.length > 0 && (
+                  <div className="space-y-3">
+                    {customDocs.map((cd, idx) => (
+                      <div key={idx} className="grid grid-cols-1 md:grid-cols-3 gap-2 items-center">
+                        <Input
+                          placeholder="Document Title (e.g., Additional Proof)"
+                          value={cd.title}
+                          onChange={(e) => updateCustomDocTitle(idx, e.target.value)}
+                        />
+                        <Input
+                          type="file"
+                          onChange={(e) => updateCustomDocFile(idx, e.target.files?.[0] || null)}
+                        />
+                        <Button type="button" variant="ghost" onClick={() => removeCustomDoc(idx)} className="md:justify-self-start">
+                          <Trash2 className="h-4 w-4 mr-1" /> Remove
                         </Button>
                       </div>
                     ))}

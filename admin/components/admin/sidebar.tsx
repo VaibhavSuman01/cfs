@@ -59,6 +59,78 @@ const navigation: NavItem[] = [
           { name: 'Pending Review', href: '/admin/tax-forms?status=Pending' },
           { name: 'Reviewed', href: '/admin/tax-forms?status=Reviewed' },
           { name: 'Filed', href: '/admin/tax-forms?status=Filed' },
+          {
+            name: 'GST Filing',
+            submenu: [
+              { name: 'All', href: '/admin/tax-forms?service=GST%20Filing' },
+              { name: 'Pending', href: '/admin/tax-forms?service=GST%20Filing&status=Pending' },
+              { name: 'Reviewed', href: '/admin/tax-forms?service=GST%20Filing&status=Reviewed' },
+              { name: 'Filed', href: '/admin/tax-forms?service=GST%20Filing&status=Filed' },
+            ]
+          },
+          {
+            name: 'Income Tax Filing',
+            submenu: [
+              { name: 'All', href: '/admin/tax-forms?service=Income%20Tax%20Filing' },
+              { name: 'Pending', href: '/admin/tax-forms?service=Income%20Tax%20Filing&status=Pending' },
+              { name: 'Reviewed', href: '/admin/tax-forms?service=Income%20Tax%20Filing&status=Reviewed' },
+              { name: 'Filed', href: '/admin/tax-forms?service=Income%20Tax%20Filing&status=Filed' },
+            ]
+          },
+          {
+            name: 'TDS Returns',
+            submenu: [
+              { name: 'All', href: '/admin/tax-forms?service=TDS%20Returns' },
+              { name: 'Pending', href: '/admin/tax-forms?service=TDS%20Returns&status=Pending' },
+              { name: 'Reviewed', href: '/admin/tax-forms?service=TDS%20Returns&status=Reviewed' },
+              { name: 'Filed', href: '/admin/tax-forms?service=TDS%20Returns&status=Filed' },
+            ]
+          },
+          {
+            name: 'Tax Planning',
+            submenu: [
+              { name: 'All', href: '/admin/tax-forms?service=Tax%20Planning' },
+              { name: 'Pending', href: '/admin/tax-forms?service=Tax%20Planning&status=Pending' },
+              { name: 'Reviewed', href: '/admin/tax-forms?service=Tax%20Planning&status=Reviewed' },
+              { name: 'Filed', href: '/admin/tax-forms?service=Tax%20Planning&status=Filed' },
+            ]
+          },
+          {
+            name: 'EPFO Filing',
+            submenu: [
+              { name: 'All', href: '/admin/tax-forms?service=EPFO%20Filing' },
+              { name: 'Pending', href: '/admin/tax-forms?service=EPFO%20Filing&status=Pending' },
+              { name: 'Reviewed', href: '/admin/tax-forms?service=EPFO%20Filing&status=Reviewed' },
+              { name: 'Filed', href: '/admin/tax-forms?service=EPFO%20Filing&status=Filed' },
+            ]
+          },
+          {
+            name: 'ESIC Filing',
+            submenu: [
+              { name: 'All', href: '/admin/tax-forms?service=ESIC%20Filing' },
+              { name: 'Pending', href: '/admin/tax-forms?service=ESIC%20Filing&status=Pending' },
+              { name: 'Reviewed', href: '/admin/tax-forms?service=ESIC%20Filing&status=Reviewed' },
+              { name: 'Filed', href: '/admin/tax-forms?service=ESIC%20Filing&status=Filed' },
+            ]
+          },
+          {
+            name: 'PT-Tax Filing',
+            submenu: [
+              { name: 'All', href: '/admin/tax-forms?service=PT-Tax%20Filing' },
+              { name: 'Pending', href: '/admin/tax-forms?service=PT-Tax%20Filing&status=Pending' },
+              { name: 'Reviewed', href: '/admin/tax-forms?service=PT-Tax%20Filing&status=Reviewed' },
+              { name: 'Filed', href: '/admin/tax-forms?service=PT-Tax%20Filing&status=Filed' },
+            ]
+          },
+          {
+            name: 'Corporate Tax Filing',
+            submenu: [
+              { name: 'All', href: '/admin/tax-forms?service=Corporate%20Tax%20Filing' },
+              { name: 'Pending', href: '/admin/tax-forms?service=Corporate%20Tax%20Filing&status=Pending' },
+              { name: 'Reviewed', href: '/admin/tax-forms?service=Corporate%20Tax%20Filing&status=Reviewed' },
+              { name: 'Filed', href: '/admin/tax-forms?service=Corporate%20Tax%20Filing&status=Filed' },
+            ]
+          },
         ]
       },
       

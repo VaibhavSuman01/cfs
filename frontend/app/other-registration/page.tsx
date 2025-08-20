@@ -105,7 +105,7 @@ export default function OtherRegistrationPage() {
                 },
                 {
                   icon: FileText,
-                  title: "GST Registration",
+                  title: "GST Filing",
                   description: "Comply with the Goods and Services Tax law in India.",
                   features: [
                     "For businesses above threshold limit",
