@@ -21,7 +21,7 @@ mongoose
 async function seedAdmin() {
   try {
     // Check if admin already exists
-    const adminExists = await User.findOne({ email: "admin@comfinancial.com" });
+    const adminExists = await User.findOne({ email: "admin@comfinserv.co" });
 
     if (adminExists) {
       console.log("Admin user already exists");
@@ -31,7 +31,7 @@ async function seedAdmin() {
     // Create admin user
     const admin = new User({
       name: "Admin User",
-      email: "admin@comfinancial.com",
+      email: "admin@comfinserv.co",
       password: "admin123",
       role: "admin",
     });
@@ -39,7 +39,7 @@ async function seedAdmin() {
     await admin.save();
 
     console.log("Admin user created successfully");
-    console.log("Email: admin@comfinancial.com");
+    console.log("Email: admin@comfinserv.co");
     console.log("Password: admin123");
     console.log("IMPORTANT: Change these credentials in production!");
 
