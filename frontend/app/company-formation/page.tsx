@@ -47,6 +47,7 @@ export default function CompanyFormationPage() {
               {[
                 {
                   title: "Private Limited Company",
+                  slug: "private-limited",
                   description: "Most popular choice for startups and growing businesses",
                   features: [
                     "Limited liability protection",
@@ -60,6 +61,7 @@ export default function CompanyFormationPage() {
                 },
                 {
                   title: "One Person Company (OPC)",
+                  slug: "one-person-company",
                   description: "Perfect for solo entrepreneurs and individual businesses",
                   features: [
                     "Single person ownership",
@@ -73,6 +75,7 @@ export default function CompanyFormationPage() {
                 },
                 {
                   title: "Public Limited Company",
+                  slug: "public-limited",
                   description: "For large businesses planning to go public",
                   features: [
                     "Can raise funds from public",
@@ -86,6 +89,7 @@ export default function CompanyFormationPage() {
                 },
                 {
                   title: "Nidhi Company",
+                  slug: "nidhi-company",
                   description: "For promoting thrift and savings among members",
                   features: [
                     "Encourages savings habit",
@@ -99,6 +103,7 @@ export default function CompanyFormationPage() {
                 },
                 {
                   title: "Section 8 Company (NPO)",
+                  slug: "section-8",
                   description: "For non-profit organizations promoting social welfare",
                   features: [
                     "Promotes charitable objects",
@@ -136,7 +141,7 @@ export default function CompanyFormationPage() {
                           </div>
                         ))}
                       </div>
-                      <Link href={`/contact?service=${encodeURIComponent(company.title)}`} passHref>
+                      <Link href={`/company-formation/${company.slug}`} passHref>
                         <Button
                           className={`w-full ${
                             company.popular ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-600 hover:bg-gray-700"

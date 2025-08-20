@@ -577,7 +577,7 @@ export default function PrivateLimitedCompanyPage() {
                     "Company Incorporation",
                     "Certificate of Incorporation",
                     "PAN & TAN Application",
-                    "GST Registration",
+                    "GST Filing",
 
                   ],
                 },
@@ -593,7 +593,7 @@ export default function PrivateLimitedCompanyPage() {
                     "Company Incorporation",
                     "Certificate of Incorporation",
                     "PAN & TAN Application",
-                    "GST Registration",
+                    "GST Filing",
                     "EPFO Registration",
                     "ESI Registration",
                     "PT Tax Registration",

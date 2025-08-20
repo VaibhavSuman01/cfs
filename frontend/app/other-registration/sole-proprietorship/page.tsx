@@ -145,7 +145,7 @@ export default function SoleProprietorshipPage() {
                 <p className="text-gray-600">A state-specific license required for operating a business from a commercial or residential premise.</p>
               </Card>
               <Card className="p-6 text-center">
-                <CardTitle className="mb-4 text-blue-600">3. GST Registration</CardTitle>
+                <CardTitle className="mb-4 text-blue-600">3. GST Filing</CardTitle>
                 <p className="text-gray-600">Mandatory if your annual turnover exceeds the prescribed limit, and essential for inter-state business.</p>
               </Card>
               <Card className="p-6 text-center">

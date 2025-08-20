@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/package.json",
   "name": "com-financial-backend",
   "version": "1.0.0",
   "description": "Backend for Com Financial Services Website",

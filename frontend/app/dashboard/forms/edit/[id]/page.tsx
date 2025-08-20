@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, FileText, Upload, ArrowLeft, Trash2 } from 'lucide-react';
+import { Loader2, FileText, Upload, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import api from '@/lib/api-client';
 import { z } from 'zod';
@@ -42,6 +42,7 @@ type TaxFormValues = z.infer<typeof taxFormSchema>;
 interface Document {
   _id: string;
   originalName: string;
+  uploadedBy?: 'user' | 'admin';
 }
 
 export default function EditFormPage() {
@@ -68,7 +69,12 @@ export default function EditFormPage() {
         const response = await api.get(`/api/forms/user-submissions/${id}`);
         const formData = response.data.data;
         form.reset(formData); // Populate form with fetched data
-        setExistingDocuments(formData.documents || []);
+        // Only show user-uploaded documents in the edit view
+        setExistingDocuments(
+          Array.isArray(formData.documents)
+            ? formData.documents.filter((d: Document) => (d.uploadedBy ?? 'user') === 'user')
+            : []
+        );
       } catch (error) {
         console.error('Failed to fetch form data:', error);
         toast.error('Failed to load form data. Please try again.');
@@ -135,9 +141,13 @@ export default function EditFormPage() {
     setNewFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  const removeExistingFile = (docId: string) => {
-    setExistingDocuments(prev => prev.filter(doc => doc._id !== docId));
-  };
+  // Prevent admins from editing user forms (redirect them away)
+  useEffect(() => {
+    if (user && user.role === 'admin') {
+      toast.error('Admins cannot edit user forms.');
+      router.push('/dashboard');
+    }
+  }, [user, router]);
 
   if (isAuthLoading || isLoading) {
     return (
@@ -250,14 +260,9 @@ export default function EditFormPage() {
                 {existingDocuments.length > 0 ? (
                   <div className="space-y-2">
                     {existingDocuments.map((doc) => (
-                      <div key={doc._id} className="flex items-center justify-between bg-gray-100 p-2 rounded-md">
-                        <div className="flex items-center">
-                          <FileText className="h-4 w-4 mr-2 text-gray-600" />
-                          <span className="text-sm truncate max-w-[200px]">{doc.originalName}</span>
-                        </div>
-                        <Button type="button" variant="ghost" size="sm" onClick={() => removeExistingFile(doc._id)} className="h-8 w-8 p-0 text-red-500 hover:bg-red-100">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                      <div key={doc._id} className="flex items-center bg-gray-100 p-2 rounded-md">
+                        <FileText className="h-4 w-4 mr-2 text-gray-600" />
+                        <span className="text-sm truncate max-w-[260px]">{doc.originalName}</span>
                       </div>
                     ))}
                   </div>

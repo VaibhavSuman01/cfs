@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
 require("dotenv").config();
+const TaxForm = require("./models/TaxForm");
 
 // Import routes
 const formRoutes = require("./routes/formRoutes");
@@ -42,6 +43,14 @@ mongoose
   })
   .then(() => {
     console.log("Connected to MongoDB");
+    // Ensure indexes are in sync with the latest schema (create new and drop obsolete)
+    TaxForm.syncIndexes()
+      .then((res) => {
+        console.log("TaxForm indexes synced:", res);
+      })
+      .catch((err) => {
+        console.error("Failed to sync TaxForm indexes:", err);
+      });
   })
   .catch((err) => {
     console.error("MongoDB connection error:", err);

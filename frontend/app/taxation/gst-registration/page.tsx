@@ -19,6 +19,7 @@ import {
   Landmark,
   FileCheck
 } from "lucide-react"
+import Link from "next/link"
 
 export default function GstRegistrationPage() {
   return (
@@ -39,7 +40,7 @@ export default function GstRegistrationPage() {
                 </Badge>
                 <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
                   <span className="bg-gradient-to-r from-gray-900 via-blue-800 to-gray-900 bg-clip-text text-transparent">
-                    GST Registration
+                    GST Filing
                   </span>
                   <br />
                   <span className="bg-gradient-to-r from-blue-600 via-blue-500 to-blue-700 bg-clip-text text-transparent">
@@ -66,16 +67,20 @@ export default function GstRegistrationPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                  <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                    Register for GST
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
-                  >
-                    Consult an Expert
-                  </Button>
+                  <Link href={`/contact?service=${encodeURIComponent("GST Registration")}`} passHref>
+                    <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                      Register for GST
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Button>
+                  </Link>
+                  <Link href={`/contact?service=${encodeURIComponent("GST Registration")}`} passHref>
+                    <Button
+                      variant="outline"
+                      className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
+                    >
+                      Consult an Expert
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </FadeInSection>
@@ -84,7 +89,7 @@ export default function GstRegistrationPage() {
                 <div className="absolute inset-0 bg-gradient-to-tr from-blue-100 to-transparent rounded-full -translate-x-10 -translate-y-10"></div>
                 <img
                   src="/images/gst-hero.svg"
-                  alt="GST Registration Illustration"
+                  alt="GST Filing Illustration"
                   className="relative rounded-lg shadow-2xl w-full h-auto"
                 />
               </div>
@@ -93,12 +98,12 @@ export default function GstRegistrationPage() {
         </div>
       </section>
 
-      {/* Benefits of GST Registration Section */}
+      {/* Benefits of GST Filing Section */}
       <FadeInSection>
         <section className="py-20 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-4xl mx-auto mb-16">
-              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">Benefits of GST Registration</h2>
+              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">Benefits of GST Filing</h2>
               <p className="text-lg text-gray-600">
                 Registering for GST provides your business with a range of advantages, from legal recognition to competitive strength.
               </p>
@@ -138,7 +143,7 @@ export default function GstRegistrationPage() {
               <Card className="p-6 text-center"><CardTitle className="mb-4 text-blue-600">1. Submit Documents</CardTitle><p className="text-gray-600">Provide your PAN, Aadhaar, and business details.</p></Card>
               <Card className="p-6 text-center"><CardTitle className="mb-4 text-blue-600">2. Application Filing</CardTitle><p className="text-gray-600">We file Form REG-01 on your behalf on the GST portal.</p></Card>
               <Card className="p-6 text-center"><CardTitle className="mb-4 text-blue-600">3. Officer Review</CardTitle><p className="text-gray-600">A GST officer reviews your application for accuracy.</p></Card>
-              <Card className="p-6 text-center"><CardTitle className="mb-4 text-blue-600">4. GSTIN Issued</CardTitle><p className="text-gray-600">Receive your GST Registration Certificate and unique GSTIN.</p></Card>
+              <Card className="p-6 text-center"><CardTitle className="mb-4 text-blue-600">4. GSTIN Issued</CardTitle><p className="text-gray-600">Receive your GST Filing Certificate and unique GSTIN.</p></Card>
             </div>
           </div>
         </section>
@@ -149,7 +154,7 @@ export default function GstRegistrationPage() {
         <section className="py-20 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-4xl mx-auto mb-16">
-              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">Documents Required for GST Registration</h2>
+              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">Documents Required for GST Filing</h2>
               <p className="text-lg text-gray-600">
                 The documentation process is straightforward. You'll need the following:
               </p>
@@ -177,7 +182,7 @@ export default function GstRegistrationPage() {
         <section className="py-20">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-4xl mx-auto mb-16">
-              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">GST Registration FAQs</h2>
+              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">GST Filing FAQs</h2>
               <p className="text-lg text-gray-600">
                 Find answers to common questions about GST registration.
               </p>
@@ -225,17 +230,21 @@ export default function GstRegistrationPage() {
                 Don't let compliance slow you down. Our experts make GST registration a hassle-free experience, so you can focus on growing your business.
               </p>
               <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                  Apply for GSTIN Now
-                  <FileCheck className="ml-2 h-5 w-5" />
-                </Button>
-                <Button
-                  variant="outline"
-                  className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
-                >
-                  Speak to Our Experts
-                  <Phone className="ml-2 h-5 w-5" />
-                </Button>
+                <Link href={`/contact?service=${encodeURIComponent("GST Registration")}`} passHref>
+                  <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                    Apply for GSTIN Now
+                    <FileCheck className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
+                <Link href={`/contact?service=${encodeURIComponent("GST Registration")}`} passHref>
+                  <Button
+                    variant="outline"
+                    className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
+                  >
+                    Speak to Our Experts
+                    <Phone className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
