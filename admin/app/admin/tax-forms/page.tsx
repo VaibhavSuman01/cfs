@@ -80,6 +80,7 @@ export default function TaxFormsPage() {
   const [status, setStatus] = useState(searchParams.get('status') || '');
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
+  const [service, setService] = useState(searchParams.get('service') || '');
 
   const fetchTaxForms = useCallback(async () => {
     setLoading(true);
@@ -88,6 +89,7 @@ export default function TaxFormsPage() {
       params.append('page', String(page));
       if (status) params.append('status', status);
       if (searchTerm) params.append('search', searchTerm);
+      if (service) params.append('service', service);
 
       const response = await api.get(`${API_PATHS.ADMIN.FORMS}?${params.toString()}`);
       setForms(response.data.forms);
@@ -102,7 +104,7 @@ export default function TaxFormsPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, status, searchTerm, toast]);
+  }, [page, status, searchTerm, service, toast]);
 
   useEffect(() => {
     fetchTaxForms();
@@ -120,12 +122,22 @@ export default function TaxFormsPage() {
     } else {
       params.delete('search');
     }
+    if (service) {
+      params.set('service', service);
+    } else {
+      params.delete('service');
+    }
     params.set('page', String(page));
     router.push(`${pathname}?${params.toString()}`);
-  }, [status, searchTerm, page, pathname, router, searchParams]);
+  }, [status, searchTerm, service, page, pathname, router, searchParams]);
 
   const handleStatusChange = (newStatus: string) => {
     setStatus(newStatus === 'all' ? '' : newStatus);
+    setPage(1);
+  };
+
+  const handleServiceChange = (newService: string) => {
+    setService(newService === 'all' ? '' : newService);
     setPage(1);
   };
 
@@ -185,6 +197,25 @@ export default function TaxFormsPage() {
                     <SelectItem value="Pending">Pending</SelectItem>
                     <SelectItem value="Reviewed">Reviewed</SelectItem>
                     <SelectItem value="Filed">Filed</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="w-full md:w-1/4">
+                <Select onValueChange={handleServiceChange} value={service || 'all'}>
+                  <SelectTrigger>
+                    <Filter className="mr-2 h-4 w-4" />
+                    <SelectValue placeholder="Filter by service" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Services</SelectItem>
+                    <SelectItem value="GST Filing">GST Filing</SelectItem>
+                    <SelectItem value="Income Tax Filing">Income Tax Filing</SelectItem>
+                    <SelectItem value="TDS Returns">TDS Returns</SelectItem>
+                    <SelectItem value="Tax Planning">Tax Planning</SelectItem>
+                    <SelectItem value="EPFO Filing">EPFO Filing</SelectItem>
+                    <SelectItem value="ESIC Filing">ESIC Filing</SelectItem>
+                    <SelectItem value="PT-Tax Filing">PT-Tax Filing</SelectItem>
+                    <SelectItem value="Corporate Tax Filing">Corporate Tax Filing</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -234,6 +234,9 @@ class ApiClient {
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("user");
 
+      // Clear token cookie used by Next.js middleware
+      document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+
       // Redirect to login page
       window.location.href = "/auth";
     }

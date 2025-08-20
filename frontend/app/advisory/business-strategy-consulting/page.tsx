@@ -56,7 +56,7 @@ export default function BusinessStrategyPage() {
                 <p className="text-gray-600 leading-relaxed">
                   In today's dynamic marketplace, a clear and robust strategy is not just an advantage—it's a necessity. Our Business Strategy Consulting services are designed to help you cut through the noise, make informed decisions, and build a resilient framework for long-term success. We partner with you to analyze your current position, identify future opportunities, and create a detailed roadmap to guide your journey.
                 </p>
-                <Link href="/contact" passHref>
+                <Link href={`/contact?service=${encodeURIComponent("Business Strategy Consulting")}`} passHref>
                   <Button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full text-lg">
                     Consult an Expert <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>

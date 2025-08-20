@@ -1,3 +1,4 @@
+
 const mongoose = require("mongoose");
 
 const documentSchema = new mongoose.Schema({
@@ -32,6 +33,8 @@ const taxFormSchema = new mongoose.Schema({
   phone: { type: String, required: true },
   pan: { type: String, required: true, uppercase: true },
   service: { type: String, required: true },
+  // Optional finer granularity under service (e.g., GST, ITR). Defaults to service for backward compatibility
+  subService: { type: String, default: function () { return this.service; } },
   year: { type: String, required: true },
   hasIncomeTaxLogin: { type: Boolean, default: false },
   incomeTaxLoginId: { type: String },
@@ -50,4 +53,9 @@ const taxFormSchema = new mongoose.Schema({
   editHistory: [editHistorySchema],
 }, { timestamps: true });
 
+// Enforce one submission per user+subService+year
+// Note: subService defaults to service to maintain compatibility with existing submissions
+taxFormSchema.index({ user: 1, subService: 1, year: 1 }, { unique: true });
+
 module.exports = mongoose.model("TaxForm", taxFormSchema);
+

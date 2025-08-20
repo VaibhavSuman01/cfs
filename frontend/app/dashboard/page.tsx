@@ -190,7 +190,7 @@ export default function UserDashboard() {
       ],
     },
     {name:"Taxation",items:[
-      "GST Registration",
+      "GST Filing",
       "Income Tax Filing",
       "TDS Returns",
       "Tax Planning",
@@ -219,7 +219,7 @@ export default function UserDashboard() {
         "TAN Apply",
         "Start-up India Registration",
         "Digital Registration",
-        "GST Registration",
+        "GST Filing",
       ],
     },
     {
@@ -390,16 +390,27 @@ export default function UserDashboard() {
                                   <span className="text-gray-700">
                                     {service}
                                   </span>
-                                  <Button variant="outline" size="sm" asChild>
-                                    <Link
-                                      href={`/contact?service=${encodeURIComponent(
-                                        service
-                                      )}`}
-                                    >
-                                      Enquire Now{" "}
-                                      <ChevronRight className="ml-2 h-4 w-4" />
-                                    </Link>
-                                  </Button>
+                                  {category.name === 'Taxation' ? (
+                                    <Button variant="outline" size="sm" asChild>
+                                      <Link
+                                        href={`/dashboard/new-form?service=${encodeURIComponent(service)}`}
+                                      >
+                                        File Now{" "}
+                                        <ChevronRight className="ml-2 h-4 w-4" />
+                                      </Link>
+                                    </Button>
+                                  ) : (
+                                    <Button variant="outline" size="sm" asChild>
+                                      <Link
+                                        href={`/contact?service=${encodeURIComponent(
+                                          service
+                                        )}`}
+                                      >
+                                        Enquire Now{" "}
+                                        <ChevronRight className="ml-2 h-4 w-4" />
+                                      </Link>
+                                    </Button>
+                                  )}
                                 </li>
                               ))}
                             </ul>

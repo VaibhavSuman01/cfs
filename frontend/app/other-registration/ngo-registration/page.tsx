@@ -5,14 +5,9 @@ import { EnhancedFooter } from '@/components/enhanced-footer';
 import { FadeInSection } from '@/components/fade-in-section';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function NgoRegistrationPage() {
-  const router = useRouter();
-
-  const handleBookService = () => {
-    router.push(`/contact?service=NGO+Registration`);
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -28,7 +23,9 @@ export default function NgoRegistrationPage() {
               <p>
                 A Non-Governmental Organization (NGO) is a non-profit, voluntary citizens' group organized on a local, national or international level. Registering your NGO as a Trust, Society, or Section 8 Company provides it with legal status and makes it eligible for tax exemptions and government funding.
               </p>
-              <Button onClick={handleBookService} className="w-full">Book This Service</Button>
+              <Link href={`/contact?service=${encodeURIComponent('NGO Registration')}`} passHref>
+                <Button className="w-full">Book This Service</Button>
+              </Link>
             </CardContent>
           </Card>
         </FadeInSection>

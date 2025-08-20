@@ -43,6 +43,7 @@ interface TaxForm {
     fileName?: string;
     originalName?: string;
     path?: string;
+    uploadedBy?: 'user' | 'admin';
   }>;
   comments?: {
     _id: string;
@@ -137,6 +138,14 @@ export default function FormDetailPage() {
       default:
         return null;
     }
+  };
+
+  // Safely format currency values and avoid NaN
+  const formatCurrency = (value?: string | number) => {
+    if (value === undefined || value === null || value === '') return '—';
+    const n = typeof value === 'string' ? parseFloat(value) : value;
+    if (Number.isNaN(n as number)) return '—';
+    return `₹${(n as number).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
   };
 
   const formatDate = (dateString: string) => {
@@ -244,20 +253,16 @@ export default function FormDetailPage() {
                     <h3 className="text-sm font-medium text-muted-foreground">
                       Gross Income
                     </h3>
-                    <p className="text-base">
-                      ₹{parseInt(form.grossIncome).toLocaleString("en-IN")}
-                    </p>
+                    <p className="text-base">{formatCurrency(form.grossIncome)}</p>
                   </div>
                   <div>
                     <h3 className="text-sm font-medium text-muted-foreground">
                       Deductions
                     </h3>
                     <p className="text-base">
-                      {form.deductions
-                        ? `₹${parseInt(form.deductions).toLocaleString(
-                            "en-IN"
-                          )}`
-                        : "None"}
+                      {form.deductions && form.deductions !== ''
+                        ? formatCurrency(form.deductions)
+                        : 'None'}
                     </p>
                   </div>
                 </div>
@@ -284,9 +289,11 @@ export default function FormDetailPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {form.documents && form.documents.length > 0 ? (
+              {(() => {
+                const userDocs = (form.documents ?? []).filter((d: { uploadedBy?: 'user' | 'admin' }) => (d.uploadedBy ?? 'user') === 'user');
+                return userDocs.length > 0 ? (
                 <div className="space-y-2">
-                  {form.documents.map((doc: { _id: string; filename?: string; fileName?: string; originalName?: string; }) => (
+                  {userDocs.map((doc: { _id: string; filename?: string; fileName?: string; originalName?: string; }) => (
                     <div key={doc._id} className="flex items-center justify-between bg-muted p-3 rounded-md">
                       <div className="flex items-center">
                         <FileText className="h-4 w-4 mr-2 text-primary" />
@@ -302,14 +309,15 @@ export default function FormDetailPage() {
                     </div>
                   ))}
                 </div>
-              ) : (
+                ) : (
                 <div className="text-center py-6">
                   <FileText className="mx-auto h-8 w-8 text-muted-foreground opacity-50" />
                   <p className="mt-2 text-sm text-muted-foreground">
                     No documents attached
                   </p>
                 </div>
-              )}
+                );
+              })()}
             </CardContent>
           </Card>
 
@@ -346,72 +354,7 @@ export default function FormDetailPage() {
             </CardContent>
           </Card>
           
-          <Card>
-            <CardHeader>
-              <CardTitle>Comments</CardTitle>
-              <CardDescription>
-                Communication regarding your tax form
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {form.comments && form.comments.length > 0 ? (
-                  <div className="space-y-4">
-                    {form.comments.map((comment) => (
-                      <div
-                        key={comment._id}
-                        className={`p-3 rounded-md ${
-                          comment.isAdmin
-                            ? "bg-primary/10 ml-8"
-                            : "bg-muted mr-8"
-                        }`}
-                      >
-                        <div className="flex justify-between items-start mb-1">
-                          <span className="text-sm font-medium">
-                            {comment.isAdmin ? "Tax Consultant" : "You"}
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(comment.createdAt).toLocaleString()}
-                          </span>
-                        </div>
-                        <p className="text-sm">{comment.text}</p>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-6">
-                    <p className="text-sm text-muted-foreground">
-                      No comments yet
-                    </p>
-                  </div>
-                )}
 
-                <Separator className="my-4" />
-
-                <form onSubmit={handleSubmitComment} className="space-y-2">
-                  <textarea
-                    className="w-full min-h-[100px] p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
-                    placeholder="Add a comment or question..."
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                  />
-                  <Button
-                    type="submit"
-                    disabled={isSubmittingComment || !comment.trim()}
-                  >
-                    {isSubmittingComment ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Sending...
-                      </>
-                    ) : (
-                      "Add Comment"
-                    )}
-                  </Button>
-                </form>
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         <div className="space-y-6">

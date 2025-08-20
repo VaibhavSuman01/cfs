@@ -30,6 +30,9 @@ router.get("/forms", async (req, res) => {
       status,
       page = 1,
       limit = 10,
+      // New filters to align with admin UI
+      search,
+      service,
     } = req.query;
 
     // Build filter object
@@ -38,6 +41,17 @@ router.get("/forms", async (req, res) => {
     if (pan) filter.pan = { $regex: pan, $options: "i" };
     if (name) filter.fullName = { $regex: name, $options: "i" };
     if (status) filter.status = status;
+    if (service) filter.service = service;
+
+    // Unified search across common fields
+    if (search) {
+      const searchRegex = { $regex: search, $options: "i" };
+      filter.$or = [
+        { pan: searchRegex },
+        { fullName: searchRegex },
+        { email: searchRegex },
+      ];
+    }
 
     // Date range filter
     if (startDate || endDate) {

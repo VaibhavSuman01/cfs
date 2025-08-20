@@ -5,14 +5,9 @@ import { EnhancedFooter } from '@/components/enhanced-footer';
 import { FadeInSection } from '@/components/fade-in-section';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function ProjectReportsPage() {
-  const router = useRouter();
-
-  const handleBookService = () => {
-    router.push(`/contact?service=Project+Reports`);
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -28,7 +23,9 @@ export default function ProjectReportsPage() {
               <p>
                 A Project Report is a comprehensive document that provides a roadmap for a proposed business venture. It covers aspects like financial viability, market analysis, and operational planning, and is often required for securing bank loans and investments.
               </p>
-              <Button onClick={handleBookService} className="w-full">Book This Service</Button>
+              <Link href={`/contact?service=${encodeURIComponent('Project Reports')}`} passHref>
+                <Button className="w-full">Book This Service</Button>
+              </Link>
             </CardContent>
           </Card>
         </FadeInSection>
