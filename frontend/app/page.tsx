@@ -2,20 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { EnhancedHeader } from "@/components/enhanced-header";
 import { EnhancedFooter } from "@/components/enhanced-footer";
 import { FadeInSection } from "@/components/fade-in-section";
-import { AnimatedCounter } from "@/components/animated-counter";
 import { FloatingElements } from "@/components/floating-elements";
 import { AnimatedBackground } from "@/components/animated-background";
 import {
@@ -24,7 +14,6 @@ import {
   Shield,
   Users,
   Phone,
-  ArrowRight,
   TrendingUp,
   Clock,
   Award,
@@ -72,54 +61,32 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-4xl mx-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-1 gap-6 w-full max-w-4xl mx-auto">
                 {/* Expert Assistance Card */}
-                <Card className="h-full border-2 border-blue-100 hover:border-blue-300 transition-all duration-300 hover:shadow-xl hover:-translate-y-2 cursor-pointer group bg-gradient-to-br from-white to-blue-50">
-                  <CardContent className="h-full p-6 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center space-x-3 mb-4">
-                        <div className="p-2 bg-blue-100 rounded-full group-hover:bg-blue-200 transition-colors">
-                          <Users className="h-6 w-6 text-blue-600 group-hover:scale-110 transition-transform" />
+                <Link href="/contact" className="h-full">
+                  <Card className="h-full border-2 border-blue-100 hover:border-blue-300 transition-all duration-300 hover:shadow-xl hover:-translate-y-2 cursor-pointer group bg-gradient-to-br from-white to-blue-50">
+                    <CardContent className="h-full p-6 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center space-x-3 mb-4">
+                          <div className="p-2 bg-blue-100 rounded-full group-hover:bg-blue-200 transition-colors">
+                            <Users className="h-6 w-6 text-blue-600 group-hover:scale-110 transition-transform" />
+                          </div>
+                          <h3 className="text-lg font-semibold text-gray-900">
+                            Expert Assistance
+                          </h3>
                         </div>
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          Expert Assistance
-                        </h3>
+                        <p className="text-gray-600 text-sm mb-6">
+                          Registration in 24 hours with our expert team handling
+                          all the paperwork and compliance.
+                        </p>
                       </div>
-                      <p className="text-gray-600 text-sm mb-6">
-                        Registration in 24 hours with our expert team handling all the paperwork and compliance.
-                      </p>
-                    </div>
-                    <Button className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 group-hover:scale-[1.02] transition-all duration-300 shadow-md hover:shadow-lg">
-                      Book Now
-                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-                  </CardContent>
-                </Card>
-
-                {/* Contact Card */}
-                <Card className="h-full border-2 border-green-100 hover:border-green-300 transition-all duration-300 hover:shadow-xl hover:-translate-y-2 cursor-pointer group bg-gradient-to-br from-white to-green-50">
-                  <CardContent className="h-full p-6 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center space-x-3 mb-4">
-                        <div className="p-2 bg-green-100 rounded-full group-hover:bg-green-200 transition-colors">
-                          <MessageCircle className="h-6 w-6 text-green-600 group-hover:scale-110 transition-transform" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          Need Help?
-                        </h3>
-                      </div>
-                      <p className="text-gray-600 text-sm mb-6">
-                        Get personalized assistance from our team of experienced professionals.
-                      </p>
-                    </div>
-                    <Link href="/contact" className="w-full">
                       <Button className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white group-hover:scale-[1.02] transition-all duration-300 shadow-md hover:shadow-lg">
                         Contact Us
                         <MessageCircle className="ml-2 h-4 w-4 group-hover:scale-110 transition-transform" />
                       </Button>
-                    </Link>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </Link>
               </div>
             </FadeInSection>
 
@@ -285,15 +252,8 @@ export default function HomePage() {
                 business dreams into reality.
               </p>
               <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                  Start Registration Now
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
                 <Link href="/contact" passHref>
-                  <Button
-                    variant="outline"
-                    className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
-                  >
+                  <Button className="border-2 border-blue-600 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white hover:text-white px-20 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                     Talk to Expert
                     <Phone className="ml-2 h-5 w-5" />
                   </Button>
