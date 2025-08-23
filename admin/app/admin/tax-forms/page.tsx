@@ -177,7 +177,7 @@ export default function TaxFormsPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-white">Tax Forms</h1>
-            <p className="text-muted-foreground">Manage and review all submitted tax forms.</p>
+            <p className="text-muted-foreground text-white">Manage and review all submitted tax forms.</p>
           </div>
         </div>
 
