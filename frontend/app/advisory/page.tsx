@@ -1,28 +1,31 @@
 "use client"
 
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { EnhancedHeader } from "@/components/enhanced-header";
 import { EnhancedFooter } from "@/components/enhanced-footer";
 import { FadeInSection } from "@/components/fade-in-section"
-import {
-  Users,
-  TrendingUp,
-  Shield,
-  Lightbulb,
-  CheckCircle,
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import Link from "next/link"
+import { getBasePrice } from "@/lib/pricing"
+import { 
+  TrendingUp, 
+  Users, 
+  Target, 
+  BarChart3, 
+  Lightbulb, 
+  Shield, 
+  Briefcase, 
+  Calculator,
   ArrowRight,
-  Clock,
+  CheckCircle,
   Star,
-  Target,
-  Briefcase,
+  Zap,
+  Clock
 } from "lucide-react"
 
 export default function AdvisoryPage() {
   return (
     <div className="min-h-screen bg-white">
-      <EnhancedHeader />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-100 py-20">
@@ -164,7 +167,7 @@ export default function AdvisoryPage() {
                           </div>
                         ))}
                       </div>
-                      <Link href={`/advisory/${service.slug}`} passHref>
+                      <Link href={`/contact?service=${encodeURIComponent(service.title)}`} passHref>
                         <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3">
                           Book Service <ArrowRight className="ml-2 h-5 w-5" />
                         </Button>
@@ -325,9 +328,11 @@ export default function AdvisoryPage() {
                 Get expert advisory services tailored to your business needs and accelerate your growth
               </p>
               <div className="flex justify-center space-x-4">
-                <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg">
-                  Schedule Consultation
-                </Button>
+                <Link href={`/contact?service=${encodeURIComponent("Business Advisory Services")}`} passHref>
+                  <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg">
+                    Schedule Consultation
+                  </Button>
+                </Link>
                 
               </div>
             </div>

@@ -30,7 +30,7 @@ import {
   Clock,
 } from "lucide-react";
 import { toast } from "sonner";
-import api from "@/lib/api-client";
+import api, { API_PATHS } from "@/lib/api-client";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -84,7 +84,7 @@ export default function FormsPage() {
     const fetchForms = async () => {
       try {
         setIsLoadingForms(true);
-        const response = await api.get("/api/admin/forms");
+        const response = await api.get(API_PATHS.ADMIN.FORMS);
         setForms(response.data.forms || []);
       } catch (error) {
         console.error("Failed to fetch forms:", error);
@@ -103,7 +103,7 @@ export default function FormsPage() {
     if (!selectedForm) return;
 
     try {
-      await api.put(`/api/admin/forms/${selectedForm._id}/status`, {
+      await api.put(API_PATHS.ADMIN.FORM_STATUS(selectedForm._id), {
         status: newStatus,
         comment: comment.trim() ? comment : undefined,
       });
@@ -213,8 +213,8 @@ export default function FormsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Tax Forms</CardTitle>
-          <CardDescription>Manage user tax form submissions</CardDescription>
+          <CardTitle className="text-blue-800">Tax Forms</CardTitle>
+          <CardDescription className="text-blue-800">Manage user tax form submissions</CardDescription>
         </CardHeader>
         <CardContent>
           {isLoadingForms ? (

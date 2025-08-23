@@ -30,7 +30,7 @@ export default function AdminLayout({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-700 via-blue-800 to-white/5">
         <div className="flex flex-col items-center space-y-4">
           <Loader2 className="h-12 w-12 animate-spin text-primary" />
           <p className="text-gray-600 dark:text-gray-400">Loading dashboard...</p>
@@ -44,11 +44,11 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="flex h-screen bg-gradient-to-br from-blue-700 via-blue-800 to-white/5">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <AdminHeader />
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-gray-900">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-transparent">
           <div className="container mx-auto px-4 py-6">
             {children}
           </div>

@@ -8,6 +8,7 @@ import { EnhancedHeader } from "@/components/enhanced-header";
 import { EnhancedFooter } from "@/components/enhanced-footer";
 import { FadeInSection } from "@/components/fade-in-section"
 import { Building2, CheckCircle, Clock, Shield, Users, FileText, ArrowRight, Star, Zap } from "lucide-react"
+import { getBasePrice } from "@/lib/pricing"
 
 export default function CompanyFormationPage() {
   return (
@@ -25,7 +26,7 @@ export default function CompanyFormationPage() {
               compliance and documentation.
             </p>
             <div className="flex justify-center space-x-4">
-              <Link href="/contact" passHref>
+              <Link href={`/contact?service=${encodeURIComponent("Company Formation")}`} passHref>
                 <Button className="bg-blue-600 hover:bg-blue-700 px-8 py-3">Start Registration</Button>
               </Link>
 
@@ -48,6 +49,7 @@ export default function CompanyFormationPage() {
                 {
                   title: "Private Limited Company",
                   slug: "private-limited",
+                  priceKey: "private limited company",
                   description: "Most popular choice for startups and growing businesses",
                   features: [
                     "Limited liability protection",
@@ -56,12 +58,12 @@ export default function CompanyFormationPage() {
                     "Perpetual succession",
                     "Tax benefits available",
                   ],
-                  price: "₹14,999",
                   popular: true,
                 },
                 {
                   title: "One Person Company (OPC)",
                   slug: "one-person-company",
+                  priceKey: "one person company (opc)",
                   description: "Perfect for solo entrepreneurs and individual businesses",
                   features: [
                     "Single person ownership",
@@ -70,12 +72,12 @@ export default function CompanyFormationPage() {
                     "Can be converted to Pvt Ltd",
                     "Minimum capital ₹1 Lakh",
                   ],
-                  price: "₹14,999",
                   popular: false,
                 },
                 {
                   title: "Public Limited Company",
                   slug: "public-limited",
+                  priceKey: "public limited company",
                   description: "For large businesses planning to go public",
                   features: [
                     "Can raise funds from public",
@@ -84,12 +86,12 @@ export default function CompanyFormationPage() {
                     "Minimum 7 members",
                     "Strict compliance requirements",
                   ],
-                  price: "₹49,999",
                   popular: false,
                 },
                 {
                   title: "Nidhi Company",
                   slug: "nidhi-company",
+                  priceKey: "nidhi company",
                   description: "For promoting thrift and savings among members",
                   features: [
                     "Encourages savings habit",
@@ -98,12 +100,12 @@ export default function CompanyFormationPage() {
                     "Easy to manage",
                     "Lower regulatory burden",
                   ],
-                  price: "₹24,999",
                   popular: false,
                 },
                 {
                   title: "Section 8 Company (NPO)",
                   slug: "section-8",
+                  priceKey: "section 8 company",
                   description: "For non-profit organizations promoting social welfare",
                   features: [
                     "Promotes charitable objects",
@@ -112,10 +114,9 @@ export default function CompanyFormationPage() {
                     "High credibility",
                     "No minimum capital required",
                   ],
-                  price: "₹24,999",
                   popular: false,
                 },
-              ].map((company, index) => (
+              ].map((company: any, index) => (
                 <FadeInSection key={index} delay={index * 100}>
                   <Card
                     className={`relative border-2 hover:shadow-xl transition-all duration-300 hover:-translate-y-2 ${
@@ -129,19 +130,19 @@ export default function CompanyFormationPage() {
                     )}
                     <CardHeader className="text-center">
                       <CardTitle className="text-xl text-gray-900">{company.title}</CardTitle>
-                      <div className="text-3xl font-bold text-blue-600">{company.price}</div>
+                      <div className="text-3xl font-bold text-blue-600">{getBasePrice(company.priceKey) ?? "—"}</div>
                       <CardDescription>{company.description}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="space-y-3">
-                        {company.features.map((feature, idx) => (
+                        {company.features.map((feature: string, idx: number) => (
                           <div key={idx} className="flex items-center space-x-2">
                             <CheckCircle className="h-4 w-4 text-green-500" />
                             <span className="text-sm text-gray-600">{feature}</span>
                           </div>
                         ))}
                       </div>
-                      <Link href={`/company-formation/${company.slug}`} passHref>
+                      <Link href={`/contact?service=${encodeURIComponent(company.title)}`} passHref>
                         <Button
                           className={`w-full ${
                             company.popular ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-600 hover:bg-gray-700"
@@ -335,7 +336,9 @@ export default function CompanyFormationPage() {
                 Join thousands of entrepreneurs who have successfully registered their companies with us
               </p>
               <div className="flex justify-center space-x-4">
-                <Button className="bg-blue-600 hover:bg-blue-700 px-8 py-3 text-lg">Start Registration Now</Button>
+                <Link href={`/contact?service=${encodeURIComponent("Company Formation")}`} passHref>
+                  <Button className="bg-blue-600 hover:bg-blue-700 px-8 py-3 text-lg">Start Registration Now</Button>
+                </Link>
                 <Link href="/contact" passHref>
                   <Button variant="outline" className="px-8 py-3 text-lg bg-transparent">
                     Talk to Expert

@@ -56,7 +56,7 @@ export default function DigitalTransformationPage() {
                 <p className="text-gray-600 leading-relaxed">
                   Digital transformation is more than just adopting new technology; it's about fundamentally reimagining how your business operates and delivers value to customers. Our advisory services help you integrate digital technology into all areas of your business, leading to improved efficiency, enhanced customer experiences, and a stronger competitive edge.
                 </p>
-                <Link href="/contact" passHref>
+                <Link href={`/contact?service=${encodeURIComponent("Digital Transformation")}`} passHref>
                   <Button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full text-lg">
                     Start Your Transformation <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>

@@ -1,18 +1,17 @@
 "use client"
 
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { EnhancedHeader } from "@/components/enhanced-header";
 import { EnhancedFooter } from "@/components/enhanced-footer";
 import { FadeInSection } from "@/components/fade-in-section"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import Link from "next/link"
+import { getBasePrice } from "@/lib/pricing"
 import { Users, FileText, Building, Handshake, CheckCircle, ArrowRight, Shield, Clock, Globe } from "lucide-react"
 
 export default function OtherRegistrationPage() {
   return (
     <div className="min-h-screen bg-white">
-      <EnhancedHeader />
-
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-100 py-20">
         <div className="container mx-auto px-4">
@@ -45,7 +44,7 @@ export default function OtherRegistrationPage() {
                     "Lower compliance requirements",
                     "No minimum capital requirement",
                   ],
-                  price: "₹8,999",
+                  price: getBasePrice("LLP Registration") ?? "₹4,999",
                   timeline: "7-10 days",
                 },
                 {
@@ -60,7 +59,7 @@ export default function OtherRegistrationPage() {
                     "Shared profits and losses",
                     "Mutual agency relationship",
                   ],
-                  price: "₹7,999",
+                  price: getBasePrice("Partnership Firm") ?? "₹2,999",
                   timeline: "3-5 days",
                 },
                 {
@@ -75,7 +74,7 @@ export default function OtherRegistrationPage() {
                     "Minimal legal formalities",
                     "Direct tax benefits",
                   ],
-                  price: "₹1,999",
+                  price: getBasePrice("Sole Proprietorship") ?? "₹1,999",
                   timeline: "1-2 days",
                 },
                 {
@@ -90,7 +89,7 @@ export default function OtherRegistrationPage() {
                     "Democratic management",
                     "Government support available",
                   ],
-                  price: "₹24,999",
+                  price: getBasePrice("Producer Company") ?? "₹34,999",
                   timeline: "20-25 days",
                 },
                 {
@@ -120,7 +119,7 @@ export default function OtherRegistrationPage() {
                     "Inter-state sales without restrictions",
                     "Unified tax system",
                   ],
-                  price: "₹2,999",
+                  price: getBasePrice("GST Filing") ?? "₹1,999",
                   timeline: "3-7 days",
                 },
                 {
@@ -135,7 +134,7 @@ export default function OtherRegistrationPage() {
                     "Covers shops, hotels, eateries",
                     "Annual renewal may be required",
                   ],
-                  price: "₹999",
+                  price: getBasePrice("form 3/gumasta") ?? "₹999",
                   timeline: "2-4 days",
                 },
                 {
@@ -254,7 +253,7 @@ export default function OtherRegistrationPage() {
                           </div>
                         ))}
                       </div>
-                      <Link href={`/other-registration/${registration.slug}`} passHref>
+                      <Link href={`/contact?service=${encodeURIComponent(registration.title)}`} passHref>
                         <Button className="w-full bg-blue-600 hover:bg-blue-700">
                           Register Now <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>
@@ -351,7 +350,9 @@ export default function OtherRegistrationPage() {
                 Our experts can help you choose the right business structure based on your specific needs
               </p>
               <div className="flex justify-center space-x-4">
-                <Link href="/contact" passHref><Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg">Talk to Expert</Button></Link>
+                <Link href={`/contact?service=${encodeURIComponent("Other Business Registrations")}`} passHref>
+                  <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg">Talk to Expert</Button>
+                </Link>
                 
               </div>
             </div>

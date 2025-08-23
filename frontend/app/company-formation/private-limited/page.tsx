@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
+import { getBasePrice, getPackages } from "@/lib/pricing"
 import {
   Building2,
   CheckCircle,
@@ -65,7 +66,7 @@ export default function PrivateLimitedCompanyPage() {
 
                 <div className="grid sm:grid-cols-3 gap-4 pt-6">
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-                    <div className="text-2xl font-bold text-blue-600">₹14,999</div>
+                    <div className="text-2xl font-bold text-blue-600">{getBasePrice("private limited company") ?? "—"}</div>
                     <div className="text-sm text-gray-600">Starting Price</div>
                   </div>
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
@@ -173,9 +174,11 @@ export default function PrivateLimitedCompanyPage() {
                     />
                   </div>
 
-                  <Button className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                    Contact Now
-                  </Button>
+                  <Link href={`/contact?service=${encodeURIComponent("Private Limited Company")}`} passHref>
+                    <Button className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                      Contact Now
+                    </Button>
+                  </Link>
 
                   <div className="text-center text-sm text-gray-500">
                     <p>🔒 Your information is 100% secure and confidential</p>
@@ -553,7 +556,7 @@ export default function PrivateLimitedCompanyPage() {
               {[
                 {
                   name: "Basic Package",
-                  price: "₹9,999",
+                  price: getPackages("private limited company")?.BASIC ?? "—",
                   popular: false,
                   features: [
                     "Company Name Search & Reservation",
@@ -567,7 +570,7 @@ export default function PrivateLimitedCompanyPage() {
                 },
                 {
                   name: "Standard Package",
-                  price: "₹14,999",
+                  price: getPackages("private limited company")?.STANDARD ?? "—",
                   popular: true,
                   features: [
                     "Company Name Search & Reservation",
@@ -583,7 +586,7 @@ export default function PrivateLimitedCompanyPage() {
                 },
                 {
                   name: "Premium Package",
-                  price: "₹24,999",
+                  price: getPackages("private limited company")?.PREMIUM ?? "—",
                   popular: false,
                   features: [
                     "Company Name Search & Reservation",
@@ -628,15 +631,17 @@ export default function PrivateLimitedCompanyPage() {
                           <span className="text-blue-100 text-sm">{feature}</span>
                         </div>
                       ))}
-                      <Button
-                        className={`w-full mt-6 ${
-                          pkg.popular
-                            ? "bg-yellow-400 text-yellow-900 hover:bg-yellow-300"
-                            : "bg-white/20 text-white hover:bg-white/30"
-                        } transition-all duration-300 hover:scale-105`}
-                      >
-                        Choose This Package
-                      </Button>
+                      <Link href={`/contact?service=${encodeURIComponent("Private Limited Company")}`} passHref>
+                        <Button
+                          className={`w-full mt-6 ${
+                            pkg.popular
+                              ? "bg-yellow-400 text-yellow-900 hover:bg-yellow-300"
+                              : "bg-white/20 text-white hover:bg-white/30"
+                          } transition-all duration-300 hover:scale-105`}
+                        >
+                          Choose This Package
+                        </Button>
+                      </Link>
                     </CardContent>
                   </Card>
                 </FadeInSection>

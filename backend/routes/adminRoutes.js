@@ -267,7 +267,7 @@ router.put("/forms/:id/status", validateObjectId(), async (req, res) => {
 // @access  Private/Admin
 router.get("/stats", async (req, res) => {
   try {
-    // Get counts by status
+    // Get counts by status (current snapshot)
     const total = await TaxForm.countDocuments();
     const pending = await TaxForm.countDocuments({ status: "Pending" });
     const reviewed = await TaxForm.countDocuments({ status: "Reviewed" });
@@ -276,22 +276,69 @@ router.get("/stats", async (req, res) => {
     // Get recent submissions
     const recent = await TaxForm.find().sort({ createdAt: -1 }).limit(5);
 
-    // Get contact form count
+    // Get totals
     const contacts = await Contact.countDocuments();
-    
-    // Get total users count
     const users = await User.countDocuments({ role: "user" });
 
+    // Build last 12 months range
+    const now = new Date();
+    const months = [];
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const start = new Date(d.getFullYear(), d.getMonth(), 1);
+      const end = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+      const label = start.toLocaleString('en-US', { month: 'short' });
+      months.push({ year: start.getFullYear(), month: start.getMonth() + 1, start, end, label });
+    }
+
+    // Aggregations
+    const usersAgg = await User.aggregate([
+      { $match: { role: 'user', createdAt: { $gte: months[0].start } } },
+      { $group: { _id: { y: { $year: '$createdAt' }, m: { $month: '$createdAt' } }, count: { $sum: 1 } } }
+    ]);
+
+    const contactsAgg = await Contact.aggregate([
+      { $match: { createdAt: { $gte: months[0].start } } },
+      { $group: { _id: { y: { $year: '$createdAt' }, m: { $month: '$createdAt' } }, count: { $sum: 1 } } }
+    ]);
+
+    const formsAgg = await TaxForm.aggregate([
+      { $match: { createdAt: { $gte: months[0].start } } },
+      { $group: { _id: { y: { $year: '$createdAt' }, m: { $month: '$createdAt' }, status: '$status' }, count: { $sum: 1 } } }
+    ]);
+
+    // Map aggregations to last-12-month arrays
+    const usersMonthly = months.map(({ year, month, label }) => {
+      const hit = usersAgg.find(a => a._id.y === year && a._id.m === month);
+      return { month: label, users: hit ? hit.count : 0 };
+    });
+
+    const contactsMonthly = months.map(({ year, month, label }) => {
+      const hit = contactsAgg.find(a => a._id.y === year && a._id.m === month);
+      return { month: label, contacts: hit ? hit.count : 0 };
+    });
+
+    const formsTrendMonthly = months.map(({ year, month, label }) => {
+      const pendingHit = formsAgg.find(a => a._id.y === year && a._id.m === month && a._id.status === 'Pending');
+      const reviewedHit = formsAgg.find(a => a._id.y === year && a._id.m === month && a._id.status === 'Reviewed');
+      const filedHit = formsAgg.find(a => a._id.y === year && a._id.m === month && a._id.status === 'Filed');
+      return {
+        month: label,
+        pending: pendingHit ? pendingHit.count : 0,
+        reviewed: reviewedHit ? reviewedHit.count : 0,
+        filed: filedHit ? filedHit.count : 0,
+      };
+    });
+
     res.json({
-      taxForms: {
-        total,
-        pending,
-        reviewed,
-        filed,
-      },
+      taxForms: { total, pending, reviewed, filed },
       contacts,
       users,
       recent,
+      // new fields for richer dashboard
+      usersMonthly,
+      formsTrendMonthly,
+      contactsMonthly,
     });
   } catch (error) {
     console.error("Get stats error:", error);

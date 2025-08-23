@@ -20,6 +20,9 @@ interface DashboardStats {
   contacts: number;
   users: number;
   recent: any[];
+  usersMonthly: Array<{ month: string; users: number }>;
+  formsTrendMonthly: Array<{ month: string; pending: number; reviewed: number; filed: number }>;
+  contactsMonthly: Array<{ month: string; contacts: number }>;
 }
 
 export default function AdminDashboard() {
@@ -53,25 +56,24 @@ export default function AdminDashboard() {
       ]
     : [];
 
-  // Data for other charts is not available from the current API response.
-  // We pass empty arrays to prevent rendering errors and gracefully handle missing data.
-  const usersData: any[] = [];
-  const formsTrendData: any[] = [];
-  const contactsData: any[] = [];
+  // Map new API series
+  const usersData = stats?.usersMonthly || [];
+  const formsTrendData = stats?.formsTrendMonthly || [];
+  const contactsData = stats?.contactsMonthly || [];
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="mb-6 text-3xl font-bold">Admin Dashboard</h1>
-      
-      <div className="mb-8">
-        <h2 className="mb-4 text-xl font-semibold">Welcome, {user?.name}</h2>
-        <p className="text-muted-foreground">Here's an overview of your system</p>
+    <div className="bg-gradient-to-br from-blue-700 via-blue-800 to-white/5">
+      {/* Header - blue glassmorphism */}
+      <div className="rounded-2xl bg-blue-600/20 backdrop-blur border border-white/20 p-6 mb-8 shadow-[0_8px_30px_rgba(31,76,255,0.15)]">
+        <h1 className="text-3xl font-bold text-white">Dashboard</h1>
+        <p className="text-sm text-white/80 mt-1">Welcome{user?.name ? `, ${user.name}` : ''}. Here’s your system overview.</p>
       </div>
 
+      {/* KPI cards */}
       {isLoadingStats ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {[1, 2, 3, 4].map((i) => (
-            <Card key={i}>
+            <Card key={i} className="border-blue-100">
               <CardHeader className="pb-2">
                 <Skeleton className="h-4 w-24" />
               </CardHeader>
@@ -83,116 +85,61 @@ export default function AdminDashboard() {
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <Card>
+          <Card variant="glass" className="hover:shadow-lg transition-all">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+              <CardTitle className="text-sm font-medium text-white/90">Total Users</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center">
-                <Users className="mr-2 h-4 w-4 text-muted-foreground" />
-                <div className="text-2xl font-bold">{stats?.users || 0}</div>
+                <Users className="mr-2 h-4 w-4 text-white/80" />
+                <div className="text-2xl font-bold text-white">{stats?.users || 0}</div>
               </div>
             </CardContent>
           </Card>
-          
-          <Card>
+          <Card variant="glass" className="hover:shadow-lg transition-all">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Total Forms</CardTitle>
+              <CardTitle className="text-sm font-medium text-white/90">Total Forms</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center">
-                <FileText className="mr-2 h-4 w-4 text-muted-foreground" />
-                <div className="text-2xl font-bold">{stats?.taxForms?.total || 0}</div>
+                <FileText className="mr-2 h-4 w-4 text-white/80" />
+                <div className="text-2xl font-bold text-white">{stats?.taxForms?.total || 0}</div>
               </div>
             </CardContent>
           </Card>
-          
-          <Card>
+          <Card variant="glass" className="hover:shadow-lg transition-all">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Pending Forms</CardTitle>
+              <CardTitle className="text-sm font-medium text-white/90">Pending Forms</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center">
-                <FileText className="mr-2 h-4 w-4 text-muted-foreground" />
-                <div className="text-2xl font-bold">{stats?.taxForms?.pending || 0}</div>
+                <FileText className="mr-2 h-4 w-4 text-white/80" />
+                <div className="text-2xl font-bold text-white">{stats?.taxForms?.pending || 0}</div>
               </div>
             </CardContent>
           </Card>
-          
-          <Card>
+          <Card variant="glass" className="hover:shadow-lg transition-all">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Contact Messages</CardTitle>
+              <CardTitle className="text-sm font-medium text-white/90">Contact Messages</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center">
-                <MessageSquare className="mr-2 h-4 w-4 text-muted-foreground" />
-                <div className="text-2xl font-bold">{stats?.contacts || 0}</div>
+                <MessageSquare className="mr-2 h-4 w-4 text-white/80" />
+                <div className="text-2xl font-bold text-white">{stats?.contacts || 0}</div>
               </div>
             </CardContent>
           </Card>
         </div>
       )}
+
+      {/* Removed duplicate KPI block to avoid duplicacy */}
 
       {!isLoadingStats && stats && (
         <div className="mt-8">
-          <MultiCharts usersData={usersData || []} formsStatusData={formsStatusData || []} formsTrendData={formsTrendData || []} contactsData={contactsData || []} />
+          <MultiCharts usersData={usersData} formsStatusData={formsStatusData} formsTrendData={formsTrendData} contactsData={contactsData} />
         </div>
       )}
 
-      <div className="mt-8">
-        <Tabs defaultValue="forms">
-          <TabsList className="mb-4">
-            <TabsTrigger value="forms">Recent Forms</TabsTrigger>
-            <TabsTrigger value="users">Recent Users</TabsTrigger>
-            <TabsTrigger value="contacts">Recent Contacts</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="forms" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Form Submissions</CardTitle>
-                <CardDescription>The latest tax form submissions from users</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">Loading recent forms...</p>
-                <Button className="mt-4" variant="outline" asChild>
-                  <a href="/admin/forms">View All Forms</a>
-                </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="users" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Users</CardTitle>
-                <CardDescription>The latest registered users</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">Loading recent users...</p>
-                <Button className="mt-4" variant="outline" asChild>
-                  <a href="/admin/users">View All Users</a>
-                </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="contacts" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Contact Messages</CardTitle>
-                <CardDescription>The latest contact form submissions</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">Loading recent contacts...</p>
-                <Button className="mt-4" variant="outline" asChild>
-                  <a href="/admin/contacts">View All Contacts</a>
-                </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
     </div>
   );
 }

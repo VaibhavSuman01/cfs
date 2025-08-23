@@ -51,11 +51,11 @@ export default function Home() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-700 via-blue-800 to-white/5 px-4 py-12 sm:px-6 lg:px-8">
+      <Card variant="glass" className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Admin Login</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-2xl font-bold text-white">Admin Login</CardTitle>
+          <CardDescription className="text-white/80">
             Enter your credentials to access the admin dashboard
           </CardDescription>
         </CardHeader>
