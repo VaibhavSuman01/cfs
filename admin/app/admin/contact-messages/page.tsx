@@ -130,7 +130,7 @@ export default function ContactsPage() {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="mb-6 text-3xl font-bold">Contact Messages</h1>
+      <h1 className="mb-6 text-3xl font-bold text-white">Contact Messages</h1>
       
       <div className="flex justify-between items-center mb-6">
         <div className="relative w-full max-w-sm">

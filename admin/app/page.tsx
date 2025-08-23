@@ -103,7 +103,7 @@ export default function Home() {
           </Form>
         </CardContent>
         <CardFooter className="flex justify-center">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground text-white">
             Admin access only. Unauthorized access is prohibited.
           </p>
         </CardFooter>
