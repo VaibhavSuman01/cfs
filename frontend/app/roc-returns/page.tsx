@@ -3,9 +3,11 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import { EnhancedHeader } from "@/components/enhanced-header";
 import { EnhancedFooter } from "@/components/enhanced-footer";
 import { FadeInSection } from "@/components/fade-in-section"
+import { getBasePrice } from "@/lib/pricing"
 import {
   FileText,
   Calendar,
@@ -75,7 +77,7 @@ export default function ROCReturnsPage() {
                     "Compliance with Companies Act",
                     "Digital documentation",
                   ],
-                  price: "₹2,999",
+                  price: getBasePrice("Board Meeting & Resolutions") ?? "₹2,999",
                   timeline: "3-5 days",
                   urgent: false,
                 },
@@ -137,7 +139,7 @@ export default function ROCReturnsPage() {
                     "Publication in gazette",
                     "Final closure certificate",
                   ],
-                  price: "₹24,999",
+                  price: getBasePrice("Company Strike Off (exculding GOVT fee)") ?? "₹12,999",
                   timeline: "60-90 days",
                   urgent: false,
                 },
@@ -182,7 +184,7 @@ export default function ROCReturnsPage() {
                           </div>
                         ))}
                       </div>
-                      <Link href={service.slug ? `/roc-returns/${service.slug}` : `/contact?service=${encodeURIComponent(service.title)}`} passHref>
+                      <Link href={`/contact?service=${encodeURIComponent(service.title)}`} passHref>
                         <Button className="w-full bg-blue-600 hover:bg-blue-700 group-hover:scale-105 transition-transform">
                           Get Started <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>
@@ -307,15 +309,19 @@ export default function ROCReturnsPage() {
                 Don't risk penalties and legal issues. Let our experts handle your ROC compliance.
               </p>
               <div className="flex justify-center space-x-4">
-                <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg">
-                  Get Compliance Help
-                </Button>
-                <Button
-                  variant="outline"
-                  className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-3 text-lg bg-transparent"
-                >
-                  Check Compliance Status
-                </Button>
+                <Link href={`/contact?service=${encodeURIComponent("ROC Returns & Company Management")}`} passHref>
+                  <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg">
+                    Get Compliance Help
+                  </Button>
+                </Link>
+                <Link href={`/contact?service=${encodeURIComponent("ROC Compliance Status Check")}`} passHref>
+                  <Button
+                    variant="outline"
+                    className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-3 text-lg bg-transparent"
+                  >
+                    Check Compliance Status
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>

@@ -1,17 +1,18 @@
 "use client";
 
 import { EnhancedHeader } from '@/components/enhanced-header';
-import { EnhancedFooter } from '@/components/enhanced-footer';
-import { FadeInSection } from '@/components/fade-in-section';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import { EnhancedFooter } from "@/components/enhanced-footer";
+import { FadeInSection } from "@/components/fade-in-section"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import Link from "next/link"
+import { getBasePrice } from "@/lib/pricing"
 
 const reportServices = [
-  { title: 'Project Reports', href: '/reports/project-reports' },
-  { title: 'CMA Reports', href: '/reports/cma-reports' },
-  { title: 'DSCR Reports', href: '/reports/dscr-reports' },
-  { title: 'Bank Reconciliation', href: '/reports/bank-reconciliation' },
+  { title: 'Project Reports' },
+  { title: 'CMA Reports' },
+  { title: 'DSCR Reports' },
+  { title: 'Bank Reconciliation' },
 ];
 
 export default function ReportsPage() {
@@ -27,7 +28,7 @@ export default function ReportsPage() {
             </CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {reportServices.map((service) => (
-                <Link key={service.href} href={service.href} passHref>
+                <Link key={service.title} href={`/contact?service=${encodeURIComponent(service.title)}`} passHref>
                   <Button variant="outline" className="w-full h-full text-left justify-start p-6">
                     <div className="flex flex-col">
                       <span className="text-lg font-semibold">{service.title}</span>

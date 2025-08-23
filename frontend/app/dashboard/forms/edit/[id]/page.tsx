@@ -133,12 +133,48 @@ export default function EditFormPage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const fileArray = Array.from(e.target.files);
-      setNewFiles(prev => [...prev, ...fileArray]);
+      
+      // Validate files
+      const validFiles: File[] = [];
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      const allowedTypes = [
+        'application/pdf',
+        'image/jpeg',
+        'image/jpg',
+        'image/png',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      ];
+
+      for (const file of fileArray) {
+        if (file.size > maxSize) {
+          toast.error(`File "${file.name}" is too large. Maximum size is 10MB.`);
+          continue;
+        }
+        
+        if (!allowedTypes.includes(file.type)) {
+          toast.error(`File "${file.name}" has an unsupported format. Please upload PDF, Word, Excel, or image files.`);
+          continue;
+        }
+        
+        validFiles.push(file);
+      }
+      
+      if (validFiles.length > 0) {
+        setNewFiles(prev => [...prev, ...validFiles]);
+        toast.success(`${validFiles.length} file(s) added successfully.`);
+      }
+      
+      // Clear the input
+      e.target.value = '';
     }
   };
 
   const removeNewFile = (index: number) => {
     setNewFiles(prev => prev.filter((_, i) => i !== index));
+    toast.success('File removed successfully.');
   };
 
   // Prevent admins from editing user forms (redirect them away)
@@ -274,7 +310,14 @@ export default function EditFormPage() {
               <div className="space-y-2">
                 <Label htmlFor="file-upload">Upload New Documents</Label>
                 <div className="flex items-center">
-                  <Input id="file-upload" type="file" multiple onChange={handleFileChange} className="hidden" />
+                  <Input 
+                    id="file-upload" 
+                    type="file" 
+                    multiple 
+                    onChange={handleFileChange} 
+                    className="hidden"
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                  />
                   <Button type="button" variant="outline" onClick={() => document.getElementById('file-upload')?.click()}>
                     <Upload className="h-4 w-4 mr-2" />
                     Select Files
@@ -283,6 +326,9 @@ export default function EditFormPage() {
                     {newFiles.length} {newFiles.length === 1 ? 'file' : 'files'} selected
                   </span>
                 </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Supported formats: PDF, Word, Excel, JPG, PNG (Max 10MB per file)
+                </p>
                 
                 {newFiles.length > 0 && (
                   <div className="mt-4 space-y-2">

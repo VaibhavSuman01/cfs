@@ -16,7 +16,7 @@ export default function GstRegistrationPage() {
         <FadeInSection>
           <Card className="max-w-4xl mx-auto">
             <CardHeader>
-              <CardTitle className="text-3xl font-bold text-center">GST Filing</CardTitle>
+              <CardTitle className="text-3xl font-bold text-center">GST Registration</CardTitle>
               <CardDescription className="text-center text-lg">Comply with the Goods and Services Tax law in India.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 text-center">

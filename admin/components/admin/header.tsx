@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Search, Menu, X } from 'lucide-react'
+import { Search, Menu } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -12,7 +12,6 @@ import { toast } from 'sonner'
 import api, { API_PATHS } from '@/lib/api-client'
 import { useAuth } from '@/providers/auth-provider'
 export function AdminHeader() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const pathname = usePathname()
   const { logout } = useAuth()
   const [openChangePwd, setOpenChangePwd] = useState(false)
@@ -28,20 +27,26 @@ export function AdminHeader() {
     return path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, ' ')
   }
 
+  const openSidebarOnMobile = () => {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('toggle-admin-sidebar'))
+    }
+  }
+
   return (
-    <header className="bg-white shadow-sm">
+    <header className="rounded-none bg-blue-600/15 backdrop-blur border-b border-white/20 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <button
               type="button"
-              className="md:hidden bg-white p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
-              onClick={() => setMobileMenuOpen(true)}
+              className="md:hidden bg-white/10 p-2 rounded-md text-white/80 hover:text-white hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white/50"
+              onClick={openSidebarOnMobile}
             >
               <span className="sr-only">Open sidebar</span>
               <Menu className="h-6 w-6" aria-hidden="true" />
             </button>
-            <h1 className="ml-4 text-xl font-semibold text-gray-900">
+            <h1 className="ml-4 text-xl font-semibold text-white">
               {getPageTitle()}
             </h1>
           </div>
@@ -49,11 +54,11 @@ export function AdminHeader() {
           <div className="flex items-center">
             <div className="relative mx-4 hidden md:block">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                <Search className="h-5 w-5 text-white/70" aria-hidden="true" />
               </div>
               <input
                 type="text"
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="block w-full pl-10 pr-3 py-2 border border-white/20 rounded-md leading-5 bg-white/10 text-white placeholder-white/70 focus:outline-none focus:placeholder-white focus:ring-1 focus:ring-white/40 focus:border-white/40 sm:text-sm"
                 placeholder="Search"
               />
             </div>
@@ -63,8 +68,8 @@ export function AdminHeader() {
             <div className="ml-4 relative">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button aria-label="Open user menu" className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <span className="text-blue-600 font-medium">AD</span>
+                  <button aria-label="Open user menu" className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-white/50">
+                    <span className="text-white font-medium">AD</span>
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
@@ -78,49 +83,6 @@ export function AdminHeader() {
           </div>
         </div>
       </div>
-      
-      {/* Mobile menu */}
-      {mobileMenuOpen && (
-        <div className="md:hidden">
-          <div className="fixed inset-0 flex z-40">
-            <div className="fixed inset-0">
-              <div className="absolute inset-0 bg-gray-600 opacity-75"></div>
-            </div>
-            <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white">
-              <div className="absolute top-0 right-0 -mr-12 pt-2">
-                <button
-                  type="button"
-                  className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <span className="sr-only">Close sidebar</span>
-                  <X className="h-6 w-6 text-white" aria-hidden="true" />
-                </button>
-              </div>
-              <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
-                <div className="flex-shrink-0 flex items-center px-4">
-                  <h1 className="text-xl font-bold text-gray-900">Admin Panel</h1>
-                </div>
-                <div className="mt-5 px-2 space-y-1">
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Search className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                    </div>
-                    <input
-                      type="text"
-                      className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                      placeholder="Search"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="flex-shrink-0 w-14">
-              {/* Force sidebar to shrink to fit close icon */}
-            </div>
-          </div>
-        </div>
-      )}
 
       <Dialog open={openChangePwd} onOpenChange={setOpenChangePwd}>
         <DialogContent>
