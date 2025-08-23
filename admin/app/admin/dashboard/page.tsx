@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useAuth } from '@/providers/auth-provider';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -85,50 +86,58 @@ export default function AdminDashboard() {
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <Card variant="glass" className="hover:shadow-lg transition-all">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-white/90">Total Users</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center">
-                <Users className="mr-2 h-4 w-4 text-white/80" />
-                <div className="text-2xl font-bold text-white">{stats?.users || 0}</div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card variant="glass" className="hover:shadow-lg transition-all">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-white/90">Total Forms</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center">
-                <FileText className="mr-2 h-4 w-4 text-white/80" />
-                <div className="text-2xl font-bold text-white">{stats?.taxForms?.total || 0}</div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card variant="glass" className="hover:shadow-lg transition-all">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-white/90">Pending Forms</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center">
-                <FileText className="mr-2 h-4 w-4 text-white/80" />
-                <div className="text-2xl font-bold text-white">{stats?.taxForms?.pending || 0}</div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card variant="glass" className="hover:shadow-lg transition-all">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-white/90">Contact Messages</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center">
-                <MessageSquare className="mr-2 h-4 w-4 text-white/80" />
-                <div className="text-2xl font-bold text-white">{stats?.contacts || 0}</div>
-              </div>
-            </CardContent>
-          </Card>
+          <Link href="/admin/users">
+            <Card variant="glass" className="hover:shadow-lg transition-all cursor-pointer hover:scale-105">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-white/90">Total Users</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center">
+                  <Users className="mr-2 h-4 w-4 text-white/80" />
+                  <div className="text-2xl font-bold text-white">{stats?.users || 0}</div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link href="/admin/forms">
+            <Card variant="glass" className="hover:shadow-lg transition-all cursor-pointer hover:scale-105">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-white/90">Total Forms</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center">
+                  <FileText className="mr-2 h-4 w-4 text-white/80" />
+                  <div className="text-2xl font-bold text-white">{stats?.taxForms?.total || 0}</div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link href="/admin/forms?status=pending">
+            <Card variant="glass" className="hover:shadow-lg transition-all cursor-pointer hover:scale-105">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-white/90">Pending Forms</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center">
+                  <FileText className="mr-2 h-4 w-4 text-white/80" />
+                  <div className="text-2xl font-bold text-white">{stats?.taxForms?.pending || 0}</div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link href="/admin/contact-messages">
+            <Card variant="glass" className="hover:shadow-lg transition-all cursor-pointer hover:scale-105">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-white/90">Contact Messages</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center">
+                  <MessageSquare className="mr-2 h-4 w-4 text-white/80" />
+                  <div className="text-2xl font-bold text-white">{stats?.contacts || 0}</div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
       )}
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { 
   DocumentTextIcon,
@@ -67,10 +68,10 @@ const StatCard = ({ title, value, icon, linkHref }: {
         <div className="text-2xl font-bold">{value}</div>
       </CardContent>
       <CardFooter className="border-t">
-        <a href={linkHref} className="text-sm font-medium text-primary hover:underline flex items-center">
+        <Link href={linkHref} className="text-sm font-medium text-primary hover:underline flex items-center">
           View all
           <ArrowRightIcon className="ml-1 h-4 w-4" />
-        </a>
+        </Link>
       </CardFooter>
     </Card>
   </motion.div>
