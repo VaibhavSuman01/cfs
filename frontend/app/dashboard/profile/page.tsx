@@ -94,8 +94,15 @@ export default function ProfilePage() {
       if (avatarFile) {
         await handleAvatarUpload();
       }
+      
+      // Exclude PAN from updates if it's already set
+      const updateData = { ...data };
+      if (user?.pan) {
+        delete updateData.pan;
+      }
+      
       // Then, update the rest of the profile
-      await api.put('/api/auth/profile', data);
+      await api.put('/api/auth/profile', updateData);
       await refreshUserProfile();
       toast.success('Profile updated successfully');
     } catch (error) {
@@ -193,8 +200,17 @@ export default function ProfilePage() {
                     <FormItem>
                       <FormLabel>PAN Card Number</FormLabel>
                       <FormControl>
-                        <Input placeholder="Your PAN card number" {...field} />
+                        <Input 
+                          placeholder="Your PAN card number" 
+                          {...field} 
+                          disabled={!!user?.pan}
+                        />
                       </FormControl>
+                      {user?.pan && (
+                        <p className="text-sm text-muted-foreground">
+                          PAN number cannot be changed after registration
+                        </p>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}
