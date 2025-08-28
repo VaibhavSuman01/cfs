@@ -15,7 +15,7 @@ export function EnhancedFooter() {
     { name: "LLP Registration", href: "/other-registration/llp" },
     { name: "Partnership Firm", href: "/other-registration/partnership" },
     { name: "Sole Proprietorship", href: "/other-registration/sole-proprietorship" },
-    { name: "Producer Company", href: "/other-registration/producer-company" },
+    { name: "Producer Company", href: "/company-formation/producer-company" },
   ]
 
   const taxationServices = [

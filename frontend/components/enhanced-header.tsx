@@ -42,6 +42,7 @@ export function EnhancedHeader() {
         { name: "One Person Company", href: "/company-formation/one-person-company" },
         { name: "Section 8 Company", href: "/company-formation/section-8" },
         { name: "Nidhi Company", href: "/company-formation/nidhi-company" },
+        { name: "Producer Company", href: "/company-formation/producer-company" },
       ],
     },
     {
@@ -51,7 +52,6 @@ export function EnhancedHeader() {
         { name: "LLP Registration", href: "/other-registration/llp-registration" },
         { name: "Partnership Firm", href: "/other-registration/partnership-firm" },
         { name: "Sole Proprietorship", href: "/other-registration/sole-proprietorship" },
-        { name: "Producer Company", href: "/other-registration/producer-company" },
         { name: "MSME/Udyam Registration", href: "/other-registration/msme-udyam-registration" },
         { name: "EPFO Registration", href: "/other-registration/epfo" },
         { name: "ESIC Registration", href: "/other-registration/esic" },

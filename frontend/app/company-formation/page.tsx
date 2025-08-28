@@ -116,6 +116,20 @@ export default function CompanyFormationPage() {
                   ],
                   popular: false,
                 },
+                {
+                  title: "Producer Company",
+                  slug: "producer-company",
+                  priceKey: "producer company",
+                  description: "Special type of company for agricultural and rural development activities",
+                  features: [
+                    "Minimum 10 members required",
+                    "Focus on agricultural activities",
+                    "Limited liability protection",
+                    "Democratic management",
+                    "Government support available",
+                  ],
+                  popular: false,
+                },
               ].map((company: any, index) => (
                 <FadeInSection key={index} delay={index * 100}>
                   <Card

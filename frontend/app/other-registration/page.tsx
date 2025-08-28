@@ -78,21 +78,6 @@ export default function OtherRegistrationPage() {
                   timeline: "1-2 days",
                 },
                 {
-                  icon: Shield,
-                  title: "Producer Company",
-                  slug: "producer-company",
-                  description: "Special type of company for agricultural and rural development activities",
-                  features: [
-                    "Minimum 10 members required",
-                    "Focus on agricultural activities",
-                    "Limited liability protection",
-                    "Democratic management",
-                    "Government support available",
-                  ],
-                  price: getBasePrice("producer company") ?? "₹34,999",
-                  timeline: "20-25 days",
-                },
-                {
                   icon: FileText,
                   title: "Digital Signature",
                   slug: "digital-signature",

@@ -187,6 +187,7 @@ export default function UserDashboard() {
         "Public Limited Company",
         "Section 8 Company",
         "Nidhi Company",
+        "Producer Company",
       ],
     },
     {name:"Taxation",items:[
@@ -205,7 +206,6 @@ export default function UserDashboard() {
         "LLP Registration",
         "Partnership Firm",
         "Proprietorship",
-        "Producer Company",
         "MSME/Udyam Registration",
         "EPFO",
         "ESIC",

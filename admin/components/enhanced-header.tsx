@@ -58,6 +58,10 @@ export function EnhancedHeader() {
           href: "/company-formation/one-person-company",
         },
         { name: "Section 8 Company", href: "/company-formation/section-8" },
+        {
+          name: "Producer Company",
+          href: "/company-formation/producer-company",
+        },
       ],
     },
     {
@@ -69,10 +73,6 @@ export function EnhancedHeader() {
         {
           name: "Sole Proprietorship",
           href: "/other-registration/sole-proprietorship",
-        },
-        {
-          name: "Producer Company",
-          href: "/other-registration/producer-company",
         },
       ],
     },
