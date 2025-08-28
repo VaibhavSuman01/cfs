@@ -68,10 +68,14 @@ export default function UsersPage() {
           params.append('search', debouncedSearchTerm);
         }
         if (dateRange?.from) {
-          params.append('startDate', dateRange.from.toISOString());
+          const startDate = new Date(dateRange.from);
+          startDate.setHours(0, 0, 0, 0);
+          params.append('startDate', startDate.toISOString());
         }
         if (dateRange?.to) {
-          params.append('endDate', dateRange.to.toISOString());
+          const endDate = new Date(dateRange.to);
+          endDate.setHours(23, 59, 59, 999);
+          params.append('endDate', endDate.toISOString());
         }
 
         const response = await api.get(`${API_PATHS.ADMIN.USERS}?${params.toString()}`);
@@ -95,15 +99,27 @@ export default function UsersPage() {
   const handleDateRangeSelect = (range: string) => {
     setSelectedRange(range);
     const now = new Date();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
     if (range === 'day') {
-      setDateRange({ from: now, to: now });
+      setDateRange({ from: today, to: now });
     } else if (range === 'week') {
-      setDateRange({ from: addDays(now, -7), to: now });
+      const weekAgo = new Date();
+      weekAgo.setDate(now.getDate() - 7);
+      weekAgo.setHours(0, 0, 0, 0);
+      setDateRange({ from: weekAgo, to: now });
     } else if (range === 'month') {
-      setDateRange({ from: addDays(now, -30), to: now });
+      const monthAgo = new Date();
+      monthAgo.setMonth(now.getMonth() - 1);
+      monthAgo.setHours(0, 0, 0, 0);
+      setDateRange({ from: monthAgo, to: now });
     } else if (range === 'year') {
-      setDateRange({ from: addDays(now, -365), to: now });
-    } else {
+      const yearAgo = new Date();
+      yearAgo.setFullYear(now.getFullYear() - 1);
+      yearAgo.setHours(0, 0, 0, 0);
+      setDateRange({ from: yearAgo, to: now });
+    } else if (range === 'all') {
       setDateRange(undefined);
     }
   };
