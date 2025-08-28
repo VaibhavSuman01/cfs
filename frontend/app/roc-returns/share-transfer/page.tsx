@@ -8,6 +8,7 @@ import { FloatingElements } from "@/components/floating-elements"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { getBasePrice } from "@/lib/pricing"
 import {
   ArrowRightLeft,
   FileText,
@@ -15,10 +16,13 @@ import {
   ShieldCheck,
   Scale,
   ArrowRight,
-  Phone
+  Phone,
+  CheckCircle
 } from "lucide-react"
 
 export default function ShareTransferPage() {
+  const basePrice = getBasePrice("share transfer & capital changes") ?? "₹5,999";
+  
   return (
     <div className="min-h-screen bg-white">
       <EnhancedHeader />
@@ -50,7 +54,7 @@ export default function ShareTransferPage() {
 
                 <div className="grid sm:grid-cols-3 gap-4 pt-6">
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-                    <div className="text-2xl font-bold text-blue-600">₹5,999</div>
+                    <div className="text-2xl font-bold text-blue-600">{basePrice}</div>
                     <div className="text-sm text-gray-600">Per Transfer</div>
                   </div>
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
@@ -127,6 +131,71 @@ export default function ShareTransferPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600">Submit the deed and original share certificate to the company. The Board of Directors will pass a resolution to approve the transfer.</p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+      </FadeInSection>
+
+      {/* Pricing Packages Section */}
+      <FadeInSection>
+        <section className="py-20">
+          <div className="container mx-auto px-4">
+            <div className="text-center max-w-4xl mx-auto mb-16">
+              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">Choose Your Share Transfer Package</h2>
+              <p className="text-lg text-gray-600">
+                Select the package that best fits your share transfer requirements
+              </p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              <Card className="border-2 border-blue-200 hover:border-blue-400 hover:shadow-xl transition-all duration-300">
+                <CardHeader className="text-center pb-4">
+                  <CardTitle className="text-2xl font-bold text-blue-600">Basic</CardTitle>
+                  <div className="text-4xl font-bold text-gray-900">₹4,999</div>
+                  <p className="text-sm text-gray-600">Starting Price</p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <ul className="space-y-3 text-left">
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Form SH-4 Drafting</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Basic Documentation</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>ROC Filing Support</span></li>
+                  </ul>
+                  <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Basic</Button>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 border-blue-400 hover:border-blue-600 hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                <CardHeader className="text-center pb-4">
+                  <CardTitle className="text-2xl font-bold text-blue-600">Standard</CardTitle>
+                  <div className="text-4xl font-bold text-gray-900">₹6,999</div>
+                  <p className="text-sm text-gray-600">Most Popular</p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <ul className="space-y-3 text-left">
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Everything in Basic</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Priority Processing</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Expert Consultation</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Board Resolution Support</span></li>
+                  </ul>
+                  <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Standard</Button>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 border-blue-200 hover:border-blue-400 hover:shadow-xl transition-all duration-300">
+                <CardHeader className="text-center pb-4">
+                  <CardTitle className="text-2xl font-bold text-blue-600">Premium</CardTitle>
+                  <div className="text-4xl font-bold text-gray-900">₹9,999</div>
+                  <p className="text-sm text-gray-600">Complete Solution</p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <ul className="space-y-3 text-left">
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Everything in Standard</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Multiple Share Transfers</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Legal Compliance Review</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>1 Year Support</span></li>
+                  </ul>
+                  <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Premium</Button>
                 </CardContent>
               </Card>
             </div>

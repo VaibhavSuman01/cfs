@@ -8,6 +8,7 @@ import { FloatingElements } from "@/components/floating-elements"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { getBasePrice } from "@/lib/pricing"
 import {
   UserPlus,
   UserMinus,
@@ -19,6 +20,8 @@ import {
 } from "lucide-react"
 
 export default function DirectorChangesPage() {
+  const basePrice = getBasePrice("director appointment/resignation") ?? "₹3,999";
+  
   return (
     <div className="min-h-screen bg-white">
       <EnhancedHeader />
@@ -50,7 +53,7 @@ export default function DirectorChangesPage() {
 
                 <div className="grid sm:grid-cols-3 gap-4 pt-6">
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-                    <div className="text-2xl font-bold text-blue-600">₹5,999</div>
+                    <div className="text-2xl font-bold text-blue-600">{basePrice}</div>
                     <div className="text-sm text-gray-600">Per Change</div>
                   </div>
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">

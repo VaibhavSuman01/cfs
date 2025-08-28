@@ -44,7 +44,7 @@ export default function OtherRegistrationPage() {
                     "Lower compliance requirements",
                     "No minimum capital requirement",
                   ],
-                  price: getBasePrice("LLP Registration") ?? "₹4,999",
+                  price: getBasePrice("llp registration") ?? "₹4,999",
                   timeline: "7-10 days",
                 },
                 {
@@ -59,7 +59,7 @@ export default function OtherRegistrationPage() {
                     "Shared profits and losses",
                     "Mutual agency relationship",
                   ],
-                  price: getBasePrice("Partnership Firm") ?? "₹2,999",
+                  price: getBasePrice("partnership firm") ?? "₹2,999",
                   timeline: "3-5 days",
                 },
                 {
@@ -74,7 +74,7 @@ export default function OtherRegistrationPage() {
                     "Minimal legal formalities",
                     "Direct tax benefits",
                   ],
-                  price: getBasePrice("Sole Proprietorship") ?? "₹1,999",
+                  price: getBasePrice("sole proprietorship") ?? "₹1,999",
                   timeline: "1-2 days",
                 },
                 {
@@ -89,7 +89,7 @@ export default function OtherRegistrationPage() {
                     "Democratic management",
                     "Government support available",
                   ],
-                  price: getBasePrice("Producer Company") ?? "₹34,999",
+                  price: getBasePrice("producer company") ?? "₹34,999",
                   timeline: "20-25 days",
                 },
                 {
@@ -104,7 +104,7 @@ export default function OtherRegistrationPage() {
                     "For Individuals & Organizations",
                     "e-Tendering & e-Filing",
                   ],
-                  price: "On Request",
+                  price: "As per request",
                   timeline: "1-2 days",
                 },
                 {
@@ -119,7 +119,7 @@ export default function OtherRegistrationPage() {
                     "Inter-state sales without restrictions",
                     "Unified tax system",
                   ],
-                  price: getBasePrice("GST Filing") ?? "₹1,999",
+                  price: getBasePrice("gst registration") ?? "₹1,999",
                   timeline: "3-7 days",
                 },
                 {
@@ -149,7 +149,7 @@ export default function OtherRegistrationPage() {
                     "Employee pension scheme",
                     "Insurance benefits",
                   ],
-                  price: "On Request",
+                  price: "As per request",
                   timeline: "3-5 days",
                 },
                 {
@@ -164,7 +164,7 @@ export default function OtherRegistrationPage() {
                     "Disablement benefits",
                     "Social security scheme",
                   ],
-                  price: "On Request",
+                  price: "As per request",
                   timeline: "3-5 days",
                 },
                 {
@@ -179,7 +179,7 @@ export default function OtherRegistrationPage() {
                     "Builds consumer trust",
                     "Avoid legal penalties",
                   ],
-                  price: "On Request",
+                  price: "As per request",
                   timeline: "7-15 days",
                 },
                 {
@@ -194,7 +194,7 @@ export default function OtherRegistrationPage() {
                     "Access to international markets",
                     "Avail government export schemes",
                   ],
-                  price: "On Request",
+                  price: "As per request",
                   timeline: "1-2 days",
                 },
                 {
@@ -209,7 +209,7 @@ export default function OtherRegistrationPage() {
                     "Varies by industry and state",
                     "Promotes organized development",
                   ],
-                  price: "On Request",
+                  price: "As per request",
                   timeline: "Varies",
                 },
                 {
@@ -224,7 +224,7 @@ export default function OtherRegistrationPage() {
                     "Priority in government tenders",
                     "No renewal required",
                   ],
-                  price: "On Request",
+                  price: "As per request",
                   timeline: "1-2 days",
                 },
               ].map((registration, index) => (
@@ -253,7 +253,7 @@ export default function OtherRegistrationPage() {
                           </div>
                         ))}
                       </div>
-                      <Link href={`/contact?service=${encodeURIComponent(registration.title)}`} passHref>
+                      <Link href={`/other-registration/${registration.slug}`} passHref>
                         <Button className="w-full bg-blue-600 hover:bg-blue-700">
                           Register Now <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>

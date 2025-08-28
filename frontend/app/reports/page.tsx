@@ -9,10 +9,30 @@ import Link from "next/link"
 import { getBasePrice } from "@/lib/pricing"
 
 const reportServices = [
-  { title: 'Project Reports' },
-  { title: 'CMA Reports' },
-  { title: 'DSCR Reports' },
-  { title: 'Bank Reconciliation' },
+  { 
+    title: 'Project Reports',
+    slug: 'project-reports',
+    price: getBasePrice("project report") ?? "As per request",
+    description: "Comprehensive project reports for business planning and funding"
+  },
+  { 
+    title: 'CMA Reports',
+    slug: 'cma-reports',
+    price: getBasePrice("dscr/cma report") ?? "As per request",
+    description: "Credit Monitoring Arrangement reports for loan applications"
+  },
+  { 
+    title: 'DSCR Reports',
+    slug: 'dscr-reports',
+    price: getBasePrice("dscr/cma report") ?? "As per request",
+    description: "Debt Service Coverage Ratio reports for financial analysis"
+  },
+  { 
+    title: 'Bank Reconciliation',
+    slug: 'bank-reconciliation',
+    price: "As per request",
+    description: "Bank statement reconciliation and financial auditing"
+  },
 ];
 
 export default function ReportsPage() {
@@ -28,10 +48,12 @@ export default function ReportsPage() {
             </CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {reportServices.map((service) => (
-                <Link key={service.title} href={`/contact?service=${encodeURIComponent(service.title)}`} passHref>
+                <Link key={service.title} href={`/reports/${service.slug}`} passHref>
                   <Button variant="outline" className="w-full h-full text-left justify-start p-6">
                     <div className="flex flex-col">
                       <span className="text-lg font-semibold">{service.title}</span>
+                      <span className="text-sm text-gray-600 mt-1">{service.description}</span>
+                      <span className="text-lg font-bold text-blue-600 mt-2">{service.price}</span>
                     </div>
                   </Button>
                 </Link>

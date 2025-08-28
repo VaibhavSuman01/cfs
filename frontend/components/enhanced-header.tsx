@@ -65,7 +65,7 @@ export function EnhancedHeader() {
         { name: "TAN Application", href: "/other-registration/tan-apply" },
         { name: "Start-up India Registration", href: "/other-registration/startup-india-registration" },
         { name: "Digital Signature", href: "/other-registration/digital-signature" },
-        { name: "GST Filing", href: "/other-registration/gst-registration" },
+        { name: "GST Registration", href: "/other-registration/gst-registration" },
       ],
     },
     {

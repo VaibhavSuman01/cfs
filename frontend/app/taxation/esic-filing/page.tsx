@@ -8,6 +8,7 @@ import { FloatingElements } from "@/components/floating-elements"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { getBasePrice } from "@/lib/pricing"
 import {
   ArrowRight,
   Phone,
@@ -19,6 +20,8 @@ import {
 } from "lucide-react"
 
 export default function EsicFilingPage() {
+  const basePrice = getBasePrice("esic filing") ?? "As per request";
+  
   return (
     <div className="min-h-screen bg-white">
       <EnhancedHeader />
@@ -50,7 +53,7 @@ export default function EsicFilingPage() {
 
                 <div className="grid sm:grid-cols-3 gap-4 pt-6">
                   <div className="text-center p-4 bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl">
-                    <div className="text-2xl font-bold text-teal-600">₹2,999</div>
+                    <div className="text-2xl font-bold text-teal-600">{basePrice}</div>
                     <div className="text-sm text-gray-600">Per Filing</div>
                   </div>
                   <div className="text-center p-4 bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl">

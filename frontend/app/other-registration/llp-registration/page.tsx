@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
+import { getBasePrice } from "@/lib/pricing"
 import {
   Users,
   CheckCircle,
@@ -29,6 +30,8 @@ import {
 import Link from "next/link"
 
 export default function LlpRegistrationPage() {
+  const basePrice = getBasePrice("llp registration") ?? "₹4,999";
+  
   return (
     <div className="min-h-screen bg-white">
       <EnhancedHeader />
@@ -60,7 +63,7 @@ export default function LlpRegistrationPage() {
 
                 <div className="grid sm:grid-cols-3 gap-4 pt-6">
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-                    <div className="text-2xl font-bold text-blue-600">₹8,999</div>
+                    <div className="text-2xl font-bold text-blue-600">{basePrice}</div>
                     <div className="text-sm text-gray-600">Starting Price</div>
                   </div>
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
@@ -136,6 +139,77 @@ export default function LlpRegistrationPage() {
         </section>
       </FadeInSection>
 
+      {/* Pricing Packages Section */}
+      <FadeInSection>
+        <section className="py-20">
+          <div className="container mx-auto px-4">
+            <div className="text-center max-w-4xl mx-auto mb-16">
+              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">Choose Your LLP Package</h2>
+              <p className="text-lg text-gray-600">
+                Select the package that best fits your business requirements
+              </p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              <Card className="border-2 border-blue-200 hover:border-blue-400 hover:shadow-xl transition-all duration-300">
+                <CardHeader className="text-center pb-4">
+                  <CardTitle className="text-2xl font-bold text-blue-600">Basic</CardTitle>
+                  <div className="text-4xl font-bold text-gray-900">₹4,999</div>
+                  <p className="text-sm text-gray-600">Starting Price</p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <ul className="space-y-3 text-left">
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>LLP Registration</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>DSC & DPIN</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Basic Documentation</span></li>
+                  </ul>
+                  <Link href={`/contact?service=${encodeURIComponent("LLP Registration - Basic")}`} passHref>
+                    <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Basic</Button>
+                  </Link>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 border-blue-400 hover:border-blue-600 hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                <CardHeader className="text-center pb-4">
+                  <CardTitle className="text-2xl font-bold text-blue-600">Standard</CardTitle>
+                  <div className="text-4xl font-bold text-gray-900">₹9,999</div>
+                  <p className="text-sm text-gray-600">Most Popular</p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <ul className="space-y-3 text-left">
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Everything in Basic</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>LLP Agreement Drafting</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Priority Processing</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Expert Consultation</span></li>
+                  </ul>
+                  <Link href={`/contact?service=${encodeURIComponent("LLP Registration - Standard")}`} passHref>
+                    <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Standard</Button>
+                  </Link>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 border-blue-200 hover:border-blue-400 hover:shadow-xl transition-all duration-300">
+                <CardHeader className="text-center pb-4">
+                  <CardTitle className="text-2xl font-bold text-blue-600">Premium</CardTitle>
+                  <div className="text-4xl font-bold text-gray-900">₹14,999</div>
+                  <p className="text-sm text-gray-600">Complete Solution</p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <ul className="space-y-3 text-left">
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Everything in Standard</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Bank Account Opening</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Compliance Setup</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>1 Year Support</span></li>
+                  </ul>
+                  <Link href={`/contact?service=${encodeURIComponent("LLP Registration - Premium")}`} passHref>
+                    <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Premium</Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+      </FadeInSection>
+
       {/* Registration Process Section */}
       <FadeInSection>
         <section className="py-20">
@@ -147,7 +221,7 @@ export default function LlpRegistrationPage() {
               </p>
             </div>
             <div className="relative">
-              <div className="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-blue-200"></div>
+              <div className="hidden md:block absolute top-1/2 left-0 w-full h-0.5"></div>
               <div className="grid md:grid-cols-5 gap-8 relative">
                 <div className="text-center space-y-4">
                   <div className="relative inline-block"><div className="w-16 h-16 mx-auto bg-blue-500 text-white rounded-full flex items-center justify-center text-xl font-bold">1</div></div>

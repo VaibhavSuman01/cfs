@@ -48,19 +48,19 @@ export default function TrademarkISOPage() {
                     {
                       title: "Trademark Search",
                       description: "Comprehensive search to ensure your trademark is unique",
-                      price: getBasePrice("Trademark Search") ?? "₹999",
+                      price: getBasePrice("trademark search") ?? "₹999",
                       timeline: "1-2 days",
                     },
                     {
                       title: "Trademark Filing",
                       description: "Complete trademark application filing with government",
-                      price: getBasePrice("Trademark Filing") ?? "₹3,999",
+                      price: getBasePrice("trademark filing") ?? "₹3,999",
                       timeline: "3-5 days",
                     },
                     {
                       title: "Trademark Registration",
                       description: "End-to-end trademark registration process",
-                      price: getBasePrice("Trademark Registration (for msme)") ?? "₹6,999",
+                      price: getBasePrice("trademark registration (for msme)") ?? "₹6,999",
                       timeline: "12-18 months",
                     },
                   ].map((service, index) => (
@@ -77,7 +77,7 @@ export default function TrademarkISOPage() {
                               <div className="text-sm text-gray-500">{service.timeline}</div>
                             </div>
                           </div>
-                          <Link href={`/contact?service=${encodeURIComponent(service.title)}`} passHref>
+                          <Link href={`/trademark-iso/trademark`} passHref>
                             <Button className="w-full bg-blue-600 hover:bg-blue-700">
                               Get Started <ArrowRight className="ml-2 h-4 w-4" />
                             </Button>
@@ -104,19 +104,19 @@ export default function TrademarkISOPage() {
                     {
                       title: "ISO 9001:2015",
                       description: "Quality Management System certification",
-                      price: getBasePrice("ISO 9001:2015") ?? "₹15,999",
+                      price: getBasePrice("iso 9001:2015") ?? "₹15,999",
                       timeline: "45-60 days",
                     },
                     {
                       title: "ISO 14001:2015",
                       description: "Environmental Management System certification",
-                      price: getBasePrice("ISO 14001:2015") ?? "₹18,999",
+                      price: getBasePrice("iso 14001:2015") ?? "₹18,999",
                       timeline: "45-60 days",
                     },
                     {
                       title: "ISO 45001:2018",
                       description: "Occupational Health & Safety Management System",
-                      price: getBasePrice("ISO 45001:2018") ?? "₹20,999",
+                      price: getBasePrice("iso 45001:2018") ?? "₹20,999",
                       timeline: "45-60 days",
                     },
                   ].map((service, index) => (
@@ -133,7 +133,7 @@ export default function TrademarkISOPage() {
                               <div className="text-sm text-gray-500">{service.timeline}</div>
                             </div>
                           </div>
-                          <Link href={`/contact?service=${encodeURIComponent(service.title)}`} passHref>
+                          <Link href={`/trademark-iso/iso-9001`} passHref>
                             <Button className="w-full bg-green-600 hover:bg-green-700">
                               Get Started <ArrowRight className="ml-2 h-4 w-4" />
                             </Button>
@@ -330,12 +330,12 @@ export default function TrademarkISOPage() {
                 Get started with trademark registration and ISO certification today
               </p>
               <div className="flex justify-center space-x-4">
-                <Link href={`/contact?service=${encodeURIComponent("Trademark Registration")}`} passHref>
+                <Link href={`/trademark-iso/trademark`} passHref>
                   <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg">
                     Register Trademark
                   </Button>
                 </Link>
-                <Link href={`/contact?service=${encodeURIComponent("ISO Certification")}`} passHref>
+                <Link href={`/trademark-iso/iso-9001`} passHref>
                   <Button
                     variant="outline"
                     className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-3 text-lg bg-transparent"

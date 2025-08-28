@@ -1,0 +1,243 @@
+{
+    "trademark search": {
+      "basePrice": "₹999*",
+      "packages": {
+        "BASIC": "₹1,499*"
+      }
+    },
+    "trademark filing": {
+      "basePrice": "₹3,999*",
+      "packages": {
+        "BASIC": "₹3,999*"
+      }
+    },
+    "trademark registration (for msme)": {
+      "basePrice": "₹6,999*",
+      "packages": {
+        "BASIC": "₹12,999*",
+        "STANDARD": "As per request*"
+      }
+    },
+    "iso 9001:2015": {
+      "basePrice": "₹15,999*",
+      "packages": {
+        "BASIC": "As per request*"
+      }
+    },
+    "iso 14001:2015": {
+      "basePrice": "₹18,999*",
+      "packages": {
+        "BASIC": "As per request*"
+      }
+    },
+    "iso 45001:2018": {
+      "basePrice": "₹20,999*",
+      "packages": {
+        "BASIC": "As per request*"
+      }
+    },
+    "gst registration": {
+      "basePrice": "₹1,999*",
+      "packages": {
+        "BASIC": "₹2,999*",
+        "STANDARD": "₹4,999*"
+      }
+    },
+    "gst filing": {
+      "basePrice": "₹1,999*",
+      "packages": {
+        "BASIC": "₹2,999*",
+        "STANDARD": "₹4,999*"
+      }
+    },
+    "income tax filing": {
+      "basePrice": "₹999*",
+      "packages": {
+        "BASIC": "₹1,499*"
+      }
+    },
+    "tds returns (per qtr)": {
+      "basePrice": "₹2,499*",
+      "packages": {
+        "BASIC": "₹2,499*",
+        "STANDARD": "₹4,999*",
+        "PREMIUM": "₹6,999*"
+      }
+    },
+    "tax planning": {
+      "basePrice": "₹4,999*",
+      "packages": {
+        "BASIC": "₹4,999*"
+      }
+    },
+    "corporate tax (company)": {
+      "basePrice": "₹7,999*",
+      "packages": {
+        "BASIC": "₹9,999*"
+      }
+    },
+    "payroll tax (per month)": {
+      "basePrice": "₹3,999*",
+      "packages": {
+        "BASIC": "₹9,999*",
+        "STANDARD": "₹14,999*",
+        "PREMIUM": "₹24,999*"
+      }
+    },
+    "annual filing (aoc-4 & mgt-7)": {
+      "basePrice": "₹4,999*",
+      "packages": {
+        "BASIC": "₹9,999*",
+        "STANDARD": "₹24,999*",
+        "PREMIUM": "₹34,999*"
+      }
+    },
+    "board meeting & resolutions": {
+      "basePrice": "₹2,999*",
+      "packages": {
+        "BASIC": "₹1,999*",
+        "STANDARD": "₹2,999*",
+        "PREMIUM": "₹4,999*"
+      }
+    },
+    "director appointment/resignation": {
+      "basePrice": "₹3,999*",
+      "packages": {
+        "BASIC": "₹4,999*"
+      }
+    },
+    "share transfer & capital changes": {
+      "basePrice": "₹5,999*",
+      "packages": {
+        "BASIC": "₹4,999*",
+        "STANDARD": "₹6,999*",
+        "PREMIUM": "₹9,999*"
+      }
+    },
+    "roc default removal": {
+      "basePrice": "₹8,999*",
+      "packages": {
+        "BASIC": "₹9,999*"
+      }
+    },
+    "company strike off": {
+      "basePrice": "₹12,999*",
+      "packages": {
+        "BASIC": "₹39,999*"
+      }
+    },
+    "llp registration": {
+      "basePrice": "₹4,999*",
+      "packages": {
+        "BASIC": "₹9,999*",
+        "STANDARD": "₹14,999*",
+        "PREMIUM": "₹24,999*"
+      }
+    },
+    "partnership firm": {
+      "basePrice": "₹2,999*",
+      "packages": {
+        "BASIC": "₹7,999*",
+        "STANDARD": "₹9,999*",
+        "PREMIUM": "₹14,999*"
+      }
+    },
+    "sole proprietorship": {
+      "basePrice": "₹1,999*",
+      "packages": {
+        "BASIC": "₹1,999*"
+      }
+    },
+    "section 8 company": {
+      "basePrice": "₹8,999*",
+      "packages": {
+        "BASIC": "₹18,999*",
+        "STANDARD": "₹24,999*",
+        "PREMIUM": "₹29,999*"
+      }
+    },
+    "producer company": {
+      "basePrice": "₹34,999*",
+      "packages": {
+        "BASIC": "₹34,999*"
+      }
+    },
+    "nidhi company": {
+      "basePrice": "₹34,999*",
+      "packages": {
+        "BASIC": "₹34,999*"
+      }
+    },
+    "one person company (opc)": {
+      "basePrice": "₹4,999*",
+      "packages": {
+        "BASIC": "₹9,999*",
+        "STANDARD": "₹14,999*",
+        "PREMIUM": "₹24,999*"
+      }
+    },
+    "public limited company": {
+      "basePrice": "₹15,999*",
+      "packages": {
+        "BASIC": "₹15,999*",
+        "STANDARD": "₹24,999*",
+        "PREMIUM": "₹30,999*"
+      }
+    },
+    "private limited company": {
+      "basePrice": "₹9,999*",
+      "packages": {
+        "BASIC": "₹9,999*",
+        "STANDARD": "₹14,999*",
+        "PREMIUM": "₹24,999*"
+      }
+    },
+    "form 3/gumasta": {
+      "basePrice": "₹999*"
+    },
+    "pan/tan card apply": {
+      "basePrice": "₹499*"
+    },
+    "project report": {
+      "basePrice": "As per request*"
+    },
+    "dscr/cma report": {
+      "basePrice": "As per request*"
+    },
+    "epfo filing": {
+      "basePrice": "As per request*"
+    },
+    "esic filing": {
+      "basePrice": "As per request*"
+    },
+    "pt tax filing": {
+      "basePrice": "As per request*"
+    },
+    "fassai food license": {
+      "basePrice": "As per request*"
+    },
+    "iec registration": {
+      "basePrice": "As per request*"
+    },
+    "industry license": {
+      "basePrice": "As per request*"
+    },
+    "msme udyam registration": {
+      "basePrice": "As per request*"
+    },
+    "ngo registration": {
+      "basePrice": "As per request*"
+    },
+    "startup india registration": {
+      "basePrice": "As per request*"
+    },
+    "digital signature": {
+      "basePrice": "As per request*"
+    },
+    "copyright registration": {
+      "basePrice": "As per request*"
+    },
+    "iso 14001 certification": {
+      "basePrice": "As per request*"
+    }
+  }

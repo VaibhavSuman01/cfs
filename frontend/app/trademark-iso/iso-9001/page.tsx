@@ -8,6 +8,7 @@ import { FloatingElements } from "@/components/floating-elements"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { getBasePrice } from "@/lib/pricing"
 import {
   Award,
   TrendingUp,
@@ -21,6 +22,8 @@ import {
 } from "lucide-react"
 
 export default function ISO9001Page() {
+  const basePrice = getBasePrice("iso 9001:2015") ?? "As per request";
+  
   return (
     <div className="min-h-screen bg-white">
       <EnhancedHeader />
@@ -52,8 +55,8 @@ export default function ISO9001Page() {
 
                 <div className="grid sm:grid-cols-3 gap-4 pt-6">
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-                    <div className="text-2xl font-bold text-blue-600">On Request</div>
-                    <div className="text-sm text-gray-600">Price</div>
+                    <div className="text-2xl font-bold text-blue-600">{basePrice}</div>
+                    <div className="text-sm text-gray-600">Starting Price</div>
                   </div>
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
                     <div className="text-2xl font-bold text-blue-600">Varies</div>

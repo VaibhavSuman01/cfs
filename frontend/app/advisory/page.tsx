@@ -63,7 +63,7 @@ export default function AdvisoryPage() {
                     "Business model optimization",
                     "Performance metrics setup",
                   ],
-                  price: "₹25,000",
+                  price: "As per request",
                   timeline: "2-3 weeks",
                 },
                 {
@@ -78,7 +78,7 @@ export default function AdvisoryPage() {
                     "Intellectual property strategy",
                     "Dispute resolution support",
                   ],
-                  price: "₹15,000",
+                  price: "As per request",
                   timeline: "1-2 weeks",
                 },
                 {
@@ -93,7 +93,7 @@ export default function AdvisoryPage() {
                     "Employee engagement strategies",
                     "Leadership development",
                   ],
-                  price: "₹20,000",
+                  price: "As per request",
                   timeline: "2-4 weeks",
                 },
                 {
@@ -108,7 +108,7 @@ export default function AdvisoryPage() {
                     "Cost reduction strategies",
                     "Financial reporting systems",
                   ],
-                  price: "₹18,000",
+                  price: "As per request",
                   timeline: "1-3 weeks",
                 },
                 {
@@ -123,7 +123,7 @@ export default function AdvisoryPage() {
                     "System integration planning",
                     "Change management support",
                   ],
-                  price: "₹30,000",
+                  price: "As per request",
                   timeline: "3-4 weeks",
                 },
                 {
@@ -138,7 +138,7 @@ export default function AdvisoryPage() {
                     "Operational setup guidance",
                     "Investor pitch preparation",
                   ],
-                  price: "₹12,000",
+                  price: "As per request",
                   timeline: "1-2 weeks",
                 },
               ].map((service, index) => (
@@ -167,7 +167,7 @@ export default function AdvisoryPage() {
                           </div>
                         ))}
                       </div>
-                      <Link href={`/contact?service=${encodeURIComponent(service.title)}`} passHref>
+                      <Link href={`/advisory/${service.slug}`} passHref>
                         <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3">
                           Book Service <ArrowRight className="ml-2 h-5 w-5" />
                         </Button>
