@@ -1,97 +1,200 @@
 "use client"
 
-import { EnhancedHeader } from '@/components/enhanced-header';
-import { EnhancedFooter } from '@/components/enhanced-footer';
-import { FadeInSection } from '@/components/fade-in-section';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { PieChart, Calculator, ClipboardList, TrendingUp, ArrowRight } from 'lucide-react';
-import Link from 'next/link';
+import { EnhancedHeader } from "@/components/enhanced-header";
+import { EnhancedFooter } from "@/components/enhanced-footer";
+import { FadeInSection } from "@/components/fade-in-section"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import Link from "next/link"
+import { Target, CheckCircle, Clock, Users, BarChart3, ArrowRight, Calculator } from "lucide-react"
 
-export default function FPAPage() {
-  const features = [
-    { 
-      title: "Budgeting & Forecasting", 
-      description: "Develop detailed budgets and accurate financial forecasts to guide your strategic decisions and resource allocation.",
-      icon: ClipboardList
-    },
-    { 
-      title: "Financial Modeling", 
-      description: "Build dynamic financial models for scenario planning, investment analysis, and long-term strategic planning.",
-      icon: Calculator
-    },
-    { 
-      title: "Performance Analysis & Reporting", 
-      description: "Gain deep insights into your financial performance with custom dashboards and variance analysis reports.",
-      icon: PieChart
-    },
-    { 
-      title: "Cash Flow Management", 
-      description: "Optimize your working capital and ensure liquidity with robust cash flow forecasting and management strategies.",
-      icon: TrendingUp
-    }
-  ];
-
+export default function FinancialPlanningAnalysisPage() {
   return (
-    <div className="min-h-screen bg-white text-gray-800">
+    <div className="min-h-screen bg-white">
       <EnhancedHeader />
 
       {/* Hero Section */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-100 py-20">
+        <div className="container mx-auto px-4">
+          <FadeInSection className="text-center space-y-8">
+            <h1 className="text-5xl font-bold text-gray-900">Financial Planning & Analysis</h1>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Optimize financial performance and plan for sustainable growth with expert analysis
+            </p>
+            <div className="flex justify-center space-x-4">
+              <Link href={`/contact?service=${encodeURIComponent("Financial Planning & Analysis")}`} passHref>
+                <Button className="bg-blue-600 hover:bg-blue-700 px-8 py-3">Get Started</Button>
+              </Link>
+            </div>
+          </FadeInSection>
+        </div>
+      </section>
+
+      {/* Service Details */}
       <FadeInSection>
-        <section className="relative bg-gradient-to-br from-blue-50 via-white to-blue-100 py-20 md:py-32">
-          <div className="container mx-auto px-4 text-center">
-            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-blue-600 to-gray-800 bg-clip-text text-transparent pb-4">Financial Planning & Analysis (FP&A)</h1>
-            <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">Drive Performance with Data-Driven Financial Insights</p>
+        <section className="py-20 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="grid lg:grid-cols-2 gap-16">
+              <div className="space-y-8">
+                <div className="space-y-4">
+                  <h2 className="text-3xl font-bold text-gray-900">Service Overview</h2>
+                  <p className="text-gray-600">
+                    Our financial planning and analysis service helps organizations optimize their financial 
+                    performance, plan for sustainable growth, and make informed financial decisions.
+                  </p>
+                </div>
+
+                <div className="space-y-6">
+                  <h3 className="text-xl font-semibold text-gray-900">What We Deliver</h3>
+                  <div className="space-y-4">
+                    {[
+                      "Financial health assessment",
+                      "Cash flow optimization",
+                      "Investment planning",
+                      "Cost reduction strategies",
+                      "Financial reporting systems",
+                      "Budget planning and forecasting"
+                    ].map((item, index) => (
+                      <div key={index} className="flex items-center space-x-3">
+                        <CheckCircle className="h-5 w-5 text-green-500" />
+                        <span className="text-gray-700">{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-8">
+                <Card className="border-2 border-blue-200">
+                  <CardHeader className="text-center">
+                    <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                      <Target className="h-8 w-8 text-blue-600" />
+                    </div>
+                    <CardTitle className="text-2xl text-gray-900">Financial Planning & Analysis</CardTitle>
+                    <div className="text-3xl font-bold text-blue-600">As per request</div>
+                    <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
+                      <Clock className="h-4 w-4" />
+                      <span>1-3 weeks</span>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="text-center">
+                    <Link href={`/contact?service=${encodeURIComponent("Financial Planning & Analysis")}`} passHref>
+                      <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3">
+                        Book Service <ArrowRight className="ml-2 h-5 w-5" />
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+
+                <div className="space-y-4">
+                  <h3 className="text-xl font-semibold text-gray-900">Why Choose Us</h3>
+                  <div className="grid gap-4">
+                    {[
+                      {
+                        icon: Users,
+                        title: "Expert Analysts",
+                        description: "Certified financial professionals with industry experience"
+                      },
+                      {
+                        icon: Target,
+                        title: "Customized Solutions",
+                        description: "Tailored financial strategies for your business needs"
+                      },
+                      {
+                        icon: Calculator,
+                        title: "Data-Driven Insights",
+                        description: "Comprehensive analysis based on real financial data"
+                      }
+                    ].map((benefit, index) => (
+                      <div key={index} className="flex items-start space-x-3">
+                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <benefit.icon className="h-5 w-5 text-blue-600" />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-gray-900">{benefit.title}</h4>
+                          <p className="text-sm text-gray-600">{benefit.description}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
       </FadeInSection>
 
-      {/* Main Content */}
+      {/* Process */}
       <FadeInSection>
-        <section className="py-16 md:py-24">
+        <section className="py-20 bg-gray-50">
           <div className="container mx-auto px-4">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div className="space-y-6">
-                <h2 className="text-3xl font-bold text-gray-900">From Financial Data to Strategic Decisions</h2>
-                <p className="text-gray-600 leading-relaxed">
-                  Effective Financial Planning & Analysis (FP&A) transforms raw financial data into a strategic asset. Our services provide you with the tools and expertise to improve budgeting, generate accurate forecasts, and conduct insightful analysis. We help you understand the story behind the numbers, enabling you to make smarter, data-driven decisions that enhance profitability and drive sustainable growth.
-                </p>
-                <Link href="/contact" passHref>
-                  <Button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full text-lg">
-                    Strengthen Your Finances <ArrowRight className="ml-2 h-5 w-5" />
+            <div className="text-center space-y-4 mb-16">
+              <h2 className="text-4xl font-bold text-gray-900">Our Process</h2>
+              <p className="text-xl text-gray-600">Structured approach to financial optimization</p>
+            </div>
+
+            <div className="grid md:grid-cols-4 gap-8">
+              {[
+                {
+                  step: "01",
+                  title: "Assessment",
+                  description: "Analyze current financial position and performance",
+                  icon: Calculator,
+                },
+                {
+                  step: "02",
+                  title: "Analysis",
+                  description: "Identify opportunities and areas for improvement",
+                  icon: BarChart3,
+                },
+                {
+                  step: "03",
+                  title: "Planning",
+                  description: "Develop comprehensive financial strategies",
+                  icon: Target,
+                },
+                {
+                  step: "04",
+                  title: "Implementation",
+                  description: "Support execution and monitor progress",
+                  icon: CheckCircle,
+                },
+              ].map((step, index) => (
+                <FadeInSection key={index} delay={index * 150}>
+                  <div className="text-center space-y-4">
+                    <div className="mx-auto w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold">
+                      {step.step}
+                    </div>
+                    <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                      <step.icon className="h-6 w-6 text-blue-600" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-900">{step.title}</h3>
+                    <p className="text-gray-600">{step.description}</p>
+                  </div>
+                </FadeInSection>
+              ))}
+            </div>
+          </div>
+        </section>
+      </FadeInSection>
+
+      {/* CTA Section */}
+      <FadeInSection>
+        <section className="py-20 bg-blue-600 text-white">
+          <div className="container mx-auto px-4 text-center">
+            <div className="space-y-8">
+              <h2 className="text-4xl font-bold">Ready to Optimize Your Finances?</h2>
+              <p className="text-xl text-blue-100 max-w-2xl mx-auto">
+                Get expert financial planning and analysis to drive your business growth
+              </p>
+              <div className="flex justify-center space-x-4">
+                <Link href={`/contact?service=${encodeURIComponent("Financial Planning & Analysis")}`} passHref>
+                  <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg">
+                    Get Financial Analysis
                   </Button>
                 </Link>
               </div>
-              <div>
-                <img src="/images/financial-planning.svg" alt="Financial Planning Illustration" className="w-full h-auto rounded-lg" />
-              </div>
-            </div>
-          </div>
-        </section>
-      </FadeInSection>
-
-      {/* Features Section */}
-      <FadeInSection>
-        <section className="py-16 md:py-24 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <div className="text-center space-y-4 mb-16">
-              <h2 className="text-3xl font-bold text-gray-900">Our FP&A Services</h2>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">Actionable insights to optimize your financial health.</p>
-            </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {features.map((feature, index) => (
-                <Card key={index} className="text-center p-6 border-2 border-transparent hover:border-blue-500 hover:shadow-xl transition-all duration-300">
-                  <CardHeader>
-                    <div className="mx-auto w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-4">
-                      <feature.icon className="w-8 h-8" />
-                    </div>
-                    <CardTitle className="text-xl font-semibold text-gray-900">{feature.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-600">{feature.description}</p>
-                  </CardContent>
-                </Card>
-              ))}
             </div>
           </div>
         </section>
@@ -99,5 +202,5 @@ export default function FPAPage() {
 
       <EnhancedFooter />
     </div>
-  );
+  )
 }

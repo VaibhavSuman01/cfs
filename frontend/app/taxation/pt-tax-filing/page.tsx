@@ -8,6 +8,7 @@ import { FloatingElements } from "@/components/floating-elements"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { getBasePrice } from "@/lib/pricing"
 import {
   ArrowRight,
   Phone,
@@ -18,6 +19,8 @@ import {
 } from "lucide-react"
 
 export default function PtTaxFilingPage() {
+  const basePrice = getBasePrice("pt tax filing") ?? "As per request";
+  
   return (
     <div className="min-h-screen bg-white">
       <EnhancedHeader />
@@ -49,7 +52,7 @@ export default function PtTaxFilingPage() {
 
                 <div className="grid sm:grid-cols-3 gap-4 pt-6">
                   <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl">
-                    <div className="text-2xl font-bold text-purple-600">₹2,499</div>
+                    <div className="text-2xl font-bold text-purple-600">{basePrice}</div>
                     <div className="text-sm text-gray-600">Per Year</div>
                   </div>
                   <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl">

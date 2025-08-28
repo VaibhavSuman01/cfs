@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { CheckCircle } from 'lucide-react';
+import { getBasePrice } from "@/lib/pricing";
 
 export default function NidhiCompanyPage() {
   const router = useRouter();
@@ -14,6 +15,8 @@ export default function NidhiCompanyPage() {
   const handleBookService = () => {
     router.push(`/contact?service=Nidhi+Company`);
   };
+
+  const basePrice = getBasePrice("nidhi company") ?? "₹34,999";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -27,7 +30,7 @@ export default function NidhiCompanyPage() {
             </CardHeader>
             <CardContent className="space-y-6 text-center">
               <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl my-4 max-w-xs mx-auto">
-                <div className="text-2xl font-bold text-blue-600">₹29,999</div>
+                <div className="text-2xl font-bold text-blue-600">{basePrice}</div>
                 <div className="text-sm text-gray-600">Starting Price</div>
               </div>
               <p className="text-left">

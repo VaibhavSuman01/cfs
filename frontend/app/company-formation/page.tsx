@@ -142,7 +142,7 @@ export default function CompanyFormationPage() {
                           </div>
                         ))}
                       </div>
-                      <Link href={`/contact?service=${encodeURIComponent(company.title)}`} passHref>
+                      <Link href={`/company-formation/${company.slug}`} passHref>
                         <Button
                           className={`w-full ${
                             company.popular ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-600 hover:bg-gray-700"

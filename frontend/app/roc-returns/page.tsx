@@ -61,7 +61,7 @@ export default function ROCReturnsPage() {
                     "Auditor's report filing",
                     "Compliance certificate",
                   ],
-                  price: "₹14,999",
+                  price: getBasePrice("annual filing (aoc-4 & mgt-7)") ?? "₹4,999",
                   timeline: "7-10 days",
                   urgent: false,
                 },
@@ -77,7 +77,7 @@ export default function ROCReturnsPage() {
                     "Compliance with Companies Act",
                     "Digital documentation",
                   ],
-                  price: getBasePrice("Board Meeting & Resolutions") ?? "₹2,999",
+                  price: getBasePrice("board meeting & resolutions") ?? "₹2,999",
                   timeline: "3-5 days",
                   urgent: false,
                 },
@@ -93,7 +93,7 @@ export default function ROCReturnsPage() {
                     "Board resolutions",
                     "ROC notifications",
                   ],
-                  price: "₹5,999",
+                  price: getBasePrice("director appointment/resignation") ?? "₹3,999",
                   timeline: "5-7 days",
                   urgent: false,
                 },
@@ -109,7 +109,7 @@ export default function ROCReturnsPage() {
                     "Updated share certificates",
                     "ROC compliance",
                   ],
-                  price: "₹5,999",
+                  price: getBasePrice("share transfer & capital changes") ?? "₹5,999",
                   timeline: "10-15 days",
                   urgent: false,
                 },
@@ -124,7 +124,7 @@ export default function ROCReturnsPage() {
                     "Compliance restoration",
                     "Status monitoring",
                   ],
-                  price: "₹14,999",
+                  price: getBasePrice("roc default removal") ?? "₹8,999",
                   timeline: "15-20 days",
                   urgent: true,
                 },
@@ -139,7 +139,7 @@ export default function ROCReturnsPage() {
                     "Publication in gazette",
                     "Final closure certificate",
                   ],
-                  price: getBasePrice("Company Strike Off (exculding GOVT fee)") ?? "₹12,999",
+                  price: getBasePrice("company strike off") ?? "₹12,999",
                   timeline: "60-90 days",
                   urgent: false,
                 },
@@ -184,7 +184,7 @@ export default function ROCReturnsPage() {
                           </div>
                         ))}
                       </div>
-                      <Link href={`/contact?service=${encodeURIComponent(service.title)}`} passHref>
+                      <Link href={`/roc-returns/${service.slug}`} passHref>
                         <Button className="w-full bg-blue-600 hover:bg-blue-700 group-hover:scale-105 transition-transform">
                           Get Started <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>

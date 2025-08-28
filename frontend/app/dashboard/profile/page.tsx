@@ -24,6 +24,9 @@ const profileSchema = z.object({
   pan: z.string().optional().refine(val => !val || /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(val), {
     message: 'Please enter a valid PAN card number',
   }),
+  aadhaar: z.string().optional().refine(val => !val || /^[0-9]{12}$/.test(val), {
+    message: 'Please enter a valid 12-digit Aadhaar number',
+  }),
   fatherName: z.string().optional(),
   address: z.string().optional(),
 });
@@ -55,6 +58,7 @@ export default function ProfilePage() {
         email: user.email || '',
         mobile: user.mobile || '',
         pan: user.pan || '',
+        aadhaar: user.aadhaar || '',
         fatherName: user.fatherName || '',
         address: user.address || '',
       });
@@ -211,6 +215,20 @@ export default function ProfilePage() {
                           PAN number cannot be changed after registration
                         </p>
                       )}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="aadhaar"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Aadhaar Card Number</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Your 12-digit Aadhaar number" {...field} />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

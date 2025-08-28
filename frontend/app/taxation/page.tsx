@@ -7,6 +7,7 @@ import { EnhancedFooter } from "@/components/enhanced-footer";
 import { FadeInSection } from "@/components/fade-in-section"
 import { Calculator, FileText, TrendingUp, Shield, CheckCircle, ArrowRight, Clock, Users, Building } from "lucide-react"
 import Link from "next/link";
+import { getBasePrice } from "@/lib/pricing"
 
 export default function TaxationPage() {
   return (
@@ -40,7 +41,7 @@ export default function TaxationPage() {
                 {
                   icon: TrendingUp,
                   title: "GST Filing",
-                  button: "gst-registration",
+                  button: "gst-filing",
                   description: "Registration and monthly/quarterly GST compliance (GSTR-1, GSTR-3B) with ITC support",
                   features: [
                     "GST registration & portal setup",
@@ -49,7 +50,7 @@ export default function TaxationPage() {
                     "E-invoice/e-way bill guidance",
                     "Input Tax Credit reconciliation",
                   ],
-                  price: "₹2,999",
+                  price: getBasePrice("gst registration") ?? "₹1,999",
                   timeline: "3-7 days",
                 },
                 {
@@ -64,7 +65,7 @@ export default function TaxationPage() {
                     "Advance tax and refund tracking",
                     "Notices and rectification support",
                   ],
-                  price: "₹2,499",
+                  price: getBasePrice("income tax filing") ?? "₹999",
                   timeline: "1-3 days",
                 },
                 {
@@ -79,7 +80,7 @@ export default function TaxationPage() {
                     "Conso file & FVU generation",
                     "Correction statements & Form 16/16A",
                   ],
-                  price: "₹3,999",
+                  price: getBasePrice("tds returns (per qtr)") ?? "₹2,499",
                   timeline: "2-5 days",
                 },
                 {
@@ -94,7 +95,7 @@ export default function TaxationPage() {
                     "Business/profession tax strategy",
                     "Advance tax and TDS planning",
                   ],
-                  price: "₹7,999",
+                  price: getBasePrice("tax planning") ?? "₹4,999",
                   timeline: "5-7 days",
                 },
                 {
@@ -109,7 +110,7 @@ export default function TaxationPage() {
                     "Transfer pricing documentation",
                     "TDS/TCS and advance tax review",
                   ],
-                  price: "₹19,999",
+                  price: getBasePrice("corporate tax (company)") ?? "₹7,999",
                   timeline: "7-10 days",
                 },
                 {
@@ -124,7 +125,7 @@ export default function TaxationPage() {
                     "Professional Tax returns (state-wise)",
                     "Payroll statutory registers & audit",
                   ],
-                  price: "₹9,999",
+                  price: getBasePrice("payroll tax (per month)") ?? "₹3,999",
                   timeline: "3-5 days",
                 },
                 {
@@ -139,7 +140,7 @@ export default function TaxationPage() {
                     "Return filing & ledger reconciliation",
                     "Inspections and compliance advisory",
                   ],
-                  price:"₹2,999",
+                  price:"As per request",
                   timeline:"3-7 days"
                 },
                 {
@@ -154,7 +155,7 @@ export default function TaxationPage() {
                     "Half-yearly return compliance",
                     "Inspection/audit assistance",
                   ],
-                  price: "₹2,499",
+                  price: "As per request",
                   timeline: "3-7 days",
                 },
                 {
@@ -169,7 +170,7 @@ export default function TaxationPage() {
                     "State-specific compliance calendar",
                     "Notices and assessment support",
                   ],
-                  price: "₹1,999",
+                  price: "As per request",
                   timeline: "2-5 days",
                 },
               ].map((service, index) => (
