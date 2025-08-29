@@ -344,7 +344,7 @@ class ApiClient {
       }
 
       // Create a fetch request with the authorization header
-      const response = await fetch(url, {
+      const response = await fetch(`${API_BASE_URL}${url}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
