@@ -23,7 +23,7 @@ export default function LegalComplianceAdvisoryPage() {
               Navigate complex legal requirements and ensure regulatory compliance with expert guidance
             </p>
             <div className="flex justify-center space-x-4">
-              <Link href={`/contact?service=${encodeURIComponent("Legal & Compliance Advisory")}`} passHref>
+              <Link href={`/dashboard/advisory-form?service=${encodeURIComponent("Legal & Compliance Advisory")}`} passHref>
                 <Button className="bg-blue-600 hover:bg-blue-700 px-8 py-3">Get Started</Button>
               </Link>
             </div>
@@ -79,7 +79,7 @@ export default function LegalComplianceAdvisoryPage() {
                     </div>
                   </CardHeader>
                   <CardContent className="text-center">
-                    <Link href={`/contact?service=${encodeURIComponent("Legal & Compliance Advisory")}`} passHref>
+                    <Link href={`/dashboard/advisory-form?service=${encodeURIComponent("Legal & Compliance Advisory")}`} passHref>
                       <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3">
                         Book Service <ArrowRight className="ml-2 h-5 w-5" />
                       </Button>
@@ -189,7 +189,7 @@ export default function LegalComplianceAdvisoryPage() {
                 Protect your business with expert legal and compliance guidance
               </p>
               <div className="flex justify-center space-x-4">
-                <Link href={`/contact?service=${encodeURIComponent("Legal & Compliance Advisory")}`} passHref>
+                <Link href={`/dashboard/advisory-form?service=${encodeURIComponent("Legal & Compliance Advisory")}`} passHref>
                   <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg">
                     Get Legal Support
                   </Button>

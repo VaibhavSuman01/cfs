@@ -26,7 +26,7 @@ export default function CompanyFormationPage() {
               compliance and documentation.
             </p>
             <div className="flex justify-center space-x-4">
-              <Link href={`/contact?service=${encodeURIComponent("Company Formation")}`} passHref>
+              <Link href={`/dashboard/company-formation-form?service=${encodeURIComponent("Company Formation")}`} passHref>
                 <Button className="bg-blue-600 hover:bg-blue-700 px-8 py-3">Start Registration</Button>
               </Link>
 
@@ -336,12 +336,12 @@ export default function CompanyFormationPage() {
                 Join thousands of entrepreneurs who have successfully registered their companies with us
               </p>
               <div className="flex justify-center space-x-4">
-                <Link href={`/contact?service=${encodeURIComponent("Company Formation")}`} passHref>
+                <Link href={`/dashboard/company-formation-form?service=${encodeURIComponent("Company Formation")}`} passHref>
                   <Button className="bg-blue-600 hover:bg-blue-700 px-8 py-3 text-lg">Start Registration Now</Button>
                 </Link>
-                <Link href="/contact" passHref>
+                <Link href={`/dashboard/company-formation-form?service=${encodeURIComponent("Company Formation")}`} passHref>
                   <Button variant="outline" className="px-8 py-3 text-lg bg-transparent">
-                    Talk to Expert
+                    Apply Now
                   </Button>
                 </Link>
               </div>

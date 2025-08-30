@@ -38,6 +38,14 @@ export const API_PATHS = {
     STATS: createUrl("/api/admin/stats"),
     USERS: createUrl("/api/admin/users"),
     USERS_DOWNLOAD: createUrl("/api/admin/users/download"),
+    SERVICE_FORMS: createUrl("/api/admin/service-forms"),
+    DELETE_REPORT: (formId: string, reportId: string, service: string) =>
+      createUrl(`/api/admin/service-forms/${formId}/reports/${reportId}?service=${encodeURIComponent(service)}`),
+    
+    // ROC Returns Admin Routes
+    ROC_RETURNS_DETAIL: (id: string) => createUrl(`/api/admin/roc-returns/${id}`),
+    ROC_RETURNS_STATUS_UPDATE: (id: string) => createUrl(`/api/admin/roc-returns/${id}/status`),
+    ROC_RETURNS_DOWNLOAD: (id: string, documentId: string) => createUrl(`/api/admin/roc-returns/${id}/download/${documentId}`),
   },
   FORMS: {
     TAX: createUrl("/api/forms/tax"),
@@ -50,6 +58,36 @@ export const API_PATHS = {
     UPLOAD_DOCUMENT: (formId: string) =>
       createUrl(`/api/forms/document/${formId}`),
     CHECK_PAN: (pan: string) => createUrl(`/api/forms/check-pan/${pan}`),
+    // Generic service form endpoint
+    SERVICE: createUrl("/api/forms/service"),
+    // Specific form endpoints
+    COMPANY_FORMATION: createUrl("/api/forms/company-formation"),
+    OTHER_REGISTRATION: createUrl("/api/forms/other-registration"),
+    ROC_RETURNS: createUrl("/api/forms/roc-returns"),
+    REPORTS: createUrl("/api/forms/reports"),
+    TRADEMARK_ISO: createUrl("/api/forms/trademark-iso"),
+    ADVISORY: createUrl("/api/forms/advisory"),
+
+    // Company Formation - user CRUD and documents
+    COMPANY_FORMATION_USER_SUBMISSIONS: createUrl("/api/forms/company-formation/user-submissions"),
+    COMPANY_FORMATION_DETAIL: (id: string) => createUrl(`/api/forms/company-formation/${id}`),
+    COMPANY_FORMATION_UPDATE: (id: string) => createUrl(`/api/forms/company-formation/${id}`),
+    COMPANY_FORMATION_UPLOAD_DOC: (formId: string) => createUrl(`/api/forms/company-formation/document/${formId}`),
+    COMPANY_FORMATION_DOWNLOAD_DOC: (documentId: string) => createUrl(`/api/forms/company-formation/download/${documentId}`),
+
+    // Other Registration - user CRUD and documents
+    OTHER_REGISTRATION_USER_SUBMISSIONS: createUrl("/api/forms/other-registration/user-submissions"),
+    OTHER_REGISTRATION_DETAIL: (id: string) => createUrl(`/api/forms/other-registration/${id}`),
+    OTHER_REGISTRATION_UPDATE: (id: string) => createUrl(`/api/forms/other-registration/${id}`),
+    OTHER_REGISTRATION_UPLOAD_DOC: (formId: string) => createUrl(`/api/forms/other-registration/document/${formId}`),
+    OTHER_REGISTRATION_DOWNLOAD_DOC: (documentId: string) => createUrl(`/api/forms/other-registration/download/${documentId}`),
+
+    // ROC Returns - user CRUD and documents
+    ROC_RETURNS_USER_SUBMISSIONS: createUrl("/api/forms/roc-returns/user-submissions"),
+    ROC_RETURNS_DETAIL: (id: string) => createUrl(`/api/forms/roc-returns/${id}`),
+    ROC_RETURNS_UPDATE: (id: string) => createUrl(`/api/forms/roc-returns/${id}`),
+    ROC_RETURNS_UPLOAD_DOC: (formId: string) => createUrl(`/api/forms/roc-returns/document/${formId}`),
+    ROC_RETURNS_DOWNLOAD_DOC: (documentId: string) => createUrl(`/api/forms/roc-returns/download/${documentId}`),
   },
 };
 

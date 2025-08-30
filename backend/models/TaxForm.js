@@ -35,7 +35,58 @@ const taxFormSchema = new mongoose.Schema({
   service: { type: String, required: true },
   // Optional finer granularity under service (e.g., GST, ITR). Defaults to service for backward compatibility
   subService: { type: String, default: function () { return this.service; } },
-  year: { type: String, required: true },
+  year: { 
+    type: String, 
+    required: function() { 
+      // Only require year for tax-related services
+      return this.service && (this.service.toLowerCase().includes('tax') || 
+                             this.service.toLowerCase().includes('itr') || 
+                             this.service.toLowerCase().includes('gst'));
+    }, 
+    default: function() {
+      // Provide current year as default for non-tax services
+      return this.service && (this.service.toLowerCase().includes('tax') || 
+                             this.service.toLowerCase().includes('itr') || 
+                             this.service.toLowerCase().includes('gst')) 
+        ? new Date().getFullYear().toString() 
+        : undefined;
+    } 
+  },
+  
+  // Business Information (for all service types)
+  businessName: { type: String },
+  businessType: { type: String },
+  businessAddress: { type: String },
+  city: { type: String },
+  state: { type: String },
+  pincode: { type: String },
+  
+  // Company Formation specific fields
+  companyName: { type: String },
+  proposedNames: [{ type: String }],
+  authorizedCapital: { type: String },
+  paidUpCapital: { type: String },
+  businessActivity: { type: String },
+  numberOfDirectors: { type: String },
+  numberOfShareholders: { type: String },
+  
+  // Registration specific fields
+  registrationType: { type: String },
+  industryType: { type: String },
+  employeeCount: { type: String },
+  annualTurnover: { type: String },
+  
+  // Advisory specific fields
+  consultationType: { type: String },
+  projectDuration: { type: String },
+  budgetRange: { type: String },
+  
+  // Additional fields
+  additionalRequirements: { type: String },
+  preferredContactTime: { type: String },
+  urgency: { type: String, default: 'Medium' },
+  
+  // Tax-specific fields (for backward compatibility)
   hasIncomeTaxLogin: { type: Boolean, default: false },
   incomeTaxLoginId: { type: String },
   incomeTaxLoginPassword: { type: String },
@@ -46,6 +97,7 @@ const taxFormSchema = new mongoose.Schema({
   homeLoanTotalInterest: { type: String },
   hasPranNumber: { type: Boolean, default: false },
   pranNumber: { type: String },
+  
   documents: [documentSchema],
   // Align with admin status values
   status: { type: String, enum: ["Pending", "Reviewed", "Filed"], default: "Pending" },
@@ -53,9 +105,12 @@ const taxFormSchema = new mongoose.Schema({
   editHistory: [editHistorySchema],
 }, { timestamps: true });
 
-// Enforce one submission per user+subService+year
-// Note: subService defaults to service to maintain compatibility with existing submissions
-taxFormSchema.index({ user: 1, subService: 1, year: 1 }, { unique: true });
+// Enforce one submission per user+subService+year combination
+// Using sparse index to handle cases where year might be null/undefined
+taxFormSchema.index({ user: 1, subService: 1, year: 1 }, { 
+  unique: true,
+  sparse: true
+});
 
 module.exports = mongoose.model("TaxForm", taxFormSchema);
 

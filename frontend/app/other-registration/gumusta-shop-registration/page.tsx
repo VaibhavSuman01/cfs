@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { getBasePrice } from '@/lib/pricing';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import {
   Shield,
   CheckCircle,
@@ -20,12 +20,7 @@ import {
 } from 'lucide-react';
 
 export default function GumustaShopRegistrationPage() {
-  const router = useRouter();
   const basePrice = getBasePrice("gumusta shop registration") ?? "₹999";
-
-  const handleBookService = () => {
-    router.push(`/contact?service=Gumusta+Shop+Registration`);
-  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -69,17 +64,20 @@ export default function GumustaShopRegistrationPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                  <Button onClick={handleBookService} className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                    Register Shop
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={handleBookService}
-                    className="border-2 border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white px-8 py-3 rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
-                  >
-                    Consult an Expert
-                  </Button>
+                  <Link href={`/dashboard/other-registration-form?service=${encodeURIComponent('Gumusta Shop Registration')}`} passHref>
+                    <Button className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                      Register Shop
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Button>
+                  </Link>
+                  <Link href={`/dashboard/other-registration-form?service=${encodeURIComponent('Gumusta Shop Registration')}`} passHref>
+                    <Button
+                      variant="outline"
+                      className="border-2 border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white px-8 py-3 rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
+                    >
+                      Consult an Expert
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </FadeInSection>
@@ -175,17 +173,20 @@ export default function GumustaShopRegistrationPage() {
                 Ensure your commercial establishment operates legally with proper registration. Get your Gumusta registration today and comply with all legal requirements.
               </p>
               <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <Button onClick={handleBookService} className="bg-white text-purple-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                  Start Registration
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={handleBookService}
-                  className="border-2 border-white text-white hover:bg-white hover:text-purple-600 px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
-                >
-                  Expert Consultation
-                </Button>
+                <Link href={`/dashboard/other-registration-form?service=${encodeURIComponent('Gumusta Shop Registration')}`} passHref>
+                  <Button className="bg-white text-purple-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                    Start Registration
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
+                <Link href={`/dashboard/other-registration-form?service=${encodeURIComponent('Gumusta Shop Registration')}`} passHref>
+                  <Button
+                    variant="outline"
+                    className="border-2 border-white text-white hover:bg-white hover:text-purple-600 px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
+                  >
+                    Apply Now
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>

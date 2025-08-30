@@ -27,7 +27,7 @@ interface User {
   mobile?: string;
   fatherName?: string;
   pan?: string;
-  aadhar?: string;
+  aadhaar?: string;
   address?: string;
   createdAt: string;
 }
@@ -279,7 +279,7 @@ export default function UsersPage() {
                       <TableCell>{user.mobile || '-'}</TableCell>
                       <TableCell>{user.fatherName || '-'}</TableCell>
                       <TableCell>{user.pan || '-'}</TableCell>
-                      <TableCell>{user.aadhar || '-'}</TableCell>
+                      <TableCell>{user.aadhaar || '-'}</TableCell>
                       <TableCell>{user.address || '-'}</TableCell>
                       <TableCell>{formatDate(user.createdAt)}</TableCell>
                     </TableRow>

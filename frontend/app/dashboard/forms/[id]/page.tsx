@@ -26,17 +26,51 @@ import {
 import { toast } from "sonner";
 import api from "@/lib/api-client";
 
-interface TaxForm {
+interface FormData {
   _id: string;
-  userId: string;
-  taxYear: string;
-  incomeType: string;
-  grossIncome: string;
-  deductions: string;
-  additionalNotes: string;
+  user: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  pan: string;
+  service: string;
+  subService?: string;
   status: "Pending" | "Reviewed" | "Filed";
+  formType: string;
   createdAt: string;
   updatedAt: string;
+  
+  // Company Formation specific fields
+  companyName?: string;
+  businessActivity?: string;
+  proposedCapital?: string;
+  registeredOfficeAddress?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
+  directors?: Array<{
+    name: string;
+    pan: string;
+    aadhaar: string;
+    email: string;
+    phone: string;
+    address: string;
+    nationality: string;
+    isResident: boolean;
+    din: string;
+  }>;
+  
+  // Other Registration specific fields
+  businessName?: string;
+  businessType?: string;
+  businessAddress?: string;
+  turnover?: string;
+  applicantName?: string;
+  applicantPan?: string;
+  applicantAadhaar?: string;
+  applicantAddress?: string;
+  
+  // Common fields
   documents?: Array<{
     _id: string;
     filename?: string;
@@ -45,18 +79,10 @@ interface TaxForm {
     path?: string;
     uploadedBy?: 'user' | 'admin';
   }>;
-  comments?: {
-    _id: string;
-    text: string;
-    createdAt: string;
-    createdBy: string;
-    isAdmin: boolean;
-  }[];
   reports?: Array<{
-    documentId?: string;
-    type?: string;
-    message?: string;
-    sentAt?: string;
+    message: string;
+    documents: string[];
+    createdAt: string;
   }>;
 }
 
@@ -64,7 +90,7 @@ export default function FormDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { user, isLoading } = useAuth();
-  const [form, setForm] = useState<TaxForm | null>(null);
+  const [form, setForm] = useState<FormData | null>(null);
   const [isLoadingForm, setIsLoadingForm] = useState(true);
   const [comment, setComment] = useState("");
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
@@ -73,8 +99,17 @@ export default function FormDetailPage() {
     const fetchFormDetails = async () => {
       try {
         setIsLoadingForm(true);
-        const response = await api.get(`/api/forms/user-submissions/${id}`);
-        setForm(response.data.data);
+        // Fetch all user submissions and find the specific form by ID
+        const response = await api.get('/api/forms/user-submissions');
+        const forms = response.data.data;
+        const targetForm = forms.find((f: any) => f._id === id);
+        
+        if (targetForm) {
+          setForm(targetForm);
+        } else {
+          toast.error("Form not found. Please try again.");
+          router.push('/dashboard');
+        }
       } catch (error) {
         console.error("Failed to fetch form details:", error);
         toast.error("Failed to load form details. Please try again.");
@@ -86,7 +121,7 @@ export default function FormDetailPage() {
     if (id && user) {
       fetchFormDetails();
     }
-  }, [id, user]);
+  }, [id, user, router]);
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -140,6 +175,27 @@ export default function FormDetailPage() {
     }
   };
 
+  const getFormTypeLabel = (formType: string) => {
+    const typeMap: Record<string, string> = {
+      'TaxForm': 'Tax Filing',
+      'CompanyForm': 'Company Formation',
+      'OtherRegistrationForm': 'Other Registration',
+      'ROCForm': 'ROC Returns',
+      'ReportsForm': 'Reports',
+      'TrademarkISOForm': 'Trademark & ISO',
+      'AdvisoryForm': 'Advisory'
+    };
+    return typeMap[formType] || formType;
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
+
   // Safely format currency values and avoid NaN
   const formatCurrency = (value?: string | number) => {
     if (value === undefined || value === null || value === '') return '—';
@@ -148,14 +204,7 @@ export default function FormDetailPage() {
     return `₹${(n as number).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
+
 
   if (isLoading || isLoadingForm) {
     return (
@@ -183,7 +232,7 @@ export default function FormDetailPage() {
             <FileText className="h-16 w-16 text-muted-foreground opacity-50 mb-4" />
             <h2 className="text-xl font-semibold mb-2">Form Not Found</h2>
             <p className="text-muted-foreground mb-6">
-              The requested tax form could not be found.
+              The requested form could not be found.
             </p>
             <Button onClick={() => router.push("/dashboard")}>
               Return to Dashboard
@@ -205,7 +254,7 @@ export default function FormDetailPage() {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Dashboard
         </Button>
-        <h1 className="text-3xl font-bold">Tax Form Details</h1>
+        <h1 className="text-3xl font-bold">{getFormTypeLabel(form.formType)} Details</h1>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
@@ -213,7 +262,7 @@ export default function FormDetailPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle>Tax Form Information</CardTitle>
+                <CardTitle>{getFormTypeLabel(form.formType)} Information</CardTitle>
                 <CardDescription>
                   Submitted on {formatDate(form.createdAt)}
                 </CardDescription>
@@ -227,55 +276,164 @@ export default function FormDetailPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
+                {/* Applicant Information */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <h3 className="text-sm font-medium text-muted-foreground">
-                      Tax Year
+                      Full Name
                     </h3>
-                    <p className="text-base">{form.taxYear}</p>
+                    <p className="text-base">{form.fullName}</p>
                   </div>
                   <div>
                     <h3 className="text-sm font-medium text-muted-foreground">
-                      Income Type
+                      Email
                     </h3>
-                    <p className="text-base">
-                      {form.incomeType
-                        ? form.incomeType
-                            .replace("_", " ")
-                            .replace(/\b\w/g, (l) => l.toUpperCase())
-                        : "None"}
-                    </p>
+                    <p className="text-base">{form.email}</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <h3 className="text-sm font-medium text-muted-foreground">
-                      Gross Income
+                      Phone
                     </h3>
-                    <p className="text-base">{formatCurrency(form.grossIncome)}</p>
+                    <p className="text-base">{form.phone}</p>
                   </div>
                   <div>
                     <h3 className="text-sm font-medium text-muted-foreground">
-                      Deductions
+                      PAN
                     </h3>
-                    <p className="text-base">
-                      {form.deductions && form.deductions !== ''
-                        ? formatCurrency(form.deductions)
-                        : 'None'}
-                    </p>
+                    <p className="text-base">{form.pan}</p>
                   </div>
                 </div>
 
-                {form.additionalNotes && (
+                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <h3 className="text-sm font-medium text-muted-foreground">
-                      Additional Notes
+                      Service
                     </h3>
-                    <p className="text-base whitespace-pre-line">
-                      {form.additionalNotes}
-                    </p>
+                    <p className="text-base">{form.service}</p>
                   </div>
+                  {form.subService && (
+                    <div>
+                      <h3 className="text-sm font-medium text-muted-foreground">
+                        Sub Service
+                      </h3>
+                      <p className="text-base">{form.subService}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Company Formation specific fields */}
+                {form.formType === 'CompanyForm' && (
+                  <>
+                    <Separator />
+                    <h3 className="text-lg font-semibold">Company Details</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <h4 className="text-sm font-medium text-muted-foreground">
+                          Company Name
+                        </h4>
+                        <p className="text-base">{form.companyName || 'Not provided'}</p>
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-muted-foreground">
+                          Business Activity
+                        </h4>
+                        <p className="text-base">{form.businessActivity || 'Not provided'}</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <h4 className="text-sm font-medium text-muted-foreground">
+                          Proposed Capital
+                        </h4>
+                        <p className="text-base">{form.proposedCapital || 'Not provided'}</p>
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-muted-foreground">
+                          Address
+                        </h4>
+                        <p className="text-base">{form.registeredOfficeAddress || 'Not provided'}</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div>
+                        <h4 className="text-sm font-medium text-muted-foreground">
+                          City
+                        </h4>
+                        <p className="text-base">{form.city || 'Not provided'}</p>
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-muted-foreground">
+                          State
+                        </h4>
+                        <p className="text-base">{form.state || 'Not provided'}</p>
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-muted-foreground">
+                          Pincode
+                        </h4>
+                        <p className="text-base">{form.pincode || 'Not provided'}</p>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* Other Registration specific fields */}
+                {form.formType === 'OtherRegistrationForm' && (
+                  <>
+                    <Separator />
+                    <h3 className="text-lg font-semibold">Business Details</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <h4 className="text-sm font-medium text-muted-foreground">
+                          Business Name
+                        </h4>
+                        <p className="text-base">{form.businessName || 'Not provided'}</p>
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-muted-foreground">
+                          Business Type
+                        </h4>
+                        <p className="text-base">{form.businessType || 'Not provided'}</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <h4 className="text-sm font-medium text-muted-foreground">
+                          Business Address
+                        </h4>
+                        <p className="text-base">{form.businessAddress || 'Not provided'}</p>
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-muted-foreground">
+                          Turnover
+                        </h4>
+                        <p className="text-base">{form.turnover || 'Not provided'}</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div>
+                        <h4 className="text-sm font-medium text-muted-foreground">
+                          City
+                        </h4>
+                        <p className="text-base">{form.city || 'Not provided'}</p>
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-muted-foreground">
+                          State
+                        </h4>
+                        <p className="text-base">{form.state || 'Not provided'}</p>
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-muted-foreground">
+                          Pincode
+                        </h4>
+                        <p className="text-base">{form.pincode || 'Not provided'}</p>
+                      </div>
+                    </div>
+                  </>
                 )}
               </div>
             </CardContent>
@@ -285,7 +443,7 @@ export default function FormDetailPage() {
             <CardHeader>
               <CardTitle>Documents</CardTitle>
               <CardDescription>
-                Supporting documents for your tax form
+                Supporting documents for your {getFormTypeLabel(form.formType).toLowerCase()}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -327,21 +485,21 @@ export default function FormDetailPage() {
               <CardDescription>Download reports shared by your consultant</CardDescription>
             </CardHeader>
             <CardContent>
-              {form.reports && form.reports.length > 0 && form.reports.some((r: { documentId?: string }) => r.documentId) ? (
+              {form.reports && form.reports.length > 0 ? (
                 <div className="space-y-2">
-                  {form.reports.filter((r: { documentId?: string }) => r.documentId).map((r: { documentId?: string; type?: string; sentAt?: string }) => (
-                    <div key={r.documentId} className="flex items-center justify-between bg-muted p-3 rounded-md">
+                  {form.reports.map((r: { message: string; documents: string[]; createdAt: string }, index: number) => (
+                    <div key={index} className="flex items-center justify-between bg-muted p-3 rounded-md">
                       <div className="flex flex-col">
-                        <span className="text-sm font-medium">{r.type || 'Report'}</span>
-                        <span className="text-xs text-muted-foreground">{r.sentAt ? new Date(r.sentAt).toLocaleString() : ''}</span>
+                        <span className="text-sm font-medium">{r.message}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {r.createdAt ? new Date(r.createdAt).toLocaleString() : ''}
+                        </span>
+                        {r.documents && r.documents.length > 0 && (
+                          <span className="text-xs text-muted-foreground">
+                            {r.documents.length} document(s) attached
+                          </span>
+                        )}
                       </div>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={() => downloadDocument(r.documentId as string, `${r.type || 'report'}-${r.documentId}.pdf`)}
-                      >
-                        <Download className="h-4 w-4" />
-                      </Button>
                     </div>
                   ))}
                 </div>
@@ -361,7 +519,7 @@ export default function FormDetailPage() {
           <Card>
             <CardHeader>
               <CardTitle>Status Timeline</CardTitle>
-              <CardDescription>Track your tax form progress</CardDescription>
+              <CardDescription>Track your {getFormTypeLabel(form.formType).toLowerCase()} progress</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="relative pl-6 border-l-2 border-muted space-y-6">
@@ -374,7 +532,7 @@ export default function FormDetailPage() {
                     {formatDate(form.createdAt)}
                   </p>
                   <p className="text-sm mt-1">
-                    Your tax form has been submitted successfully.
+                    Your {getFormTypeLabel(form.formType).toLowerCase()} has been submitted successfully.
                   </p>
                 </div>
 
@@ -398,8 +556,8 @@ export default function FormDetailPage() {
                   </p>
                   <p className="text-sm mt-1">
                     {form.status !== "Pending"
-                      ? "Your tax form has been reviewed by our consultants."
-                      : "Your tax form is waiting to be reviewed by our consultants."}
+                      ? `Your ${getFormTypeLabel(form.formType).toLowerCase()} has been reviewed by our consultants.`
+                      : `Your ${getFormTypeLabel(form.formType).toLowerCase()} is waiting to be reviewed by our consultants.`}
                   </p>
                 </div>
 
@@ -423,8 +581,8 @@ export default function FormDetailPage() {
                   </p>
                   <p className="text-sm mt-1">
                     {form.status === "Filed"
-                      ? "Your tax form has been filed with the tax authorities."
-                      : "Your tax form will be filed after review and approval."}
+                      ? `Your ${getFormTypeLabel(form.formType).toLowerCase()} has been completed.`
+                      : `Your ${getFormTypeLabel(form.formType).toLowerCase()} will be completed after review and approval.`}
                   </p>
                 </div>
               </div>
@@ -438,7 +596,7 @@ export default function FormDetailPage() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground mb-4">
-                If you have any questions about your tax form, please contact
+                If you have any questions about your {getFormTypeLabel(form.formType).toLowerCase()}, please contact
                 our support team.
               </p>
               <Button variant="outline" className="w-full" asChild>

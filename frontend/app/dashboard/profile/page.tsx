@@ -46,6 +46,7 @@ export default function ProfilePage() {
       email: '',
       mobile: '',
       pan: '',
+      aadhaar: '',
       fatherName: '',
       address: '',
     },
@@ -53,7 +54,8 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (user) {
-      form.reset({
+      // Ensure all values are strings, not undefined
+      const formData = {
         name: user.name || '',
         email: user.email || '',
         mobile: user.mobile || '',
@@ -61,9 +63,46 @@ export default function ProfilePage() {
         aadhaar: user.aadhaar || '',
         fatherName: user.fatherName || '',
         address: user.address || '',
-      });
+      };
+      
+      // Only reset if the form values are different to avoid unnecessary re-renders
+      const currentValues = form.getValues();
+      const hasChanges = Object.keys(formData).some(key => 
+        currentValues[key as keyof ProfileFormValues] !== formData[key as keyof ProfileFormValues]
+      );
+      
+      if (hasChanges) {
+        form.reset(formData);
+      }
     }
   }, [user, form]);
+
+  // Ensure form is properly initialized even before user data loads
+  useEffect(() => {
+    if (!user && !isLoading) {
+      // If no user and not loading, ensure form has empty default values
+      const emptyValues = {
+        name: '',
+        email: '',
+        mobile: '',
+        pan: '',
+        aadhaar: '',
+        fatherName: '',
+        address: '',
+      };
+      form.reset(emptyValues);
+    }
+  }, [user, isLoading, form]);
+
+  // Helper function to ensure controlled input values
+  const getControlledValue = (value: any) => {
+    return value !== undefined && value !== null ? value : '';
+  };
+
+  // Helper function to handle controlled input changes
+  const handleControlledChange = (field: any, value: string) => {
+    field.onChange(value);
+  };
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -155,7 +194,12 @@ export default function ProfilePage() {
                     <FormItem>
                       <FormLabel>Full Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="Your full name" {...field} />
+                        <Input 
+                          placeholder="Your full name" 
+                          {...field} 
+                          value={field.value || ''}
+                          onChange={(e) => field.onChange(e.target.value || '')}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -169,7 +213,12 @@ export default function ProfilePage() {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="Your email address" {...field} disabled />
+                        <Input 
+                          placeholder="Your email address" 
+                          {...field} 
+                          value={field.value || ''}
+                          disabled 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -183,7 +232,12 @@ export default function ProfilePage() {
                     <FormItem>
                       <FormLabel>Mobile Number</FormLabel>
                       <FormControl>
-                        <Input placeholder="Your 10-digit mobile number" {...field} />
+                        <Input 
+                          placeholder="Your 10-digit mobile number" 
+                          {...field} 
+                          value={field.value || ''}
+                          onChange={(e) => field.onChange(e.target.value || '')}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -197,7 +251,12 @@ export default function ProfilePage() {
                     <FormItem>
                       <FormLabel>PAN Card Number</FormLabel>
                       <FormControl>
-                        <Input placeholder="Your PAN card number" {...field} />
+                        <Input 
+                          placeholder="Your PAN card number" 
+                          {...field} 
+                          value={field.value || ''}
+                          onChange={(e) => field.onChange(e.target.value || '')}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -211,7 +270,12 @@ export default function ProfilePage() {
                     <FormItem>
                       <FormLabel>Aadhaar Card Number</FormLabel>
                       <FormControl>
-                        <Input placeholder="Your 12-digit Aadhaar number" {...field} />
+                        <Input 
+                          placeholder="Your 12-digit Aadhaar number" 
+                          {...field} 
+                          value={field.value || ''}
+                          onChange={(e) => field.onChange(e.target.value || '')}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -225,7 +289,12 @@ export default function ProfilePage() {
                     <FormItem>
                       <FormLabel>Father's Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="Your father's name" {...field} />
+                        <Input 
+                          placeholder="Your father's name" 
+                          {...field} 
+                          value={field.value || ''}
+                          onChange={(e) => field.onChange(e.target.value || '')}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -239,7 +308,12 @@ export default function ProfilePage() {
                     <FormItem>
                       <FormLabel>Address</FormLabel>
                       <FormControl>
-                        <Input placeholder="Your current address" {...field} />
+                        <Input 
+                          placeholder="Your current address" 
+                          {...field} 
+                          value={field.value || ''}
+                          onChange={(e) => field.onChange(e.target.value || '')}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

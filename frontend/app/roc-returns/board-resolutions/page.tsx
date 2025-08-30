@@ -20,6 +20,7 @@ import {
   Phone,
   CheckCircle
 } from "lucide-react"
+import Link from "next/link"
 
 export default function BoardResolutionsPage() {
   const basePrice = getBasePrice("board meeting & resolutions") ?? "₹2,999";
@@ -69,16 +70,20 @@ export default function BoardResolutionsPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 pt-6">
-                  <Button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                    Draft a Resolution
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white px-8 py-3 rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
-                  >
-                    Learn More
-                  </Button>
+                  <Link href={`/dashboard/roc-returns-form?service=${encodeURIComponent("Board Resolutions")}`} passHref>
+                    <Button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                      Draft a Resolution
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Button>
+                  </Link>
+                  <Link href={`/dashboard/roc-returns-form?service=${encodeURIComponent("Board Resolutions")}`} passHref>
+                    <Button
+                      variant="outline"
+                      className="border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white px-8 py-3 rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
+                    >
+                      Learn More
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </FadeInSection>
@@ -281,17 +286,21 @@ export default function BoardResolutionsPage() {
                 From drafting to filing, our experts help you navigate the complexities of corporate resolutions, ensuring every decision is compliant and correctly documented.
               </p>
               <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                  Get Expert Assistance
-                  <Scale className="ml-2 h-5 w-5" />
-                </Button>
-                <Button
-                  variant="outline"
-                  className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
-                >
-                  Contact Us
-                  <Phone className="ml-2 h-5 w-5" />
-                </Button>
+                <Link href={`/dashboard/roc-returns-form?service=${encodeURIComponent("Board Resolutions")}`} passHref>
+                  <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                    Get Expert Assistance
+                    <Scale className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
+                <Link href={`/dashboard/roc-returns-form?service=${encodeURIComponent("Board Resolutions")}`} passHref>
+                  <Button
+                    variant="outline"
+                    className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
+                  >
+                    Apply Now
+                    <Phone className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>

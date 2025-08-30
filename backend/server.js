@@ -3,7 +3,15 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
 require("dotenv").config();
+
+// Import all models
 const TaxForm = require("./models/TaxForm");
+const ROCForm = require("./models/ROCForm");
+const CompanyForm = require("./models/CompanyForm");
+const OtherRegistrationForm = require("./models/OtherRegistrationForm");
+const ReportsForm = require("./models/ReportsForm");
+const TrademarkISOForm = require("./models/TrademarkISOForm");
+const AdvisoryForm = require("./models/AdvisoryForm");
 
 // Import routes
 const formRoutes = require("./routes/formRoutes");
@@ -35,22 +43,46 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/auth", passwordResetRoutes);
 
+// Function to sync all model indexes
+const syncAllIndexes = async () => {
+  const models = [
+    { name: 'TaxForm', model: TaxForm },
+    { name: 'ROCForm', model: ROCForm },
+    { name: 'CompanyForm', model: CompanyForm },
+    { name: 'OtherRegistrationForm', model: OtherRegistrationForm },
+    { name: 'ReportsForm', model: ReportsForm },
+    { name: 'TrademarkISOForm', model: TrademarkISOForm },
+    { name: 'AdvisoryForm', model: AdvisoryForm }
+  ];
+
+  for (const { name, model } of models) {
+    try {
+      await model.syncIndexes();
+      console.log(`✅ ${name} indexes synced successfully`);
+    } catch (err) {
+      console.error(`❌ Failed to sync ${name} indexes:`, err.message);
+      // Continue with other models even if one fails
+    }
+  }
+};
+
 // Connect to MongoDB
 mongoose
   .connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => {
+  .then(async () => {
     console.log("Connected to MongoDB");
-    // Ensure indexes are in sync with the latest schema (create new and drop obsolete)
-    TaxForm.syncIndexes()
-      .then((res) => {
-        console.log("TaxForm indexes synced:", res);
-      })
-      .catch((err) => {
-        console.error("Failed to sync TaxForm indexes:", err);
-      });
+    
+    // Sync all model indexes
+    try {
+      await syncAllIndexes();
+      console.log("All model indexes synced successfully");
+    } catch (err) {
+      console.error("Error syncing model indexes:", err);
+      // Continue server startup even if index syncing fails
+    }
   })
   .catch((err) => {
     console.error("MongoDB connection error:", err);

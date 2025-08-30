@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { getBasePrice } from "@/lib/pricing"
+import Link from "next/link"
 import {
   UserPlus,
   UserMinus,
@@ -67,16 +68,20 @@ export default function DirectorChangesPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 pt-6">
-                  <Button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                    Manage Directors
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white px-8 py-3 rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
-                  >
-                    Consult an Expert
-                  </Button>
+                  <Link href={`/dashboard/roc-returns-form?service=${encodeURIComponent("Director Changes")}`} passHref>
+                    <Button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                      Manage Directors
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Button>
+                  </Link>
+                  <Link href={`/dashboard/roc-returns-form?service=${encodeURIComponent("Director Changes")}`} passHref>
+                    <Button
+                      variant="outline"
+                      className="border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white px-8 py-3 rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
+                    >
+                      Consult an Expert
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </FadeInSection>
@@ -216,17 +221,21 @@ export default function DirectorChangesPage() {
                 Our experts ensure every director appointment, resignation, or removal is handled smoothly and in full compliance with ROC regulations. Let us manage the paperwork, so you can focus on your business.
               </p>
               <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                  Get Compliance Support
-                  <Scale className="ml-2 h-5 w-5" />
-                </Button>
-                <Button
-                  variant="outline"
-                  className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
-                >
-                  Contact Us
-                  <Phone className="ml-2 h-5 w-5" />
-                </Button>
+                <Link href={`/dashboard/roc-returns-form?service=${encodeURIComponent("Director Changes")}`} passHref>
+                  <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                    Get Compliance Support
+                    <Scale className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
+                <Link href={`/dashboard/roc-returns-form?service=${encodeURIComponent("Director Changes")}`} passHref>
+                  <Button
+                    variant="outline"
+                    className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
+                  >
+                    Apply Now
+                    <Phone className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>

@@ -23,7 +23,7 @@ export default function BusinessStrategyConsultingPage() {
               Develop comprehensive business strategies for growth and market expansion with expert guidance
             </p>
             <div className="flex justify-center space-x-4">
-              <Link href={`/contact?service=${encodeURIComponent("Business Strategy Consulting")}`} passHref>
+              <Link href={`/dashboard/advisory-form?service=${encodeURIComponent("Business Strategy Consulting")}`} passHref>
                 <Button className="bg-blue-600 hover:bg-blue-700 px-8 py-3">Get Started</Button>
               </Link>
             </div>
@@ -79,7 +79,7 @@ export default function BusinessStrategyConsultingPage() {
                     </div>
                   </CardHeader>
                   <CardContent className="text-center">
-                    <Link href={`/contact?service=${encodeURIComponent("Business Strategy Consulting")}`} passHref>
+                    <Link href={`/dashboard/advisory-form?service=${encodeURIComponent("Business Strategy Consulting")}`} passHref>
                       <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3">
                         Book Consultation <ArrowRight className="ml-2 h-5 w-5" />
                       </Button>
@@ -189,7 +189,7 @@ export default function BusinessStrategyConsultingPage() {
                 Get expert business strategy consulting tailored to your business needs
               </p>
               <div className="flex justify-center space-x-4">
-                <Link href={`/contact?service=${encodeURIComponent("Business Strategy Consulting")}`} passHref>
+                <Link href={`/dashboard/advisory-form?service=${encodeURIComponent("Business Strategy Consulting")}`} passHref>
                   <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg">
                     Schedule Consultation
                   </Button>

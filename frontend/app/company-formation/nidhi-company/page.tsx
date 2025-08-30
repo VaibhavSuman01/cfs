@@ -5,17 +5,11 @@ import { EnhancedFooter } from '@/components/enhanced-footer';
 import { FadeInSection } from '@/components/fade-in-section';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { CheckCircle } from 'lucide-react';
 import { getBasePrice } from "@/lib/pricing";
 
 export default function NidhiCompanyPage() {
-  const router = useRouter();
-
-  const handleBookService = () => {
-    router.push(`/contact?service=Nidhi+Company`);
-  };
-
   const basePrice = getBasePrice("nidhi company") ?? "₹34,999";
 
   return (
@@ -91,7 +85,9 @@ export default function NidhiCompanyPage() {
         <FadeInSection>
           <Card className="max-w-4xl mx-auto">
             <CardContent className="space-y-6 text-center">
-              <Button onClick={handleBookService} className="w-full">Book This Service</Button>
+              <Link href={`/dashboard/company-formation-form?service=${encodeURIComponent('Nidhi Company')}`} passHref>
+                <Button className="w-full">Book This Service</Button>
+              </Link>
             </CardContent>
           </Card>
         </FadeInSection>

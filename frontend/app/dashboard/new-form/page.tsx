@@ -157,8 +157,11 @@ export default function NewFormPage() {
       Object.entries(data).forEach(([key, value]) => {
         if (typeof value === 'boolean') {
           formData.append(key, String(value));
-        } else if (value) {
+        } else if (value !== undefined && value !== null) {
           formData.append(key, value);
+        } else {
+          // Append empty string for undefined/null values to ensure all fields are sent
+          formData.append(key, '');
         }
       });
 

@@ -13,6 +13,14 @@ const sendEmail = require("../utils/email");
 const mongoose = require("mongoose");
 const isValidObjectId = mongoose.Types.ObjectId.isValid;
 
+// Import all the new models
+const CompanyForm = require("../models/CompanyForm");
+const OtherRegistrationForm = require("../models/OtherRegistrationForm");
+const ROCForm = require("../models/ROCForm");
+const ReportsForm = require("../models/ReportsForm");
+const TrademarkISOForm = require("../models/TrademarkISOForm");
+const AdvisoryForm = require("../models/AdvisoryForm");
+
 // Apply auth middleware to all admin routes
 router.use(protect);
 router.use(admin);
@@ -84,6 +92,80 @@ router.get("/forms", async (req, res) => {
     });
   } catch (error) {
     console.error("Get forms error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// @route   DELETE /api/admin/service-forms/:id/reports/:reportId
+// @desc    Delete a report (and its attached document) for any service form
+// @access  Private/Admin
+router.delete("/service-forms/:id/reports/:reportId", async (req, res) => {
+  try {
+    const { id, reportId } = req.params;
+    const { service } = req.query;
+
+    // Validate IDs
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({ message: "Invalid form ID format. Must be a 24-character hex string." });
+    }
+    if (!isValidObjectId(reportId)) {
+      return res.status(400).json({ message: "Invalid report ID format. Must be a 24-character hex string." });
+    }
+
+    // Determine model based on service
+    let model;
+    if (service === 'Company Formation' || (service || '').includes('Company')) {
+      model = CompanyForm;
+    } else if (service === 'Other Registration' || (service || '').includes('Registration')) {
+      model = OtherRegistrationForm;
+    } else if (service === 'ROC Returns' || (service || '').includes('ROC')) {
+      model = ROCForm;
+    } else if (service === 'Reports' || (service || '').includes('Report')) {
+      model = ReportsForm;
+    } else if (service === 'Trademark & ISO' || (service || '').includes('Trademark') || (service || '').includes('ISO')) {
+      model = TrademarkISOForm;
+    } else if (service === 'Advisory' || (service || '').includes('Advisory')) {
+      model = AdvisoryForm;
+    } else {
+      model = TaxForm;
+    }
+
+    const form = await model.findById(id);
+    if (!form) {
+      return res.status(404).json({ message: "Form not found" });
+    }
+
+    // Find report
+    const reportIndex = (form.reports || []).findIndex(r => r._id.toString() === reportId);
+    if (reportIndex === -1) {
+      return res.status(404).json({ message: "Report not found" });
+    }
+
+    const report = form.reports[reportIndex];
+    const docId = report.documentId ? report.documentId.toString() : null;
+
+    // Remove report
+    form.reports.splice(reportIndex, 1);
+
+    // Remove attached document if present
+    let removedDocument = null;
+    if (docId && form.documents && form.documents.length) {
+      const docIndex = form.documents.findIndex(d => d._id.toString() === docId);
+      if (docIndex !== -1) {
+        removedDocument = form.documents[docIndex];
+        form.documents.splice(docIndex, 1);
+      }
+    }
+
+    await form.save();
+
+    return res.json({
+      success: true,
+      message: "Report deleted successfully",
+      removedDocumentId: removedDocument ? removedDocument._id : undefined,
+    });
+  } catch (error) {
+    console.error("Error deleting report:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -394,7 +476,7 @@ router.get("/users", async (req, res) => {
         { mobile: searchRegex },
         { fatherName: searchRegex },
         { pan: searchRegex },
-        { aadhar: searchRegex },
+        { aadhaar: searchRegex },
         { address: searchRegex },
       ];
     }
@@ -406,7 +488,7 @@ router.get("/users", async (req, res) => {
     }
 
     const users = await User.find(filter)
-      .select("name fatherName mobile email address pan createdAt")
+      .select("name fatherName mobile email address pan aadhaar createdAt")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit));
@@ -445,7 +527,7 @@ router.get("/users/download", async (req, res) => {
         { mobile: searchRegex },
         { fatherName: searchRegex },
         { pan: searchRegex },
-        { aadhar: searchRegex },
+        { aadhaar: searchRegex },
         { address: searchRegex },
       ];
     }
@@ -457,7 +539,7 @@ router.get("/users/download", async (req, res) => {
     }
 
     const users = await User.find(filter)
-      .select("name fatherName mobile email address pan aadhar dob createdAt")
+      .select("name fatherName mobile email address pan aadhaar dob createdAt")
       .sort({ createdAt: -1 });
 
     // Create a new Excel workbook and worksheet
@@ -550,6 +632,365 @@ router.post("/contacts/:id/reply", validateObjectId(), async (req, res) => {
   } catch (error) {
     console.error("Reply to contact error:", error);
     res.status(500).json({ message: "Server error" });
+  }
+});
+
+// @route   GET /api/admin/test-forms
+// @desc    Test endpoint to check if forms exist in database
+// @access  Private/Admin
+router.get("/test-forms", async (req, res) => {
+  try {
+    // Check all models for forms
+    const [taxCount, companyCount, rocCount, otherCount, reportsCount, trademarkCount, advisoryCount] = await Promise.all([
+      TaxForm.countDocuments(),
+      CompanyForm.countDocuments(),
+      ROCForm.countDocuments(),
+      OtherRegistrationForm.countDocuments(),
+      ReportsForm.countDocuments(),
+      TrademarkISOForm.countDocuments(),
+      AdvisoryForm.countDocuments()
+    ]);
+
+    res.json({
+      message: "Database form counts",
+      counts: {
+        TaxForm: taxCount,
+        CompanyForm: companyCount,
+        ROCForm: rocCount,
+        OtherRegistrationForm: otherCount,
+        ReportsForm: reportsCount,
+        TrademarkISOForm: trademarkCount,
+        AdvisoryForm: advisoryCount
+      },
+      total: taxCount + companyCount + rocCount + otherCount + reportsCount + trademarkCount + advisoryCount
+    });
+  } catch (error) {
+    console.error("Test forms error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// @route   GET /api/admin/service-forms
+// @desc    Get all form submissions from all services with optional filters
+// @access  Private/Admin
+router.get("/service-forms", async (req, res) => {
+  try {
+    const {
+      search,
+      service,
+      status,
+      startDate,
+      endDate,
+      page = 1,
+      limit = 10,
+    } = req.query;
+
+    // Build filter object
+    const filter = {};
+
+    if (service && service !== 'all') filter.service = service;
+    if (status && status !== 'all') filter.status = status;
+
+    // Unified search across common fields
+    if (search) {
+      const searchRegex = { $regex: search, $options: "i" };
+      filter.$or = [
+        { fullName: searchRegex },
+        { email: searchRegex },
+        { businessName: searchRegex },
+        { companyName: searchRegex },
+        { service: searchRegex },
+      ];
+    }
+
+    // Date range filter
+    if (startDate || endDate) {
+      filter.createdAt = {};
+      if (startDate) filter.createdAt.$gte = new Date(startDate);
+      if (endDate) filter.createdAt.$lte = new Date(endDate);
+    }
+
+    // Fetch forms from ALL models
+    const [taxForms, companyForms, rocForms, otherRegistrationForms, reportsForms, trademarkISOForms, advisoryForms] = await Promise.all([
+      TaxForm.find(filter).select("-documents.fileData").populate('user', 'name email mobile pan').sort({ createdAt: -1 }),
+      CompanyForm.find(filter).select("-documents.fileData").populate('user', 'name email mobile pan').sort({ createdAt: -1 }),
+      ROCForm.find(filter).select("-documents.fileData").populate('user', 'name email mobile pan').sort({ createdAt: -1 }),
+      OtherRegistrationForm.find(filter).select("-documents.fileData").populate('user', 'name email mobile pan').sort({ createdAt: -1 }),
+      ReportsForm.find(filter).select("-documents.fileData").populate('user', 'name email mobile pan').sort({ createdAt: -1 }),
+      TrademarkISOForm.find(filter).select("-documents.fileData").populate('user', 'name email mobile pan').sort({ createdAt: -1 }),
+      AdvisoryForm.find(filter).select("-documents.fileData").populate('user', 'name email mobile pan').sort({ createdAt: -1 })
+    ]);
+
+    // Combine all forms and add form type identifier
+    const allForms = [
+      ...taxForms.map(form => ({ ...form.toObject(), formType: 'TaxForm' })),
+      ...companyForms.map(form => ({ ...form.toObject(), formType: 'CompanyForm' })),
+      ...rocForms.map(form => ({ ...form.toObject(), formType: 'ROCForm' })),
+      ...otherRegistrationForms.map(form => ({ ...form.toObject(), formType: 'OtherRegistrationForm' })),
+      ...reportsForms.map(form => ({ ...form.toObject(), formType: 'ReportsForm' })),
+      ...trademarkISOForms.map(form => ({ ...form.toObject(), formType: 'TrademarkISOForm' })),
+      ...advisoryForms.map(form => ({ ...form.toObject(), formType: 'AdvisoryForm' }))
+    ];
+
+    // Sort all forms by creation date (newest first)
+    allForms.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    // Apply pagination
+    const total = allForms.length;
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + parseInt(limit);
+    const paginatedForms = allForms.slice(startIndex, endIndex);
+
+    res.json({
+      forms: paginatedForms,
+      pagination: {
+        total,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        pages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    console.error("Get service forms error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Get forms by service type for admin panel
+router.get("/forms/service", admin, async (req, res) => {
+  try {
+    const { service, status, search } = req.query;
+    let query = {};
+    
+    // Filter by service type
+    if (service && service !== 'all') {
+      query.service = service;
+    }
+    
+    // Filter by status
+    if (status && status !== 'all') {
+      query.status = status;
+    }
+    
+    // Search functionality
+    if (search) {
+      const searchRegex = new RegExp(search, 'i');
+      query.$or = [
+        { businessName: searchRegex },
+        { companyName: searchRegex },
+        { fullName: searchRegex },
+        { email: searchRegex }
+      ];
+    }
+    
+    // Determine which model to use based on service category
+    let forms = [];
+    let model;
+    
+    if (service === 'Company Formation' || service.includes('Company')) {
+      model = CompanyForm;
+    } else if (service === 'Other Registration' || service.includes('Registration')) {
+      model = OtherRegistrationForm;
+    } else if (service === 'ROC Returns' || service.includes('ROC')) {
+      model = ROCForm;
+    } else if (service === 'Reports' || service.includes('Report')) {
+      model = ReportsForm;
+    } else if (service === 'Trademark & ISO' || service.includes('Trademark') || service.includes('ISO')) {
+      model = TrademarkISOForm;
+    } else if (service === 'Advisory' || service.includes('Advisory')) {
+      model = AdvisoryForm;
+    } else {
+      // Default to TaxForm for taxation services
+      model = TaxForm;
+    }
+    
+    // Fetch forms with pagination
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+    
+    forms = await model.find(query)
+      .populate('user', 'name email mobile pan')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+    
+    const total = await model.countDocuments(query);
+    
+    res.json({
+      success: true,
+      forms,
+      pagination: {
+        current: page,
+        total: Math.ceil(total / limit),
+        hasNext: page * limit < total,
+        hasPrev: page > 1
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching service forms:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch forms' });
+  }
+});
+
+// @route   PUT /api/admin/roc-returns/:id/status
+// @desc    Update ROC returns form status and upload completion documents
+// @access  Private/Admin
+router.put("/roc-returns/:id/status", upload.array("completionDocuments", 10), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, remarks, completionNotes } = req.body;
+
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({ message: "Invalid form ID" });
+    }
+
+    if (!status || !["Pending", "Reviewed", "Filed"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status. Must be Pending, Reviewed, or Filed" });
+    }
+
+    const rocForm = await ROCForm.findById(id);
+    if (!rocForm) {
+      return res.status(404).json({ message: "ROC returns form not found" });
+    }
+
+    const updateData = {
+      status,
+      updatedAt: new Date(),
+    };
+
+    // Add admin remarks if provided
+    if (remarks) {
+      updateData.remarks = remarks;
+    }
+
+    // Add completion notes if status is Filed
+    if (status === "Filed" && completionNotes) {
+      updateData.completionNotes = completionNotes;
+    }
+
+    // Process completion documents if status is Filed
+    if (status === "Filed" && req.files && req.files.length > 0) {
+      const completionDocs = req.files.map((file, index) => ({
+        documentType: req.body[`documentType_${index}`] || "Completion Document",
+        fileName: Date.now() + "-" + Math.round(Math.random() * 1e9) + path.extname(file.originalname),
+        originalName: file.originalname,
+        fileType: file.mimetype,
+        fileSize: file.size,
+        fileData: file.buffer,
+        contentType: file.mimetype,
+        uploadedBy: 'admin',
+        isCompletionDocument: true,
+      }));
+
+      updateData.completionDocuments = completionDocs;
+    }
+
+    const updatedForm = await ROCForm.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true, runValidators: true }
+    ).select("-documents.fileData -completionDocuments.fileData");
+
+    // Send email notification to user about status update
+    try {
+      await sendEmail({
+        to: rocForm.email,
+        subject: `ROC Returns Form Status Updated - ${status}`,
+        html: `
+          <h2>ROC Returns Form Status Update</h2>
+          <p>Dear ${rocForm.fullName},</p>
+          <p>Your ROC returns form for <strong>${rocForm.companyName}</strong> has been updated.</p>
+          <p><strong>New Status:</strong> ${status}</p>
+          ${remarks ? `<p><strong>Remarks:</strong> ${remarks}</p>` : ''}
+          ${status === "Filed" && completionNotes ? `<p><strong>Completion Notes:</strong> ${completionNotes}</p>` : ''}
+          <p>You can view the updated status in your dashboard.</p>
+          <p>Best regards,<br>Com Financial Services Team</p>
+        `
+      });
+    } catch (emailError) {
+      console.error("Failed to send status update email:", emailError);
+      // Don't fail the request if email fails
+    }
+
+    res.json({
+      success: true,
+      message: "ROC returns form status updated successfully",
+      data: updatedForm,
+    });
+  } catch (error) {
+    console.error("Error updating ROC returns form status:", error);
+    res.status(500).json({ message: "Server error while updating form status" });
+  }
+});
+
+// @route   GET /api/admin/roc-returns/:id
+// @desc    Get specific ROC returns form details for admin
+// @access  Private/Admin
+router.get("/roc-returns/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({ message: "Invalid form ID" });
+    }
+
+    const rocForm = await ROCForm.findById(id)
+      .select("-documents.fileData -completionDocuments.fileData")
+      .populate('user', 'name email mobile pan');
+
+    if (!rocForm) {
+      return res.status(404).json({ message: "ROC returns form not found" });
+    }
+
+    res.json({
+      success: true,
+      data: rocForm,
+    });
+  } catch (error) {
+    console.error("Error fetching ROC returns form details:", error);
+    res.status(500).json({ message: "Server error while fetching form details" });
+  }
+});
+
+// @route   GET /api/admin/roc-returns/:id/download/:documentId
+// @desc    Download document from ROC returns form (admin access)
+// @access  Private/Admin
+router.get("/roc-returns/:id/download/:documentId", async (req, res) => {
+  try {
+    const { id, documentId } = req.params;
+
+    if (!isValidObjectId(id) || !isValidObjectId(documentId)) {
+      return res.status(400).json({ message: "Invalid ID format" });
+    }
+
+    const rocForm = await ROCForm.findById(id);
+    if (!rocForm) {
+      return res.status(404).json({ message: "ROC returns form not found" });
+    }
+
+    // Find document in either documents or completionDocuments array
+    let document = rocForm.documents.find(d => d._id.toString() === documentId);
+    let isCompletionDoc = false;
+
+    if (!document) {
+      document = rocForm.completionDocuments?.find(d => d._id.toString() === documentId);
+      isCompletionDoc = true;
+    }
+
+    if (!document) {
+      return res.status(404).json({ message: "Document not found" });
+    }
+
+    res.set({
+      "Content-Type": document.contentType,
+      "Content-Disposition": `attachment; filename="${document.originalName || document.fileName || "document"}"`,
+    });
+
+    res.send(document.fileData);
+  } catch (error) {
+    console.error("Error downloading ROC returns document:", error);
+    res.status(500).json({ message: "Server error while downloading document" });
   }
 });
 

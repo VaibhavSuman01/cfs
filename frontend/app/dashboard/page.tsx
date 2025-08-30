@@ -95,26 +95,32 @@ const OrderStatusTracker = ({
   );
 };
 
-interface TaxForm {
+interface FormSubmission {
   _id: string;
+  formType: string;
   service?: string;
-  year?: string;
-  status: 'Pending' | 'Reviewed' | 'Filed';
+  subService?: string;
+  status: "Pending" | "Reviewed" | "Filed";
   createdAt: string;
   updatedAt: string;
-  editHistory: any[];
+  fullName?: string;
+  companyName?: string;
+  businessName?: string;
+  year?: string;
+  editHistory?: any[];
   reports?: Array<{
     documentId?: string;
     type?: string;
     message?: string;
     sentAt?: string;
   }>;
+  // Add other common fields
 }
 
 // --- [Main] Revamped User Dashboard Component ---
 export default function UserDashboard() {
   const { user, isLoading } = useAuth();
-  const [forms, setForms] = useState<TaxForm[]>([]);
+  const [forms, setForms] = useState<FormSubmission[]>([]);
   const [isLoadingForms, setIsLoadingForms] = useState(true);
 
   const avatarSrc = user?.avatarUrl
@@ -141,7 +147,7 @@ export default function UserDashboard() {
     }
   }, [user]);
 
-  const handleDownloadLatestReport = async (form: TaxForm) => {
+  const handleDownloadLatestReport = async (form: FormSubmission) => {
     try {
       const latest = (form.reports || []).slice().reverse().find(r => r.documentId);
       if (!latest || !latest.documentId) return;
@@ -176,6 +182,80 @@ export default function UserDashboard() {
       }`.toUpperCase();
     }
     return name.substring(0, 2).toUpperCase();
+  };
+
+  const getFormTypeLabel = (formType: string) => {
+    const typeMap: Record<string, string> = {
+      'TaxForm': 'Tax Filing',
+      'CompanyForm': 'Company Formation',
+      'OtherRegistrationForm': 'Other Registration',
+      'ROCForm': 'ROC Returns',
+      'ReportsForm': 'Reports',
+      'TrademarkISOForm': 'Trademark & ISO',
+      'AdvisoryForm': 'Advisory'
+    };
+    return typeMap[formType] || formType;
+  };
+
+  const getServiceLabel = (service: string) => {
+    if (!service) return 'Service';
+    
+    // Map service names to more readable labels
+    const serviceMap: Record<string, string> = {
+      'GST Filing': 'GST Filing',
+      'Income Tax Filing': 'Income Tax Filing',
+      'TDS Returns': 'TDS Returns',
+      'Tax Planning': 'Tax Planning',
+      'EPFO Filing': 'EPFO Filing',
+      'ESIC Filing': 'ESIC Filing',
+      'PT-Tax Filing': 'PT-Tax Filing',
+      'Corporate Tax Filing': 'Corporate Tax Filing',
+      'Private Limited Company': 'Private Limited Company',
+      'One Person Company': 'One Person Company',
+      'Public Limited Company': 'Public Limited Company',
+      'Section 8 Company': 'Section 8 Company',
+      'Nidhi Company': 'Nidhi Company',
+      'LLP Registration': 'LLP Registration',
+      'Partnership Firm': 'Partnership Firm',
+      'Sole Proprietorship': 'Sole Proprietorship',
+      'GST Registration': 'GST Registration',
+      'MSME Registration': 'MSME Registration',
+      'FSSAI Food License': 'FSSAI Food License',
+      'Digital Signature': 'Digital Signature',
+      'EPFO Registration': 'EPFO Registration',
+      'ESIC Registration': 'ESIC Registration',
+      'IEC Registration': 'IEC Registration',
+      'NGO Registration': 'NGO Registration',
+      'Startup India Registration': 'Startup India Registration',
+      'Producer Company': 'Producer Company',
+      'Professional Tax': 'Professional Tax',
+      'Trade License': 'Trade License',
+      'PSARA License': 'PSARA License',
+      'Industry License': 'Industry License',
+      'Annual Filing': 'Annual Filing',
+      'Board Resolutions': 'Board Resolutions',
+      'Director Changes': 'Director Changes',
+      'Share Transfer': 'Share Transfer',
+      'Bank Reconciliation': 'Bank Reconciliation',
+      'CMA Reports': 'CMA Reports',
+      'DSCR Reports': 'DSCR Reports',
+      'Project Reports': 'Project Reports',
+      'Trademark Registration': 'Trademark Registration',
+      'ISO 9001': 'ISO 9001',
+      'ISO 14001': 'ISO 14001',
+      'Copyright Registration': 'Copyright Registration',
+      'Business Strategy Consulting': 'Business Strategy Consulting',
+      'Financial Planning & Analysis': 'Financial Planning & Analysis',
+      'Digital Transformation': 'Digital Transformation',
+      'HR & Organizational Development': 'HR & Organizational Development',
+      'Legal Compliance Advisory': 'Legal Compliance Advisory',
+      'Startup Mentoring': 'Startup Mentoring',
+      'Tax Planning & Analysis': 'Tax Planning & Analysis',
+      'Assistance for Fund Raising': 'Assistance for Fund Raising',
+      'Other Finance Related Services': 'Other Finance Related Services'
+    };
+    
+    return serviceMap[service] || service;
   };
 
   const services = [
@@ -331,7 +411,7 @@ export default function UserDashboard() {
                       Father's Name
                     </p>
                     <p className="text-sm font-medium text-gray-800 flex items-center">
-                      <User className="mr-2 h-4 w-4 text-gray-400" />
+                      <User className="mr-2 h-4 w-4" />
                       {user?.fatherName || "Not provided"}
                     </p>
                   </div>
@@ -399,6 +479,60 @@ export default function UserDashboard() {
                                         <ChevronRight className="ml-2 h-4 w-4" />
                                       </Link>
                                     </Button>
+                                  ) : category.name === 'Company Formation' ? (
+                                    <Button variant="outline" size="sm" asChild>
+                                      <Link
+                                        href={`/dashboard/company-formation-form?service=${encodeURIComponent(service)}`}
+                                      >
+                                        Apply Now{" "}
+                                        <ChevronRight className="ml-2 h-4 w-4" />
+                                      </Link>
+                                    </Button>
+                                  ) : category.name === 'Other Registration' ? (
+                                    <Button variant="outline" size="sm" asChild>
+                                      <Link
+                                        href={`/dashboard/other-registration-form?service=${encodeURIComponent(service)}`}
+                                      >
+                                        Apply Now{" "}
+                                        <ChevronRight className="ml-2 h-4 w-4" />
+                                      </Link>
+                                    </Button>
+                                  ) : category.name === 'Reports' ? (
+                                    <Button variant="outline" size="sm" asChild>
+                                      <Link
+                                        href={`/dashboard/reports-form?service=${encodeURIComponent(service)}`}
+                                      >
+                                        Apply Now{" "}
+                                        <ChevronRight className="ml-2 h-4 w-4" />
+                                      </Link>
+                                    </Button>
+                                  ) : category.name === 'Trademark & ISO' ? (
+                                    <Button variant="outline" size="sm" asChild>
+                                      <Link
+                                        href={`/dashboard/trademark-iso-form?service=${encodeURIComponent(service)}`}
+                                      >
+                                        Apply Now{" "}
+                                        <ChevronRight className="ml-2 h-4 w-4" />
+                                      </Link>
+                                    </Button>
+                                  ) : category.name === 'ROC Returns' ? (
+                                    <Button variant="outline" size="sm" asChild>
+                                      <Link
+                                        href={`/dashboard/roc-returns-form?service=${encodeURIComponent(service)}`}
+                                      >
+                                        Apply Now{" "}
+                                        <ChevronRight className="ml-2 h-4 w-4" />
+                                      </Link>
+                                    </Button>
+                                  ) : category.name === 'Advisory' ? (
+                                    <Button variant="outline" size="sm" asChild>
+                                      <Link
+                                        href={`/dashboard/advisory-form?service=${encodeURIComponent(service)}`}
+                                      >
+                                        Apply Now{" "}
+                                        <ChevronRight className="ml-2 h-4 w-4" />
+                                      </Link>
+                                    </Button>
                                   ) : (
                                     <Button variant="outline" size="sm" asChild>
                                       <Link
@@ -425,9 +559,9 @@ export default function UserDashboard() {
               <TabsContent value="forms" className="mt-4">
                 <Card className="shadow-sm">
                   <CardHeader>
-                    <CardTitle>Your Tax Form Submissions</CardTitle>
+                    <CardTitle>Your Form Submissions</CardTitle>
                     <CardDescription>
-                      Track the filing status of all your forms.
+                      Track the filing status of all your forms across all services.
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -444,7 +578,9 @@ export default function UserDashboard() {
                           >
                             <div className="mb-4 flex items-center justify-between">
                                 <div>
-                                    <div className="font-bold text-gray-800">{form.service || 'Form'}{form.year ? ` - FY ${form.year}` : ''}</div>
+                                    <div className="font-bold text-gray-800">
+                                      {getFormTypeLabel(form.formType)} - {getServiceLabel(form.service || 'Service')}{form.year ? ` - FY ${form.year}` : ''}
+                                    </div>
                                     <div className="text-xs text-gray-500">
                                       Submitted: {formatDate(form.createdAt)}{' '}
                                       {new Date(form.updatedAt).getTime() > new Date(form.createdAt).getTime() && (
@@ -460,7 +596,7 @@ export default function UserDashboard() {
                                         </Link>
                                       </Button>
                                     )}
-                                    {form.status === 'Filed' && (form.reports?.some(r => r.documentId)) && (
+                                    {form.status === 'Filed' && (form.reports?.some((r: any) => r.documentId)) && (
                                         <Button
                                           variant="outline"
                                           size="sm"
@@ -490,10 +626,10 @@ export default function UserDashboard() {
                           No Forms Submitted
                         </h3>
                         <p className="mt-2 text-sm text-gray-500">
-                          Click below to start filing your first tax return.
+                          Click below to start filing your first form.
                         </p>
                         <Button className="mt-6" asChild>
-                          <Link href="/dashboard/new-form">File New ITR</Link>
+                          <Link href="/dashboard/new-form">File New Form</Link>
                         </Button>
                       </div>
                     )}
