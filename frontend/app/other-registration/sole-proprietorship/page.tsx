@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { getBasePrice } from "@/lib/pricing"
+import Link from "next/link"
 import {
   User,
   CheckCircle,
@@ -70,16 +71,20 @@ export default function SoleProprietorshipPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                  <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                    Start Your Business
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
-                  >
-                    Consult an Expert
-                  </Button>
+                  <Link href={`/dashboard/other-registration-form?service=${encodeURIComponent("Sole Proprietorship")}`} passHref>
+                    <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                      Start Your Business
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Button>
+                  </Link>
+                  <Link href={`/dashboard/other-registration-form?service=${encodeURIComponent("Sole Proprietorship")}`} passHref>
+                    <Button
+                      variant="outline"
+                      className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
+                    >
+                      Consult an Expert
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </FadeInSection>
@@ -237,17 +242,20 @@ export default function SoleProprietorshipPage() {
                 Take the first step towards your entrepreneurial journey. Let us help you set up your Sole Proprietorship quickly and correctly.
               </p>
               <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                  Start My Proprietorship
-                  <Rocket className="ml-2 h-5 w-5" />
-                </Button>
-                <Button
-                  variant="outline"
-                  className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
-                >
-                  Speak to Our Experts
-                  <Phone className="ml-2 h-5 w-5" />
-                </Button>
+                <Link href={`/dashboard/other-registration-form?service=${encodeURIComponent("Sole Proprietorship")}`} passHref>
+                  <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                    Start My Proprietorship
+                    <Rocket className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
+                <Link href={`/dashboard/other-registration-form?service=${encodeURIComponent("Sole Proprietorship")}`} passHref>
+                  <Button
+                    variant="outline"
+                    className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
+                  >
+                    Apply Now
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>

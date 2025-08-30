@@ -64,13 +64,13 @@ export default function NgoRegistrationPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                  <Link href={`/contact?service=${encodeURIComponent('NGO Registration')}`} passHref>
+                  <Link href={`/dashboard/other-registration-form?service=${encodeURIComponent('NGO Registration')}`} passHref>
                     <Button className="bg-gradient-to-r from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                       Register NGO
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
-                  <Link href={`/contact?service=${encodeURIComponent('NGO Registration')}`} passHref>
+                  <Link href={`/dashboard/other-registration-form?service=${encodeURIComponent('NGO Registration')}`} passHref>
                     <Button
                       variant="outline"
                       className="border-2 border-pink-600 text-pink-600 hover:bg-pink-600 hover:text-white px-8 py-3 rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
@@ -173,18 +173,18 @@ export default function NgoRegistrationPage() {
                 Establish your non-profit organization and start working for social causes. Get your NGO registration today and create positive change in society.
               </p>
               <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <Link href={`/contact?service=${encodeURIComponent('NGO Registration')}`} passHref>
+                <Link href={`/dashboard/other-registration-form?service=${encodeURIComponent('NGO Registration')}`} passHref>
                   <Button className="bg-white text-pink-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                     Start Registration
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
-                <Link href={`/contact?service=${encodeURIComponent('NGO Registration')}`} passHref>
+                <Link href={`/dashboard/other-registration-form?service=${encodeURIComponent('NGO Registration')}`} passHref>
                   <Button
                     variant="outline"
                     className="border-2 border-white text-white hover:bg-white hover:text-pink-600 px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
                   >
-                    Expert Consultation
+                    Apply Now
                   </Button>
                 </Link>
               </div>

@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { getBasePrice } from '@/lib/pricing';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import {
   BarChart3,
   CheckCircle,
@@ -20,12 +20,7 @@ import {
 } from 'lucide-react';
 
 export default function DscrReportsPage() {
-  const router = useRouter();
   const basePrice = getBasePrice("dscr/cma report") ?? "As per request";
-
-  const handleBookService = () => {
-    router.push(`/contact?service=DSCR+Reports`);
-  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -69,17 +64,20 @@ export default function DscrReportsPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                  <Button onClick={handleBookService} className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                    Book This Service
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={handleBookService}
-                    className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
-                  >
-                    Consult an Expert
-                  </Button>
+                  <Link href={`/dashboard/reports-form?service=${encodeURIComponent('DSCR Reports')}`} passHref>
+                    <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                      Book This Service
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Button>
+                  </Link>
+                  <Link href={`/dashboard/reports-form?service=${encodeURIComponent('DSCR Reports')}`} passHref>
+                    <Button
+                      variant="outline"
+                      className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
+                    >
+                      Consult an Expert
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </FadeInSection>
@@ -175,17 +173,20 @@ export default function DscrReportsPage() {
                 Demonstrate your debt repayment capacity to lenders with a professionally prepared DSCR report. Our experts will analyze your financials and create a comprehensive report that improves your loan approval chances.
               </p>
               <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <Button onClick={handleBookService} className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                  Get DSCR Report
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={handleBookService}
-                  className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
-                >
-                  Get Expert Consultation
-                </Button>
+                <Link href={`/dashboard/reports-form?service=${encodeURIComponent('DSCR Reports')}`} passHref>
+                  <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                    Get DSCR Report
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
+                <Link href={`/dashboard/reports-form?service=${encodeURIComponent('DSCR Reports')}`} passHref>
+                  <Button
+                    variant="outline"
+                    className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
+                  >
+                    Apply Now
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>

@@ -82,7 +82,7 @@ export function EnhancedHeader() {
       name: "Taxation",
       href: "/taxation",
       dropdown: [
-        { name: "GST Filing", href: "/taxation/gst-registration" },
+        { name: "GST Filing", href: "/taxation/gst-filing" },
         { name: "Income Tax Filing", href: "/taxation/income-tax" },
         { name: "TDS Returns", href: "/taxation/tds-returns" },
         { name: "Tax Planning", href: "/taxation/tax-planning" },

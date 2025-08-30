@@ -35,14 +35,69 @@ const navigation: NavItem[] = [
     icon: FileSpreadsheet,
     href: '#',
   },
+  
   // Company Formation
   {
     name: 'Company Formation', icon: FileText,
     submenu: [
-      { name: 'Private Limited', href: '/admin/services/private-limited' },
-      { name: 'Public Limited', href: '/admin/services/public-limited' },
-      { name: 'One Person Company', href: '/admin/services/opc' },
-      { name: 'Section 8 Company', href: '/admin/services/section-8' },
+      { name: 'All Forms', href: '/admin/forms/company-formation' },
+      { name: 'Pending Review', href: '/admin/forms/company-formation?status=Pending' },
+      { name: 'Reviewed', href: '/admin/forms/company-formation?status=Reviewed' },
+      { name: 'Filed', href: '/admin/forms/company-formation?status=Filed' },
+      {
+        name: 'Private Limited Company',
+        submenu: [
+          { name: 'All', href: '/admin/forms/company-formation?service=Private%20Limited%20Company' },
+          { name: 'Pending', href: '/admin/forms/company-formation?service=Private%20Limited%20Company&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/company-formation?service=Private%20Limited%20Company&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/company-formation?service=Private%20Limited%20Company&status=Filed' },
+        ]
+      },
+      {
+        name: 'Public Limited Company',
+        submenu: [
+          { name: 'All', href: '/admin/forms/company-formation?service=Public%20Limited%20Company' },
+          { name: 'Pending', href: '/admin/forms/company-formation?service=Public%20Limited%20Company&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/company-formation?service=Public%20Limited%20Company&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/company-formation?service=Public%20Limited%20Company&status=Filed' },
+        ]
+      },
+      {
+        name: 'One Person Company',
+        submenu: [
+          { name: 'All', href: '/admin/forms/company-formation?service=One%20Person%20Company' },
+          { name: 'Pending', href: '/admin/forms/company-formation?service=One%20Person%20Company&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/company-formation?service=One%20Person%20Company&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/company-formation?service=One%20Person%20Company&status=Filed' },
+        ]
+      },
+      {
+        name: 'Section 8 Company',
+        submenu: [
+          { name: 'All', href: '/admin/forms/company-formation?service=Section%208%20Company' },
+          { name: 'Pending', href: '/admin/forms/company-formation?service=Section%208%20Company&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/company-formation?service=Section%208%20Company&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/company-formation?service=Section%208%20Company&status=Filed' },
+        ]
+      },
+      {
+        name: 'Nidhi Company',
+        submenu: [
+          { name: 'All', href: '/admin/forms/company-formation?service=Nidhi%20Company' },
+          { name: 'Pending', href: '/admin/forms/company-formation?service=Nidhi%20Company&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/company-formation?service=Nidhi%20Company&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/company-formation?service=Nidhi%20Company&status=Filed' },
+        ]
+      },
+      {
+        name: 'Partnership Firm Registration',
+        submenu: [
+          { name: 'All', href: '/admin/forms/company-formation?service=Partnership%20Firm%20Registration' },
+          { name: 'Pending', href: '/admin/forms/company-formation?service=Partnership%20Firm%20Registration&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/company-formation?service=Partnership%20Firm%20Registration&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/company-formation?service=Partnership%20Firm%20Registration&status=Filed' },
+        ]
+      },
     ]
   },
 
@@ -50,9 +105,396 @@ const navigation: NavItem[] = [
   {
     name: 'Other Registration', icon: FileText,
     submenu: [
-      { name: 'LLP Registration', href: '/admin/services/llp' },
-      { name: 'Partnership Firm', href: '/admin/services/partnership' },
-      { name: 'Sole Proprietorship', href: '/admin/services/sole-proprietorship' },
+      { name: 'All Forms', href: '/admin/forms/other-registration' },
+      { name: 'Pending Review', href: '/admin/forms/other-registration?status=Pending' },
+      { name: 'Reviewed', href: '/admin/forms/other-registration?status=Reviewed' },
+      { name: 'Filed', href: '/admin/forms/other-registration?status=Filed' },
+      {
+        name: 'LLP Registration',
+        submenu: [
+          { name: 'All', href: '/admin/forms/other-registration?service=LLP%20Registration' },
+          { name: 'Pending', href: '/admin/forms/other-registration?service=LLP%20Registration&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/other-registration?service=LLP%20Registration&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/other-registration?service=LLP%20Registration&status=Filed' },
+        ]
+      },
+      {
+        name: 'Partnership Firm',
+        submenu: [
+          { name: 'All', href: '/admin/forms/other-registration?service=Partnership%20Firm%20Registration' },
+          { name: 'Pending', href: '/admin/forms/other-registration?service=Partnership%20Firm%20Registration&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/other-registration?service=Partnership%20Firm%20Registration&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/other-registration?service=Partnership%20Firm%20Registration&status=Filed' },
+        ]
+      },
+      {
+        name: 'Sole Proprietorship',
+        submenu: [
+          { name: 'All', href: '/admin/forms/other-registration?service=Sole%20Proprietorship' },
+          { name: 'Pending', href: '/admin/forms/other-registration?service=Sole%20Proprietorship&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/other-registration?service=Sole%20Proprietorship&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/other-registration?service=Sole%20Proprietorship&status=Filed' },
+        ]
+      },
+      {
+        name: 'GST Registration',
+        submenu: [
+          { name: 'All', href: '/admin/forms/other-registration?service=GST%20Registration' },
+          { name: 'Pending', href: '/admin/forms/other-registration?service=GST%20Registration&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/other-registration?service=GST%20Registration&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/other-registration?service=GST%20Registration&status=Filed' },
+        ]
+      },
+      {
+        name: 'Digital Signature',
+        submenu: [
+          { name: 'All', href: '/admin/forms/other-registration?service=Digital%20Signature' },
+          { name: 'Pending', href: '/admin/forms/other-registration?service=Digital%20Signature&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/other-registration?service=Digital%20Signature&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/other-registration?service=Digital%20Signature&status=Filed' },
+        ]
+      },
+      {
+        name: 'EPFO Registration',
+        submenu: [
+          { name: 'All', href: '/admin/forms/other-registration?service=EPFO%20Registration' },
+          { name: 'Pending', href: '/admin/forms/other-registration?service=EPFO%20Registration&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/other-registration?service=EPFO%20Registration&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/other-registration?service=EPFO%20Registration&status=Filed' },
+        ]
+      },
+      {
+        name: 'ESIC Registration',
+        submenu: [
+          { name: 'All', href: '/admin/forms/other-registration?service=ESIC%20Registration' },
+          { name: 'Pending', href: '/admin/forms/other-registration?service=ESIC%20Registration&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/other-registration?service=ESIC%20Registration&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/other-registration?service=ESIC%20Registration&status=Filed' },
+        ]
+      },
+      {
+        name: 'FSSAI Food License',
+        submenu: [
+          { name: 'All', href: '/admin/forms/other-registration?service=FSSAI%20Food%20License' },
+          { name: 'Pending', href: '/admin/forms/other-registration?service=FSSAI%20Food%20License&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/other-registration?service=FSSAI%20Food%20License&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/other-registration?service=FSSAI%20Food%20License&status=Filed' },
+        ]
+      },
+      {
+        name: 'IEC Registration',
+        submenu: [
+          { name: 'All', href: '/admin/forms/other-registration?service=IEC%20Registration' },
+          { name: 'Pending', href: '/admin/forms/other-registration?service=IEC%20Registration&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/other-registration?service=IEC%20Registration&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/other-registration?service=IEC%20Registration&status=Filed' },
+        ]
+      },
+      {
+        name: 'Industry License',
+        submenu: [
+          { name: 'All', href: '/admin/forms/other-registration?service=Industry%20License' },
+          { name: 'Pending', href: '/admin/forms/other-registration?service=Industry%20License&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/other-registration?service=Industry%20License&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/other-registration?service=Industry%20License&status=Filed' },
+        ]
+      },
+      {
+        name: 'MSME Udyam Registration',
+        submenu: [
+          { name: 'All', href: '/admin/forms/other-registration?service=MSME%20Udyam%20Registration' },
+          { name: 'Pending', href: '/admin/forms/other-registration?service=MSME%20Udyam%20Registration&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/other-registration?service=MSME%20Udyam%20Registration&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/other-registration?service=MSME%20Udyam%20Registration&status=Filed' },
+        ]
+      },
+      {
+        name: 'NGO Registration',
+        submenu: [
+          { name: 'All', href: '/admin/forms/other-registration?service=NGO%20Registration' },
+          { name: 'Pending', href: '/admin/forms/other-registration?service=NGO%20Registration&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/other-registration?service=NGO%20Registration&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/other-registration?service=NGO%20Registration&status=Filed' },
+        ]
+      },
+      {
+        name: 'PAN Apply',
+        submenu: [
+          { name: 'All', href: '/admin/forms/other-registration?service=PAN%20Apply' },
+          { name: 'Pending', href: '/admin/forms/other-registration?service=PAN%20Apply&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/other-registration?service=PAN%20Apply&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/other-registration?service=PAN%20Apply&status=Filed' },
+        ]
+      },
+      {
+        name: 'Producer Company',
+        submenu: [
+          { name: 'All', href: '/admin/forms/other-registration?service=Producer%20Company' },
+          { name: 'Pending', href: '/admin/forms/other-registration?service=Producer%20Company&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/other-registration?service=Producer%20Company&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/other-registration?service=Producer%20Company&status=Filed' },
+        ]
+      },
+      {
+        name: 'PT Tax Registration',
+        submenu: [
+          { name: 'All', href: '/admin/forms/other-registration?service=PT%20Tax%20Registration' },
+          { name: 'Pending', href: '/admin/forms/other-registration?service=PT%20Tax%20Registration&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/other-registration?service=PT%20Tax%20Registration&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/other-registration?service=PT%20Tax%20Registration&status=Filed' },
+        ]
+      },
+      {
+        name: 'Startup India Registration',
+        submenu: [
+          { name: 'All', href: '/admin/forms/other-registration?service=Startup%20India%20Registration' },
+          { name: 'Pending', href: '/admin/forms/other-registration?service=Startup%20India%20Registration&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/other-registration?service=Startup%20India%20Registration&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/other-registration?service=Startup%20India%20Registration&status=Filed' },
+        ]
+      },
+      {
+        name: 'TAN Apply',
+        submenu: [
+          { name: 'All', href: '/admin/forms/other-registration?service=TAN%20Apply' },
+          { name: 'Pending', href: '/admin/forms/other-registration?service=TAN%20Apply&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/other-registration?service=TAN%20Apply&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/other-registration?service=TAN%20Apply&status=Filed' },
+        ]
+      },
+    ]
+  },
+
+  // ROC Returns
+  {
+    name: 'ROC Returns', icon: FileText,
+    submenu: [
+      { name: 'All Forms', href: '/admin/forms/roc-returns' },
+      { name: 'Pending Review', href: '/admin/forms/roc-returns?status=Pending' },
+      { name: 'Reviewed', href: '/admin/forms/roc-returns?status=Reviewed' },
+      { name: 'Filed', href: '/admin/forms/roc-returns?status=Filed' },
+      {
+        name: 'Annual Filing',
+        submenu: [
+          { name: 'All', href: '/admin/forms/roc-returns?service=Annual%20Filing' },
+          { name: 'Pending', href: '/admin/forms/roc-returns?service=Annual%20Filing&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/roc-returns?service=Annual%20Filing&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/roc-returns?service=Annual%20Filing&status=Filed' },
+        ]
+      },
+      {
+        name: 'Board Resolutions',
+        submenu: [
+          { name: 'All', href: '/admin/forms/roc-returns?service=Board%20Resolutions' },
+          { name: 'Pending', href: '/admin/forms/roc-returns?service=Board%20Resolutions&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/roc-returns?service=Board%20Resolutions&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/roc-returns?service=Board%20Resolutions&status=Filed' },
+        ]
+      },
+      {
+        name: 'Director Changes',
+        submenu: [
+          { name: 'All', href: '/admin/forms/roc-returns?service=Director%20Changes' },
+          { name: 'Pending', href: '/admin/forms/roc-returns?service=Director%20Changes&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/roc-returns?service=Director%20Changes&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/roc-returns?service=Director%20Changes&status=Filed' },
+        ]
+      },
+      {
+        name: 'Share Transfer',
+        submenu: [
+          { name: 'All', href: '/admin/forms/roc-returns?service=Share%20Transfer' },
+          { name: 'Pending', href: '/admin/forms/roc-returns?service=Share%20Transfer&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/roc-returns?service=Share%20Transfer&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/roc-returns?service=Share%20Transfer&status=Filed' },
+        ]
+      },
+    ]
+  },
+
+  // Reports
+  {
+    name: 'Reports', icon: FileText,
+    submenu: [
+      { name: 'All Forms', href: '/admin/forms/reports' },
+      { name: 'Pending Review', href: '/admin/forms/reports?status=Pending' },
+      { name: 'Reviewed', href: '/admin/forms/reports?status=Reviewed' },
+      { name: 'Filed', href: '/admin/forms/reports?status=Filed' },
+      {
+        name: 'Bank Reconciliation',
+        submenu: [
+          { name: 'All', href: '/admin/forms/reports?service=Bank%20Reconciliation' },
+          { name: 'Pending', href: '/admin/forms/reports?service=Bank%20Reconciliation&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/reports?service=Bank%20Reconciliation&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/reports?service=Bank%20Reconciliation&status=Filed' },
+        ]
+      },
+      {
+        name: 'CMA Reports',
+        submenu: [
+          { name: 'All', href: '/admin/forms/reports?service=CMA%20Reports' },
+          { name: 'Pending', href: '/admin/forms/reports?service=CMA%20Reports&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/reports?service=CMA%20Reports&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/reports?service=CMA%20Reports&status=Filed' },
+        ]
+      },
+      {
+        name: 'DSCR Reports',
+        submenu: [
+          { name: 'All', href: '/admin/forms/reports?service=DSCR%20Reports' },
+          { name: 'Pending', href: '/admin/forms/reports?service=DSCR%20Reports&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/reports?service=DSCR%20Reports&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/reports?service=DSCR%20Reports&status=Filed' },
+        ]
+      },
+      {
+        name: 'Project Reports',
+        submenu: [
+          { name: 'All', href: '/admin/forms/reports?service=Project%20Reports' },
+          { name: 'Pending', href: '/admin/forms/reports?service=Project%20Reports&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/reports?service=Project%20Reports&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/reports?service=Project%20Reports&status=Filed' },
+        ]
+      },
+    ]
+  },
+
+  // Trademark & ISO
+  {
+    name: 'Trademark & ISO', icon: FileText,
+    submenu: [
+      { name: 'All Forms', href: '/admin/forms/trademark-iso' },
+      { name: 'Pending Review', href: '/admin/forms/trademark-iso?status=Pending' },
+      { name: 'Reviewed', href: '/admin/forms/trademark-iso?status=Reviewed' },
+      { name: 'Filed', href: '/admin/forms/trademark-iso?status=Filed' },
+      {
+        name: 'Trademark Registration',
+        submenu: [
+          { name: 'All', href: '/admin/forms/trademark-iso?service=Trademark%20Registration' },
+          { name: 'Pending', href: '/admin/forms/trademark-iso?service=Trademark%20Registration&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/trademark-iso?service=Trademark%20Registration&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/trademark-iso?service=Trademark%20Registration&status=Filed' },
+        ]
+      },
+      {
+        name: 'ISO 9001',
+        submenu: [
+          { name: 'All', href: '/admin/forms/trademark-iso?service=ISO%209001' },
+          { name: 'Pending', href: '/admin/forms/trademark-iso?service=ISO%209001&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/trademark-iso?service=ISO%209001&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/trademark-iso?service=ISO%209001&status=Filed' },
+        ]
+      },
+      {
+        name: 'ISO 14001',
+        submenu: [
+          { name: 'All', href: '/admin/forms/trademark-iso?service=ISO%2014001' },
+          { name: 'Pending', href: '/admin/forms/trademark-iso?service=ISO%2014001&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/trademark-iso?service=ISO%2014001&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/trademark-iso?service=ISO%2014001&status=Filed' },
+        ]
+      },
+      {
+        name: 'Copyright Registration',
+        submenu: [
+          { name: 'All', href: '/admin/forms/trademark-iso?service=Copyright%20Registration' },
+          { name: 'Pending', href: '/admin/forms/trademark-iso?service=Copyright%20Registration&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/trademark-iso?service=Copyright%20Registration&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/trademark-iso?service=Copyright%20Registration&status=Filed' },
+        ]
+      },
+    ]
+  },
+
+  // Advisory
+  {
+    name: 'Advisory', icon: FileText,
+    submenu: [
+      { name: 'All Forms', href: '/admin/forms/advisory' },
+      { name: 'Pending Review', href: '/admin/forms/advisory?status=Pending' },
+      { name: 'Reviewed', href: '/admin/forms/advisory?status=Reviewed' },
+      { name: 'Filed', href: '/admin/forms/advisory?status=Filed' },
+      {
+        name: 'Business Strategy Consulting',
+        submenu: [
+          { name: 'All', href: '/admin/forms/advisory?service=Business%20Strategy%20Consulting' },
+          { name: 'Pending', href: '/admin/forms/advisory?service=Business%20Strategy%20Consulting&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/advisory?service=Business%20Strategy%20Consulting&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/advisory?service=Business%20Strategy%20Consulting&status=Filed' },
+        ]
+      },
+      {
+        name: 'Financial Planning & Analysis',
+        submenu: [
+          { name: 'All', href: '/admin/forms/advisory?service=Financial%20Planning%20%26%20Analysis' },
+          { name: 'Pending', href: '/admin/forms/advisory?service=Financial%20Planning%20%26%20Analysis&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/advisory?service=Financial%20Planning%20%26%20Analysis&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/advisory?service=Financial%20Planning%20%26%20Analysis&status=Filed' },
+        ]
+      },
+      {
+        name: 'Digital Transformation',
+        submenu: [
+          { name: 'All', href: '/admin/forms/advisory?service=Digital%20Transformation' },
+          { name: 'Pending', href: '/admin/forms/advisory?service=Digital%20Transformation&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/advisory?service=Digital%20Transformation&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/advisory?service=Digital%20Transformation&status=Filed' },
+        ]
+      },
+      {
+        name: 'HR & Organizational Development',
+        submenu: [
+          { name: 'All', href: '/admin/forms/advisory?service=HR%20%26%20Organizational%20Development' },
+          { name: 'Pending', href: '/admin/forms/advisory?service=HR%20%26%20Organizational%20Development&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/advisory?service=HR%20%26%20Organizational%20Development&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/advisory?service=HR%20%26%20Organizational%20Development&status=Filed' },
+        ]
+      },
+      {
+        name: 'Legal Compliance Advisory',
+        submenu: [
+          { name: 'All', href: '/admin/forms/advisory?service=Legal%20Compliance%20Advisory' },
+          { name: 'Pending', href: '/admin/forms/advisory?service=Legal%20Compliance%20Advisory&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/advisory?service=Legal%20Compliance%20Advisory&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/advisory?service=Legal%20Compliance%20Advisory&status=Filed' },
+        ]
+      },
+      {
+        name: 'Startup Mentoring',
+        submenu: [
+          { name: 'All', href: '/admin/forms/advisory?service=Startup%20Mentoring' },
+          { name: 'Pending', href: '/admin/forms/advisory?service=Startup%20Mentoring&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/advisory?service=Startup%20Mentoring&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/advisory?service=Startup%20Mentoring&status=Filed' },
+        ]
+      },
+      {
+        name: 'Tax Planning & Analysis',
+        submenu: [
+          { name: 'All', href: '/admin/forms/advisory?service=Tax%20Planning%20%26%20Analysis' },
+          { name: 'Pending', href: '/admin/forms/advisory?service=Tax%20Planning%20%26%20Analysis&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/advisory?service=Tax%20Planning%20%26%20Analysis&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/advisory?service=Tax%20Planning%20%26%20Analysis&status=Filed' },
+        ]
+      },
+      {
+        name: 'Assistance for Fund Raising',
+        submenu: [
+          { name: 'All', href: '/admin/forms/advisory?service=Assistance%20for%20Fund%20Raising' },
+          { name: 'Pending', href: '/admin/forms/advisory?service=Assistance%20for%20Fund%20Raising&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/advisory?service=Assistance%20for%20Fund%20Raising&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/advisory?service=Assistance%20for%20Fund%20Raising&status=Filed' },
+        ]
+      },
+      {
+        name: 'Other Finance Related Services',
+        submenu: [
+          { name: 'All', href: '/admin/forms/advisory?service=Other%20Finance%20Related%20Services' },
+          { name: 'Pending', href: '/admin/forms/advisory?service=Other%20Finance%20Related%20Services&status=Pending' },
+          { name: 'Reviewed', href: '/admin/forms/advisory?service=Other%20Finance%20Related%20Services&status=Reviewed' },
+          { name: 'Filed', href: '/admin/forms/advisory?service=Other%20Finance%20Related%20Services&status=Filed' },
+        ]
+      },
     ]
   },
 
@@ -139,15 +581,6 @@ const navigation: NavItem[] = [
     ]
   },
 
-  // Trademark & ISO
-  {
-    name: 'Trademark & ISO', icon: FileText,
-    submenu: [
-      { name: 'Trademark Registration', href: '/admin/services/trademark' },
-      { name: 'ISO Certification', href: '/admin/services/iso' },
-      { name: 'Copyright', href: '/admin/services/copyright' },
-    ]
-  },
   { name: 'Contact Messages', href: '/admin/contact-messages', icon: MessageSquare },
 ]
 

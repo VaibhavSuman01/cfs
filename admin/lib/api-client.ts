@@ -29,12 +29,17 @@ export const API_PATHS = {
   },
   ADMIN: {
     FORMS: createUrl("/api/admin/forms"),
+    SERVICE_FORMS: createUrl("/api/admin/service-forms"),
     FORM_DETAIL: (id: string) => createUrl(`/api/admin/forms/${id}`),
     FORM_STATUS: (id: string) => createUrl(`/api/admin/forms/${id}/status`),
     CONTACTS: createUrl("/api/admin/contacts"),
     STATS: createUrl("/api/admin/stats"),
     USERS: createUrl("/api/admin/users"),
     USERS_DOWNLOAD: createUrl("/api/admin/users/download"),
+    // Add specific form type endpoints
+    ROC_RETURNS_DETAIL: (id: string) => createUrl(`/api/admin/roc-returns/${id}`),
+    ROC_RETURNS_STATUS_UPDATE: (id: string) => createUrl(`/api/admin/roc-returns/${id}/status`),
+    ROC_RETURNS_DOWNLOAD: (id: string, documentId: string) => createUrl(`/api/admin/roc-returns/${id}/download/${documentId}`),
   },
   FORMS: {
     TAX: createUrl("/api/forms/tax"),

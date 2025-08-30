@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { getBasePrice } from '@/lib/pricing';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import {
   Award,
   TrendingUp,
@@ -22,12 +22,7 @@ import {
 } from 'lucide-react';
 
 export default function Iso14001Page() {
-  const router = useRouter();
   const basePrice = getBasePrice("iso 14001 certification") ?? "As per request";
-
-  const handleBookService = () => {
-    router.push(`/contact?service=ISO+14001+Certification`);
-  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -71,17 +66,20 @@ export default function Iso14001Page() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                  <Button onClick={handleBookService} className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                    Get Certified
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={handleBookService}
-                    className="border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white px-8 py-3 rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
-                  >
-                    Consult an Expert
-                  </Button>
+                  <Link href={`/dashboard/trademark-iso-form?service=${encodeURIComponent('ISO 14001')}`} passHref>
+                    <Button className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                      Get Certified
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Button>
+                  </Link>
+                  <Link href={`/dashboard/trademark-iso-form?service=${encodeURIComponent('ISO 14001')}`} passHref>
+                    <Button
+                      variant="outline"
+                      className="border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white px-8 py-3 rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
+                    >
+                      Consult an Expert
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </FadeInSection>
@@ -177,17 +175,20 @@ export default function Iso14001Page() {
                 Demonstrate your commitment to environmental responsibility with ISO 14001 certification. Join the global movement towards sustainable business practices.
               </p>
               <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <Button onClick={handleBookService} className="bg-white text-green-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                  Start Certification
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={handleBookService}
-                  className="border-2 border-white text-white hover:bg-white hover:text-green-600 px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
-                >
-                  Get Expert Consultation
-                </Button>
+                <Link href={`/dashboard/trademark-iso-form?service=${encodeURIComponent('ISO 14001')}`} passHref>
+                  <Button className="bg-white text-green-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                    Start Certification
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
+                <Link href={`/dashboard/trademark-iso-form?service=${encodeURIComponent('ISO 14001')}`} passHref>
+                  <Button
+                    variant="outline"
+                    className="border-2 border-white text-white hover:bg-white hover:text-green-600 px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
+                  >
+                    Apply Now
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>

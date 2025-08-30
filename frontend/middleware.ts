@@ -11,6 +11,8 @@ export function middleware(request: NextRequest) {
     "/dashboard/profile",
     "/dashboard/new-form",
     "/dashboard/forms",
+    "/dashboard/roc-returns-form",
+    "/dashboard/roc-returns",
   ];
 
   // Check if the current path is a protected route

@@ -328,7 +328,7 @@ export default function AdvisoryPage() {
                 Get expert advisory services tailored to your business needs and accelerate your growth
               </p>
               <div className="flex justify-center space-x-4">
-                <Link href={`/contact?service=${encodeURIComponent("Business Advisory Services")}`} passHref>
+                <Link href={`/dashboard/advisory-form?service=${encodeURIComponent("Business Advisory Services")}`} passHref>
                   <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg">
                     Schedule Consultation
                   </Button>
