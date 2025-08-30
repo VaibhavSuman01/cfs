@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { DownloadIcon, UserIcon, CalendarIcon, SearchIcon } from 'lucide-react';
+import { DownloadIcon, UserIcon, CalendarIcon, SearchIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
 import { addDays, format } from 'date-fns';
 
@@ -19,7 +19,7 @@ import { Calendar } from '@/components/ui/calendar';
 import api from '@/lib/api-client';
 import { API_PATHS } from '@/lib/api-client';
 
-// Types
+// Define interfaces
 interface User {
   _id: string;
   name: string;
@@ -48,6 +48,8 @@ export default function UsersPage() {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [selectedRange, setSelectedRange] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -64,6 +66,8 @@ export default function UsersPage() {
       setLoading(true);
       try {
         const params = new URLSearchParams();
+        params.append('page', currentPage.toString());
+        params.append('limit', pageSize.toString());
         if (debouncedSearchTerm) {
           params.append('search', debouncedSearchTerm);
         }
@@ -94,7 +98,12 @@ export default function UsersPage() {
     };
 
     fetchUsers();
-  }, [toast, debouncedSearchTerm, dateRange]);
+  }, [toast, debouncedSearchTerm, dateRange, currentPage, pageSize]);
+
+  // Reset to first page when search or date filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearchTerm, dateRange]);
 
   const handleDateRangeSelect = (range: string) => {
     setSelectedRange(range);
@@ -141,7 +150,7 @@ export default function UsersPage() {
       if (dateRange?.to) {
         params.append('endDate', dateRange.to.toISOString());
       }
-      await api.downloadFile(`${API_PATHS.ADMIN.USERS}/download?${params.toString()}`, `users-${date}.xlsx`);
+      await api.downloadFile(`${API_PATHS.ADMIN.USERS_DOWNLOAD}?${params.toString()}`, `users-${date}.xlsx`);
       loadingToast.dismiss();
       toast({
         title: 'Download Started',
@@ -218,7 +227,7 @@ export default function UsersPage() {
                   {dateRange?.from ? (
                     dateRange.to ? (
                       <>
-                        {format(dateRange.from, "LLL dd, y")} -{" "}
+                        {format(dateRange.from, "LLL dd, y")} -{" "}
                         {format(dateRange.to, "LLL dd, y")}
                       </>
                     ) : (
@@ -235,7 +244,7 @@ export default function UsersPage() {
                   mode="range"
                   defaultMonth={dateRange?.from}
                   selected={dateRange}
-                  onSelect={(range) => { setDateRange(range); setSelectedRange('custom'); } }
+                  onSelect={(range) => { setDateRange(range); setSelectedRange('custom'); }}
                   numberOfMonths={2}
                 />
               </PopoverContent>
@@ -247,7 +256,11 @@ export default function UsersPage() {
           <CardHeader>
             <CardTitle>All Users</CardTitle>
             <CardDescription>
-              {pagination ? `${pagination.total} users found` : 'Loading...'}
+              {pagination ? (
+                pagination.pages > 1 ? 
+                  `${pagination.total} users found (Page ${pagination.page} of ${pagination.pages})` : 
+                  `${pagination.total} users found`
+              ) : 'Loading...'}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -261,7 +274,7 @@ export default function UsersPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                                        <TableHead>Name</TableHead>
+                    <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
                     <TableHead>Mobile</TableHead>
                     <TableHead>Father's Name</TableHead>
@@ -274,7 +287,7 @@ export default function UsersPage() {
                 <TableBody>
                   {users.map((user) => (
                     <TableRow key={user._id}>
-                                                                  <TableCell className="font-medium">{user.name}</TableCell>
+                      <TableCell className="font-medium">{user.name}</TableCell>
                       <TableCell>{user.email}</TableCell>
                       <TableCell>{user.mobile || '-'}</TableCell>
                       <TableCell>{user.fatherName || '-'}</TableCell>
@@ -286,6 +299,88 @@ export default function UsersPage() {
                   ))}
                 </TableBody>
               </Table>
+            )}
+            
+            {/* Pagination Controls */}
+            {pagination && (
+              <div className="flex items-center justify-between mt-6 pt-4 border-t">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">
+                    Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, pagination.total)} of {pagination.total} users
+                  </span>
+                </div>
+                
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">Rows per page:</span>
+                    <Select value={pageSize.toString()} onValueChange={(value) => {
+                      setPageSize(Number(value));
+                      setCurrentPage(1);
+                    }}>
+                      <SelectTrigger className="w-[70px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="5">5</SelectItem>
+                        <SelectItem value="10">10</SelectItem>
+                        <SelectItem value="20">20</SelectItem>
+                        <SelectItem value="50">50</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  {pagination.pages > 1 && (
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        disabled={currentPage <= 1}
+                      >
+                        <ChevronLeftIcon className="h-4 w-4" />
+                        Previous
+                      </Button>
+                      
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: Math.min(5, pagination.pages) }, (_, i) => {
+                          let pageNum;
+                          if (pagination.pages <= 5) {
+                            pageNum = i + 1;
+                          } else if (currentPage <= 3) {
+                            pageNum = i + 1;
+                          } else if (currentPage >= pagination.pages - 2) {
+                            pageNum = pagination.pages - 4 + i;
+                          } else {
+                            pageNum = currentPage - 2 + i;
+                          }
+                          
+                          return (
+                            <Button
+                              key={pageNum}
+                              variant={currentPage === pageNum ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => setCurrentPage(pageNum)}
+                              className="w-8 h-8 p-0"
+                            >
+                              {pageNum}
+                            </Button>
+                          );
+                        })}
+                      </div>
+                      
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        disabled={currentPage >= pagination.pages}
+                      >
+                        Next
+                        <ChevronRightIcon className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
             )}
           </CardContent>
         </Card>

@@ -348,8 +348,11 @@ class ApiClient {
         return;
       }
 
+      // Determine if URL is absolute or relative
+      const finalUrl = url.startsWith('http') ? url : `${API_BASE_URL}${url.startsWith('/') ? url : `/${url}`}`;
+
       // Create a fetch request with the authorization header
-      const response = await fetch(`${API_BASE_URL}${url}`, {
+      const response = await fetch(finalUrl, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
