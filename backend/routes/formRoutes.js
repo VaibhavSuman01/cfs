@@ -607,7 +607,7 @@ router.put(
       }
 
       // Find the existing form and verify ownership
-      const existingForm = await TaxForm.findOne({ _id: id, userId });
+      const existingForm = await TaxForm.findOne({ _id: id, user: userId });
       if (!existingForm) {
         return res
           .status(404)
@@ -649,24 +649,45 @@ router.put(
         const existingDocIds = Array.isArray(existingDocuments)
           ? existingDocuments
           : [existingDocuments];
-        q;
 
         documentsToKeep = existingForm.documents.filter((doc) =>
           existingDocIds.includes(doc._id.toString())
         );
       }
 
+      // Get document types from request body
+      const documentTypes = {};
+      Object.keys(req.body).forEach((key) => {
+        if (key.startsWith("documentType_")) {
+          const fileId = key.replace("documentType_", "");
+          documentTypes[fileId] = req.body[key];
+        }
+      });
+
       // Handle new uploaded files
       let newDocuments = [];
       if (req.files && req.files.length > 0) {
-        newDocuments = req.files.map((file) => ({
-          originalName: file.originalname,
-          filename: file.filename,
-          path: file.path,
-          size: file.size,
-          mimetype: file.mimetype,
-          uploadDate: new Date(),
-        }));
+        req.files.forEach((file, index) => {
+          const fileId = req.body[`fileId_${index}`] || `file_${index}`;
+          const docType = documentTypes[fileId] || "other";
+
+          // Generate a unique filename
+          const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+          const ext = path.extname(file.originalname);
+          const fileName = uniqueSuffix + ext;
+
+          newDocuments.push({
+            documentType: docType,
+            fileName: fileName,
+            originalName: file.originalname,
+            fileType: file.mimetype,
+            fileSize: file.size,
+            fileData: file.buffer,
+            contentType: file.mimetype,
+            uploadedBy: 'user',
+            uploadDate: new Date(),
+          });
+        });
       }
 
       // Combine existing and new documents
