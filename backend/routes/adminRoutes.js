@@ -554,6 +554,7 @@ router.get("/users/download", async (req, res) => {
       { header: "Email", key: "email", width: 25 },
       { header: "Address", key: "address", width: 30 },
       { header: "PAN", key: "pan", width: 15 },
+      { header: "Aadhaar Number", key: "aadhaar", width: 18 },
       { header: "Date of Birth", key: "dob", width: 15 },
       { header: "Registered On", key: "createdAt", width: 15 }
     ];
@@ -575,6 +576,7 @@ router.get("/users/download", async (req, res) => {
         email: user.email || "N/A",
         address: user.address || "N/A",
         pan: user.pan || "N/A",
+        aadhaar: user.aadhaar || "N/A",
         dob: user.dob ? new Date(user.dob).toLocaleDateString() : "N/A",
         createdAt: new Date(user.createdAt).toLocaleDateString()
       });
