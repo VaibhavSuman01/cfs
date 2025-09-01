@@ -31,6 +31,10 @@ interface Document {
   isEdited?: boolean;
   name?: string; // For backward compatibility
   path?: string; // For backward compatibility
+  reportType?: string; // For admin reports
+  message?: string; // For admin report messages
+  createdAt?: string; // For timestamp
+  uploadedBy?: string; // For tracking who uploaded the document
 }
 
 interface TaxForm {
@@ -248,10 +252,11 @@ export default function TaxFormDetailPage() {
                   </InfoSection>
                 )}
 
-                <InfoSection title="Uploaded Documents">
+                {/* User Documents Section */}
+                <InfoSection title="User Documents">
                   <ul className="space-y-2">
-                    {form.documents && form.documents.length > 0 ? (
-                      form.documents.map(doc => (
+                    {form.documents && form.documents.filter(doc => doc.documentType !== 'admin-report').length > 0 ? (
+                      form.documents.filter(doc => doc.documentType !== 'admin-report').map(doc => (
                         <li key={doc._id} className="flex items-center justify-between p-2 rounded-md border">
                           <div className="flex flex-col">
                             <span className="text-sm font-medium">{doc.originalName || doc.fileName || doc.name || 'Document'}</span>
@@ -261,7 +266,30 @@ export default function TaxFormDetailPage() {
                         </li>
                       ))
                     ) : (
-                      <li className="p-2 text-sm text-muted-foreground">No documents uploaded</li>
+                      <li className="p-2 text-sm text-muted-foreground">No documents uploaded yet</li>
+                    )}
+                  </ul>
+                </InfoSection>
+
+                {/* Admin Sent Reports Section */}
+                <InfoSection title="Sent Reports">
+                  <ul className="space-y-2">
+                    {form.documents && form.documents.filter(doc => doc.documentType === 'admin-report').length > 0 ? (
+                      form.documents.filter(doc => doc.documentType === 'admin-report').map(doc => (
+                        <li key={doc._id} className="flex items-center justify-between p-3 rounded-md border bg-blue-50">
+                          <div className="flex flex-col space-y-1">
+                            <span className="text-sm font-medium">{doc.originalName || doc.fileName || doc.name || 'Report'}</span>
+                            <div className="flex items-center space-x-4 text-xs text-muted-foreground">
+                              {doc.reportType && <span className="capitalize">Type: {doc.reportType}</span>}
+                              {doc.createdAt && <span>Sent: {new Date(doc.createdAt).toLocaleDateString()}</span>}
+                            </div>
+                            {doc.message && <p className="text-xs text-gray-600 mt-1">{doc.message}</p>}
+                          </div>
+                          <Button size="sm" variant="outline" onClick={() => handleDownload(doc)}><Download className="mr-2 h-4 w-4"/>Download</Button>
+                        </li>
+                      ))
+                    ) : (
+                      <li className="p-2 text-sm text-muted-foreground">No reports sent yet</li>
                     )}
                   </ul>
                 </InfoSection>

@@ -12,6 +12,7 @@ const upload = require("../middleware/upload");
 const sendEmail = require("../utils/email");
 const mongoose = require("mongoose");
 const isValidObjectId = mongoose.Types.ObjectId.isValid;
+const { getFileData, cleanupTempFiles, generateUniqueFilename } = require("../utils/fileHandler");
 
 // Import all the new models
 const CompanyForm = require("../models/CompanyForm");
@@ -243,11 +244,46 @@ router.post("/forms/:id/send-report", validateObjectId(), upload.single('reportF
     const { reportType, message, attachmentIds } = req.body;
     const id = req.params.id;
     
-    // Find the tax form
-    const form = await TaxForm.findById(id);
+    // Validate required fields
+    if (!reportType || !message) {
+      return res.status(400).json({ message: "Report type and message are required" });
+    }
+    
+    // Find the form - try different models
+    let form = null;
+    let formModel = null;
+    
+    // Try to find the form in different collections
+    const models = [
+      { model: TaxForm, name: 'TaxForm' },
+      { model: CompanyForm, name: 'CompanyForm' },
+      { model: OtherRegistrationForm, name: 'OtherRegistrationForm' },
+      { model: ROCForm, name: 'ROCForm' },
+      { model: ReportsForm, name: 'ReportsForm' },
+      { model: TrademarkISOForm, name: 'TrademarkISOForm' },
+      { model: AdvisoryForm, name: 'AdvisoryForm' }
+    ];
+    
+    for (const { model, name } of models) {
+      try {
+        form = await model.findById(id);
+        if (form) {
+          formModel = model;
+          break;
+        }
+      } catch (error) {
+        // Continue to next model if this one fails
+        continue;
+      }
+    }
     
     if (!form) {
       return res.status(404).json({ message: "Form not found" });
+    }
+    
+    // Ensure user is authenticated
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({ message: "User not authenticated" });
     }
     
     // Get user email from the form
@@ -260,27 +296,43 @@ router.post("/forms/:id/send-report", validateObjectId(), upload.single('reportF
     // 3. Sending the email to the user
     
         let newReportDocument = null;
+    let documentId = undefined;
+    
     if (req.file) {
+      // Read file data from disk since we're using disk storage
+      const fileData = fs.readFileSync(req.file.path);
+      
       newReportDocument = {
         documentType: 'admin-report',
         fileName: req.file.originalname,
         originalName: req.file.originalname,
         fileType: req.file.mimetype,
         fileSize: req.file.size,
-        fileData: req.file.buffer,
+        fileData: fileData,
         contentType: req.file.mimetype,
         uploadedBy: 'admin',
+        reportType: reportType,
+        message: message,
+        createdAt: new Date(),
       };
       form.documents.push(newReportDocument);
+      documentId = form.documents[form.documents.length - 1]._id;
+      
+      // Clean up the temporary file after reading it
+      try {
+        fs.unlinkSync(req.file.path);
+      } catch (cleanupError) {
+        console.warn('Failed to cleanup temporary file:', cleanupError);
+      }
     }
 
-    // Update the form to record that a report was sent and add the new document
+    // Update the form to record that a report was sent
     form.reports.push({
       type: reportType,
       message: message,
       sentAt: new Date(),
       sentBy: req.user._id,
-      documentId: newReportDocument ? form.documents[form.documents.length - 1]._id : undefined
+      documentId: documentId
     });
 
     await form.save();
@@ -305,7 +357,25 @@ router.post("/forms/:id/send-report", validateObjectId(), upload.single('reportF
     res.json({ success: true, message: "Report sent successfully" });
   } catch (error) {
     console.error("Send report error:", error);
-    res.status(500).json({ message: "Server error" });
+    
+    // Handle specific mongoose validation errors
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ 
+        message: "Validation failed", 
+        errors: validationErrors 
+      });
+    }
+    
+    // Handle mongoose cast errors (invalid ObjectId)
+    if (error.name === 'CastError') {
+      return res.status(400).json({ message: "Invalid ID format" });
+    }
+    
+    res.status(500).json({ 
+      message: "Server error", 
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined 
+    });
   }
 });
 
@@ -314,7 +384,7 @@ router.post("/forms/:id/send-report", validateObjectId(), upload.single('reportF
 // @access  Private/Admin
 router.put("/forms/:id/status", validateObjectId(), async (req, res) => {
   try {
-    const { status } = req.body;
+    const { status, comment } = req.body;
     const id = req.params.id;
 
     // Validate status
@@ -322,14 +392,58 @@ router.put("/forms/:id/status", validateObjectId(), async (req, res) => {
       return res.status(400).json({ message: "Invalid status" });
     }
 
-    const form = await TaxForm.findById(id);
+    // Validate ObjectId
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({ message: "Invalid form ID" });
+    }
+
+    // Define all form models to search
+    const formModels = [
+      { model: TaxForm, name: 'TaxForm' },
+      { model: CompanyForm, name: 'CompanyForm' },
+      { model: ROCForm, name: 'ROCForm' },
+      { model: OtherRegistrationForm, name: 'OtherRegistrationForm' },
+      { model: ReportsForm, name: 'ReportsForm' },
+      { model: TrademarkISOForm, name: 'TrademarkISOForm' },
+      { model: AdvisoryForm, name: 'AdvisoryForm' }
+    ];
+
+    let form = null;
+    let formType = null;
+
+    // Search across all form models
+    for (const { model, name } of formModels) {
+      try {
+        form = await model.findById(id);
+        if (form) {
+          formType = name;
+          break;
+        }
+      } catch (err) {
+        // Continue searching other models
+        continue;
+      }
+    }
 
     if (!form) {
       return res.status(404).json({ message: "Form not found" });
     }
 
+    // Update form status
     form.status = status;
     form.updatedAt = Date.now();
+    
+    // Add comment if provided
+    if (comment) {
+      if (!form.adminComments) {
+        form.adminComments = [];
+      }
+      form.adminComments.push({
+        comment,
+        createdAt: new Date(),
+        createdBy: 'admin'
+      });
+    }
 
     await form.save();
 
@@ -337,6 +451,7 @@ router.put("/forms/:id/status", validateObjectId(), async (req, res) => {
       success: true,
       message: "Form status updated",
       form,
+      formType
     });
   } catch (error) {
     console.error("Update status error:", error);
@@ -875,11 +990,11 @@ router.put("/roc-returns/:id/status", upload.array("completionDocuments", 10), a
     if (status === "Filed" && req.files && req.files.length > 0) {
       const completionDocs = req.files.map((file, index) => ({
         documentType: req.body[`documentType_${index}`] || "Completion Document",
-        fileName: Date.now() + "-" + Math.round(Math.random() * 1e9) + path.extname(file.originalname),
+        fileName: generateUniqueFilename(file.originalname),
         originalName: file.originalname,
         fileType: file.mimetype,
         fileSize: file.size,
-        fileData: file.buffer,
+        fileData: getFileData(file),
         contentType: file.mimetype,
         uploadedBy: 'admin',
         isCompletionDocument: true,

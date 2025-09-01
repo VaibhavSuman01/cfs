@@ -413,8 +413,18 @@ router.put("/profile/avatar", protect, upload.single("avatar"), async (req, res)
       fs.mkdirSync(uploadsDir, { recursive: true });
     }
 
-    // Write the file from buffer to the uploads directory
-    fs.writeFileSync(filePath, req.file.buffer);
+    // Read file data from disk since we're using disk storage
+    const fileData = fs.readFileSync(req.file.path);
+    
+    // Write the file to the uploads directory
+    fs.writeFileSync(filePath, fileData);
+    
+    // Clean up the temporary file after reading it
+    try {
+      fs.unlinkSync(req.file.path);
+    } catch (cleanupError) {
+      console.warn('Failed to cleanup temporary file:', cleanupError);
+    }
 
     // Set the avatar URL (relative path for client access)
     const avatarUrl = `/uploads/${filename}`;
@@ -434,7 +444,7 @@ router.put("/profile/avatar", protect, upload.single("avatar"), async (req, res)
     });
   } catch (error) {
     console.error("Avatar upload error:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 

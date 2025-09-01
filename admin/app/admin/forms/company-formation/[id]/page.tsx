@@ -31,6 +31,11 @@ interface Document {
   isEdited?: boolean;
   name?: string;
   path?: string;
+  reportType?: string; // For admin reports
+  message?: string; // For admin report messages
+  createdAt?: string; // For timestamp
+  updatedAt?: string; // For tracking when document was last updated
+  uploadedBy?: string; // For tracking who uploaded the document
 }
 
 interface CompanyForm {
@@ -65,6 +70,8 @@ interface CompanyForm {
     type: string;
     documents: string[];
     createdAt: string;
+    documentId?: string;
+    sentAt?: string;
   }>;
   createdAt: string;
   updatedAt?: string;
@@ -412,38 +419,98 @@ export default function CompanyFormDetailPage() {
           </CardContent>
         </Card>
 
-        {/* Documents */}
+        {/* User Documents */}
         <Card className="mt-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5 text-blue-600" />
-              Documents
+              User Documents
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {form.documents && form.documents.length > 0 ? (
-              <div className="space-y-2">
-                {form.documents.map((doc, index) => (
-                  <div key={doc._id || index} className="flex items-center justify-between border rounded-md p-3">
-                    <div className="flex items-center gap-3">
-                      <FileText className="h-5 w-5 text-blue-600" />
-                      <div>
-                        <p className="font-medium">{doc.originalName || doc.fileName || doc.name || `Document ${index + 1}`}</p>
-                        {doc.contentType && (
-                          <p className="text-sm text-muted-foreground">{doc.contentType}</p>
-                        )}
+            {(() => {
+              const userDocuments = form.documents?.filter(doc => 
+                doc.documentType !== 'admin-report' && doc.uploadedBy !== 'admin'
+              ) || [];
+              
+              return userDocuments.length > 0 ? (
+                <div className="space-y-2">
+                  {userDocuments.map((doc, index) => (
+                    <div key={doc._id || index} className="flex items-center justify-between border rounded-md p-3">
+                      <div className="flex items-center gap-3">
+                        <FileText className="h-5 w-5 text-blue-600" />
+                        <div>
+                          <p className="font-medium">{doc.originalName || doc.fileName || doc.name || `Document ${index + 1}`}</p>
+                          {doc.contentType && (
+                            <p className="text-sm text-muted-foreground">{doc.contentType}</p>
+                          )}
+                        </div>
+                      </div>
+                      <Button variant="outline" size="sm">
+                        <Download className="mr-2 h-4 w-4" />
+                        Download
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-muted-foreground">No user documents uploaded yet.</p>
+              );
+            })()
+            }
+          </CardContent>
+        </Card>
+
+        {/* Admin Reports */}
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Send className="h-5 w-5 text-green-600" />
+              Sent Reports
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {(() => {
+              const adminReports = form.documents?.filter(doc => 
+                doc.documentType === 'admin-report' || doc.uploadedBy === 'admin'
+              ) || [];
+              
+              return adminReports.length > 0 ? (
+                <div className="space-y-2">
+                  {adminReports.map((doc, index) => (
+                    <div key={doc._id || index} className="border rounded-md p-3 bg-green-50">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <Send className="h-5 w-5 text-green-600" />
+                          <div>
+                            <p className="font-medium">{doc.originalName || doc.fileName || doc.name || `Report ${index + 1}`}</p>
+                            {doc.contentType && (
+                              <p className="text-sm text-muted-foreground">{doc.contentType}</p>
+                            )}
+                            {doc.reportType && (
+                              <p className="text-sm font-medium text-green-700">Type: {doc.reportType}</p>
+                            )}
+                            {doc.createdAt && (
+                              <p className="text-sm text-gray-600">Sent: {new Date(doc.createdAt).toLocaleDateString()}</p>
+                            )}
+                            {doc.message && (
+                              <p className="text-sm text-gray-600 mt-1 p-2 bg-blue-50 rounded">Message: {doc.message}</p>
+                            )}
+                          </div>
+                        </div>
+                        <Button variant="outline" size="sm">
+                          <Download className="mr-2 h-4 w-4" />
+                          Download
+                        </Button>
                       </div>
                     </div>
-                    <Button variant="outline" size="sm">
-                      <Download className="mr-2 h-4 w-4" />
-                      Download
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-muted-foreground">No documents uploaded yet.</p>
-            )}
+                  ))}
+                </div>
+              ) : (
+                <p className="text-muted-foreground">No reports sent yet.</p>
+              );
+            })()
+            }
           </CardContent>
         </Card>
       </motion.div>

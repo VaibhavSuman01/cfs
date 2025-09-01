@@ -9,6 +9,7 @@ const { handleMulterError } = require("../middleware/upload");
 const { protect } = require("../middleware/auth");
 const { isValidObjectId } = require("../utils/validation");
 const { validate, validateObjectId } = require("../utils/validation");
+const { getFileData, cleanupTempFiles, generateUniqueFilename } = require("../utils/fileHandler");
 
 // Import all the new models
 const CompanyForm = require("../models/CompanyForm");
@@ -184,19 +185,16 @@ router.post(
           });
 
           // Generate a unique filename
-          const uniqueSuffix =
-            Date.now() + "-" + Math.round(Math.random() * 1e9);
-          const ext = path.extname(file.originalname);
-          const fileName = uniqueSuffix + ext;
+          const fileName = generateUniqueFilename(file.originalname);
 
-          // Add to documents array with file data stored in Buffer
+          // Add to documents array with file data
           formData.documents.push({
             documentType: docType,
             fileName: fileName,
             originalName: file.originalname,
             fileType: file.mimetype,
             fileSize: file.size,
-            fileData: file.buffer,
+            fileData: getFileData(file),
             contentType: file.mimetype,
             uploadedBy: 'user', // submissions here are always by the user
           });
@@ -330,17 +328,27 @@ router.post("/roc-returns/document/:formId", protect, upload.single("document"),
       return res.status(403).json({ message: "Not authorized to update this form" });
     }
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+    // Read file data from disk since we're using disk storage
+    const fileData = require('fs').readFileSync(req.file.path);
+    
     const newDoc = {
       documentType: documentType || "other",
       fileName: Date.now() + "-" + Math.round(Math.random() * 1e9) + path.extname(req.file.originalname),
       originalName: req.file.originalname,
       fileType: req.file.mimetype,
       fileSize: req.file.size,
-      fileData: req.file.buffer,
+      fileData: fileData,
       contentType: req.file.mimetype,
       isEdited: true,
       uploadedBy: req.user.role === "admin" ? "admin" : "user",
     };
+    
+    // Clean up the temporary file after reading it
+    try {
+      require('fs').unlinkSync(req.file.path);
+    } catch (cleanupError) {
+      console.warn('Failed to cleanup temporary file:', cleanupError);
+    }
     form.documents.push(newDoc);
     await form.save();
     const responseDocument = {
@@ -390,11 +398,11 @@ router.put("/roc-returns/:id", protect, upload.array("documents", 10), handleMul
     if (req.files?.length) {
       newDocs = req.files.map((file, index) => ({
         documentType: req.body[`documentType_${index}`] || "General Document",
-        fileName: Date.now() + "-" + Math.round(Math.random() * 1e9) + path.extname(file.originalname),
+        fileName: generateUniqueFilename(file.originalname),
         originalName: file.originalname,
         fileType: file.mimetype,
         fileSize: file.size,
-        fileData: file.buffer,
+        fileData: getFileData(file),
         contentType: file.mimetype,
         isEdited: true,
         uploadedBy: req.user.role === "admin" ? "admin" : "user",
@@ -532,17 +540,28 @@ router.post("/other-registration/document/:formId", protect, upload.single("docu
       return res.status(403).json({ message: "Not authorized to update this form" });
     }
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+    
+    // Read file data from disk since we're using disk storage
+    const fileData = require('fs').readFileSync(req.file.path);
+    
     const newDoc = {
       documentType: documentType || "other",
       fileName: Date.now() + "-" + Math.round(Math.random() * 1e9) + path.extname(req.file.originalname),
       originalName: req.file.originalname,
       fileType: req.file.mimetype,
       fileSize: req.file.size,
-      fileData: req.file.buffer,
+      fileData: fileData,
       contentType: req.file.mimetype,
       isEdited: true,
       uploadedBy: req.user.role === "admin" ? "admin" : "user",
     };
+    
+    // Clean up the temporary file after reading it
+    try {
+      require('fs').unlinkSync(req.file.path);
+    } catch (cleanupError) {
+      console.warn('Failed to cleanup temporary file:', cleanupError);
+    }
     form.documents.push(newDoc);
     await form.save();
     const responseDocument = {
@@ -591,11 +610,11 @@ router.put("/other-registration/:id", protect, upload.array("documents", 10), ha
     if (req.files?.length) {
       newDocs = req.files.map((file, index) => ({
         documentType: req.body[`documentType_${index}`] || "General Document",
-        fileName: Date.now() + "-" + Math.round(Math.random() * 1e9) + path.extname(file.originalname),
+        fileName: generateUniqueFilename(file.originalname),
         originalName: file.originalname,
         fileType: file.mimetype,
         fileSize: file.size,
-        fileData: file.buffer,
+        fileData: getFileData(file),
         contentType: file.mimetype,
         isEdited: true,
         uploadedBy: req.user.role === "admin" ? "admin" : "user",
@@ -774,17 +793,27 @@ router.post(
         return res.status(400).json({ message: "No file uploaded" });
       }
 
+      // Read file data from disk since we're using disk storage
+      const fileData = require('fs').readFileSync(req.file.path);
+      
       const newDoc = {
         documentType: documentType || "other",
         fileName: Date.now() + "-" + Math.round(Math.random() * 1e9) + path.extname(req.file.originalname),
         originalName: req.file.originalname,
         fileType: req.file.mimetype,
         fileSize: req.file.size,
-        fileData: req.file.buffer,
+        fileData: fileData,
         contentType: req.file.mimetype,
         isEdited: true,
         uploadedBy: req.user.role === "admin" ? "admin" : "user",
       };
+      
+      // Clean up the temporary file after reading it
+      try {
+        require('fs').unlinkSync(req.file.path);
+      } catch (cleanupError) {
+        console.warn('Failed to cleanup temporary file:', cleanupError);
+      }
 
       form.documents.push(newDoc);
       await form.save();
@@ -878,7 +907,7 @@ router.put(
           originalName: file.originalname,
           fileType: file.mimetype,
           fileSize: file.size,
-          fileData: file.buffer,
+          fileData: getFileData(file),
           contentType: file.mimetype,
           isEdited: true,
           uploadedBy: req.user.role === "admin" ? "admin" : "user",
@@ -1007,27 +1036,59 @@ router.get("/user-submissions", protect, async (req, res) => {
  });
 
 // @route   GET /api/forms/user-submissions/:id
-// @desc    Get a specific tax form submission for the logged-in user
+// @desc    Get a specific form submission for the logged-in user across all form types
 // @access  Private
 router.get("/user-submissions/:id", protect, async (req, res) => {
   try {
-    const submission = await TaxForm.findById(req.params.id).select(
-      "-incomeTaxLoginCredentials -documents.fileData"
-    ); // Exclude sensitive data and file data
+    const formId = req.params.id;
+    const userId = req.user._id;
+    const userEmail = req.user.email;
+
+    if (!isValidObjectId(formId)) {
+      return res.status(400).json({ message: "Invalid form ID" });
+    }
+
+    // Search across all form models
+    const models = [
+      { model: TaxForm, type: 'TaxForm', selectFields: '-incomeTaxLoginCredentials -documents.fileData' },
+      { model: CompanyForm, type: 'CompanyForm', selectFields: '-documents.fileData' },
+      { model: ROCForm, type: 'ROCForm', selectFields: '-documents.fileData' },
+      { model: OtherRegistrationForm, type: 'OtherRegistrationForm', selectFields: '-documents.fileData' },
+      { model: ReportsForm, type: 'ReportsForm', selectFields: '-documents.fileData' },
+      { model: TrademarkISOForm, type: 'TrademarkISOForm', selectFields: '-documents.fileData' },
+      { model: AdvisoryForm, type: 'AdvisoryForm', selectFields: '-documents.fileData' }
+    ];
+
+    let submission = null;
+    let formType = null;
+
+    // Search each model for the form ID
+    for (const { model, type, selectFields } of models) {
+      try {
+        const found = await model.findById(formId).select(selectFields);
+        if (found) {
+          // Check if the submission belongs to the logged-in user
+          const ownsByUser = found.user && found.user.equals(userId);
+          if (!ownsByUser && found.email !== userEmail) {
+            return res.status(403).json({ message: "Not authorized to view this submission" });
+          }
+          submission = found;
+          formType = type;
+          break;
+        }
+      } catch (err) {
+        // Continue searching in other models if this one fails
+        continue;
+      }
+    }
 
     if (!submission) {
       return res.status(404).json({ message: "Submission not found" });
     }
 
-    // Check if the submission belongs to the logged-in user
-    if (submission.email !== req.user.email) {
-      return res
-        .status(403)
-        .json({ message: "Not authorized to view this submission" });
-    }
-
     // Process documents by document type for easier frontend access
     const processedSubmission = submission.toObject();
+    processedSubmission.formType = formType;
 
     // Create document objects by type for easier frontend access
     if (
@@ -1253,6 +1314,9 @@ router.post(
         return res.status(400).json({ message: "No file uploaded" });
       }
 
+      // Read file data from disk since we're using disk storage
+      const fileData = require('fs').readFileSync(req.file.path);
+      
       // Create new document object
       const newDocument = {
         documentType: documentType || "other",
@@ -1264,11 +1328,18 @@ router.post(
         originalName: req.file.originalname,
         fileType: req.file.mimetype,
         fileSize: req.file.size,
-        fileData: req.file.buffer,
+        fileData: fileData,
         contentType: req.file.mimetype,
         isEdited: true, // Mark this document as edited since it's being added after initial submission
         uploadedBy: req.user.role === 'admin' ? 'admin' : 'user',
       };
+      
+      // Clean up the temporary file after reading it
+      try {
+        require('fs').unlinkSync(req.file.path);
+      } catch (cleanupError) {
+        console.warn('Failed to cleanup temporary file:', cleanupError);
+      }
 
       // Add the new document to the documents array
       taxForm.documents.push(newDocument);
@@ -1401,7 +1472,7 @@ router.put(
             originalName: file.originalname,
             fileType: file.mimetype,
             fileSize: file.size,
-            fileData: file.buffer,
+            fileData: getFileData(file),
             contentType: file.mimetype,
             uploadedBy: 'user',
             uploadDate: new Date(),
@@ -1619,7 +1690,7 @@ router.post(
               originalName: file.originalname,
               fileType: file.mimetype,
               fileSize: file.size,
-              fileData: file.buffer,
+              fileData: getFileData(file),
               contentType: file.mimetype,
             };
           });
@@ -1746,7 +1817,7 @@ router.post(
           originalName: file.originalname,
           fileType: file.mimetype,
           fileSize: file.size,
-          fileData: file.buffer,
+          fileData: getFileData(file),
           contentType: file.mimetype,
         }));
       }
@@ -1872,7 +1943,7 @@ router.post(
             originalName: file.originalname,
             fileType: file.mimetype,
             fileSize: file.size,
-            fileData: file.buffer,
+            fileData: getFileData(file),
             contentType: file.mimetype,
             uploadedBy: 'user', // submissions here are always by the user
           });
@@ -2004,7 +2075,7 @@ router.post(
           originalName: file.originalname,
           fileType: file.mimetype,
           fileSize: file.size,
-          fileData: file.buffer,
+          fileData: getFileData(file),
           contentType: file.mimetype,
         }));
       }
@@ -2112,7 +2183,7 @@ router.post(
           originalName: file.originalname,
           fileType: file.mimetype,
           fileSize: file.size,
-          fileData: file.buffer,
+          fileData: getFileData(file),
           contentType: file.mimetype,
         }));
       }
@@ -2226,7 +2297,7 @@ router.post(
           originalName: file.originalname,
           fileType: file.mimetype,
           fileSize: file.size,
-          fileData: file.buffer,
+          fileData: getFileData(file),
           contentType: file.mimetype,
         }));
       }
@@ -2383,7 +2454,7 @@ router.post(
           originalName: file.originalname,
           fileType: file.mimetype,
           fileSize: file.size,
-          fileData: file.buffer,
+          fileData: getFileData(file),
           contentType: file.mimetype,
         }));
       }

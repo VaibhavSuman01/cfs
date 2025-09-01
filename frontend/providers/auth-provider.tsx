@@ -86,6 +86,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       // Update user in state and localStorage
       setUser(userData);
+      
+      // Update localStorage with fresh user data to ensure persistence
+      if (typeof window !== "undefined") {
+        localStorage.setItem("user", JSON.stringify(userData));
+      }
 
       return userData;
     } catch (error) {
@@ -116,6 +121,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       // Set cookies for middleware authentication
       document.cookie = `token=${token}; path=/`;
+
+      // Immediately refresh user profile to get the latest data from server
+      // This ensures any profile updates made before logout are visible
+      try {
+        await refreshUserProfile();
+      } catch (refreshError) {
+        console.warn("Failed to refresh user profile after login:", refreshError);
+        // Don't fail the login if profile refresh fails
+      }
 
       toast.success("Login successful!");
 

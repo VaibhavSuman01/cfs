@@ -4,6 +4,9 @@ const User = require("../models/User");
 // Middleware to protect routes
 const protect = async (req, res, next) => {
   let token;
+  
+  console.log("Auth middleware - Request URL:", req.url);
+  console.log("Auth middleware - Headers:", req.headers.authorization);
 
   // Check if token exists in headers
   if (
@@ -13,6 +16,7 @@ const protect = async (req, res, next) => {
     try {
       // Get token from header
       token = req.headers.authorization.split(" ")[1];
+      console.log("Auth middleware - Token extracted:", token ? "Yes" : "No");
 
       // Verify token with ignoreExpiration option to handle clock sync issues
       // This will allow us to check the expiration manually
