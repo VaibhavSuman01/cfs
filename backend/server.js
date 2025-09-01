@@ -28,6 +28,9 @@ const passwordResetRoutes = require("./routes/passwordResetRoutes");
 const app = express();
 const PORT = process.env.PORT || 5001; // Use environment variable or default to 5001
 
+// Trust proxy for Vercel deployment (required for rate limiting and IP detection)
+app.set('trust proxy', 1);
+
 // Security middleware
 app.use(helmet({
   contentSecurityPolicy: {
@@ -194,7 +197,7 @@ const syncAllIndexes = async () => {
   }
 };
 
-// Connect to MongoDB with optimized settings
+// Connect to MongoDB with optimized settings for serverless
 mongoose
   .connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
@@ -202,7 +205,7 @@ mongoose
     maxPoolSize: 10, // Maintain up to 10 socket connections
     serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
     socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
-    bufferCommands: false, // Disable mongoose buffering
+    bufferCommands: true, // Enable mongoose buffering for serverless environments
     maxIdleTimeMS: 30000, // Close connections after 30 seconds of inactivity
     family: 4 // Use IPv4, skip trying IPv6
   })
