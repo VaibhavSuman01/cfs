@@ -403,31 +403,29 @@ router.put("/profile/avatar", protect, upload.single("avatar"), async (req, res)
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Create a unique filename
-    const filename = `avatar-${user._id}${path.extname(req.file.originalname)}`;
-    const uploadsDir = path.join(__dirname, "..", "public", "uploads");
-    const filePath = path.join(uploadsDir, filename);
-
-    // Ensure the uploads directory exists
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
+    // In serverless environments, store avatar data directly in database
+    // Get file data (works for both disk and memory storage)
+    let fileData;
+    if (req.file.buffer) {
+      // Memory storage - use buffer directly
+      fileData = req.file.buffer;
+    } else if (req.file.path) {
+      // Disk storage - read file from disk
+      fileData = fs.readFileSync(req.file.path);
+      
+      // Clean up the temporary file after reading it
+      try {
+        fs.unlinkSync(req.file.path);
+      } catch (cleanupError) {
+        console.warn('Failed to cleanup temporary file:', cleanupError);
+      }
+    } else {
+      return res.status(400).json({ message: "Invalid file upload" });
     }
 
-    // Read file data from disk since we're using disk storage
-    const fileData = fs.readFileSync(req.file.path);
-    
-    // Write the file to the uploads directory
-    fs.writeFileSync(filePath, fileData);
-    
-    // Clean up the temporary file after reading it
-    try {
-      fs.unlinkSync(req.file.path);
-    } catch (cleanupError) {
-      console.warn('Failed to cleanup temporary file:', cleanupError);
-    }
-
-    // Set the avatar URL (relative path for client access)
-    const avatarUrl = `/uploads/${filename}`;
+    // Store avatar data in user document (base64 encoded for easy retrieval)
+    const avatarBase64 = fileData.toString('base64');
+    const avatarUrl = `data:${req.file.mimetype};base64,${avatarBase64}`;
     user.avatarUrl = avatarUrl;
 
     await user.save();

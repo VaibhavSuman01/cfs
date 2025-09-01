@@ -2,14 +2,23 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-// Create uploads directory if it doesn't exist
+// Create uploads directory if it doesn't exist (only in writable environments)
 const uploadsDir = path.join(__dirname, '../uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
+let canCreateUploadsDir = true;
+
+try {
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+} catch (error) {
+  // In serverless environments like Vercel, filesystem is read-only
+  // Switch to memory storage for file uploads
+  canCreateUploadsDir = false;
+  console.warn('Cannot create uploads directory (read-only filesystem). Switching to memory storage.');
 }
 
-// Use disk storage for better performance with large files
-const storage = multer.diskStorage({
+// Use disk storage for better performance with large files (fallback to memory storage in serverless)
+const storage = canCreateUploadsDir ? multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, uploadsDir);
   },
@@ -18,9 +27,11 @@ const storage = multer.diskStorage({
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
   }
-});
+}) : multer.memoryStorage();
 
-console.log("Using disk storage for file uploads at:", uploadsDir);
+console.log(canCreateUploadsDir ? 
+  `Using disk storage for file uploads at: ${uploadsDir}` : 
+  'Using memory storage for file uploads (serverless environment)');
 
 // File filter function
 const fileFilter = (req, file, cb) => {

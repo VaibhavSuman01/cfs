@@ -1,16 +1,25 @@
 const fs = require('fs');
 const path = require('path');
 
-// Create logs directory if it doesn't exist
+// Create logs directory if it doesn't exist (only in writable environments)
 const logsDir = path.join(__dirname, '..', 'logs');
-if (!fs.existsSync(logsDir)) {
-  fs.mkdirSync(logsDir, { recursive: true });
+let canWriteToFile = true;
+
+try {
+  if (!fs.existsSync(logsDir)) {
+    fs.mkdirSync(logsDir, { recursive: true });
+  }
+} catch (error) {
+  // In serverless environments like Vercel, filesystem is read-only
+  // Disable file logging and only use console logging
+  canWriteToFile = false;
+  console.warn('Cannot create logs directory (read-only filesystem). File logging disabled.');
 }
 
 class Logger {
   constructor() {
     this.logLevel = process.env.LOG_LEVEL || 'info';
-    this.logToFile = process.env.LOG_TO_FILE === 'true';
+    this.logToFile = process.env.LOG_TO_FILE === 'true' && canWriteToFile;
     this.logFile = path.join(logsDir, 'app.log');
     this.errorLogFile = path.join(logsDir, 'error.log');
   }
@@ -22,10 +31,15 @@ class Logger {
   }
 
   writeToFile(message, isError = false) {
-    if (!this.logToFile) return;
+    if (!this.logToFile || !canWriteToFile) return;
     
-    const logFile = isError ? this.errorLogFile : this.logFile;
-    fs.appendFileSync(logFile, message + '\n');
+    try {
+      const logFile = isError ? this.errorLogFile : this.logFile;
+      fs.appendFileSync(logFile, message + '\n');
+    } catch (error) {
+      // Silently fail if we can't write to file (serverless environment)
+      console.warn('Failed to write to log file:', error.message);
+    }
   }
 
   shouldLog(level) {
