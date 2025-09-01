@@ -28,6 +28,7 @@ yarn-error.log*
 
 # Local env files
 /backend/.env
+/backend/.env.production
 /backend/seed.js
 
 /frontend/.env
