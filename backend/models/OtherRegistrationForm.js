@@ -30,7 +30,21 @@ const otherRegistrationFormSchema = new mongoose.Schema({
   fullName: { type: String, required: true },
   email: { type: String, required: true },
   phone: { type: String, required: true },
-  pan: { type: String, required: true, uppercase: true },
+  pan: { 
+    type: String, 
+    required: true, 
+    uppercase: true,
+    validate: {
+      validator: function(v) {
+        return /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(v);
+      },
+      message: 'PAN must be in format AAAAA0000A'
+    },
+    set: function(v) {
+      if (!v) return v;
+      return v.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+    }
+  },
   service: { type: String, required: true },
   subService: { type: String, default: function () { return this.service; } },
   
@@ -51,8 +65,35 @@ const otherRegistrationFormSchema = new mongoose.Schema({
   
   // Applicant Details
   applicantName: { type: String, required: true },
-  applicantPan: { type: String, required: true },
-  applicantAadhaar: { type: String, required: true },
+  applicantPan: { 
+    type: String, 
+    required: true,
+    uppercase: true,
+    validate: {
+      validator: function(v) {
+        return /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(v);
+      },
+      message: 'Applicant PAN must be in format AAAAA0000A'
+    },
+    set: function(v) {
+      if (!v) return v;
+      return v.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+    }
+  },
+  applicantAadhaar: { 
+    type: String, 
+    required: true,
+    validate: {
+      validator: function(v) {
+        return /^\d{12}$/.test(v);
+      },
+      message: 'Applicant Aadhaar must be exactly 12 digits'
+    },
+    set: function(v) {
+      if (!v) return v;
+      return v.replace(/\D/g, '');
+    }
+  },
   applicantAddress: { type: String, required: true },
   
   // Additional Requirements

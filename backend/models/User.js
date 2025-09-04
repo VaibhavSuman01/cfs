@@ -29,6 +29,18 @@ const UserSchema = new mongoose.Schema(
       trim: true,
       uppercase: true,
       unique: true,
+      validate: {
+        validator: function(v) {
+          if (!v) return true; // Allow empty PAN
+          return /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(v);
+        },
+        message: 'PAN must be in format AAAAA0000A'
+      },
+      set: function(v) {
+        if (!v) return v;
+        // Remove any non-alphanumeric characters and convert to uppercase
+        return v.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+      }
     },
     dob: {
       type: Date,
@@ -40,6 +52,18 @@ const UserSchema = new mongoose.Schema(
     aadhaar: {
       type: String,
       trim: true,
+      validate: {
+        validator: function(v) {
+          if (!v) return true; // Allow empty Aadhaar
+          return /^\d{12}$/.test(v);
+        },
+        message: 'Aadhaar must be exactly 12 digits'
+      },
+      set: function(v) {
+        if (!v) return v;
+        // Remove any non-numeric characters
+        return v.replace(/\D/g, '');
+      }
     },
     fatherName: {
       type: String,

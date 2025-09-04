@@ -30,7 +30,21 @@ const companyFormSchema = new mongoose.Schema({
   fullName: { type: String, required: true },
   email: { type: String, required: true },
   phone: { type: String, required: true },
-  pan: { type: String, required: true, uppercase: true },
+  pan: { 
+    type: String, 
+    required: true, 
+    uppercase: true,
+    validate: {
+      validator: function(v) {
+        return /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(v);
+      },
+      message: 'PAN must be in format AAAAA0000A'
+    },
+    set: function(v) {
+      if (!v) return v;
+      return v.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+    }
+  },
   service: { type: String, required: true },
   subService: { type: String, default: function () { return this.service; } },
   
@@ -46,9 +60,38 @@ const companyFormSchema = new mongoose.Schema({
   // Director Information
   directors: [{
     name: { type: String, required: true },
-    pan: { type: String, required: false }, // Made optional for new directors
-    aadhaar: { type: String, required: false }, // Made optional for new directors
-    email: { type: String, required: true },
+    pan: { 
+      type: String, 
+      required: false, // Made optional for new directors
+      uppercase: true,
+      validate: {
+        validator: function(v) {
+          if (!v) return true; // Allow empty PAN
+          return /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(v);
+        },
+        message: 'PAN must be in format AAAAA0000A'
+      },
+      set: function(v) {
+        if (!v) return v;
+        return v.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+      }
+    },
+    aadhaar: { 
+      type: String, 
+      required: false, // Made optional for new directors
+      validate: {
+        validator: function(v) {
+          if (!v) return true; // Allow empty Aadhaar
+          return /^\d{12}$/.test(v);
+        },
+        message: 'Aadhaar must be exactly 12 digits'
+      },
+      set: function(v) {
+         if (!v) return v;
+         return v.replace(/\D/g, '');
+       }
+     },
+     email: { type: String, required: true },
     phone: { type: String, required: true },
     address: { type: String, required: true },
     nationality: { type: String, default: 'Indian' },

@@ -31,7 +31,21 @@ const rocFormSchema = new mongoose.Schema({
   fullName: { type: String, required: true },
   email: { type: String, required: true },
   phone: { type: String, required: true },
-  pan: { type: String, required: true, uppercase: true },
+  pan: { 
+    type: String, 
+    required: true, 
+    uppercase: true,
+    validate: {
+      validator: function(v) {
+        return /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(v);
+      },
+      message: 'PAN must be in format AAAAA0000A'
+    },
+    set: function(v) {
+      if (!v) return v;
+      return v.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+    }
+  },
   service: { type: String, required: true },
   subService: { type: String, default: function () { return this.service; } },
   

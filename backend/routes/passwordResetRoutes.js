@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const PasswordResetToken = require('../models/PasswordResetToken');
 const jwt = require('jsonwebtoken');
 const { check, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
@@ -27,8 +28,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// Store reset tokens (in a real app, these would be stored in a database)
-const passwordResetTokens = new Map();
+// Password reset tokens are now stored in the database using PasswordResetToken model
 
 /**
  * @route   POST /request-password-reset
@@ -54,15 +54,18 @@ router.post('/request-password-reset', [
       return res.status(200).json({ message: 'If your email is registered, you will receive password reset instructions shortly' });
     }
 
+    // Clean up any existing tokens for this user
+    await PasswordResetToken.deleteMany({ userId: user._id });
+
     // Generate a reset token
     const resetToken = crypto.randomBytes(32).toString('hex');
-    const resetTokenExpiry = Date.now() + 3600000; // 1 hour from now
 
-    // Store the token with the user's ID
-    passwordResetTokens.set(resetToken, {
+    // Store the token in the database
+    const passwordResetToken = new PasswordResetToken({
       userId: user._id,
-      expiry: resetTokenExpiry
+      token: resetToken,
     });
+    await passwordResetToken.save();
 
     // Create reset URL
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
@@ -210,14 +213,14 @@ router.post('/reset-password', [
   try {
     const { token, password } = req.body;
 
-    // Verify token exists and is not expired
-    const tokenData = passwordResetTokens.get(token);
-    if (!tokenData || tokenData.expiry < Date.now()) {
+    // Find and validate the reset token
+    const resetTokenDoc = await PasswordResetToken.findOne({ token }).populate('userId');
+    if (!resetTokenDoc || !resetTokenDoc.isValid()) {
       return res.status(400).json({ message: 'Invalid or expired reset token' });
     }
 
-    // Find user
-    const user = await User.findById(tokenData.userId);
+    // Get the user from the token
+    const user = resetTokenDoc.userId;
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -228,8 +231,8 @@ router.post('/reset-password', [
     // Save user with new password
     await user.save();
 
-    // Remove used token
-    passwordResetTokens.delete(token);
+    // Mark token as used and remove it
+    await PasswordResetToken.findByIdAndDelete(resetTokenDoc._id);
 
     res.status(200).json({ message: 'Password has been reset successfully' });
   } catch (error) {
