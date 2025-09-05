@@ -21,6 +21,30 @@ const reportSchema = new mongoose.Schema({
   documentId: { type: mongoose.Schema.Types.ObjectId },
 });
 
+const adminDataSchema = new mongoose.Schema({
+  reports: [{
+    type: { type: String, required: true },
+    message: { type: String, required: true },
+    sentAt: { type: Date, default: Date.now },
+    sentBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    document: {
+      fileName: { type: String },
+      originalName: { type: String },
+      fileType: { type: String },
+      fileSize: { type: Number },
+      fileData: { type: Buffer },
+      contentType: { type: String },
+      uploadDate: { type: Date, default: Date.now }
+    }
+  }],
+  documents: [documentSchema],
+  notes: [{
+    content: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now },
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }
+  }]
+});
+
 const editHistorySchema = new mongoose.Schema({
   editedAt: { type: Date, default: Date.now },
   editorId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
@@ -113,6 +137,8 @@ const taxFormSchema = new mongoose.Schema({
   pranNumber: { type: String },
   
   documents: [documentSchema],
+  // Admin-specific data section
+  adminData: { type: adminDataSchema, default: () => ({}) },
   // Align with admin status values
   status: { type: String, enum: ["Pending", "Reviewed", "Filed"], default: "Pending" },
   reports: [reportSchema],

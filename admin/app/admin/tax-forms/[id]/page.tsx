@@ -37,6 +37,33 @@ interface Document {
   uploadedBy?: string; // For tracking who uploaded the document
 }
 
+interface AdminReport {
+  _id: string;
+  type: string;
+  message: string;
+  sentAt: string;
+  sentBy: string;
+  document: {
+    fileName: string;
+    originalName: string;
+    fileType: string;
+    fileSize: number;
+    fileData: Buffer;
+    contentType: string;
+    uploadDate: string;
+  };
+}
+
+interface AdminData {
+  reports: AdminReport[];
+  documents: Document[];
+  notes: Array<{
+    content: string;
+    createdAt: string;
+    createdBy: string;
+  }>;
+}
+
 interface TaxForm {
   _id: string;
   fullName: string;
@@ -58,6 +85,7 @@ interface TaxForm {
   pranNumber?: string;
   status: 'Pending' | 'Reviewed' | 'Filed';
   documents: Document[];
+  adminData?: AdminData;
   createdAt: string;
   updatedAt?: string;
 }
@@ -255,8 +283,8 @@ export default function TaxFormDetailPage() {
                 {/* User Documents Section */}
                 <InfoSection title="User Documents">
                   <ul className="space-y-2">
-                    {form.documents && form.documents.filter(doc => doc.documentType !== 'admin-report').length > 0 ? (
-                      form.documents.filter(doc => doc.documentType !== 'admin-report').map(doc => (
+                    {form.documents && form.documents.length > 0 ? (
+                      form.documents.map(doc => (
                         <li key={doc._id} className="flex items-center justify-between p-2 rounded-md border">
                           <div className="flex flex-col">
                             <span className="text-sm font-medium">{doc.originalName || doc.fileName || doc.name || 'Document'}</span>
@@ -274,18 +302,22 @@ export default function TaxFormDetailPage() {
                 {/* Admin Sent Reports Section */}
                 <InfoSection title="Sent Reports">
                   <ul className="space-y-2">
-                    {form.documents && form.documents.filter(doc => doc.documentType === 'admin-report').length > 0 ? (
-                      form.documents.filter(doc => doc.documentType === 'admin-report').map(doc => (
-                        <li key={doc._id} className="flex items-center justify-between p-3 rounded-md border bg-blue-50">
+                    {form.adminData?.reports && form.adminData.reports.length > 0 ? (
+                      form.adminData.reports.map(report => (
+                        <li key={report._id} className="flex items-center justify-between p-3 rounded-md border bg-blue-50">
                           <div className="flex flex-col space-y-1">
-                            <span className="text-sm font-medium">{doc.originalName || doc.fileName || doc.name || 'Report'}</span>
+                            <span className="text-sm font-medium">{report.document.originalName || report.document.fileName || 'Report'}</span>
                             <div className="flex items-center space-x-4 text-xs text-muted-foreground">
-                              {doc.reportType && <span className="capitalize">Type: {doc.reportType}</span>}
-                              {doc.createdAt && <span>Sent: {new Date(doc.createdAt).toLocaleDateString()}</span>}
+                              <span className="capitalize">Type: {report.type}</span>
+                              <span>Sent: {new Date(report.sentAt).toLocaleDateString()}</span>
                             </div>
-                            {doc.message && <p className="text-xs text-gray-600 mt-1">{doc.message}</p>}
+                            {report.message && <p className="text-xs text-gray-600 mt-1">{report.message}</p>}
                           </div>
-                          <Button size="sm" variant="outline" onClick={() => handleDownload(doc)}><Download className="mr-2 h-4 w-4"/>Download</Button>
+                          <Button size="sm" variant="outline" onClick={() => handleDownload({
+                            _id: report._id,
+                            originalName: report.document.originalName,
+                            fileName: report.document.fileName
+                          } as Document)}><Download className="mr-2 h-4 w-4"/>Download</Button>
                         </li>
                       ))
                     ) : (

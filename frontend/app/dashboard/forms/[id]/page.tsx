@@ -26,6 +26,28 @@ import {
 import { toast } from "sonner";
 import api from "@/lib/api-client";
 
+interface AdminReport {
+  _id: string;
+  type: string;
+  message: string;
+  sentAt: string;
+  document: {
+    fileName: string;
+    originalName: string;
+    fileType: string;
+    contentType: string;
+    fileSize: number;
+    fileData: any;
+    uploadDate: string;
+  };
+}
+
+interface AdminData {
+  reports: AdminReport[];
+  documents: any[];
+  notes: any[];
+}
+
 interface FormData {
   _id: string;
   user: string;
@@ -79,6 +101,8 @@ interface FormData {
     path?: string;
     uploadedBy?: 'user' | 'admin';
   }>;
+  adminData?: AdminData;
+  // Legacy reports field for backward compatibility
   reports?: Array<{
     message: string;
     documents: string[];
@@ -146,6 +170,15 @@ export default function FormDetailPage() {
     } catch (error) {
       console.error("Failed to download document:", error);
       toast.error("Failed to download document. Please try again.");
+    }
+  };
+
+  const downloadAdminReport = async (formId: string, reportId: string, filename: string) => {
+    try {
+      await api.downloadFile(`/api/forms/download-admin-report/${formId}/${reportId}`, filename);
+    } catch (error) {
+      console.error("Admin report download failed:", error);
+      toast.error("Failed to download the admin report. Please try again.");
     }
   };
 
@@ -485,30 +518,63 @@ export default function FormDetailPage() {
               <CardDescription>Download reports shared by your consultant</CardDescription>
             </CardHeader>
             <CardContent>
-              {form.reports && form.reports.length > 0 ? (
-                <div className="space-y-2">
-                  {form.reports.map((r: { message: string; documents: string[]; createdAt: string }, index: number) => (
-                    <div key={index} className="flex items-center justify-between bg-muted p-3 rounded-md">
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium">{r.message}</span>
-                        <span className="text-xs text-muted-foreground">
-                          {r.createdAt ? new Date(r.createdAt).toLocaleString() : ''}
-                        </span>
-                        {r.documents && r.documents.length > 0 && (
+              {(() => {
+                const adminReports = form.adminData?.reports || [];
+                const legacyReports = form.reports || [];
+                const hasReports = adminReports.length > 0 || legacyReports.length > 0;
+                
+                return hasReports ? (
+                  <div className="space-y-2">
+                    {/* New admin reports */}
+                    {adminReports.map((report: AdminReport) => (
+                      <div key={report._id} className="flex items-center justify-between bg-muted p-3 rounded-md">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium">{report.message}</span>
                           <span className="text-xs text-muted-foreground">
-                            {r.documents.length} document(s) attached
+                            {new Date(report.sentAt).toLocaleString()}
                           </span>
+                          {report.document && (
+                            <span className="text-xs text-muted-foreground">
+                              Document attached: {report.document.originalName}
+                            </span>
+                          )}
+                        </div>
+                        {report.document && (
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => downloadAdminReport(form._id, report._id, report.document.originalName)}
+                          >
+                            <Download className="h-4 w-4" />
+                          </Button>
                         )}
                       </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-6">
-                  <FileText className="mx-auto h-8 w-8 text-muted-foreground opacity-50" />
-                  <p className="mt-2 text-sm text-muted-foreground">No reports shared yet</p>
-                </div>
-              )}
+                    ))}
+                    
+                    {/* Legacy reports for backward compatibility */}
+                    {legacyReports.map((r: { message: string; documents: string[]; createdAt: string }, index: number) => (
+                      <div key={`legacy-${index}`} className="flex items-center justify-between bg-muted p-3 rounded-md">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium">{r.message}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {r.createdAt ? new Date(r.createdAt).toLocaleString() : ''}
+                          </span>
+                          {r.documents && r.documents.length > 0 && (
+                            <span className="text-xs text-muted-foreground">
+                              {r.documents.length} document(s) attached
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-6">
+                    <FileText className="mx-auto h-8 w-8 text-muted-foreground opacity-50" />
+                    <p className="mt-2 text-sm text-muted-foreground">No reports shared yet</p>
+                  </div>
+                );
+              })()}
             </CardContent>
           </Card>
           

@@ -8,6 +8,7 @@ const upload = require("../middleware/upload");
 const path = require("path");
 const fs = require("fs");
 const { check, validationResult } = require("express-validator");
+const { getFileData, cleanupTempFiles } = require("../utils/fileHandler");
 
 // @route   POST api/auth/login
 // @desc    Authenticate user & get token
@@ -405,23 +406,10 @@ router.put("/profile/avatar", protect, upload.single("avatar"), async (req, res)
 
     // In serverless environments, store avatar data directly in database
     // Get file data (works for both disk and memory storage)
-    let fileData;
-    if (req.file.buffer) {
-      // Memory storage - use buffer directly
-      fileData = req.file.buffer;
-    } else if (req.file.path) {
-      // Disk storage - read file from disk
-      fileData = fs.readFileSync(req.file.path);
-      
-      // Clean up the temporary file after reading it
-      try {
-        fs.unlinkSync(req.file.path);
-      } catch (cleanupError) {
-        console.warn('Failed to cleanup temporary file:', cleanupError);
-      }
-    } else {
-      return res.status(400).json({ message: "Invalid file upload" });
-    }
+    const fileData = getFileData(req.file);
+    
+    // Clean up temporary files (only applies to disk storage)
+    cleanupTempFiles([req.file]);
 
     // Store avatar data in user document (base64 encoded for easy retrieval)
     const avatarBase64 = fileData.toString('base64');

@@ -328,12 +328,12 @@ router.post("/roc-returns/document/:formId", protect, upload.single("document"),
       return res.status(403).json({ message: "Not authorized to update this form" });
     }
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
-    // Read file data from disk since we're using disk storage
-    const fileData = require('fs').readFileSync(req.file.path);
+    // Get file data (works for both disk and memory storage)
+    const fileData = getFileData(req.file);
     
     const newDoc = {
       documentType: documentType || "other",
-      fileName: Date.now() + "-" + Math.round(Math.random() * 1e9) + path.extname(req.file.originalname),
+      fileName: generateUniqueFilename(req.file.originalname),
       originalName: req.file.originalname,
       fileType: req.file.mimetype,
       fileSize: req.file.size,
@@ -343,12 +343,8 @@ router.post("/roc-returns/document/:formId", protect, upload.single("document"),
       uploadedBy: req.user.role === "admin" ? "admin" : "user",
     };
     
-    // Clean up the temporary file after reading it
-    try {
-      require('fs').unlinkSync(req.file.path);
-    } catch (cleanupError) {
-      console.warn('Failed to cleanup temporary file:', cleanupError);
-    }
+    // Clean up temporary files (only applies to disk storage)
+    cleanupTempFiles([req.file]);
     form.documents.push(newDoc);
     await form.save();
     const responseDocument = {
@@ -541,12 +537,12 @@ router.post("/other-registration/document/:formId", protect, upload.single("docu
     }
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
     
-    // Read file data from disk since we're using disk storage
-    const fileData = require('fs').readFileSync(req.file.path);
+    // Get file data (works for both disk and memory storage)
+    const fileData = getFileData(req.file);
     
     const newDoc = {
       documentType: documentType || "other",
-      fileName: Date.now() + "-" + Math.round(Math.random() * 1e9) + path.extname(req.file.originalname),
+      fileName: generateUniqueFilename(req.file.originalname),
       originalName: req.file.originalname,
       fileType: req.file.mimetype,
       fileSize: req.file.size,
@@ -556,12 +552,8 @@ router.post("/other-registration/document/:formId", protect, upload.single("docu
       uploadedBy: req.user.role === "admin" ? "admin" : "user",
     };
     
-    // Clean up the temporary file after reading it
-    try {
-      require('fs').unlinkSync(req.file.path);
-    } catch (cleanupError) {
-      console.warn('Failed to cleanup temporary file:', cleanupError);
-    }
+    // Clean up temporary files (only applies to disk storage)
+    cleanupTempFiles([req.file]);
     form.documents.push(newDoc);
     await form.save();
     const responseDocument = {
@@ -793,12 +785,12 @@ router.post(
         return res.status(400).json({ message: "No file uploaded" });
       }
 
-      // Read file data from disk since we're using disk storage
-      const fileData = require('fs').readFileSync(req.file.path);
+      // Read file data using fileHandler utility (handles both disk and memory storage)
+      const fileData = getFileData(req.file);
       
       const newDoc = {
         documentType: documentType || "other",
-        fileName: Date.now() + "-" + Math.round(Math.random() * 1e9) + path.extname(req.file.originalname),
+        fileName: generateUniqueFilename(req.file.originalname),
         originalName: req.file.originalname,
         fileType: req.file.mimetype,
         fileSize: req.file.size,
@@ -808,12 +800,8 @@ router.post(
         uploadedBy: req.user.role === "admin" ? "admin" : "user",
       };
       
-      // Clean up the temporary file after reading it
-      try {
-        require('fs').unlinkSync(req.file.path);
-      } catch (cleanupError) {
-        console.warn('Failed to cleanup temporary file:', cleanupError);
-      }
+      // Clean up temporary files using fileHandler utility
+      cleanupTempFiles([req.file]);
 
       form.documents.push(newDoc);
       await form.save();
@@ -1170,6 +1158,57 @@ router.get("/download/:documentId", protect, async (req, res) => {
   }
 });
 
+// @route   GET /api/forms/download-admin-report/:formId/:reportId
+// @desc    Download a document from an admin report in adminData
+// @access  Private
+router.get("/download-admin-report/:formId/:reportId", protect, async (req, res) => {
+  try {
+    const { formId, reportId } = req.params;
+
+    // Validate IDs
+    if (!isValidObjectId(formId) || !isValidObjectId(reportId)) {
+      return res.status(400).json({
+        message: "Invalid ID format. Must be a 24-character hex string.",
+      });
+    }
+
+    // Find the tax form
+    const taxForm = await TaxForm.findById(formId);
+
+    if (!taxForm) {
+      return res.status(404).json({ message: "Form not found" });
+    }
+
+    // Check if the tax form belongs to the logged-in user or if user is admin
+    if (taxForm.email !== req.user.email && req.user.role !== "admin") {
+      return res
+        .status(403)
+        .json({ message: "Not authorized to access this document" });
+    }
+
+    // Find the specific report in adminData.reports
+    const report = taxForm.adminData?.reports?.find(
+      (rep) => rep._id.toString() === reportId
+    );
+
+    if (!report || !report.document) {
+      return res.status(404).json({ message: "Report document not found" });
+    }
+
+    // Set response headers
+    res.set({
+      "Content-Type": report.document.contentType,
+      "Content-Disposition": `attachment; filename="${report.document.originalName || report.document.fileName}"`,
+    });
+
+    // Send the file data
+    res.send(report.document.fileData);
+  } catch (error) {
+    console.error("Error downloading admin report document:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 // @route   DELETE /api/forms/document/:documentId
 // @desc    Delete a document from a tax form submission
 // @access  Private
@@ -1314,17 +1353,13 @@ router.post(
         return res.status(400).json({ message: "No file uploaded" });
       }
 
-      // Read file data from disk since we're using disk storage
-      const fileData = require('fs').readFileSync(req.file.path);
+      // Read file data using fileHandler utility (handles both disk and memory storage)
+      const fileData = getFileData(req.file);
       
       // Create new document object
       const newDocument = {
         documentType: documentType || "other",
-        fileName:
-          Date.now() +
-          "-" +
-          Math.round(Math.random() * 1e9) +
-          path.extname(req.file.originalname),
+        fileName: generateUniqueFilename(req.file.originalname),
         originalName: req.file.originalname,
         fileType: req.file.mimetype,
         fileSize: req.file.size,
@@ -1334,12 +1369,8 @@ router.post(
         uploadedBy: req.user.role === 'admin' ? 'admin' : 'user',
       };
       
-      // Clean up the temporary file after reading it
-      try {
-        require('fs').unlinkSync(req.file.path);
-      } catch (cleanupError) {
-        console.warn('Failed to cleanup temporary file:', cleanupError);
-      }
+      // Clean up temporary files using fileHandler utility
+      cleanupTempFiles([req.file]);
 
       // Add the new document to the documents array
       taxForm.documents.push(newDocument);

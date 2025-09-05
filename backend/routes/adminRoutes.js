@@ -299,41 +299,70 @@ router.post("/forms/:id/send-report", validateObjectId(), upload.single('reportF
     let documentId = undefined;
     
     if (req.file) {
-      // Read file data from disk since we're using disk storage
-      const fileData = fs.readFileSync(req.file.path);
+      // Use getFileData utility to handle both disk and memory storage
+      const fileData = getFileData(req.file);
       
-      newReportDocument = {
-        documentType: 'admin-report',
-        fileName: req.file.originalname,
-        originalName: req.file.originalname,
-        fileType: req.file.mimetype,
-        fileSize: req.file.size,
-        fileData: fileData,
-        contentType: req.file.mimetype,
-        uploadedBy: 'admin',
-        reportType: reportType,
-        message: message,
-        createdAt: new Date(),
-      };
-      form.documents.push(newReportDocument);
-      documentId = form.documents[form.documents.length - 1]._id;
-      
-      // Clean up the temporary file after reading it
-      try {
-        fs.unlinkSync(req.file.path);
-      } catch (cleanupError) {
-        console.warn('Failed to cleanup temporary file:', cleanupError);
+      // Check if this is a TaxForm to store in adminData section
+      if (formModel.modelName === 'TaxForm') {
+        // Initialize adminData if it doesn't exist
+        if (!form.adminData) {
+          form.adminData = { reports: [], documents: [], notes: [] };
+        }
+        
+        // Create admin report with embedded document
+        const adminReport = {
+          type: reportType,
+          message: message,
+          sentAt: new Date(),
+          sentBy: req.user._id,
+          document: {
+            fileName: req.file.originalname,
+            originalName: req.file.originalname,
+            fileType: req.file.mimetype,
+            fileSize: req.file.size,
+            fileData: fileData,
+            contentType: req.file.mimetype,
+            uploadDate: new Date()
+          }
+        };
+        
+        form.adminData.reports.push(adminReport);
+        documentId = form.adminData.reports[form.adminData.reports.length - 1]._id;
+      } else {
+        // For non-TaxForm models, use the existing documents array approach
+        newReportDocument = {
+          documentType: 'admin-report',
+          fileName: req.file.originalname,
+          originalName: req.file.originalname,
+          fileType: req.file.mimetype,
+          fileSize: req.file.size,
+          fileData: fileData,
+          contentType: req.file.mimetype,
+          uploadedBy: 'admin',
+          reportType: reportType,
+          message: message,
+          createdAt: new Date(),
+        };
+        form.documents.push(newReportDocument);
+        documentId = form.documents[form.documents.length - 1]._id;
       }
+      
+      // Clean up temporary files (only applies to disk storage)
+      cleanupTempFiles([req.file]);
     }
 
     // Update the form to record that a report was sent
-    form.reports.push({
-      type: reportType,
-      message: message,
-      sentAt: new Date(),
-      sentBy: req.user._id,
-      documentId: documentId
-    });
+    // For TaxForms, the report is already stored in adminData.reports
+    // For other forms, we still use the general reports array for tracking
+    if (formModel.modelName !== 'TaxForm') {
+      form.reports.push({
+        type: reportType,
+        message: message,
+        sentAt: new Date(),
+        sentBy: req.user._id,
+        documentId: documentId
+      });
+    }
 
     await form.save();
 
