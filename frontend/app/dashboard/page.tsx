@@ -584,7 +584,7 @@ export default function UserDashboard() {
                                     <div className="text-xs text-gray-500">
                                       Submitted: {formatDate(form.createdAt)}{' '}
                                       {new Date(form.updatedAt).getTime() > new Date(form.createdAt).getTime() && (
-                                        <span className="ml-2 text-[11px] px-1.5 py-0.5 rounded bg-yellow-50 text-yellow-700 border border-yellow-200">Last updated: {formatDate(form.updatedAt)}</span>
+                                        <span className="ml-2 text-[11px] px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">Last updated: {formatDate(form.updatedAt)}</span>
                                       )}
                                     </div>
                                 </div>
@@ -600,7 +600,7 @@ export default function UserDashboard() {
                                         <Button
                                           variant="outline"
                                           size="sm"
-                                          className="border-green-600 text-green-600 hover:bg-green-50 hover:text-green-700"
+                                          className="border-blue-600 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
                                           onClick={() => handleDownloadLatestReport(form)}
                                         >
                                             <Download className="mr-2 h-4 w-4"/> Download Report

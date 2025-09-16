@@ -178,10 +178,10 @@ export default function SoleProprietorshipPage() {
             <div className="max-w-2xl mx-auto">
               <Card className="p-8">
                 <ul className="space-y-4 text-gray-700 text-lg">
-                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-green-500 mr-4 flex-shrink-0" /><span>Aadhaar Card of the Proprietor.</span></li>
-                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-green-500 mr-4 flex-shrink-0" /><span>PAN Card of the Proprietor.</span></li>
-                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-green-500 mr-4 flex-shrink-0" /><span>Proof of Business Address (Utility Bill / Rent Agreement).</span></li>
-                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-green-500 mr-4 flex-shrink-0" /><span>Bank Account Details (Cancelled Cheque / Bank Statement).</span></li>
+                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Aadhaar Card of the Proprietor.</span></li>
+                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>PAN Card of the Proprietor.</span></li>
+                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Proof of Business Address (Utility Bill / Rent Agreement).</span></li>
+                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Bank Account Details (Cancelled Cheque / Bank Statement).</span></li>
                 </ul>
               </Card>
             </div>

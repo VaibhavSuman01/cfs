@@ -120,9 +120,9 @@ export default function GstRegistrationPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <ul className="space-y-3 text-left">
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>GST Registration</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Basic Documentation</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Registration Certificate</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>GST Registration</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Basic Documentation</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Registration Certificate</span></li>
                   </ul>
                   <Link href={`/tax-form?service=${encodeURIComponent("GST Filing - Basic")}`} passHref>
                     <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Basic</Button>
@@ -138,10 +138,10 @@ export default function GstRegistrationPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <ul className="space-y-3 text-left">
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Everything in Basic</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Priority Processing</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Expert Consultation</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Post-Registration Support</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Everything in Basic</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Priority Processing</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Expert Consultation</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Post-Registration Support</span></li>
                   </ul>
                   <Link href={`/tax-form?service=${encodeURIComponent("GST Filing - Standard")}`} passHref>
                     <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Standard</Button>
@@ -157,10 +157,10 @@ export default function GstRegistrationPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <ul className="space-y-3 text-left">
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Everything in Standard</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Compliance Training</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>1 Year Support</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>GST Filing Assistance</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Everything in Standard</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Compliance Training</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>1 Year Support</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>GST Filing Assistance</span></li>
                   </ul>
                   <Link href={`/tax-form?service=${encodeURIComponent("GST Filing - Premium")}`} passHref>
                     <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Premium</Button>
@@ -236,14 +236,14 @@ export default function GstRegistrationPage() {
             <div className="max-w-3xl mx-auto">
               <Card className="p-8">
                 <ul className="space-y-4 text-gray-700 text-lg grid md:grid-cols-2 gap-x-8 gap-y-4">
-                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-green-500 mr-4 flex-shrink-0" /><span>PAN Card of Applicant</span></li>
-                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-green-500 mr-4 flex-shrink-0" /><span>Aadhaar Card</span></li>
-                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-green-500 mr-4 flex-shrink-0" /><span>Proof of Business Registration</span></li>
-                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-green-500 mr-4 flex-shrink-0" /><span>Promoter's ID & Address Proof</span></li>
-                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-green-500 mr-4 flex-shrink-0" /><span>Business Address Proof</span></li>
-                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-green-500 mr-4 flex-shrink-0" /><span>Bank Account Statement</span></li>
-                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-green-500 mr-4 flex-shrink-0" /><span>Digital Signature</span></li>
-                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-green-500 mr-4 flex-shrink-0" /><span>Letter of Authorization</span></li>
+                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>PAN Card of Applicant</span></li>
+                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Aadhaar Card</span></li>
+                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Proof of Business Registration</span></li>
+                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Promoter's ID & Address Proof</span></li>
+                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Business Address Proof</span></li>
+                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Bank Account Statement</span></li>
+                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Digital Signature</span></li>
+                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Letter of Authorization</span></li>
                 </ul>
               </Card>
             </div>

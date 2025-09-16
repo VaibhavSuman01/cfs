@@ -54,7 +54,7 @@ export default function NidhiCompanyPage() {
                       "Mobile number and Email ID",
                     ].map((doc, index) => (
                       <div key={index} className="flex items-center space-x-3">
-                        <CheckCircle className="h-5 w-5 text-green-500" />
+                        <CheckCircle className="h-5 w-5 text-blue-500" />
                         <span className="text-gray-700">{doc}</span>
                       </div>
                     ))}
@@ -71,7 +71,7 @@ export default function NidhiCompanyPage() {
                       "Proposed company names (1-2 options)",
                     ].map((doc, index) => (
                       <div key={index} className="flex items-center space-x-3">
-                        <CheckCircle className="h-5 w-5 text-green-500" />
+                        <CheckCircle className="h-5 w-5 text-blue-500" />
                         <span className="text-gray-700">{doc}</span>
                       </div>
                     ))}

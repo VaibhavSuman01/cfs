@@ -160,9 +160,9 @@ export default function Section8CompanyPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <ul className="space-y-3 text-left">
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Section 8 Registration</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>DSC & DPIN</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Basic Documentation</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Section 8 Registration</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>DSC & DPIN</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Basic Documentation</span></li>
                   </ul>
                   <Link href={`/dashboard/company-formation-form?service=${encodeURIComponent('Section 8 Company')}`} passHref>
                     <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Basic</Button>
@@ -178,10 +178,10 @@ export default function Section8CompanyPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <ul className="space-y-3 text-left">
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Everything in Basic</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Priority Processing</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Expert Consultation</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Bank Account Setup</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Everything in Basic</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Priority Processing</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Expert Consultation</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Bank Account Setup</span></li>
                   </ul>
                   <Link href={`/dashboard/company-formation-form?service=${encodeURIComponent('Section 8 Company')}`} passHref>
                     <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Standard</Button>
@@ -197,10 +197,10 @@ export default function Section8CompanyPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <ul className="space-y-3 text-left">
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Everything in Standard</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>80G & 12A Registration</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Compliance Setup</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>1 Year Support</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Everything in Standard</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>80G & 12A Registration</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Compliance Setup</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>1 Year Support</span></li>
                   </ul>
                   <Link href={`/dashboard/company-formation-form?service=${encodeURIComponent('Section 8 Company')}`} passHref>
                     <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Premium</Button>
@@ -266,18 +266,18 @@ export default function Section8CompanyPage() {
               <Card className="p-6">
                 <CardTitle className="mb-4 text-blue-600">For Directors</CardTitle>
                 <ul className="space-y-3 text-gray-700">
-                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-1 flex-shrink-0" /><span>PAN Card and Aadhaar Card.</span></li>
-                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-1 flex-shrink-0" /><span>Identity Proof: Driving License, Passport, or Voter ID.</span></li>
-                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-1 flex-shrink-0" /><span>Latest Address Proof: Utility bill or bank statement (not older than 2 months).</span></li>
-                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-1 flex-shrink-0" /><span>Form DIR-2 (Consent to act as a director).</span></li>
+                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 mt-1 flex-shrink-0" /><span>PAN Card and Aadhaar Card.</span></li>
+                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 mt-1 flex-shrink-0" /><span>Identity Proof: Driving License, Passport, or Voter ID.</span></li>
+                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 mt-1 flex-shrink-0" /><span>Latest Address Proof: Utility bill or bank statement (not older than 2 months).</span></li>
+                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 mt-1 flex-shrink-0" /><span>Form DIR-2 (Consent to act as a director).</span></li>
                 </ul>
               </Card>
               <Card className="p-6">
                 <CardTitle className="mb-4 text-blue-600">For Registered Office</CardTitle>
                 <ul className="space-y-3 text-gray-700">
-                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-1 flex-shrink-0" /><span>Address Proof: Latest utility bill (Electricity/Telephone).</span></li>
-                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-1 flex-shrink-0" /><span>No Objection Certificate (NOC) from the property owner if rented.</span></li>
-                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-1 flex-shrink-0" /><span>Rent agreement if the property is rented.</span></li>
+                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 mt-1 flex-shrink-0" /><span>Address Proof: Latest utility bill (Electricity/Telephone).</span></li>
+                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 mt-1 flex-shrink-0" /><span>No Objection Certificate (NOC) from the property owner if rented.</span></li>
+                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 mt-1 flex-shrink-0" /><span>Rent agreement if the property is rented.</span></li>
                 </ul>
               </Card>
             </div>
@@ -349,7 +349,7 @@ export default function Section8CompanyPage() {
                     "Mobile number and Email ID",
                   ].map((doc, index) => (
                     <div key={index} className="flex items-center space-x-3">
-                      <CheckCircle className="h-5 w-5 text-green-500" />
+                      <CheckCircle className="h-5 w-5 text-blue-500" />
                       <span className="text-gray-700">{doc}</span>
                     </div>
                   ))}
@@ -366,7 +366,7 @@ export default function Section8CompanyPage() {
                     "Proposed company names (1-2 options)",
                   ].map((doc, index) => (
                     <div key={index} className="flex items-center space-x-3">
-                      <CheckCircle className="h-5 w-5 text-green-500" />
+                      <CheckCircle className="h-5 w-5 text-blue-500" />
                       <span className="text-gray-700">{doc}</span>
                     </div>
                   ))}

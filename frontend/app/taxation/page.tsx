@@ -194,7 +194,7 @@ export default function TaxationPage() {
                       <div className="space-y-3">
                         {service.features.map((feature, idx) => (
                           <div key={idx} className="flex items-center space-x-2">
-                            <CheckCircle className="h-4 w-4 text-green-500" />
+                            <CheckCircle className="h-4 w-4 text-blue-500" />
                             <span className="text-sm text-gray-600">{feature}</span>
                           </div>
                         ))}
@@ -302,7 +302,7 @@ export default function TaxationPage() {
                       <div className="space-y-2">
                         {calendar.deadlines.map((deadline, idx) => (
                           <div key={idx} className="flex items-center space-x-2">
-                            <Clock className="h-4 w-4 text-orange-500" />
+                            <Clock className="h-4 w-4 text-blue-500" />
                             <span className="text-sm text-gray-600">{deadline}</span>
                           </div>
                         ))}

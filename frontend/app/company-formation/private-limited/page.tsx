@@ -47,7 +47,7 @@ export default function PrivateLimitedCompanyPage() {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <FadeInSection className="space-y-8">
               <div className="space-y-6">
-                <Badge className="bg-gradient-to-r from-green-100 to-green-200 text-green-800 hover:from-green-200 hover:to-green-300 animate-pulse border-0 px-4 py-2">
+                <Badge className="bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 hover:from-blue-200 hover:to-blue-300 animate-pulse border-0 px-4 py-2">
                   Most Popular Choice for Startups
                 </Badge>
                 <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
@@ -401,7 +401,7 @@ export default function PrivateLimitedCompanyPage() {
                     "Bank account statement (last 3 months)",
                   ].map((doc, index) => (
                     <div key={index} className="flex items-start space-x-3">
-                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+                      <CheckCircle className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
                       <span className="text-gray-700">{doc}</span>
                     </div>
                   ))}
@@ -425,7 +425,7 @@ export default function PrivateLimitedCompanyPage() {
                     "Sale deed (if owned property)",
                   ].map((doc, index) => (
                     <div key={index} className="flex items-start space-x-3">
-                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+                      <CheckCircle className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
                       <span className="text-gray-700">{doc}</span>
                     </div>
                   ))}
@@ -434,15 +434,15 @@ export default function PrivateLimitedCompanyPage() {
             </div>
 
             <div className="mt-12 text-center">
-              <Card className="border-2 border-orange-200 bg-gradient-to-r from-orange-50 to-orange-100 max-w-4xl mx-auto">
+              <Card className="border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-blue-100 max-w-4xl mx-auto">
                 <CardContent className="p-6">
                   <div className="flex items-start space-x-4">
-                    <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
                       <span className="text-white font-bold text-sm">!</span>
                     </div>
                     <div className="text-left">
-                      <h3 className="font-semibold text-orange-800 mb-2">Important Note:</h3>
-                      <p className="text-orange-700 text-sm leading-relaxed">
+                      <h3 className="font-semibold text-blue-800 mb-2">Important Note:</h3>
+                      <p className="text-blue-700 text-sm leading-relaxed">
                         All documents should be clear, legible, and not older than 2 months (except PAN and Aadhaar).
                         Foreign nationals require additional documents including passport, visa, and address proof from
                         home country.
@@ -612,24 +612,24 @@ export default function PrivateLimitedCompanyPage() {
                   <Card
                     className={`relative border-2 hover:shadow-2xl transition-all duration-300 hover:scale-105 ${
                       pkg.popular
-                        ? "border-yellow-400 bg-white/15 backdrop-blur-sm"
+                        ? "border-blue-400 bg-white/15 backdrop-blur-sm"
                         : "border-white/20 bg-white/10 backdrop-blur-sm"
                     }`}
                   >
                     {pkg.popular && (
                       <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                        <Badge className="bg-yellow-400 text-yellow-900 px-4 py-1">Most Popular</Badge>
+                        <Badge className="bg-blue-400 text-blue-900 px-4 py-1">Most Popular</Badge>
                       </div>
                     )}
                     <CardHeader className="text-center">
                       <CardTitle className="text-2xl font-bold">{pkg.name}</CardTitle>
-                      <div className="text-4xl font-bold text-yellow-400 my-4">{pkg.price}</div>
+                      <div className="text-4xl font-bold text-blue-400 my-4">{pkg.price}</div>
                       <p className="text-blue-100">One-time payment</p>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       {pkg.features.map((feature, idx) => (
                         <div key={idx} className="flex items-center space-x-3">
-                          <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0" />
+                          <CheckCircle className="h-5 w-5 text-blue-400 flex-shrink-0" />
                           <span className="text-blue-100 text-sm">{feature}</span>
                         </div>
                       ))}
@@ -637,7 +637,7 @@ export default function PrivateLimitedCompanyPage() {
                         <Button
                           className={`w-full mt-6 ${
                             pkg.popular
-                              ? "bg-yellow-400 text-yellow-900 hover:bg-yellow-300"
+                              ? "bg-blue-400 text-blue-900 hover:bg-blue-300"
                               : "bg-white/20 text-white hover:bg-white/30"
                           } transition-all duration-300 hover:scale-105`}
                         >
@@ -744,7 +744,7 @@ export default function PrivateLimitedCompanyPage() {
                     "Mobile number and Email ID",
                   ].map((doc, index) => (
                     <div key={index} className="flex items-center space-x-3">
-                      <CheckCircle className="h-5 w-5 text-green-500" />
+                      <CheckCircle className="h-5 w-5 text-blue-500" />
                       <span className="text-gray-700">{doc}</span>
                     </div>
                   ))}
@@ -761,7 +761,7 @@ export default function PrivateLimitedCompanyPage() {
                     "Proposed company names (1-2 options)",
                   ].map((doc, index) => (
                     <div key={index} className="flex items-center space-x-3">
-                      <CheckCircle className="h-5 w-5 text-green-500" />
+                      <CheckCircle className="h-5 w-5 text-blue-500" />
                       <span className="text-gray-700">{doc}</span>
                     </div>
                   ))}

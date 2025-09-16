@@ -76,11 +76,11 @@ export default function ROCReturnsDetailPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'Pending':
-        return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">Pending</Badge>
+        return <Badge variant="secondary" className="bg-blue-100 text-blue-800">Pending</Badge>
       case 'Reviewed':
         return <Badge variant="secondary" className="bg-blue-100 text-blue-800">Reviewed</Badge>
       case 'Filed':
-        return <Badge variant="secondary" className="bg-green-100 text-green-800">Filed</Badge>
+        return <Badge variant="secondary" className="bg-blue-100 text-blue-800">Filed</Badge>
       default:
         return <Badge variant="outline">{status}</Badge>
     }
@@ -187,7 +187,7 @@ export default function ROCReturnsDetailPage() {
             {form.completionNotes && (
               <div>
                 <div className="font-medium text-sm mb-2">Completion Notes:</div>
-                <div className="p-3 bg-green-50 rounded-md text-sm">{form.completionNotes}</div>
+                <div className="p-3 bg-blue-50 rounded-md text-sm">{form.completionNotes}</div>
               </div>
             )}
           </CardContent>
@@ -231,7 +231,7 @@ export default function ROCReturnsDetailPage() {
         <Card className="mt-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-green-600" />
+              <CheckCircle className="h-5 w-5 text-blue-600" />
               Completion Documents
             </CardTitle>
             <CardDescription>Documents provided upon completion of your filing</CardDescription>
@@ -239,7 +239,7 @@ export default function ROCReturnsDetailPage() {
           <CardContent>
             <div className="space-y-2">
               {form.completionDocuments.map((d, idx) => (
-                <div key={getDocId(d) || idx} className="flex items-center justify-between border rounded-md p-2 bg-green-50">
+                <div key={getDocId(d) || idx} className="flex items-center justify-between border rounded-md p-2 bg-blue-50">
                   <div className="text-sm">
                     {getDocTitle(d)}
                     {d.contentType ? <span className="ml-2 text-xs text-muted-foreground">({d.contentType})</span> : null}

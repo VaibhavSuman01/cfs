@@ -114,7 +114,7 @@ function EnhancedHeader({ isLoggedIn, user, onLogout }: { isLoggedIn: boolean, u
                     <hr className="my-1" />
                     <Button 
                       onClick={onLogout}
-                      className="w-full text-left px-4 py-3 hover:bg-gray-50 text-red-600 flex items-center space-x-2 transition-colors"
+                      className="w-full text-left px-4 py-3 hover:bg-gray-50 text-blue-600 flex items-center space-x-2 transition-colors"
                     >
                       <Lock className="w-4 h-4" />
                       <span>Sign Out</span>
@@ -168,7 +168,7 @@ function EnhancedHeader({ isLoggedIn, user, onLogout }: { isLoggedIn: boolean, u
                     </button>
                     <button 
                       onClick={onLogout}
-                      className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-white rounded transition-colors"
+                      className="w-full text-left px-3 py-2 text-sm text-blue-600 hover:bg-white rounded transition-colors"
                     >
                       Sign Out
                     </button>
@@ -193,13 +193,13 @@ function HomePage({ user }: { user: any }) {
     <div className="min-h-screen bg-white overflow-hidden">
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center pt-20">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-indigo-100/50"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-blue-100/50"></div>
 
         <div className="container mx-auto px-4 py-20 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
               <div className="space-y-6">
-                <div className="bg-gradient-to-r from-green-100 to-green-200 text-green-800 px-4 py-2 rounded-full text-sm font-medium inline-block animate-pulse">
+                <div className="bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 px-4 py-2 rounded-full text-sm font-medium inline-block animate-pulse">
                   ₹50+ Cr Business Registrations Processed
                 </div>
                 <h1 className="text-6xl lg:text-7xl font-bold leading-tight">
@@ -216,7 +216,7 @@ function HomePage({ user }: { user: any }) {
                 </p>
                 <div className="flex items-center space-x-2">
                   <div className="h-1 w-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"></div>
-                  <p className="text-lg font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent tracking-wider">
+                  <p className="text-lg font-bold bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent tracking-wider">
                     REGISTRATIONS. FILINGS. COMPLIANCES.
                   </p>
                   <div className="h-1 w-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"></div>
@@ -443,7 +443,7 @@ function AuthComponent({ onAuthSuccess }: { onAuthSuccess: (user: any) => void }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">
@@ -457,7 +457,7 @@ function AuthComponent({ onAuthSuccess }: { onAuthSuccess: (user: any) => void }
         {!isLogin ? (
           <div className="space-y-4">
             {errors.general && (
-              <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">
+              <div className="bg-blue-50 text-blue-600 p-3 rounded-lg text-sm">
                 {errors.general}
               </div>
             )}
@@ -470,11 +470,11 @@ function AuthComponent({ onAuthSuccess }: { onAuthSuccess: (user: any) => void }
                   type="text"
                   value={signupForm.fullName}
                   onChange={(e) => setSignupForm({...signupForm, fullName: e.target.value})}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.fullName ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.fullName ? 'border-blue-500' : 'border-gray-300'}`}
                   placeholder="Enter your full name"
                 />
               </div>
-              {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>}
+              {errors.fullName && <p className="text-blue-500 text-xs mt-1">{errors.fullName}</p>}
             </div>
 
             <div>
@@ -485,11 +485,11 @@ function AuthComponent({ onAuthSuccess }: { onAuthSuccess: (user: any) => void }
                   type="email"
                   value={signupForm.email}
                   onChange={(e) => setSignupForm({...signupForm, email: e.target.value})}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.email ? 'border-blue-500' : 'border-gray-300'}`}
                   placeholder="Enter your email"
                 />
               </div>
-              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+              {errors.email && <p className="text-blue-500 text-xs mt-1">{errors.email}</p>}
             </div>
 
             <div>
@@ -500,12 +500,12 @@ function AuthComponent({ onAuthSuccess }: { onAuthSuccess: (user: any) => void }
                   type="text"
                   value={signupForm.panCard}
                   onChange={(e) => setSignupForm({...signupForm, panCard: e.target.value.toUpperCase()})}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.panCard ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.panCard ? 'border-blue-500' : 'border-gray-300'}`}
                   placeholder="ABCDE1234F"
                   maxLength={10}
                 />
               </div>
-              {errors.panCard && <p className="text-red-500 text-xs mt-1">{errors.panCard}</p>}
+              {errors.panCard && <p className="text-blue-500 text-xs mt-1">{errors.panCard}</p>}
             </div>
 
             <div>
@@ -516,10 +516,10 @@ function AuthComponent({ onAuthSuccess }: { onAuthSuccess: (user: any) => void }
                   type="date"
                   value={signupForm.dateOfBirth}
                   onChange={(e) => setSignupForm({...signupForm, dateOfBirth: e.target.value})}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.dateOfBirth ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.dateOfBirth ? 'border-blue-500' : 'border-gray-300'}`}
                 />
               </div>
-              {errors.dateOfBirth && <p className="text-red-500 text-xs mt-1">{errors.dateOfBirth}</p>}
+              {errors.dateOfBirth && <p className="text-blue-500 text-xs mt-1">{errors.dateOfBirth}</p>}
             </div>
 
             <div>
@@ -530,12 +530,12 @@ function AuthComponent({ onAuthSuccess }: { onAuthSuccess: (user: any) => void }
                   type="tel"
                   value={signupForm.mobileNumber}
                   onChange={(e) => setSignupForm({...signupForm, mobileNumber: e.target.value})}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.mobileNumber ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.mobileNumber ? 'border-blue-500' : 'border-gray-300'}`}
                   placeholder="Enter 10-digit mobile number"
                   maxLength={10}
                 />
               </div>
-              {errors.mobileNumber && <p className="text-red-500 text-xs mt-1">{errors.mobileNumber}</p>}
+              {errors.mobileNumber && <p className="text-blue-500 text-xs mt-1">{errors.mobileNumber}</p>}
             </div>
 
             <div>
@@ -546,7 +546,7 @@ function AuthComponent({ onAuthSuccess }: { onAuthSuccess: (user: any) => void }
                   type={showPassword ? 'text' : 'password'}
                   value={signupForm.password}
                   onChange={(e) => setSignupForm({...signupForm, password: e.target.value})}
-                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.password ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.password ? 'border-blue-500' : 'border-gray-300'}`}
                   placeholder="Enter your password"
                 />
                 <button
@@ -557,7 +557,7 @@ function AuthComponent({ onAuthSuccess }: { onAuthSuccess: (user: any) => void }
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
-              {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+              {errors.password && <p className="text-blue-500 text-xs mt-1">{errors.password}</p>}
             </div>
 
             <div>
@@ -568,7 +568,7 @@ function AuthComponent({ onAuthSuccess }: { onAuthSuccess: (user: any) => void }
                   type={showConfirmPassword ? 'text' : 'password'}
                   value={signupForm.confirmPassword}
                   onChange={(e) => setSignupForm({...signupForm, confirmPassword: e.target.value})}
-                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.confirmPassword ? 'border-blue-500' : 'border-gray-300'}`}
                   placeholder="Confirm your password"
                 />
                 <button
@@ -579,7 +579,7 @@ function AuthComponent({ onAuthSuccess }: { onAuthSuccess: (user: any) => void }
                   {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
-              {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
+              {errors.confirmPassword && <p className="text-blue-500 text-xs mt-1">{errors.confirmPassword}</p>}
             </div>
 
             <button
@@ -606,7 +606,7 @@ function AuthComponent({ onAuthSuccess }: { onAuthSuccess: (user: any) => void }
         ) : (
           <div className="space-y-6">
             {errors.general && (
-              <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">
+              <div className="bg-blue-50 text-blue-600 p-3 rounded-lg text-sm">
                 {errors.general}
               </div>
             )}
@@ -619,11 +619,11 @@ function AuthComponent({ onAuthSuccess }: { onAuthSuccess: (user: any) => void }
                   type="text"
                   value={loginForm.emailOrPan}
                   onChange={(e) => setLoginForm({...loginForm, emailOrPan: e.target.value})}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.emailOrPan ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.emailOrPan ? 'border-blue-500' : 'border-gray-300'}`}
                   placeholder="Enter email or PAN card"
                 />
               </div>
-              {errors.emailOrPan && <p className="text-red-500 text-xs mt-1">{errors.emailOrPan}</p>}
+              {errors.emailOrPan && <p className="text-blue-500 text-xs mt-1">{errors.emailOrPan}</p>}
             </div>
 
             <div>
@@ -634,7 +634,7 @@ function AuthComponent({ onAuthSuccess }: { onAuthSuccess: (user: any) => void }
                   type={showPassword ? 'text' : 'password'}
                   value={loginForm.password}
                   onChange={(e) => setLoginForm({...loginForm, password: e.target.value})}
-                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.password ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.password ? 'border-blue-500' : 'border-gray-300'}`}
                   placeholder="Enter your password"
                 />
                 <button
@@ -645,7 +645,7 @@ function AuthComponent({ onAuthSuccess }: { onAuthSuccess: (user: any) => void }
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
-              {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+              {errors.password && <p className="text-blue-500 text-xs mt-1">{errors.password}</p>}
             </div>
 
             <button
