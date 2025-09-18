@@ -8,7 +8,8 @@ import { FloatingElements } from "@/components/floating-elements"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { getBasePrice } from "@/lib/pricing"
+import { PricingDisplay } from "@/components/ui/pricing-display"
+
 import {
   Receipt,
   CheckCircle,
@@ -23,7 +24,6 @@ import {
 import Link from "next/link"
 
 export default function GstRegistrationPage() {
-  const basePrice = getBasePrice("gst registration") ?? "₹1,999";
   
   return (
     <div className="min-h-screen bg-white">
@@ -56,7 +56,9 @@ export default function GstRegistrationPage() {
 
                 <div className="grid sm:grid-cols-3 gap-4 pt-6">
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-                    <div className="text-2xl font-bold text-blue-600">{basePrice}</div>
+                    <div className="text-2xl font-bold text-blue-600">
+                      <PricingDisplay serviceName="gst registration" />
+                    </div>
                     <div className="text-sm text-gray-600">Starting Price</div>
                   </div>
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">

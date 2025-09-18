@@ -1209,6 +1209,193 @@ router.get("/download-admin-report/:formId/:reportId", protect, async (req, res)
   }
 });
 
+// @route   POST /api/forms/download-all/:formId
+// @desc    Download all documents from a form as a ZIP file
+// @access  Private
+router.post("/download-all/:formId", protect, async (req, res) => {
+  try {
+    const { formId } = req.params;
+    const { formType, documents } = req.body;
+
+    // Validate form ID
+    if (!isValidObjectId(formId)) {
+      return res.status(400).json({
+        message: "Invalid form ID format. Must be a 24-character hex string.",
+      });
+    }
+
+    // Determine which model to use based on form type
+    let FormModel;
+    switch (formType) {
+      case 'TaxForm':
+        FormModel = TaxForm;
+        break;
+      case 'CompanyForm':
+        FormModel = CompanyForm;
+        break;
+      case 'ROCForm':
+        FormModel = ROCForm;
+        break;
+      case 'OtherRegistrationForm':
+        FormModel = OtherRegistrationForm;
+        break;
+      case 'ReportsForm':
+        FormModel = ReportsForm;
+        break;
+      case 'TrademarkISOForm':
+        FormModel = TrademarkISOForm;
+        break;
+      case 'AdvisoryForm':
+        FormModel = AdvisoryForm;
+        break;
+      default:
+        return res.status(400).json({ message: "Invalid form type" });
+    }
+
+    // Find the form
+    const form = await FormModel.findById(formId);
+    if (!form) {
+      return res.status(404).json({ message: "Form not found" });
+    }
+
+    // Check authorization
+    if (form.email !== req.user.email && req.user.role !== "admin") {
+      return res.status(403).json({ message: "Not authorized to access this form" });
+    }
+
+    // Check if there are documents
+    if (!form.documents || form.documents.length === 0) {
+      return res.status(404).json({ message: "No documents found" });
+    }
+
+    // Create ZIP file
+    const archiver = require('archiver');
+    const archive = archiver('zip', { zlib: { level: 9 } });
+
+    // Set response headers
+    res.set({
+      'Content-Type': 'application/zip',
+      'Content-Disposition': `attachment; filename="${formType}_${formId}_documents.zip"`
+    });
+
+    // Pipe archive to response
+    archive.pipe(res);
+
+    // Add each document to the ZIP
+    for (const doc of form.documents) {
+      if (doc.fileData) {
+        const fileName = doc.originalName || doc.fileName || `document_${doc._id}`;
+        archive.append(doc.fileData, { name: fileName });
+      }
+    }
+
+    // Finalize the archive
+    await archive.finalize();
+
+  } catch (error) {
+    console.error("Error creating ZIP file:", error);
+    if (!res.headersSent) {
+      res.status(500).json({ message: "Server error" });
+    }
+  }
+});
+
+// @route   POST /api/forms/download-all-reports/:formId
+// @desc    Download all admin reports from a form as a ZIP file
+// @access  Private
+router.post("/download-all-reports/:formId", protect, async (req, res) => {
+  try {
+    const { formId } = req.params;
+    const { formType } = req.body;
+
+    // Validate form ID
+    if (!isValidObjectId(formId)) {
+      return res.status(400).json({
+        message: "Invalid form ID format. Must be a 24-character hex string.",
+      });
+    }
+
+    // Determine which model to use based on form type
+    let FormModel;
+    switch (formType) {
+      case 'TaxForm':
+        FormModel = TaxForm;
+        break;
+      case 'CompanyForm':
+        FormModel = CompanyForm;
+        break;
+      case 'ROCForm':
+        FormModel = ROCForm;
+        break;
+      case 'OtherRegistrationForm':
+        FormModel = OtherRegistrationForm;
+        break;
+      case 'ReportsForm':
+        FormModel = ReportsForm;
+        break;
+      case 'TrademarkISOForm':
+        FormModel = TrademarkISOForm;
+        break;
+      case 'AdvisoryForm':
+        FormModel = AdvisoryForm;
+        break;
+      default:
+        return res.status(400).json({ message: "Invalid form type" });
+    }
+
+    // Find the form
+    const form = await FormModel.findById(formId);
+    if (!form) {
+      return res.status(404).json({ message: "Form not found" });
+    }
+
+    // Check authorization
+    if (form.email !== req.user.email && req.user.role !== "admin") {
+      return res.status(403).json({ message: "Not authorized to access this form" });
+    }
+
+    // Get admin reports (reports with documentId)
+    const adminReports = (form.reports || []).filter(report => report.documentId);
+    
+    if (adminReports.length === 0) {
+      return res.status(404).json({ message: "No admin reports found" });
+    }
+
+    // Create ZIP file
+    const archiver = require('archiver');
+    const archive = archiver('zip', { zlib: { level: 9 } });
+
+    // Set response headers
+    res.set({
+      'Content-Type': 'application/zip',
+      'Content-Disposition': `attachment; filename="${formType}_${formId}_admin_reports.zip"`
+    });
+
+    // Pipe archive to response
+    archive.pipe(res);
+
+    // Add each admin report document to the ZIP
+    for (const report of adminReports) {
+      // Find the document in the documents array
+      const document = form.documents.find(doc => doc._id.toString() === report.documentId.toString());
+      
+      if (document && document.fileData) {
+        const fileName = `${report.type || 'report'}_${report.sentAt ? new Date(report.sentAt).toISOString().split('T')[0] : 'unknown'}_${document.originalName || document.fileName || `document_${document._id}`}`;
+        archive.append(document.fileData, { name: fileName });
+      }
+    }
+
+    // Finalize the archive
+    await archive.finalize();
+
+  } catch (error) {
+    console.error("Error creating admin reports ZIP file:", error);
+    if (!res.headersSent) {
+      res.status(500).json({ message: "Server error" });
+    }
+  }
+});
+
 // @route   DELETE /api/forms/document/:documentId
 // @desc    Delete a document from a tax form submission
 // @access  Private
@@ -1770,7 +1957,18 @@ router.post(
 router.post(
   "/other-registration",
   protect,
-  upload.array("documents", 10),
+  upload.fields([
+    { name: 'aadhaarFile', maxCount: 1 },
+    { name: 'panFile', maxCount: 1 },
+    { name: 'addressProofFile', maxCount: 1 },
+    { name: 'businessAddressProofFile', maxCount: 1 },
+    { name: 'identityProofFile', maxCount: 1 },
+    { name: 'partnershipDeedFile', maxCount: 1 },
+    { name: 'mouFile', maxCount: 1 },
+    { name: 'bankAccountFile', maxCount: 1 },
+    { name: 'businessRegistrationFile', maxCount: 1 },
+    { name: 'documents', maxCount: 10 }
+  ]),
   handleMulterError,
   async (req, res) => {
     try {
@@ -1780,14 +1978,20 @@ router.post(
         email,
         phone,
         pan,
-        service,
-        subService,
+        aadhaar,
+        registrationType,
         businessName,
-        businessType,
+        businessActivity,
         businessAddress,
         city,
         state,
         pincode,
+        registrationPurpose,
+        description,
+        // Legacy fields for backward compatibility
+        service,
+        subService,
+        businessType,
         turnover,
         employeeCount,
         businessCategory,
@@ -1803,7 +2007,12 @@ router.post(
         selectedPackage,
       } = req.body;
 
-      if (!fullName || !email || !phone || !pan || !service || !businessName || !businessType || !businessAddress || !city || !state || !pincode || !applicantName || !applicantPan || !applicantAadhaar || !applicantAddress) {
+      // Map frontend fields to backend expectations
+      const mappedService = registrationType || service;
+      const mappedBusinessType = businessActivity || businessType;
+      const mappedApplicantAadhaar = aadhaar || applicantAadhaar;
+      
+      if (!fullName || !email || !phone || !pan || !mappedService || !businessName || !mappedBusinessType || !businessAddress) {
         return res.status(400).json({ message: "All required fields must be provided" });
       }
 
@@ -1818,39 +2027,75 @@ router.post(
         email,
         phone,
         pan: pan.toUpperCase(),
-        service,
-        subService: subService || service,
+        aadhaar: mappedApplicantAadhaar,
+        service: mappedService,
+        subService: subService || mappedService,
         businessName,
-        businessType,
+        businessType: mappedBusinessType,
         businessAddress,
         city,
         state,
         pincode,
-        turnover,
-        employeeCount,
-        businessCategory,
-        foodBusinessType,
-        importExportCode,
-        applicantName,
-        applicantPan: applicantPan.toUpperCase(),
-        applicantAadhaar,
-        applicantAddress,
+        registrationPurpose,
+        description,
+        // Legacy fields for backward compatibility
+        turnover: turnover || "",
+        employeeCount: employeeCount || "",
+        businessCategory: businessCategory || "",
+        foodBusinessType: foodBusinessType || "",
+        importExportCode: importExportCode || "",
+        applicantName: applicantName || fullName,
+        applicantPan: applicantPan ? applicantPan.toUpperCase() : pan.toUpperCase(),
+        applicantAadhaar: mappedApplicantAadhaar,
+        applicantAddress: applicantAddress || businessAddress,
         requiresDigitalSignature: requiresDigitalSignature === 'true',
         requiresBankAccount: requiresBankAccount === 'true',
         requiresCompliance: requiresCompliance === 'true',
         selectedPackage: selectedPackage || "Basic",
       };
 
-      if (req.files && req.files.length > 0) {
-        formData.documents = req.files.map((file, index) => ({
-          documentType: req.body[`documentType_${index}`] || "General Document",
-          fileName: file.filename,
-          originalName: file.originalname,
-          fileType: file.mimetype,
-          fileSize: file.size,
-          fileData: getFileData(file),
-          contentType: file.mimetype,
-        }));
+      // Handle file uploads
+      const documents = [];
+      
+      // Process specific document files
+      const fileFields = [
+        'aadhaarFile', 'panFile', 'addressProofFile', 'businessAddressProofFile',
+        'identityProofFile', 'partnershipDeedFile', 'mouFile', 'bankAccountFile',
+        'businessRegistrationFile'
+      ];
+      
+      fileFields.forEach(fieldName => {
+        if (req.files[fieldName] && req.files[fieldName].length > 0) {
+          const file = req.files[fieldName][0];
+          documents.push({
+            documentType: fieldName.replace('File', ' Document'),
+            fileName: file.filename,
+            originalName: file.originalname,
+            fileType: file.mimetype,
+            fileSize: file.size,
+            fileData: getFileData(file),
+            contentType: file.mimetype,
+          });
+        }
+      });
+      
+      // Process additional documents
+      if (req.files['documents'] && req.files['documents'].length > 0) {
+        req.files['documents'].forEach((file, index) => {
+          documents.push({
+            documentType: req.body[`documentType_${index}`] || "Additional Document",
+            fileName: file.filename,
+            originalName: file.originalname,
+            fileType: file.mimetype,
+            fileSize: file.size,
+            fileData: getFileData(file),
+            contentType: file.mimetype,
+          });
+        });
+      }
+      
+      if (documents.length > 0) {
+        formData.documents = documents;
       }
 
       const otherRegistrationForm = new OtherRegistrationForm(formData);

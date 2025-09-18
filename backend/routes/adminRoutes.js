@@ -10,6 +10,7 @@ const ExcelJS = require("exceljs");
 const { validateObjectId } = require("../utils/validation");
 const upload = require("../middleware/upload");
 const sendEmail = require("../utils/email");
+const emailTemplates = require("../utils/emailTemplates");
 const mongoose = require("mongoose");
 const isValidObjectId = mongoose.Types.ObjectId.isValid;
 const { getFileData, cleanupTempFiles, generateUniqueFilename } = require("../utils/fileHandler");
@@ -632,7 +633,9 @@ router.get("/users", async (req, res) => {
     }
 
     const users = await User.find(filter)
-      .select("name fatherName mobile email address pan aadhaar createdAt")
+      .select("name fatherName mobile email address pan aadhaar dob createdAt isBlocked blockedAt blockReason blockedBy unblockedAt unblockedBy")
+      .populate('blockedBy', 'name email')
+      .populate('unblockedBy', 'name email')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit));
@@ -650,6 +653,186 @@ router.get("/users", async (req, res) => {
     });
   } catch (error) {
     console.error("Get users error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// @route   GET /api/admin/users/:id
+// @desc    Get user details by ID
+// @access  Private/Admin
+router.get("/users/:id", validateObjectId(), async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id)
+      .select("-password")
+      .populate('blockedBy', 'name email')
+      .populate('unblockedBy', 'name email');
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ user });
+  } catch (error) {
+    console.error("Get user error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// @route   PUT /api/admin/users/:id
+// @desc    Update user profile
+// @access  Private/Admin
+router.put("/users/:id", validateObjectId(), async (req, res) => {
+  try {
+    const { name, email, mobile, pan, aadhaar, fatherName, address, dob } = req.body;
+    
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if email is being changed and if it already exists
+    if (email && email !== user.email) {
+      const existingUser = await User.findOne({ email, _id: { $ne: req.params.id } });
+      if (existingUser) {
+        return res.status(400).json({ message: "Email already exists" });
+      }
+    }
+
+    // Update user fields
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (mobile) user.mobile = mobile;
+    if (pan) user.pan = pan;
+    if (aadhaar) user.aadhaar = aadhaar;
+    if (fatherName) user.fatherName = fatherName;
+    if (address) user.address = address;
+    if (dob) user.dob = new Date(dob);
+
+    await user.save();
+
+    res.json({ message: "User updated successfully", user });
+  } catch (error) {
+    console.error("Update user error:", error);
+    
+    // Handle specific MongoDB errors
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern)[0];
+      return res.status(400).json({ 
+        message: `${field.charAt(0).toUpperCase() + field.slice(1)} already exists` 
+      });
+    }
+    
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// @route   POST /api/admin/users/:id/block
+// @desc    Block a user
+// @access  Private/Admin
+router.post("/users/:id/block", validateObjectId(), async (req, res) => {
+  try {
+    const { reason } = req.body;
+    
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.isBlocked) {
+      return res.status(400).json({ message: "User is already blocked" });
+    }
+
+    user.isBlocked = true;
+    user.blockedAt = new Date();
+    user.blockedBy = req.user._id;
+    user.blockReason = reason;
+
+    await user.save();
+
+    // Send email notification to user
+    try {
+      const adminUser = await User.findById(req.user._id).select('name email');
+      const emailTemplate = emailTemplates.userBlocked(user.name, reason, adminUser?.name || 'Admin');
+
+      await sendEmail({
+        email: user.email,
+        subject: emailTemplate.subject,
+        html: emailTemplate.html,
+        text: emailTemplate.text,
+      });
+
+      console.log(`Block notification email sent to ${user.email}`);
+    } catch (emailError) {
+      console.error(`Failed to send block notification email to ${user.email}:`, emailError);
+    }
+
+    res.json({ message: "User blocked successfully" });
+  } catch (error) {
+    console.error("Block user error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// @route   POST /api/admin/users/:id/unblock
+// @desc    Unblock a user
+// @access  Private/Admin
+router.post("/users/:id/unblock", validateObjectId(), async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (!user.isBlocked) {
+      return res.status(400).json({ message: "User is not blocked" });
+    }
+
+    user.isBlocked = false;
+    user.unblockedAt = new Date();
+    user.unblockedBy = req.user._id;
+
+    await user.save();
+
+    // Send email notification to user
+    try {
+      const adminUser = await User.findById(req.user._id).select('name email');
+      const emailTemplate = emailTemplates.userUnblocked(user.name, adminUser?.name || 'Admin');
+
+      await sendEmail({
+        email: user.email,
+        subject: emailTemplate.subject,
+        html: emailTemplate.html,
+        text: emailTemplate.text,
+      });
+
+      console.log(`Unblock notification email sent to ${user.email}`);
+    } catch (emailError) {
+      console.error(`Failed to send unblock notification email to ${user.email}:`, emailError);
+    }
+
+    res.json({ message: "User unblocked successfully" });
+  } catch (error) {
+    console.error("Unblock user error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// @route   DELETE /api/admin/users/:id
+// @desc    Delete a user
+// @access  Private/Admin
+router.delete("/users/:id", validateObjectId(), async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Delete user
+    await User.findByIdAndDelete(req.params.id);
+
+    res.json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.error("Delete user error:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -1137,6 +1320,182 @@ router.get("/roc-returns/:id/download/:documentId", async (req, res) => {
   } catch (error) {
     console.error("Error downloading ROC returns document:", error);
     res.status(500).json({ message: "Server error while downloading document" });
+  }
+});
+
+// @route   POST /api/admin/send-weekly-report
+// @desc    Send weekly admin report to all admins
+// @access  Private/Admin
+router.post("/send-weekly-report", async (req, res) => {
+  try {
+    // Get all admin users
+    const admins = await User.find({ role: 'admin' }).select('name email');
+    
+    if (admins.length === 0) {
+      return res.status(404).json({ message: "No admin users found" });
+    }
+
+    // Calculate weekly stats
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    const [newUsers, newForms, pendingForms, newContacts] = await Promise.all([
+      User.countDocuments({ 
+        role: 'user', 
+        createdAt: { $gte: oneWeekAgo } 
+      }),
+      TaxForm.countDocuments({ 
+        createdAt: { $gte: oneWeekAgo } 
+      }),
+      TaxForm.countDocuments({ 
+        status: 'Pending' 
+      }),
+      Contact.countDocuments({ 
+        createdAt: { $gte: oneWeekAgo } 
+      })
+    ]);
+
+    const stats = {
+      newUsers,
+      newForms,
+      pendingForms,
+      newContacts
+    };
+
+    // Send email to each admin
+    const emailPromises = admins.map(async (admin) => {
+      try {
+        const emailTemplate = emailTemplates.weeklyAdminReport(admin.name, stats);
+        
+        await sendEmail({
+          email: admin.email,
+          subject: emailTemplate.subject,
+          html: emailTemplate.html,
+          text: emailTemplate.text,
+        });
+
+        console.log(`Weekly report sent to ${admin.email}`);
+        return { success: true, email: admin.email };
+      } catch (error) {
+        console.error(`Failed to send weekly report to ${admin.email}:`, error);
+        return { success: false, email: admin.email, error: error.message };
+      }
+    });
+
+    const results = await Promise.all(emailPromises);
+    const successful = results.filter(r => r.success).length;
+    const failed = results.filter(r => !r.success).length;
+
+    res.json({
+      message: `Weekly report sent to ${successful} admins, ${failed} failed`,
+      stats,
+      results
+    });
+
+  } catch (error) {
+    console.error("Send weekly report error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// @route   POST /api/admin/forms/:formId/reports
+// @desc    Create an admin report with documents for a specific form
+// @access  Private/Admin
+router.post("/forms/:formId/reports", upload.array("documents", 10), async (req, res) => {
+  try {
+    const { formId } = req.params;
+    const { message, reportType, formType } = req.body;
+
+    if (!message || !reportType) {
+      return res.status(400).json({ message: "Message and report type are required" });
+    }
+
+    // Determine which model to use based on formType
+    let Model;
+    switch (formType) {
+      case 'CompanyForm':
+        Model = CompanyForm;
+        break;
+      case 'OtherRegistrationForm':
+        Model = OtherRegistrationForm;
+        break;
+      case 'ROCForm':
+        Model = ROCForm;
+        break;
+      case 'ReportsForm':
+        Model = ReportsForm;
+        break;
+      case 'TrademarkISOForm':
+        Model = TrademarkISOForm;
+        break;
+      case 'AdvisoryForm':
+        Model = AdvisoryForm;
+        break;
+      case 'TaxForm':
+        Model = TaxForm;
+        break;
+      default:
+        return res.status(400).json({ message: "Invalid form type" });
+    }
+
+    // Find the form
+    const form = await Model.findById(formId);
+    if (!form) {
+      return res.status(404).json({ message: "Form not found" });
+    }
+
+    // Process uploaded documents
+    const documents = [];
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        documents.push({
+          documentType: 'admin-report',
+          fileName: generateUniqueFilename(file.originalname),
+          originalName: file.originalname,
+          fileType: file.mimetype,
+          fileSize: file.size,
+          fileData: getFileData(file),
+          contentType: file.mimetype,
+          uploadedBy: 'admin',
+          uploadDate: new Date(),
+        });
+      }
+    }
+
+    // Create the report
+    const report = {
+      message,
+      type: reportType,
+      documents: documents.map(doc => doc._id || doc),
+      sentAt: new Date(),
+      sentBy: req.user.name || req.user.email,
+    };
+
+    // Add the report to the form
+    if (!form.reports) {
+      form.reports = [];
+    }
+    form.reports.push(report);
+
+    // If documents were uploaded, add them to the form's documents array
+    if (documents.length > 0) {
+      if (!form.documents) {
+        form.documents = [];
+      }
+      form.documents.push(...documents);
+    }
+
+    await form.save();
+
+    res.status(201).json({
+      message: "Admin report created successfully",
+      reportId: report._id,
+      documentsCount: documents.length
+    });
+
+  } catch (error) {
+    console.error("Error creating admin report:", error);
+    res.status(500).json({ message: "Server error" });
   }
 });
 

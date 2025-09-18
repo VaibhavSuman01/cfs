@@ -20,21 +20,21 @@ mongoose
 // Reset admin password
 async function resetAdminPassword() {
   try {
+    const adminEmail = process.env.ADMIN_EMAIL || "admin@comfinserv.co";
+    const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
+    const adminName = process.env.ADMIN_NAME || "Admin User";
+    
     // Find admin user
-    const admin = await User.findOne({ email: "admin@comfinserv.co" });
+    const admin = await User.findOne({ email: adminEmail });
 
     if (!admin) {
       console.log("Admin user not found. Creating new admin user...");
       
       const newAdmin = new User({
-        name: "Admin User",
-        email: "admin@comfinserv.co",
-        password: "admin123",
-        role: "admin",
-        pan: "ADMIN1234A",
-        dob: new Date("1990-01-01"),
-        mobile: "9999999999",
-        aadhaar: "999999999999"
+        name: adminName,
+        email: adminEmail,
+        password: adminPassword,
+        role: "admin"
       });
 
       await newAdmin.save();
@@ -43,15 +43,15 @@ async function resetAdminPassword() {
       console.log("Admin user found. Resetting password...");
       
       // Update password - this will trigger the pre-save middleware to hash it
-      admin.password = "admin123";
+      admin.password = adminPassword;
       await admin.save();
       
       console.log("Admin password reset successfully");
     }
 
     console.log("Admin credentials:");
-    console.log("Email: admin@comfinserv.co");
-    console.log("Password: admin123");
+    console.log(`Email: ${adminEmail}`);
+    console.log(`Password: ${adminPassword}`);
     console.log("IMPORTANT: Change these credentials in production!");
 
     process.exit(0);

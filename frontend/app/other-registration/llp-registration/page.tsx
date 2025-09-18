@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import { getBasePrice } from "@/lib/pricing"
+import { PricingDisplay } from "@/components/ui/pricing-display"
 import {
   Users,
   CheckCircle,
@@ -28,9 +28,9 @@ import {
   Handshake
 } from "lucide-react"
 import Link from "next/link"
+import { DotLottieReact } from "@lottiefiles/dotlottie-react"
 
 export default function LlpRegistrationPage() {
-  const basePrice = getBasePrice("llp registration") ?? "₹4,999";
   
   return (
     <div className="min-h-screen bg-white">
@@ -63,7 +63,9 @@ export default function LlpRegistrationPage() {
 
                 <div className="grid sm:grid-cols-3 gap-4 pt-6">
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-                    <div className="text-2xl font-bold text-blue-600">{basePrice}</div>
+                    <div className="text-2xl font-bold text-blue-600">
+                      <PricingDisplay serviceName="llp registration" />
+                    </div>
                     <div className="text-sm text-gray-600">Starting Price</div>
                   </div>
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
@@ -77,13 +79,13 @@ export default function LlpRegistrationPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                  <Link href={`/dashboard/other-registration-form?service=${encodeURIComponent("LLP Registration")}`} passHref>
+                  <Link href={`/dashboard/other-registration?service=${encodeURIComponent("LLP Registration")}`} passHref>
                     <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                       Register Your LLP Now
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
-                  <Link href={`/dashboard/other-registration-form?service=${encodeURIComponent("LLP Registration")}`} passHref>
+                  <Link href={`/dashboard/other-registration?service=${encodeURIComponent("LLP Registration")}`} passHref>
                     <Button
                       variant="outline"
                       className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
@@ -97,11 +99,15 @@ export default function LlpRegistrationPage() {
             <FadeInSection className="hidden lg:block">
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-tr from-blue-100 to-transparent rounded-full -translate-x-10 -translate-y-10"></div>
-                <img
-                  src="/images/llp-hero.svg"
-                  alt="LLP Registration Illustration"
-                  className="relative rounded-lg shadow-2xl w-full h-auto"
-                />
+                <div
+                  className="relative rounded-lg w-full h-auto"
+                >
+                  <DotLottieReact
+                    src="https://lottie.host/af2a5238-9300-42e9-a30a-159737f8aa0a/yaSxFcqJAm.lottie"
+                    loop
+                    autoplay
+                  />
+                </div>
               </div>
             </FadeInSection>
           </div>
@@ -335,13 +341,13 @@ export default function LlpRegistrationPage() {
                 Get the perfect blend of flexibility and protection for your business. Start your LLP registration with our expert team today.
               </p>
               <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <Link href={`/dashboard/other-registration-form?service=${encodeURIComponent("LLP Registration")}`} passHref>
+                <Link href={`/dashboard/other-registration?service=${encodeURIComponent("LLP Registration")}`} passHref>
                   <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                     Start My LLP Registration
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
-                <Link href={`/dashboard/other-registration-form?service=${encodeURIComponent("LLP Registration")}`} passHref>
+                <Link href={`/dashboard/other-registration?service=${encodeURIComponent("LLP Registration")}`} passHref>
                   <Button
                     variant="outline"
                     className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent"

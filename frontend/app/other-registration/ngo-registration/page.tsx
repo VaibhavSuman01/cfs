@@ -6,7 +6,7 @@ import { FadeInSection } from '@/components/fade-in-section';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { getBasePrice } from '@/lib/pricing';
+import { PricingDisplay } from '@/components/ui/pricing-display';
 import Link from 'next/link';
 import {
   Shield,
@@ -20,7 +20,6 @@ import {
 } from 'lucide-react';
 
 export default function NgoRegistrationPage() {
-  const basePrice = getBasePrice("ngo registration") ?? "As per request";
 
   return (
     <div className="min-h-screen bg-white">
@@ -50,7 +49,9 @@ export default function NgoRegistrationPage() {
 
                 <div className="grid sm:grid-cols-3 gap-4 pt-6">
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-                    <div className="text-2xl font-bold text-blue-600">{basePrice}</div>
+                    <div className="text-2xl font-bold text-blue-600">
+                      <PricingDisplay serviceName="ngo registration" />
+                    </div>
                     <div className="text-sm text-gray-600">Starting Price</div>
                   </div>
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
@@ -64,13 +65,13 @@ export default function NgoRegistrationPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                  <Link href={`/dashboard/other-registration-form?service=${encodeURIComponent('NGO Registration')}`} passHref>
+                  <Link href={`/dashboard/other-registration?service=${encodeURIComponent('NGO Registration')}`} passHref>
                     <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                       Register NGO
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
-                  <Link href={`/dashboard/other-registration-form?service=${encodeURIComponent('NGO Registration')}`} passHref>
+                  <Link href={`/dashboard/other-registration?service=${encodeURIComponent('NGO Registration')}`} passHref>
                     <Button
                       variant="outline"
                       className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
@@ -92,6 +93,125 @@ export default function NgoRegistrationPage() {
           </div>
         </div>
       </section>
+
+      {/* Document Requirements Section */}
+      <FadeInSection>
+        <section className="py-20 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="text-center max-w-4xl mx-auto mb-16">
+              <h2 className="text-4xl font-bold text-gray-900 mb-6">
+                Required Documents
+              </h2>
+              <p className="text-xl text-gray-600">
+                Please ensure you have the following documents ready before starting the registration process
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <Card className="border-blue-200 bg-blue-50">
+                <CardHeader>
+                  <CardTitle className="text-blue-800 flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Identity Documents
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm text-gray-700">
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      PAN Card (PDF format)
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      Aadhaar Card (PDF format)
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      Passport size photo
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      Address proof (Utility bill, Bank statement)
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              <Card className="border-green-200 bg-green-50">
+                <CardHeader>
+                  <CardTitle className="text-green-800 flex items-center gap-2">
+                    <Award className="h-5 w-5" />
+                    NGO Documents
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm text-gray-700">
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      Memorandum of Association
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      Articles of Association
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      Trust Deed (if applicable)
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      Society Registration Certificate
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              <Card className="border-purple-200 bg-purple-50">
+                <CardHeader>
+                  <CardTitle className="text-purple-800 flex items-center gap-2">
+                    <Shield className="h-5 w-5" />
+                    Additional Documents
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm text-gray-700">
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      Bank account details
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      Office address proof
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      Board resolution (if applicable)
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      Digital signature certificate
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="mt-12 text-center">
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 max-w-2xl mx-auto">
+                <h3 className="text-lg font-semibold text-yellow-800 mb-2">
+                  Important Notes
+                </h3>
+                <ul className="text-sm text-yellow-700 space-y-1">
+                  <li>• All documents must be in PDF format and clearly readable</li>
+                  <li>• File size should not exceed 5MB per document</li>
+                  <li>• Documents should be recent (not older than 3 months)</li>
+                  <li>• Ensure all signatures are visible and clear</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+      </FadeInSection>
 
       {/* What is NGO Section */}
       <FadeInSection>
@@ -173,13 +293,13 @@ export default function NgoRegistrationPage() {
                 Establish your non-profit organization and start working for social causes. Get your NGO registration today and create positive change in society.
               </p>
               <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <Link href={`/dashboard/other-registration-form?service=${encodeURIComponent('NGO Registration')}`} passHref>
+                <Link href={`/dashboard/other-registration?service=${encodeURIComponent('NGO Registration')}`} passHref>
                   <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                     Start Registration
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
-                <Link href={`/dashboard/other-registration-form?service=${encodeURIComponent('NGO Registration')}`} passHref>
+                <Link href={`/dashboard/other-registration?service=${encodeURIComponent('NGO Registration')}`} passHref>
                   <Button
                     variant="outline"
                     className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent"

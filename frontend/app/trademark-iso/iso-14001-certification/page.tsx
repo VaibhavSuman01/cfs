@@ -6,7 +6,6 @@ import { FadeInSection } from '@/components/fade-in-section';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { getBasePrice } from '@/lib/pricing';
 import Link from 'next/link';
 import {
   Award,
@@ -20,9 +19,9 @@ import {
   Phone,
   Leaf
 } from 'lucide-react';
+import { PricingDisplay } from '@/components/ui/pricing-display';
 
 export default function Iso14001Page() {
-  const basePrice = getBasePrice("iso 14001 certification") ?? "As per request";
 
   return (
     <div className="min-h-screen bg-white">
@@ -52,7 +51,9 @@ export default function Iso14001Page() {
 
                 <div className="grid sm:grid-cols-3 gap-4 pt-6">
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-                    <div className="text-2xl font-bold text-blue-600">{basePrice}</div>
+                    <div className="text-2xl font-bold text-blue-600">
+                      <PricingDisplay serviceName="iso 14001 certification" />
+                    </div>
                     <div className="text-sm text-gray-600">Starting Price</div>
                   </div>
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
@@ -66,13 +67,13 @@ export default function Iso14001Page() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                  <Link href={`/dashboard/trademark-iso-form?service=${encodeURIComponent('ISO 14001')}`} passHref>
+                  <Link href={`/dashboard/trademark-iso?service=${encodeURIComponent('ISO 14001')}`} passHref>
                     <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                       Get Certified
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
-                  <Link href={`/dashboard/trademark-iso-form?service=${encodeURIComponent('ISO 14001')}`} passHref>
+                  <Link href={`/dashboard/trademark-iso?service=${encodeURIComponent('ISO 14001')}`} passHref>
                     <Button
                       variant="outline"
                       className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
@@ -175,13 +176,13 @@ export default function Iso14001Page() {
                 Demonstrate your commitment to environmental responsibility with ISO 14001 certification. Join the global movement towards sustainable business practices.
               </p>
               <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <Link href={`/dashboard/trademark-iso-form?service=${encodeURIComponent('ISO 14001')}`} passHref>
+                <Link href={`/dashboard/trademark-iso?service=${encodeURIComponent('ISO 14001')}`} passHref>
                   <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                     Start Certification
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
-                <Link href={`/dashboard/trademark-iso-form?service=${encodeURIComponent('ISO 14001')}`} passHref>
+                <Link href={`/dashboard/trademark-iso?service=${encodeURIComponent('ISO 14001')}`} passHref>
                   <Button
                     variant="outline"
                     className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent"

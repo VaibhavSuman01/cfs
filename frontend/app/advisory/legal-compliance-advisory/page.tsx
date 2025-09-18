@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { Shield, CheckCircle, Clock, Users, Target, BarChart3, ArrowRight, FileText } from "lucide-react"
+import { PricingDisplay } from "@/components/ui/pricing-display"
 
 export default function LegalComplianceAdvisoryPage() {
   return (
@@ -23,7 +24,7 @@ export default function LegalComplianceAdvisoryPage() {
               Navigate complex legal requirements and ensure regulatory compliance with expert guidance
             </p>
             <div className="flex justify-center space-x-4">
-              <Link href={`/dashboard/advisory-form?service=${encodeURIComponent("Legal & Compliance Advisory")}`} passHref>
+              <Link href={`/dashboard/advisory?service=${encodeURIComponent("Legal & Compliance Advisory")}`} passHref>
                 <Button className="bg-blue-600 hover:bg-blue-700 px-8 py-3">Get Started</Button>
               </Link>
             </div>
@@ -72,14 +73,16 @@ export default function LegalComplianceAdvisoryPage() {
                       <Shield className="h-8 w-8 text-blue-600" />
                     </div>
                     <CardTitle className="text-2xl text-gray-900">Legal & Compliance Advisory</CardTitle>
-                    <div className="text-3xl font-bold text-blue-600">As per request</div>
+                    <div className="text-3xl font-bold text-blue-600">
+                      <PricingDisplay serviceName="legal compliance advisory" />
+                    </div>
                     <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
                       <Clock className="h-4 w-4" />
                       <span>1-2 weeks</span>
                     </div>
                   </CardHeader>
                   <CardContent className="text-center">
-                    <Link href={`/dashboard/advisory-form?service=${encodeURIComponent("Legal & Compliance Advisory")}`} passHref>
+                    <Link href={`/dashboard/advisory?service=${encodeURIComponent("Legal & Compliance Advisory")}`} passHref>
                       <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3">
                         Book Service <ArrowRight className="ml-2 h-5 w-5" />
                       </Button>
@@ -189,7 +192,7 @@ export default function LegalComplianceAdvisoryPage() {
                 Protect your business with expert legal and compliance guidance
               </p>
               <div className="flex justify-center space-x-4">
-                <Link href={`/dashboard/advisory-form?service=${encodeURIComponent("Legal & Compliance Advisory")}`} passHref>
+                <Link href={`/dashboard/advisory?service=${encodeURIComponent("Legal & Compliance Advisory")}`} passHref>
                   <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg">
                     Get Legal Support
                   </Button>

@@ -97,8 +97,8 @@ export default function ROCReturnsPage() {
       if (searchTerm) params.append('search', searchTerm);
       if (service) params.append('service', service);
 
-      // Use the service-forms endpoint with ROC Returns filter
-      const response = await api.get(`${API_PATHS.ADMIN.SERVICE_FORMS}?${params.toString()}&service=ROC Returns`);
+      // Use the service-forms endpoint to get all forms
+      const response = await api.get(`${API_PATHS.ADMIN.SERVICE_FORMS}?${params.toString()}`);
       
       // Filter to only show ROCForm type forms
       const rocForms = response.data.forms.filter((form: any) => form.formType === 'ROCForm');

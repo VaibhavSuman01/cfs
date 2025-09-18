@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { EnhancedHeader } from "@/components/enhanced-header";
 import { EnhancedFooter } from "@/components/enhanced-footer";
 import { FadeInSection } from "@/components/fade-in-section"
-import { getBasePrice } from "@/lib/pricing"
+import { PricingDisplay } from "@/components/ui/pricing-display"
 import {
   FileText,
   Calendar,
@@ -61,7 +61,7 @@ export default function ROCReturnsPage() {
                     "Auditor's report filing",
                     "Compliance certificate",
                   ],
-                  price: getBasePrice("annual filing (aoc-4 & mgt-7)") ?? "₹4,999",
+                  priceKey: "annual filing (aoc-4 & mgt-7)",
                   timeline: "7-10 days",
                   urgent: false,
                 },
@@ -77,7 +77,7 @@ export default function ROCReturnsPage() {
                     "Compliance with Companies Act",
                     "Digital documentation",
                   ],
-                  price: getBasePrice("board meeting & resolutions") ?? "₹2,999",
+                  priceKey: "board meeting & resolutions",
                   timeline: "3-5 days",
                   urgent: false,
                 },
@@ -93,7 +93,7 @@ export default function ROCReturnsPage() {
                     "Board resolutions",
                     "ROC notifications",
                   ],
-                  price: getBasePrice("director appointment/resignation") ?? "₹3,999",
+                  priceKey: "director appointment/resignation",
                   timeline: "5-7 days",
                   urgent: false,
                 },
@@ -109,7 +109,7 @@ export default function ROCReturnsPage() {
                     "Updated share certificates",
                     "ROC compliance",
                   ],
-                  price: getBasePrice("share transfer & capital changes") ?? "₹5,999",
+                  priceKey: "share transfer & capital changes",
                   timeline: "10-15 days",
                   urgent: false,
                 },
@@ -124,7 +124,7 @@ export default function ROCReturnsPage() {
                     "Compliance restoration",
                     "Status monitoring",
                   ],
-                  price: getBasePrice("roc default removal") ?? "₹8,999",
+                  priceKey: "roc default removal",
                   timeline: "15-20 days",
                   urgent: true,
                 },
@@ -139,7 +139,7 @@ export default function ROCReturnsPage() {
                     "Publication in gazette",
                     "Final closure certificate",
                   ],
-                  price: getBasePrice("company strike off") ?? "₹12,999",
+                  priceKey: "company strike off",
                   timeline: "60-90 days",
                   urgent: false,
                 },
@@ -166,7 +166,11 @@ export default function ROCReturnsPage() {
                       <CardTitle className="text-xl text-gray-900">{service.title}</CardTitle>
                       <div className="space-y-2">
                         <div className={`text-2xl font-bold ${service.urgent ? "text-blue-600" : "text-blue-600"}`}>
-                          {service.price}
+                          {service.priceKey ? (
+                            <PricingDisplay serviceName={service.priceKey} />
+                          ) : (
+                            service.priceKey
+                          )}
                         </div>
                         <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
                           <Clock className="h-4 w-4" />

@@ -24,12 +24,14 @@ import {
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useToast } from '@/components/ui/use-toast'
 import { Skeleton } from '@/components/ui/skeleton'
+import DocumentDisplay from '@/components/ui/document-display'
+import AdminReportSection from '@/components/ui/admin-report-section'
 import api from '@/lib/api-client'
 import { API_PATHS } from '@/lib/api-client'
 
@@ -58,6 +60,7 @@ interface OtherRegistrationForm {
     message: string
     documents: string[]
     createdAt: string
+    uploadedBy?: string
   }>
   createdAt: string
   updatedAt: string
@@ -100,7 +103,6 @@ export default function OtherRegistrationDetailPage() {
   const [form, setForm] = useState<OtherRegistrationForm | null>(null)
   const [loading, setLoading] = useState(true)
   const [updatingStatus, setUpdatingStatus] = useState(false)
-  const [sendingReport, setSendingReport] = useState(false)
   
   // Status update dialog
   const [statusDialogOpen, setStatusDialogOpen] = useState(false)
@@ -110,6 +112,8 @@ export default function OtherRegistrationDetailPage() {
   const [reportDialogOpen, setReportDialogOpen] = useState(false)
   const [reportMessage, setReportMessage] = useState('')
   const [reportDocuments, setReportDocuments] = useState<File[]>([])
+  const [sendingReport, setSendingReport] = useState(false)
+  
 
   const formId = params.id as string
 
@@ -184,19 +188,31 @@ export default function OtherRegistrationDetailPage() {
     try {
       setSendingReport(true)
       
-      // For now, just update local state since backend endpoint is not implemented
-      // TODO: Implement backend endpoint for sending reports
-      const newReport = {
-        message: reportMessage,
-        documents: reportDocuments.map(doc => doc.name),
-        createdAt: new Date().toISOString()
-      };
+      // Create FormData for file upload
+      const formData = new FormData();
+      formData.append('reportType', 'Other Registration Report');
+      formData.append('message', reportMessage);
+      if (reportDocuments.length > 0) {
+        reportDocuments.forEach((file, index) => {
+          formData.append('reportFile', file);
+        });
+      }
 
-      // Update local form state to show the new report
-      setForm(prev => prev ? {
-        ...prev,
-        reports: [...(prev.reports || []), newReport]
-      } : null);
+      // Call the backend API to send the report
+      await api.post(`/api/admin/forms/${form._id}/send-report`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      // Refresh the form data to get the updated reports
+      const response = await api.get(`${API_PATHS.ADMIN.SERVICE_FORMS}`)
+      const forms = response.data.forms
+      const targetForm = forms.find((f: any) => f._id === form._id && f.formType === 'OtherRegistrationForm')
+      
+      if (targetForm) {
+        setForm(targetForm)
+      }
       
       setReportDialogOpen(false)
       setReportMessage('')
@@ -204,19 +220,20 @@ export default function OtherRegistrationDetailPage() {
       
       toast({
         title: 'Success',
-        description: 'Report added successfully. (Backend integration pending)',
+        description: 'Report sent successfully to the user.',
       })
     } catch (error) {
-      console.error('Failed to add report:', error)
+      console.error('Failed to send report:', error)
       toast({
         title: 'Error',
-        description: 'Failed to add report',
+        description: 'Failed to send report',
         variant: 'destructive',
       })
     } finally {
       setSendingReport(false)
     }
   }
+
 
   const handleDocumentDownload = async (document: any) => {
     try {
@@ -339,6 +356,50 @@ export default function OtherRegistrationDetailPage() {
                 </div>
               </DialogContent>
             </Dialog>
+            <Dialog open={reportDialogOpen} onOpenChange={setReportDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Send className="mr-2 h-4 w-4" />
+                  Send Report
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>Send Report</DialogTitle>
+                  <DialogDescription>
+                    Send a report to the user. This will appear in their dashboard (email functionality temporarily disabled).
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium">Message</label>
+                    <Textarea
+                      placeholder="Enter your report message..."
+                      value={reportMessage}
+                      onChange={(e) => setReportMessage(e.target.value)}
+                      rows={4}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Attach Documents (Optional)</label>
+                    <Input
+                      type="file"
+                      multiple
+                      onChange={(e) => setReportDocuments(Array.from(e.target.files || []))}
+                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                    />
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <Button variant="outline" onClick={() => setReportDialogOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button onClick={handleSendReport} disabled={sendingReport || !reportMessage.trim()}>
+                      {sendingReport ? 'Sending...' : 'Send Report'}
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
 
@@ -429,114 +490,23 @@ export default function OtherRegistrationDetailPage() {
           </Card>
 
           {/* Documents */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                Uploaded Documents ({form.documents?.length || 0})
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {form.documents && form.documents.length > 0 ? (
-                <div className="space-y-2">
-                  {form.documents.map((doc, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <FileText className="h-4 w-4 text-muted-foreground" />
-                        <div>
-                          <p className="text-sm font-medium">{doc.originalname}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {(doc.size / 1024 / 1024).toFixed(2)} MB
-                          </p>
-                        </div>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDocumentDownload(doc)}
-                      >
-                        <Download className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-muted-foreground text-center py-4">No documents uploaded</p>
-              )}
-            </CardContent>
-          </Card>
+          <DocumentDisplay
+            documents={form.documents || []}
+            formId={form._id}
+            formType="OtherRegistrationForm"
+            title="Uploaded Documents"
+            showBulkDownload={true}
+          />
 
-          {/* Reports */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5" />
-                  Reports ({form.reports?.length || 0})
-                </CardTitle>
-                <Dialog open={reportDialogOpen} onOpenChange={setReportDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button>
-                      <Send className="mr-2 h-4 w-4" />
-                      Send Report
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-2xl">
-                    <DialogHeader>
-                      <DialogTitle>Send Report</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <div>
-                        <label className="text-sm font-medium">Message</label>
-                        <Textarea
-                          placeholder="Enter your report message..."
-                          value={reportMessage}
-                          onChange={(e) => setReportMessage(e.target.value)}
-                          rows={4}
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium">Attach Documents (Optional)</label>
-                        <Input
-                          type="file"
-                          multiple
-                          onChange={(e) => setReportDocuments(Array.from(e.target.files || []))}
-                          accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                        />
-                      </div>
-                      <div className="flex justify-end gap-2">
-                        <Button variant="outline" onClick={() => setReportDialogOpen(false)}>
-                          Cancel
-                        </Button>
-                        <Button onClick={handleSendReport} disabled={sendingReport || !reportMessage.trim()}>
-                          {sendingReport ? 'Sending...' : 'Send Report'}
-                        </Button>
-                      </div>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {form.reports && form.reports.length > 0 ? (
-                <div className="space-y-3">
-                  {form.reports.map((report, index) => (
-                    <div key={index} className="p-3 border rounded-lg">
-                      <p className="text-sm mb-2">{report.message}</p>
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <span>{formatDate(report.createdAt)}</span>
-                        {report.documents && report.documents.length > 0 && (
-                          <span>{report.documents.length} document(s) attached</span>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-muted-foreground text-center py-4">No reports sent yet</p>
-              )}
-            </CardContent>
-          </Card>
+          {/* Admin Reports */}
+          <AdminReportSection
+            reports={form.reports || []}
+            formId={form._id}
+            formType="OtherRegistrationForm"
+            title="Admin Reports"
+            className="mt-6"
+          />
+
         </div>
 
         {/* Form Details */}

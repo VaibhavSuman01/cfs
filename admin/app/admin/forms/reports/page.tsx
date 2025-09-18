@@ -68,12 +68,13 @@ export default function ReportsPage() {
       setLoading(true)
       const response = await api.get(API_PATHS.ADMIN.SERVICE_FORMS, {
         params: {
-          service: serviceFilter !== 'all' ? 'Reports' : undefined,
           status: statusFilter !== 'all' ? statusFilter : undefined,
           search: searchTerm || undefined,
         }
       })
-      setForms(response.data.forms || [])
+      // Filter to only show ReportsForm type forms
+      const reportsForms = response.data.forms.filter((form: any) => form.formType === 'ReportsForm');
+      setForms(reportsForms || [])
     } catch (error) {
       console.error('Error fetching forms:', error)
       toast.error('Failed to load forms. Please try again.')

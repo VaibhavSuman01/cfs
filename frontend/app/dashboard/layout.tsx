@@ -4,13 +4,14 @@ import { EnhancedHeader } from "@/components/enhanced-header";
 import { useAuth } from "@/providers/auth-provider";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import BlockedUserComponent from "@/components/ui/blocked-user-component";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -29,6 +30,11 @@ export default function DashboardLayout({
 
   if (!isAuthenticated) {
     return null; // will redirect
+  }
+
+  // Check if user is blocked
+  if (user?.isBlocked) {
+    return <BlockedUserComponent />;
   }
 
   return (

@@ -23,6 +23,7 @@ const formRoutes = require("./routes/formRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const authRoutes = require("./routes/authRoutes");
 const passwordResetRoutes = require("./routes/passwordResetRoutes");
+const supportRoutes = require("./routes/supportRoutes");
 const PasswordResetToken = require("./models/PasswordResetToken");
 
 // Initialize express app
@@ -142,6 +143,7 @@ app.use(express.static(path.join(__dirname, "public")));
 // Routes
 app.use("/api/forms", formRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/support", supportRoutes);
 
 // Apply profile-specific rate limiting to profile routes
 app.use("/api/auth/profile", profileLimiter);

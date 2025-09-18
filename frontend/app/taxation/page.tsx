@@ -7,7 +7,7 @@ import { EnhancedFooter } from "@/components/enhanced-footer";
 import { FadeInSection } from "@/components/fade-in-section"
 import { Calculator, FileText, TrendingUp, Shield, CheckCircle, ArrowRight, Clock, Users, Building } from "lucide-react"
 import Link from "next/link";
-import { getBasePrice } from "@/lib/pricing"
+import { PricingDisplay } from "@/components/ui/pricing-display"
 
 export default function TaxationPage() {
   return (
@@ -50,7 +50,7 @@ export default function TaxationPage() {
                     "E-invoice/e-way bill guidance",
                     "Input Tax Credit reconciliation",
                   ],
-                  price: getBasePrice("gst registration") ?? "₹1,999",
+                  priceKey: "gst registration",
                   timeline: "3-7 days",
                 },
                 {
@@ -65,7 +65,7 @@ export default function TaxationPage() {
                     "Advance tax and refund tracking",
                     "Notices and rectification support",
                   ],
-                  price: getBasePrice("income tax filing") ?? "₹999",
+                  priceKey: "income tax filing",
                   timeline: "1-3 days",
                 },
                 {
@@ -80,7 +80,7 @@ export default function TaxationPage() {
                     "Conso file & FVU generation",
                     "Correction statements & Form 16/16A",
                   ],
-                  price: getBasePrice("tds returns (per qtr)") ?? "₹2,499",
+                  priceKey: "tds returns (per qtr)",
                   timeline: "2-5 days",
                 },
                 {
@@ -95,7 +95,7 @@ export default function TaxationPage() {
                     "Business/profession tax strategy",
                     "Advance tax and TDS planning",
                   ],
-                  price: getBasePrice("tax planning") ?? "₹4,999",
+                  priceKey: "tax planning",
                   timeline: "5-7 days",
                 },
                 {
@@ -110,7 +110,7 @@ export default function TaxationPage() {
                     "Transfer pricing documentation",
                     "TDS/TCS and advance tax review",
                   ],
-                  price: getBasePrice("corporate tax (company)") ?? "₹7,999",
+                  priceKey: "corporate tax (company)",
                   timeline: "7-10 days",
                 },
                 {
@@ -125,7 +125,7 @@ export default function TaxationPage() {
                     "Professional Tax returns (state-wise)",
                     "Payroll statutory registers & audit",
                   ],
-                  price: getBasePrice("payroll tax (per month)") ?? "₹3,999",
+                  priceKey: "payroll tax (per month)",
                   timeline: "3-5 days",
                 },
                 {
@@ -182,7 +182,13 @@ export default function TaxationPage() {
                       </div>
                       <CardTitle className="text-xl text-gray-900">{service.title}</CardTitle>
                       <div className="space-y-2">
-                        <div className="text-2xl font-bold text-blue-600">{service.price}</div>
+                        <div className="text-2xl font-bold text-blue-600">
+                          {service.priceKey ? (
+                            <PricingDisplay serviceName={service.priceKey} />
+                          ) : (
+                            service.price
+                          )}
+                        </div>
                         <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
                           <Clock className="h-4 w-4" />
                           <span>{service.timeline}</span>

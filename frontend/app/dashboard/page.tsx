@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/providers/auth-provider";
+import { useRouter } from "next/navigation";
+import { getAvatarUrl } from "@/lib/avatar-utils";
 import {
   Card,
   CardContent,
@@ -120,14 +122,18 @@ interface FormSubmission {
 // --- [Main] Revamped User Dashboard Component ---
 export default function UserDashboard() {
   const { user, isLoading } = useAuth();
+  const router = useRouter();
   const [forms, setForms] = useState<FormSubmission[]>([]);
   const [isLoadingForms, setIsLoadingForms] = useState(true);
 
-  const avatarSrc = user?.avatarUrl
-    ? user.avatarUrl.startsWith("http")
-      ? user.avatarUrl
-      : `${API_BASE_URL}${user.avatarUrl}`
-    : "/placeholder-user.jpg";
+  // Check if user is blocked
+  useEffect(() => {
+    if (user && user.isBlocked) {
+      router.push('/blocked');
+    }
+  }, [user, router]);
+
+  const avatarSrc = getAvatarUrl(user?.avatarUrl);
 
   useEffect(() => {
     const fetchForms = async () => {
@@ -155,6 +161,32 @@ export default function UserDashboard() {
       await api.downloadFile(`/api/forms/download/${latest.documentId}`, defaultName);
     } catch (e) {
       console.error('Failed to download report', e);
+    }
+  };
+
+  const handleDownloadAllReports = async (form: FormSubmission) => {
+    try {
+      const reportsWithDocs = (form.reports || []).filter(r => r.documentId);
+      if (reportsWithDocs.length === 0) return;
+      
+      // Call the backend endpoint to download all reports as ZIP
+      const response = await api.post(`/api/forms/download-all-reports/${form._id}`, {
+        formType: form.formType
+      }, {
+        responseType: 'blob'
+      });
+      
+      // Create download link
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${form.formType}_${form._id}_admin_reports.zip`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error('Failed to download all reports', e);
     }
   };
 
@@ -195,6 +227,32 @@ export default function UserDashboard() {
       'AdvisoryForm': 'Advisory'
     };
     return typeMap[formType] || formType;
+  };
+
+  const getFormDetailUrl = (formType: string, formId: string) => {
+    const typeMap: Record<string, string> = {
+      'TaxForm': `/dashboard/forms/${formId}`,
+      'CompanyForm': `/dashboard/company-formation/${formId}`,
+      'OtherRegistrationForm': `/dashboard/other-registration/${formId}`,
+      'ROCForm': `/dashboard/roc-returns/${formId}`,
+      'ReportsForm': `/dashboard/reports/${formId}`,
+      'TrademarkISOForm': `/dashboard/trademark-iso/${formId}`,
+      'AdvisoryForm': `/dashboard/advisory/${formId}`
+    };
+    return typeMap[formType] || `/dashboard/forms/${formId}`;
+  };
+
+  const getFormEditUrl = (formType: string, formId: string) => {
+    const typeMap: Record<string, string> = {
+      'TaxForm': `/dashboard/forms/edit/${formId}`,
+      'CompanyForm': `/dashboard/company-formation/${formId}/edit`,
+      'OtherRegistrationForm': `/dashboard/other-registration/${formId}/edit`,
+      'ROCForm': `/dashboard/roc-returns/${formId}/edit`,
+      'ReportsForm': `/dashboard/reports/${formId}/edit`,
+      'TrademarkISOForm': `/dashboard/trademark-iso/${formId}/edit`,
+      'AdvisoryForm': `/dashboard/advisory/${formId}/edit`
+    };
+    return typeMap[formType] || `/dashboard/forms/edit/${formId}`;
   };
 
   const getServiceLabel = (service: string) => {
@@ -473,7 +531,7 @@ export default function UserDashboard() {
                                   {category.name === 'Taxation' ? (
                                     <Button variant="outline" size="sm" asChild>
                                       <Link
-                                        href={`/dashboard/new-form?service=${encodeURIComponent(service)}`}
+                                        href={`/dashboard/newservice=${encodeURIComponent(service)}`}
                                       >
                                         File Now{" "}
                                         <ChevronRight className="ml-2 h-4 w-4" />
@@ -482,7 +540,7 @@ export default function UserDashboard() {
                                   ) : category.name === 'Company Formation' ? (
                                     <Button variant="outline" size="sm" asChild>
                                       <Link
-                                        href={`/dashboard/company-formation-form?service=${encodeURIComponent(service)}`}
+                                        href={`/dashboard/company-formation?service=${encodeURIComponent(service)}`}
                                       >
                                         Apply Now{" "}
                                         <ChevronRight className="ml-2 h-4 w-4" />
@@ -491,7 +549,7 @@ export default function UserDashboard() {
                                   ) : category.name === 'Other Registration' ? (
                                     <Button variant="outline" size="sm" asChild>
                                       <Link
-                                        href={`/dashboard/other-registration-form?service=${encodeURIComponent(service)}`}
+                                        href={`/dashboard/other-registration?service=${encodeURIComponent(service)}`}
                                       >
                                         Apply Now{" "}
                                         <ChevronRight className="ml-2 h-4 w-4" />
@@ -500,7 +558,7 @@ export default function UserDashboard() {
                                   ) : category.name === 'Reports' ? (
                                     <Button variant="outline" size="sm" asChild>
                                       <Link
-                                        href={`/dashboard/reports-form?service=${encodeURIComponent(service)}`}
+                                        href={`/dashboard/reports?service=${encodeURIComponent(service)}`}
                                       >
                                         Apply Now{" "}
                                         <ChevronRight className="ml-2 h-4 w-4" />
@@ -509,7 +567,7 @@ export default function UserDashboard() {
                                   ) : category.name === 'Trademark & ISO' ? (
                                     <Button variant="outline" size="sm" asChild>
                                       <Link
-                                        href={`/dashboard/trademark-iso-form?service=${encodeURIComponent(service)}`}
+                                        href={`/dashboard/trademark-iso?service=${encodeURIComponent(service)}`}
                                       >
                                         Apply Now{" "}
                                         <ChevronRight className="ml-2 h-4 w-4" />
@@ -518,7 +576,7 @@ export default function UserDashboard() {
                                   ) : category.name === 'ROC Returns' ? (
                                     <Button variant="outline" size="sm" asChild>
                                       <Link
-                                        href={`/dashboard/roc-returns-form?service=${encodeURIComponent(service)}`}
+                                        href={`/dashboard/roc-returns?service=${encodeURIComponent(service)}`}
                                       >
                                         Apply Now{" "}
                                         <ChevronRight className="ml-2 h-4 w-4" />
@@ -527,7 +585,7 @@ export default function UserDashboard() {
                                   ) : category.name === 'Advisory' ? (
                                     <Button variant="outline" size="sm" asChild>
                                       <Link
-                                        href={`/dashboard/advisory-form?service=${encodeURIComponent(service)}`}
+                                        href={`/dashboard/advisory?service=${encodeURIComponent(service)}`}
                                       >
                                         Apply Now{" "}
                                         <ChevronRight className="ml-2 h-4 w-4" />
@@ -578,8 +636,13 @@ export default function UserDashboard() {
                           >
                             <div className="mb-4 flex items-center justify-between">
                                 <div>
-                                    <div className="font-bold text-gray-800">
+                                    <div className="font-bold text-gray-800 flex items-center gap-2">
                                       {getFormTypeLabel(form.formType)} - {getServiceLabel(form.service || 'Service')}{form.year ? ` - FY ${form.year}` : ''}
+                                      {form.reports && form.reports.length > 0 && (
+                                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                          {form.reports.length} Report{form.reports.length > 1 ? 's' : ''}
+                                        </span>
+                                      )}
                                     </div>
                                     <div className="text-xs text-gray-500">
                                       Submitted: {formatDate(form.createdAt)}{' '}
@@ -591,23 +654,37 @@ export default function UserDashboard() {
                                 <div className="flex items-center space-x-2">
                                     {form.status === 'Pending' && form.editHistory && form.editHistory.length < 2 && (
                                       <Button variant="secondary" size="sm" asChild>
-                                        <Link href={`/dashboard/forms/edit/${form._id}`}>
+                                        <Link href={getFormEditUrl(form.formType, form._id)}>
                                           <Pencil className="mr-2 h-4 w-4"/> Edit
                                         </Link>
                                       </Button>
                                     )}
-                                    {form.status === 'Filed' && (form.reports?.some((r: any) => r.documentId)) && (
-                                        <Button
-                                          variant="outline"
-                                          size="sm"
-                                          className="border-blue-600 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
-                                          onClick={() => handleDownloadLatestReport(form)}
-                                        >
-                                            <Download className="mr-2 h-4 w-4"/> Download Report
-                                        </Button>
+                                    {form.reports && form.reports.length > 0 && (
+                                        <div className="flex gap-2">
+                                          {form.reports.some((r: any) => r.documentId) && (
+                                            <Button
+                                              variant="outline"
+                                              size="sm"
+                                              className="border-blue-600 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+                                              onClick={() => handleDownloadLatestReport(form)}
+                                            >
+                                                <Download className="mr-2 h-4 w-4"/> Download Latest
+                                            </Button>
+                                          )}
+                                          {form.reports.length > 1 && (
+                                            <Button
+                                              variant="outline"
+                                              size="sm"
+                                              className="border-green-600 text-green-600 hover:bg-green-50 hover:text-green-700"
+                                              onClick={() => handleDownloadAllReports(form)}
+                                            >
+                                                <Download className="mr-2 h-4 w-4"/> Download All
+                                            </Button>
+                                          )}
+                                        </div>
                                     )}
                                     <Button size="sm" asChild>
-                                        <Link href={`/dashboard/forms/${form._id}`}>View Details</Link>
+                                        <Link href={getFormDetailUrl(form.formType, form._id)}>View Details</Link>
                                     </Button>
                                 </div>
                             </div>

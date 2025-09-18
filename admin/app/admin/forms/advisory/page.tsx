@@ -95,8 +95,8 @@ export default function AdvisoryPage() {
       if (searchTerm) params.append('search', searchTerm);
       if (service) params.append('service', service);
 
-      // Use the service-forms endpoint with Advisory filter
-      const response = await api.get(`${API_PATHS.ADMIN.SERVICE_FORMS}?${params.toString()}&service=Advisory`);
+      // Use the service-forms endpoint to get all forms
+      const response = await api.get(`${API_PATHS.ADMIN.SERVICE_FORMS}?${params.toString()}`);
       
       // Filter to only show AdvisoryForm type forms
       const advisoryForms = response.data.forms.filter((form: any) => form.formType === 'AdvisoryForm');

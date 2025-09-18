@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import { getBasePrice, getPackages } from "@/lib/pricing"
+import { PricingDisplay, PackagePricingDisplay } from "@/components/ui/pricing-display"
 import {
   Building2,
   CheckCircle,
@@ -27,6 +27,7 @@ import {
   Mail,
   MapPin,
 } from "lucide-react"
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 export default function PrivateLimitedCompanyPage() {
   const router = useRouter();
@@ -66,7 +67,9 @@ export default function PrivateLimitedCompanyPage() {
 
                 <div className="grid sm:grid-cols-3 gap-4 pt-6">
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-                    <div className="text-2xl font-bold text-blue-600">{getBasePrice("private limited company") ?? "—"}</div>
+                    <div className="text-2xl font-bold text-blue-600">
+                      <PricingDisplay serviceName="private limited company" />
+                    </div>
                     <div className="text-sm text-gray-600">Starting Price</div>
                   </div>
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
@@ -80,7 +83,7 @@ export default function PrivateLimitedCompanyPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                  <Link href={`/dashboard/company-formation-form?service=${encodeURIComponent("Private Limited Company")}`} passHref>
+                  <Link href={`/dashboard/company-formation?service=${encodeURIComponent("Private Limited Company")}`} passHref>
                     <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                       Start Registration Now
                       <ArrowRight className="ml-2 h-5 w-5" />
@@ -91,102 +94,16 @@ export default function PrivateLimitedCompanyPage() {
               </div>
             </FadeInSection>
 
-            {/* Contact Form */}
+            
             <FadeInSection delay={300} className="relative">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-100 to-blue-200 rounded-3xl blur-3xl opacity-30 animate-pulse-slow"></div>
-              <Card className="relative bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl border-2 border-blue-100 hover:shadow-3xl transition-all duration-500">
-                <CardHeader className="text-center pb-6">
-                  <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mb-4">
-                    <Building2 className="h-8 w-8 text-white" />
-                  </div>
-                  <CardTitle className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-blue-800 bg-clip-text text-transparent">
-                    Get Your Quote Now
-                  </CardTitle>
-                  <p className="text-gray-600">Fill the form below and get instant quote for Private Limited Company</p>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="name" className="text-gray-700 font-medium">
-                        Name*
-                      </Label>
-                      <Input
-                        id="name"
-                        placeholder="Enter your name"
-                        className="mt-2 border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="email" className="text-gray-700 font-medium">
-                        Email*
-                      </Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="Enter your email"
-                        className="mt-2 border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="phone" className="text-gray-700 font-medium">
-                      Phone*
-                    </Label>
-                    <Input
-                      id="phone"
-                      placeholder="Enter your phone number"
-                      className="mt-2 border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="service" className="text-gray-700 font-medium">
-                      Service Required*
-                    </Label>
-                    <Input
-                      id="service"
-                      value="Private Limited Company"
-                      readOnly
-                      className="mt-2 border-2 border-gray-200 bg-blue-50 text-blue-800 font-medium"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="address" className="text-gray-700 font-medium">
-                      Address*
-                    </Label>
-                    <Textarea
-                      id="address"
-                      placeholder="Enter your complete address"
-                      className="mt-2 border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
-                      rows={3}
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="additional" className="text-gray-700 font-medium">
-                      Additional Requirements
-                    </Label>
-                    <Textarea
-                      id="additional"
-                      placeholder="In case you wish to avail any other services than the one selected above, please drop us a note here."
-                      className="mt-2 border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
-                      rows={3}
-                    />
-                  </div>
-
-                  <Link href={`/dashboard/company-formation-form?service=${encodeURIComponent("Private Limited Company")}`} passHref>
-                    <Button className="w-full bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                      Apply Now
-                    </Button>
-                  </Link>
-
-                  <div className="text-center text-sm text-gray-500">
-                    <p>🔒 Your information is 100% secure and confidential</p>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="relative rounded-lg w-full h-auto"
+                >
+                 <DotLottieReact
+      src="/lottie/Book a 1_1.lottie"
+      loop
+      autoplay
+    /></div>
             </FadeInSection>
           </div>
         </div>
@@ -558,7 +475,7 @@ export default function PrivateLimitedCompanyPage() {
               {[
                 {
                   name: "Basic Package",
-                  price: getPackages("private limited company")?.BASIC ?? "—",
+                  price: "BASIC",
                   popular: false,
                   features: [
                     "Company Name Search & Reservation",
@@ -572,7 +489,7 @@ export default function PrivateLimitedCompanyPage() {
                 },
                 {
                   name: "Standard Package",
-                  price: getPackages("private limited company")?.STANDARD ?? "—",
+                  price: "STANDARD",
                   popular: true,
                   features: [
                     "Company Name Search & Reservation",
@@ -588,7 +505,7 @@ export default function PrivateLimitedCompanyPage() {
                 },
                 {
                   name: "Premium Package",
-                  price: getPackages("private limited company")?.PREMIUM ?? "—",
+                  price: "PREMIUM",
                   popular: false,
                   features: [
                     "Company Name Search & Reservation",
@@ -623,7 +540,9 @@ export default function PrivateLimitedCompanyPage() {
                     )}
                     <CardHeader className="text-center">
                       <CardTitle className="text-2xl font-bold">{pkg.name}</CardTitle>
-                      <div className="text-4xl font-bold text-blue-400 my-4">{pkg.price}</div>
+                      <div className="text-4xl font-bold text-blue-400 my-4">
+                        <PackagePricingDisplay serviceName="private limited company" packageType={pkg.price as "BASIC" | "STANDARD" | "PREMIUM" } />
+                      </div>
                       <p className="text-blue-100">One-time payment</p>
                     </CardHeader>
                     <CardContent className="space-y-4">
@@ -633,7 +552,7 @@ export default function PrivateLimitedCompanyPage() {
                           <span className="text-blue-100 text-sm">{feature}</span>
                         </div>
                       ))}
-                      <Link href={`/dashboard/company-formation-form?service=${encodeURIComponent("Private Limited Company")}`} passHref>
+                      <Link href={`/dashboard/company-formation?service=${encodeURIComponent("Private Limited Company")}`} passHref>
                         <Button
                           className={`w-full mt-6 ${
                             pkg.popular
@@ -783,7 +702,7 @@ export default function PrivateLimitedCompanyPage() {
                 Services. Get started today with our expert guidance and support.
               </p>
               <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <Link href={`/dashboard/company-formation-form?service=${encodeURIComponent("Private Limited Company")}`} passHref>
+                <Link href={`/dashboard/company-formation?service=${encodeURIComponent("Private Limited Company")}`} passHref>
                   <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                     Start Registration Now
                     <ArrowRight className="ml-2 h-5 w-5" />

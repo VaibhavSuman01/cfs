@@ -8,7 +8,7 @@ import { EnhancedHeader } from "@/components/enhanced-header";
 import { EnhancedFooter } from "@/components/enhanced-footer";
 import { FadeInSection } from "@/components/fade-in-section"
 import { Building2, CheckCircle, Clock, Shield, Users, FileText, ArrowRight, Star, Zap } from "lucide-react"
-import { getBasePrice } from "@/lib/pricing"
+import { PricingDisplay } from "@/components/ui/pricing-display"
 
 export default function CompanyFormationPage() {
   return (
@@ -26,7 +26,7 @@ export default function CompanyFormationPage() {
               compliance and documentation.
             </p>
             <div className="flex justify-center space-x-4">
-              <Link href={`/dashboard/company-formation-form?service=${encodeURIComponent("Company Formation")}`} passHref>
+              <Link href={`/dashboard/company-formation?service=${encodeURIComponent("Company Formation")}`} passHref>
                 <Button className="bg-blue-600 hover:bg-blue-700 px-8 py-3">Start Registration</Button>
               </Link>
 
@@ -144,7 +144,9 @@ export default function CompanyFormationPage() {
                     )}
                     <CardHeader className="text-center">
                       <CardTitle className="text-xl text-gray-900">{company.title}</CardTitle>
-                      <div className="text-3xl font-bold text-blue-600">{getBasePrice(company.priceKey) ?? "—"}</div>
+                      <div className="text-3xl font-bold text-blue-600">
+                        <PricingDisplay serviceName={company.priceKey} />
+                      </div>
                       <CardDescription>{company.description}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
@@ -350,10 +352,10 @@ export default function CompanyFormationPage() {
                 Join thousands of entrepreneurs who have successfully registered their companies with us
               </p>
               <div className="flex justify-center space-x-4">
-                <Link href={`/dashboard/company-formation-form?service=${encodeURIComponent("Company Formation")}`} passHref>
+                <Link href={`/dashboard/company-formation?service=${encodeURIComponent("Company Formation")}`} passHref>
                   <Button className="bg-blue-600 hover:bg-blue-700 px-8 py-3 text-lg">Start Registration Now</Button>
                 </Link>
-                <Link href={`/dashboard/company-formation-form?service=${encodeURIComponent("Company Formation")}`} passHref>
+                <Link href={`/dashboard/company-formation?service=${encodeURIComponent("Company Formation")}`} passHref>
                   <Button variant="outline" className="px-8 py-3 text-lg bg-transparent">
                     Apply Now
                   </Button>

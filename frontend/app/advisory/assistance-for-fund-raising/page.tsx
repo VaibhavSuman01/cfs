@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { DollarSign, CheckCircle, Clock, Users, Target, BarChart3, ArrowRight, TrendingUp } from "lucide-react"
+import { PricingDisplay } from "@/components/ui/pricing-display"
 
 export default function AssistanceForFundRaisingPage() {
   return (
@@ -23,7 +24,7 @@ export default function AssistanceForFundRaisingPage() {
               Get expert guidance to raise funds and secure investment for your business growth
             </p>
             <div className="flex justify-center space-x-4">
-              <Link href={`/dashboard/advisory-form?service=${encodeURIComponent("Assistance for Fund Raising")}`} passHref>
+              <Link href={`/dashboard/advisory?service=${encodeURIComponent("Assistance for Fund Raising")}`} passHref>
                 <Button className="bg-blue-600 hover:bg-blue-700 px-8 py-3">Get Started</Button>
               </Link>
             </div>
@@ -72,14 +73,16 @@ export default function AssistanceForFundRaisingPage() {
                       <DollarSign className="h-8 w-8 text-blue-600" />
                     </div>
                     <CardTitle className="text-2xl text-gray-900">Assistance for Fund Raising</CardTitle>
-                    <div className="text-3xl font-bold text-blue-600">As per request</div>
+                    <div className="text-3xl font-bold text-blue-600">
+                      <PricingDisplay serviceName="assistance for fund raising" />
+                    </div>
                     <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
                       <Clock className="h-4 w-4" />
                       <span>2-4 weeks</span>
                     </div>
             </CardHeader>
                   <CardContent className="text-center">
-                    <Link href={`/dashboard/advisory-form?service=${encodeURIComponent("Assistance for Fund Raising")}`} passHref>
+                    <Link href={`/dashboard/advisory?service=${encodeURIComponent("Assistance for Fund Raising")}`} passHref>
                       <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3">
                         Book Service <ArrowRight className="ml-2 h-5 w-5" />
                       </Button>
@@ -189,7 +192,7 @@ export default function AssistanceForFundRaisingPage() {
                 Get expert assistance to secure the funding your business needs
               </p>
               <div className="flex justify-center space-x-4">
-                <Link href={`/dashboard/advisory-form?service=${encodeURIComponent("Assistance for Fund Raising")}`} passHref>
+                <Link href={`/dashboard/advisory?service=${encodeURIComponent("Assistance for Fund Raising")}`} passHref>
                   <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg">
                     Start Fund Raising
                   </Button>

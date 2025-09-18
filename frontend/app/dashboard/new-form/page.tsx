@@ -23,6 +23,7 @@ const taxFormSchema = z.object({
   email: z.string().email('Invalid email address'),
   phone: z.string().min(10, 'Phone number must be at least 10 digits'),
   pan: z.string().regex(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, 'Invalid PAN format'),
+  aadhaar: z.string().regex(/^\d{12}$/, 'Aadhaar must be exactly 12 digits').optional(),
   service: z.string().min(1, 'Please select a service'),
   year: z.string().min(4, 'Please select a financial year'),
   hasIncomeTaxLogin: z.boolean().optional(),
@@ -35,6 +36,33 @@ const taxFormSchema = z.object({
   homeLoanTotalInterest: z.string().optional(),
   hasPranNumber: z.boolean().optional(),
   pranNumber: z.string().optional(),
+  
+  // GST Filing specific fields
+  gstFilingMonth: z.string().optional(),
+  gstFilingYear: z.string().optional(),
+  gstNumber: z.string().optional(),
+  
+  // TDS Return specific fields
+  tdsFilingMonth: z.string().optional(),
+  tdsFilingYear: z.string().optional(),
+  tracesUserId: z.string().optional(),
+  tracesPassword: z.string().optional(),
+  tanNumber: z.string().optional(),
+  incomeTaxUserId: z.string().optional(),
+  incomeTaxPassword: z.string().optional(),
+  panNumber: z.string().optional(),
+  
+  // EPFO specific fields
+  epfoUserId: z.string().optional(),
+  epfoPassword: z.string().optional(),
+  
+  // ESIC specific fields
+  esicUserId: z.string().optional(),
+  esicPassword: z.string().optional(),
+  
+  // PT-Tax specific fields
+  ptTaxUserId: z.string().optional(),
+  ptTaxPassword: z.string().optional(),
 });
 
 type TaxFormValues = z.infer<typeof taxFormSchema>;
@@ -46,16 +74,47 @@ export default function NewFormPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [customDocs, setCustomDocs] = useState<Array<{ title: string; file: File | null }>>([]);
+  const [aadhaarFile, setAadhaarFile] = useState<File | null>(null);
+  
+  // Service-specific document states
+  const [salesDataFile, setSalesDataFile] = useState<File | null>(null);
+  const [purchaseDataFile, setPurchaseDataFile] = useState<File | null>(null);
+  const [bankStatementFile, setBankStatementFile] = useState<File | null>(null);
+  const [tdsDataFile, setTdsDataFile] = useState<File | null>(null);
+  const [wagesReportFile, setWagesReportFile] = useState<File | null>(null);
+  const [salarySheetFile, setSalarySheetFile] = useState<File | null>(null);
+
+  // Month and year options
+  const months = [
+    { value: '01', label: 'January' },
+    { value: '02', label: 'February' },
+    { value: '03', label: 'March' },
+    { value: '04', label: 'April' },
+    { value: '05', label: 'May' },
+    { value: '06', label: 'June' },
+    { value: '07', label: 'July' },
+    { value: '08', label: 'August' },
+    { value: '09', label: 'September' },
+    { value: '10', label: 'October' },
+    { value: '11', label: 'November' },
+    { value: '12', label: 'December' },
+  ];
+
+  const years = [
+    { value: '2024', label: '2024' },
+    { value: '2023', label: '2023' },
+    { value: '2022', label: '2022' },
+    { value: '2021', label: '2021' },
+    { value: '2020', label: '2020' },
+  ];
 
   // Suggested required documents by service
   const serviceDocMap: Record<string, string[]> = useMemo(() => ({
     'GST Filing': [
-      'Sales Invoices',
-      'Purchase Invoices',
-      'Debit/Credit Notes',
-      'E-Way Bills',
-      'Challan Copies',
-      'Previous GST Returns',
+      'Sales Data (Tally Data) - zip/excel',
+      'Bank Statement (Tally Data)',
+      'Purchase Data (Tally Data)',
+      'Any other documents (Excel, Zip, Pdf, Word)',
     ],
     'Income Tax Filing': [
       'Form 16 / 16A / 16B',
@@ -68,11 +127,27 @@ export default function NewFormPage() {
       'Previous ITR (optional)',
     ],
     'TDS Returns': [
-      'TAN Details',
-      'Deductee PAN List',
-      'Salary/Vendor Payment Records',
-      'TDS Challan Copies',
-      'Previous TDS Returns',
+      'TRACES User ID & Password (Text format)',
+      'Income Tax User ID & Password (Text format)',
+      'TDS Data (Monthly) - Excel/Zip/Pdf/Word',
+      'Any other documents (Excel, Zip, Pdf, Word)',
+    ],
+    'EPFO Filing': [
+      'EPFO User ID & Password (Text format)',
+      'Wages Report / Calculation of monthly wages - Excel/Zip/Pdf/Word',
+      'Salary Sheet of all Employed - Excel/Zip/Pdf/Word',
+    ],
+    'ESIC Filing': [
+      'ESIC User ID & Password (Text format)',
+      'Wages Report / Calculation of monthly wages - Excel/Zip/Pdf/Word',
+      'Salary Sheet of all Employed - Excel/Zip/Pdf/Word',
+      'Any other documents (Excel, Zip, Pdf, Word)',
+    ],
+    'PT-Tax Filing': [
+      'Login Credentials - User ID & Password (Text format)',
+      'Wages Report / Calculation of monthly wages - Excel/Zip/Pdf/Word',
+      'Salary Sheet of all Employed - Excel/Zip/Pdf/Word',
+      'Any other documents (Excel, Zip, Pdf, Word)',
     ],
     'Corporate Tax Filing': [
       'Audited Financial Statements',
@@ -89,18 +164,6 @@ export default function NewFormPage() {
       'Insurance Policies',
       'Loan Statements',
       'Capital Gains Statements',
-    ],
-    'EPFO Filing': [
-      'PF Challans',
-      'Employee Master & Payroll Summary',
-    ],
-    'ESIC Filing': [
-      'ESI Challans',
-      'Employee Master & Payroll Summary',
-    ],
-    'PT-Tax Filing': [
-      'PT Challans',
-      'Employee Count & Salary Slabs',
     ],
     'Payroll Tax': [
       'Salary Register / Payroll Records',
@@ -164,6 +227,19 @@ export default function NewFormPage() {
           formData.append(key, '');
         }
       });
+
+      // Append Aadhaar file if uploaded
+      if (aadhaarFile) {
+        formData.append('aadhaarFile', aadhaarFile);
+      }
+
+      // Append service-specific files
+      if (salesDataFile) formData.append('salesDataFile', salesDataFile);
+      if (purchaseDataFile) formData.append('purchaseDataFile', purchaseDataFile);
+      if (bankStatementFile) formData.append('bankStatementFile', bankStatementFile);
+      if (tdsDataFile) formData.append('tdsDataFile', tdsDataFile);
+      if (wagesReportFile) formData.append('wagesReportFile', wagesReportFile);
+      if (salarySheetFile) formData.append('salarySheetFile', salarySheetFile);
 
       // Append files with backend-compatible identifiers
       // Backend expects fileId_<index> and optional documentType_<fileId>
@@ -261,7 +337,54 @@ export default function NewFormPage() {
                 <FormField control={form.control} name="fullName" render={({ field }) => (<FormItem><FormLabel>Full Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
                 <FormField control={form.control} name="email" render={({ field }) => (<FormItem><FormLabel>Email</FormLabel><FormControl><Input {...field} type="email" /></FormControl><FormMessage /></FormItem>)} />
                 <FormField control={form.control} name="phone" render={({ field }) => (<FormItem><FormLabel>Phone</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-                <FormField control={form.control} name="pan" render={({ field }) => (<FormItem><FormLabel>PAN</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
+                <FormField 
+                  control={form.control} 
+                  name="pan" 
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>PAN Number *</FormLabel>
+                      <FormControl>
+                        <Input 
+                          {...field} 
+                          placeholder="AAAAA0000A" 
+                          maxLength={10}
+                          onChange={(e) => {
+                            const value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                            field.onChange(value);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                      <p className="text-xs text-muted-foreground">
+                        Format: 5 letters + 4 digits + 1 letter (e.g., ABCDE1234F)
+                      </p>
+                    </FormItem>
+                  )} 
+                />
+                <FormField 
+                  control={form.control} 
+                  name="aadhaar" 
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Aadhaar Number (Optional)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          {...field} 
+                          placeholder="123456789012" 
+                          maxLength={12}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/\D/g, '');
+                            field.onChange(value);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                      <p className="text-xs text-muted-foreground">
+                        12-digit unique identification number
+                      </p>
+                    </FormItem>
+                  )} 
+                />
                 <FormField
                   control={form.control}
                   name="service"
@@ -325,6 +448,233 @@ export default function NewFormPage() {
                       <li key={doc}>{doc}</li>
                     ))}
                   </ul>
+                </div>
+              )}
+
+              {/* Service-specific fields */}
+              {selectedService === 'GST Filing' && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">GST Filing Details</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="gstFilingMonth"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Filing Month *</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select month" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {months.map((month) => (
+                                <SelectItem key={month.value} value={month.value}>
+                                  {month.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="gstFilingYear"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Filing Year *</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select year" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {years.map((year) => (
+                                <SelectItem key={year.value} value={year.value}>
+                                  {year.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="gstNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>GST Number</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Enter GST number" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {selectedService === 'TDS Returns' && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">TDS Return Details</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="tdsFilingMonth"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Filing Month *</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select month" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {months.map((month) => (
+                                <SelectItem key={month.value} value={month.value}>
+                                  {month.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="tdsFilingYear"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Filing Year *</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select year" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {years.map((year) => (
+                                <SelectItem key={year.value} value={year.value}>
+                                  {year.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="tanNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>TAN Number</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Enter TAN number" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="tracesUserId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>TRACES User ID</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Enter TRACES User ID" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="tracesPassword"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>TRACES Password</FormLabel>
+                          <FormControl>
+                            <Input type="password" {...field} placeholder="Enter TRACES Password" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="incomeTaxUserId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Income Tax User ID</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Enter Income Tax User ID" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="incomeTaxPassword"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Income Tax Password</FormLabel>
+                          <FormControl>
+                            <Input type="password" {...field} placeholder="Enter Income Tax Password" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {(selectedService === 'EPFO Filing' || selectedService === 'ESIC Filing' || selectedService === 'PT-Tax Filing') && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">{selectedService} Details</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name={selectedService === 'EPFO Filing' ? 'epfoUserId' : selectedService === 'ESIC Filing' ? 'esicUserId' : 'ptTaxUserId'}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>User ID</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder={`Enter ${selectedService} User ID`} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={selectedService === 'EPFO Filing' ? 'epfoPassword' : selectedService === 'ESIC Filing' ? 'esicPassword' : 'ptTaxPassword'}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Password</FormLabel>
+                          <FormControl>
+                            <Input type="password" {...field} placeholder={`Enter ${selectedService} Password`} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
               )}
 
@@ -397,6 +747,342 @@ export default function NewFormPage() {
                     <FormField control={form.control} name="pranNumber" render={({ field }) => (<FormItem><FormLabel>PRAN Number</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
                   </div>
                 )}
+              </div>
+
+              {/* Service-specific document uploads */}
+              {selectedService === 'GST Filing' && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">GST Filing Documents</h3>
+                  <div className="space-y-4">
+                    <div className="border-2 border-dashed border-blue-200 rounded-lg p-4 bg-blue-50">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label className="text-sm font-medium text-blue-800">Sales Data (Tally Data)</Label>
+                          <p className="text-xs text-blue-600 mt-1">
+                            Upload sales data in zip/excel format
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {salesDataFile && (
+                            <span className="text-sm text-green-600 font-medium">
+                              {salesDataFile.name}
+                            </span>
+                          )}
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => document.getElementById('sales-data-upload')?.click()}
+                          >
+                            <Upload className="h-4 w-4 mr-2" />
+                            {salesDataFile ? 'Change' : 'Upload'}
+                          </Button>
+                          <input
+                            id="sales-data-upload"
+                            type="file"
+                            accept=".zip,.xlsx,.xls"
+                            onChange={(e) => setSalesDataFile(e.target.files?.[0] || null)}
+                            className="hidden"
+                          />
+                          {salesDataFile && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setSalesDataFile(null)}
+                              className="h-8 w-8 p-0"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="border-2 border-dashed border-blue-200 rounded-lg p-4 bg-blue-50">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label className="text-sm font-medium text-blue-800">Purchase Data (Tally Data)</Label>
+                          <p className="text-xs text-blue-600 mt-1">
+                            Upload purchase data in zip/excel format
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {purchaseDataFile && (
+                            <span className="text-sm text-green-600 font-medium">
+                              {purchaseDataFile.name}
+                            </span>
+                          )}
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => document.getElementById('purchase-data-upload')?.click()}
+                          >
+                            <Upload className="h-4 w-4 mr-2" />
+                            {purchaseDataFile ? 'Change' : 'Upload'}
+                          </Button>
+                          <input
+                            id="purchase-data-upload"
+                            type="file"
+                            accept=".zip,.xlsx,.xls"
+                            onChange={(e) => setPurchaseDataFile(e.target.files?.[0] || null)}
+                            className="hidden"
+                          />
+                          {purchaseDataFile && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setPurchaseDataFile(null)}
+                              className="h-8 w-8 p-0"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="border-2 border-dashed border-blue-200 rounded-lg p-4 bg-blue-50">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label className="text-sm font-medium text-blue-800">Bank Statement (Tally Data)</Label>
+                          <p className="text-xs text-blue-600 mt-1">
+                            Upload bank statement data in zip/excel format
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {bankStatementFile && (
+                            <span className="text-sm text-green-600 font-medium">
+                              {bankStatementFile.name}
+                            </span>
+                          )}
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => document.getElementById('bank-statement-upload')?.click()}
+                          >
+                            <Upload className="h-4 w-4 mr-2" />
+                            {bankStatementFile ? 'Change' : 'Upload'}
+                          </Button>
+                          <input
+                            id="bank-statement-upload"
+                            type="file"
+                            accept=".zip,.xlsx,.xls"
+                            onChange={(e) => setBankStatementFile(e.target.files?.[0] || null)}
+                            className="hidden"
+                          />
+                          {bankStatementFile && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setBankStatementFile(null)}
+                              className="h-8 w-8 p-0"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {selectedService === 'TDS Returns' && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">TDS Return Documents</h3>
+                  <div className="border-2 border-dashed border-blue-200 rounded-lg p-4 bg-blue-50">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Label className="text-sm font-medium text-blue-800">TDS Data (Monthly)</Label>
+                        <p className="text-xs text-blue-600 mt-1">
+                          Upload TDS data in Excel/Zip/Pdf/Word format
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {tdsDataFile && (
+                          <span className="text-sm text-green-600 font-medium">
+                            {tdsDataFile.name}
+                          </span>
+                        )}
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => document.getElementById('tds-data-upload')?.click()}
+                        >
+                          <Upload className="h-4 w-4 mr-2" />
+                          {tdsDataFile ? 'Change' : 'Upload'}
+                        </Button>
+                        <input
+                          id="tds-data-upload"
+                          type="file"
+                          accept=".xlsx,.xls,.zip,.pdf,.doc,.docx"
+                          onChange={(e) => setTdsDataFile(e.target.files?.[0] || null)}
+                          className="hidden"
+                        />
+                        {tdsDataFile && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setTdsDataFile(null)}
+                            className="h-8 w-8 p-0"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {(selectedService === 'EPFO Filing' || selectedService === 'ESIC Filing' || selectedService === 'PT-Tax Filing') && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">{selectedService} Documents</h3>
+                  <div className="space-y-4">
+                    <div className="border-2 border-dashed border-blue-200 rounded-lg p-4 bg-blue-50">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label className="text-sm font-medium text-blue-800">Wages Report / Calculation of monthly wages</Label>
+                          <p className="text-xs text-blue-600 mt-1">
+                            Upload wages report in Excel/Zip/Pdf/Word format
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {wagesReportFile && (
+                            <span className="text-sm text-green-600 font-medium">
+                              {wagesReportFile.name}
+                            </span>
+                          )}
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => document.getElementById('wages-report-upload')?.click()}
+                          >
+                            <Upload className="h-4 w-4 mr-2" />
+                            {wagesReportFile ? 'Change' : 'Upload'}
+                          </Button>
+                          <input
+                            id="wages-report-upload"
+                            type="file"
+                            accept=".xlsx,.xls,.zip,.pdf,.doc,.docx"
+                            onChange={(e) => setWagesReportFile(e.target.files?.[0] || null)}
+                            className="hidden"
+                          />
+                          {wagesReportFile && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setWagesReportFile(null)}
+                              className="h-8 w-8 p-0"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="border-2 border-dashed border-blue-200 rounded-lg p-4 bg-blue-50">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label className="text-sm font-medium text-blue-800">Salary Sheet of all Employed</Label>
+                          <p className="text-xs text-blue-600 mt-1">
+                            Upload salary sheet in Excel/Zip/Pdf/Word format
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {salarySheetFile && (
+                            <span className="text-sm text-green-600 font-medium">
+                              {salarySheetFile.name}
+                            </span>
+                          )}
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => document.getElementById('salary-sheet-upload')?.click()}
+                          >
+                            <Upload className="h-4 w-4 mr-2" />
+                            {salarySheetFile ? 'Change' : 'Upload'}
+                          </Button>
+                          <input
+                            id="salary-sheet-upload"
+                            type="file"
+                            accept=".xlsx,.xls,.zip,.pdf,.doc,.docx"
+                            onChange={(e) => setSalarySheetFile(e.target.files?.[0] || null)}
+                            className="hidden"
+                          />
+                          {salarySheetFile && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setSalarySheetFile(null)}
+                              className="h-8 w-8 p-0"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Aadhaar PDF Upload */}
+              <div className="border-2 border-dashed border-blue-200 rounded-lg p-4 bg-blue-50">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label className="text-sm font-medium text-blue-800">Aadhaar Card (PDF)</Label>
+                    <p className="text-xs text-blue-600 mt-1">
+                      Upload your Aadhaar card in PDF format (Max 5MB)
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {aadhaarFile && (
+                      <span className="text-sm text-green-600 font-medium">
+                        {aadhaarFile.name}
+                      </span>
+                    )}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => document.getElementById('aadhaar-upload')?.click()}
+                    >
+                      <Upload className="h-4 w-4 mr-2" />
+                      {aadhaarFile ? 'Change' : 'Upload'}
+                    </Button>
+                    <input
+                      id="aadhaar-upload"
+                      type="file"
+                      accept=".pdf"
+                      onChange={(e) => setAadhaarFile(e.target.files?.[0] || null)}
+                      className="hidden"
+                    />
+                    {aadhaarFile && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setAadhaarFile(null)}
+                        className="h-8 w-8 p-0"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-2">

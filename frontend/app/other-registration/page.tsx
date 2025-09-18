@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
-import { getBasePrice } from "@/lib/pricing"
+import { PricingDisplay } from "@/components/ui/pricing-display"
 import { Users, FileText, Building, Handshake, CheckCircle, ArrowRight, Shield, Clock, Globe } from "lucide-react"
+
 
 export default function OtherRegistrationPage() {
   return (
@@ -44,7 +45,7 @@ export default function OtherRegistrationPage() {
                     "Lower compliance requirements",
                     "No minimum capital requirement",
                   ],
-                  price: getBasePrice("llp registration") ?? "₹4,999",
+                  priceKey: "llp registration",
                   timeline: "7-10 days",
                 },
                 {
@@ -59,7 +60,7 @@ export default function OtherRegistrationPage() {
                     "Shared profits and losses",
                     "Mutual agency relationship",
                   ],
-                  price: getBasePrice("partnership firm") ?? "₹2,999",
+                  priceKey: "partnership firm",
                   timeline: "3-5 days",
                 },
                 {
@@ -74,7 +75,7 @@ export default function OtherRegistrationPage() {
                     "Minimal legal formalities",
                     "Direct tax benefits",
                   ],
-                  price: getBasePrice("sole proprietorship") ?? "₹1,999",
+                  priceKey: "sole proprietorship",
                   timeline: "1-2 days",
                 },
                 {
@@ -89,7 +90,7 @@ export default function OtherRegistrationPage() {
                     "For Individuals & Organizations",
                     "e-Tendering & e-Filing",
                   ],
-                  price: "As per request",
+                    price: "As per request",
                   timeline: "1-2 days",
                 },
                 {
@@ -104,7 +105,7 @@ export default function OtherRegistrationPage() {
                     "Inter-state sales without restrictions",
                     "Unified tax system",
                   ],
-                  price: getBasePrice("gst registration") ?? "₹1,999",
+                  priceKey: "gst registration",
                   timeline: "3-7 days",
                 },
                 {
@@ -119,7 +120,7 @@ export default function OtherRegistrationPage() {
                     "Covers shops, hotels, eateries",
                     "Annual renewal may be required",
                   ],
-                  price: getBasePrice("form 3/gumasta") ?? "₹999",
+                  priceKey: "form 3/gumasta",
                   timeline: "2-4 days",
                 },
                 {
@@ -221,7 +222,13 @@ export default function OtherRegistrationPage() {
                       </div>
                       <CardTitle className="text-xl text-gray-900">{registration.title}</CardTitle>
                       <div className="space-y-2">
-                        <div className="text-2xl font-bold text-blue-600">{registration.price}</div>
+                        <div className="text-2xl font-bold text-blue-600">
+                          {registration.priceKey ? (
+                            <PricingDisplay serviceName={registration.priceKey} />
+                          ) : (
+                            registration.price
+                          )}
+                        </div>
                         <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
                           <Clock className="h-4 w-4" />
                           <span>{registration.timeline}</span>

@@ -63,6 +63,36 @@ const otherRegistrationFormSchema = new mongoose.Schema({
   foodBusinessType: { type: String },
   importExportCode: { type: String },
   
+  // Additional document fields for different registration types
+  bankStatement: { type: String }, // Bank statement / Cancel check
+  gstNumber: { type: String }, // GST number if available
+  electricityBill: { type: String }, // Electricity bill
+  rentAgreement: { type: String }, // Rent agreement
+  businessRegistrationCertificate: { type: String }, // Business registration certificate
+  
+  // Partnership specific fields (if applicable)
+  partnershipDeed: { type: String },
+  partnerDetails: [{
+    name: { type: String },
+    pan: { type: String },
+    aadhaar: { type: String },
+    email: { type: String },
+    phone: { type: String },
+    address: { type: String }
+  }],
+  
+  // LLP specific fields (if applicable)
+  llpAgreement: { type: String },
+  designatedPartnerDetails: [{
+    name: { type: String },
+    din: { type: String },
+    pan: { type: String },
+    aadhaar: { type: String },
+    email: { type: String },
+    phone: { type: String },
+    address: { type: String }
+  }],
+  
   // Applicant Details
   applicantName: { type: String, required: true },
   applicantPan: { 
