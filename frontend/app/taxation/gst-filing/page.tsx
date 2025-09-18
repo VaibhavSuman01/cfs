@@ -72,13 +72,13 @@ export default function GstRegistrationPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                  <Link href={`/tax-form?service=${encodeURIComponent("GST Filing")}`} passHref>
+                  <Link href={`/dashboard/new-form?service=${encodeURIComponent("GST Filing")}`} passHref>
                     <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                       Register for GST
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
-                  <Link href={`/tax-form?service=${encodeURIComponent("GST Filing")}`} passHref>
+                  <Link href={`/dashboard/new-form?service=${encodeURIComponent("GST Filing")}`} passHref>
                     <Button
                       variant="outline"
                       className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
@@ -126,7 +126,7 @@ export default function GstRegistrationPage() {
                     <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Basic Documentation</span></li>
                     <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Registration Certificate</span></li>
                   </ul>
-                  <Link href={`/tax-form?service=${encodeURIComponent("GST Filing - Basic")}`} passHref>
+                  <Link href={`/dashboard/new-form?service=${encodeURIComponent("GST Filing - Basic")}`} passHref>
                     <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Basic</Button>
                   </Link>
                 </CardContent>
@@ -145,7 +145,7 @@ export default function GstRegistrationPage() {
                     <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Expert Consultation</span></li>
                     <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Post-Registration Support</span></li>
                   </ul>
-                  <Link href={`/tax-form?service=${encodeURIComponent("GST Filing - Standard")}`} passHref>
+                  <Link href={`/dashboard/new-form?service=${encodeURIComponent("GST Filing - Standard")}`} passHref>
                     <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Standard</Button>
                   </Link>
                 </CardContent>
@@ -164,7 +164,7 @@ export default function GstRegistrationPage() {
                     <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>1 Year Support</span></li>
                     <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>GST Filing Assistance</span></li>
                   </ul>
-                  <Link href={`/tax-form?service=${encodeURIComponent("GST Filing - Premium")}`} passHref>
+                  <Link href={`/dashboard/new-form?service=${encodeURIComponent("GST Filing - Premium")}`} passHref>
                     <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Premium</Button>
                   </Link>
                 </CardContent>
@@ -306,13 +306,13 @@ export default function GstRegistrationPage() {
                 Don't let compliance slow you down. Our experts make GST registration a hassle-free experience, so you can focus on growing your business.
               </p>
               <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <Link href={`/tax-form?service=${encodeURIComponent("GST Filing")}`} passHref>
+                <Link href={`/dashboard/new-form?service=${encodeURIComponent("GST Filing")}`} passHref>
                   <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                     Apply for GSTIN Now
                     <FileCheck className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
-                <Link href={`/tax-form?service=${encodeURIComponent("GST Filing")}`} passHref>
+                <Link href={`/dashboard/new-form?service=${encodeURIComponent("GST Filing")}`} passHref>
                   <Button
                     variant="outline"
                     className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent"

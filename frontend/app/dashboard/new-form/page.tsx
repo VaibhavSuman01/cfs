@@ -608,7 +608,7 @@ export default function NewFormPage() {
                         <FormItem>
                           <FormLabel>TRACES Password</FormLabel>
                           <FormControl>
-                            <Input type="password" {...field} placeholder="Enter TRACES Password" />
+                            <Input type="text" {...field} placeholder="Enter TRACES Password" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -634,7 +634,7 @@ export default function NewFormPage() {
                         <FormItem>
                           <FormLabel>Income Tax Password</FormLabel>
                           <FormControl>
-                            <Input type="password" {...field} placeholder="Enter Income Tax Password" />
+                            <Input type="text" {...field} placeholder="Enter Income Tax Password" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -668,7 +668,7 @@ export default function NewFormPage() {
                         <FormItem>
                           <FormLabel>Password</FormLabel>
                           <FormControl>
-                            <Input type="password" {...field} placeholder={`Enter ${selectedService} Password`} />
+                            <Input type="text" {...field} placeholder={`Enter ${selectedService} Password`} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -697,7 +697,7 @@ export default function NewFormPage() {
                 {hasIncomeTaxLogin && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pl-4 border-l-2">
                     <FormField control={form.control} name="incomeTaxLoginId" render={({ field }) => (<FormItem><FormLabel>Login ID</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="incomeTaxLoginPassword" render={({ field }) => (<FormItem><FormLabel>Password</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                    <FormField control={form.control} name="incomeTaxLoginPassword" render={({ field }) => (<FormItem><FormLabel>Password</FormLabel><FormControl><Input type="text" {...field} /></FormControl><FormMessage /></FormItem>)} />
                   </div>
                 )}
               </div>
