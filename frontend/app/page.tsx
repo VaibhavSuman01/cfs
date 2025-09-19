@@ -36,7 +36,7 @@ export default function HomePage() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <FadeInSection className="space-y-8">
               <div className="space-y-6">
-                <Badge className="bg-gradient-to-r from-green-100 to-green-200 text-green-800 hover:from-green-200 hover:to-green-300 animate-pulse border-0 px-4 py-2">
+                <Badge className="bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 hover:from-blue-200 hover:to-blue-300 animate-pulse border-0 px-4 py-2">
                   2.5k+ Business Registrations Processed
                 </Badge>
                 <h1 className="text-6xl lg:text-7xl font-bold leading-tight">
@@ -54,7 +54,7 @@ export default function HomePage() {
                 </p>
                 <div className="flex items-center space-x-2">
                   <div className="h-1 w-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"></div>
-                  <p className="text-lg font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent tracking-wider">
+                  <p className="text-lg font-bold bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent tracking-wider">
                     REGISTRATIONS. FILINGS. COMPLIANCES.
                   </p>
                   <div className="h-1 w-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"></div>
@@ -80,7 +80,7 @@ export default function HomePage() {
                           all the paperwork and compliance.
                         </p>
                       </div>
-                      <Button className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white group-hover:scale-[1.02] transition-all duration-300 shadow-md hover:shadow-lg">
+                      <Button className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white group-hover:scale-[1.02] transition-all duration-300 shadow-md hover:shadow-lg">
                         Contact Us
                         <MessageCircle className="ml-2 h-4 w-4 group-hover:scale-110 transition-transform" />
                       </Button>

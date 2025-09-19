@@ -105,10 +105,10 @@ export function AdminHeader() {
                   </Link>
                   <div className="border-t border-gray-100"></div>
                   <button
-                    className="w-full text-left flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                    className="w-full text-left flex items-center px-4 py-2 text-sm text-blue-600 hover:bg-gray-100"
                     role="menuitem"
                   >
-                    <LogOut className="mr-3 h-5 w-5 text-red-400" />
+                    <LogOut className="mr-3 h-5 w-5 text-blue-400" />
                     Sign out
                   </button>
                 </div>

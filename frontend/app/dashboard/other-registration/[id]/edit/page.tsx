@@ -5,12 +5,13 @@ import { useParams, useRouter } from "next/navigation";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, ArrowLeft, Upload, FileText } from "lucide-react";
+import { Loader2, ArrowLeft, Upload, FileText, Edit3, Save, AlertCircle, Building } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import api, { API_PATHS } from "@/lib/api-client";
 import { toast } from "sonner";
 
@@ -96,90 +97,149 @@ export default function OtherRegistrationEditPage() {
   }
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="flex items-center mb-6">
-        <Button variant="ghost" onClick={() => router.back()} className="mr-4">
-          <ArrowLeft className="h-4 w-4 mr-2" /> Back
-        </Button>
-        <h1 className="text-2xl font-bold">Edit Other Registration</h1>
+    <div className="container mx-auto p-6 max-w-4xl">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" onClick={() => router.back()} className="hover:bg-gray-100">
+            <ArrowLeft className="h-4 w-4 mr-2" /> Back
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
+              <Building className="h-8 w-8 text-blue-600" />
+              Edit Other Registration
+            </h1>
+            <p className="text-gray-600 mt-1">Update your registration application details and upload additional documents</p>
+          </div>
+        </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Update Details</CardTitle>
-          <CardDescription>Upload additional documents if required. Deletion is disabled.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField control={form.control} name="businessName" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Business Name</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="businessActivity" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Business Activity</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} rows={3} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-              </div>
+      <div className="space-y-6">
+        {/* Information Alert */}
+        <Alert className="border-blue-200 bg-blue-50">
+          <AlertCircle className="h-4 w-4 text-blue-600" />
+          <AlertDescription className="text-blue-800">
+            You can update your registration details and upload additional documents. Existing documents cannot be deleted.
+          </AlertDescription>
+        </Alert>
 
-              <FormField control={form.control} name="registeredOfficeAddress" render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Registered Office Address</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} rows={3} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
+        {/* Main Form Card */}
+        <Card className="border-0 shadow-lg">
+          <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <Edit3 className="h-6 w-6 text-blue-600" />
+              Update Registration Details
+            </CardTitle>
+            <CardDescription>Modify your registration information and add supporting documents</CardDescription>
+          </CardHeader>
+          <CardContent className="p-6">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                {/* Business Information */}
+                <div className="space-y-6">
+                  <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Business Information</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField control={form.control} name="businessName" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium text-gray-700">Business Name *</FormLabel>
+                        <FormControl>
+                          <Input {...field} className="h-11" placeholder="Enter business name" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="businessActivity" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium text-gray-700">Business Activity *</FormLabel>
+                        <FormControl>
+                          <Textarea {...field} rows={3} className="resize-none" placeholder="Describe your business activity" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                  </div>
 
-              <div className="space-y-2">
-                <FormLabel>Upload Additional Documents</FormLabel>
-                <div>
-                  <Input type="file" multiple onChange={(e) => {
-                    const arr = Array.from(e.target.files || []);
-                    setFiles(arr);
-                  }} />
+                  <FormField control={form.control} name="registeredOfficeAddress" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-700">Registered Office Address *</FormLabel>
+                      <FormControl>
+                        <Textarea {...field} rows={3} className="resize-none" placeholder="Enter complete registered office address" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
                 </div>
-                {files.length > 0 && (
-                  <div className="mt-3 space-y-2">
-                    {files.map((f, i) => (
-                      <div key={i} className="flex items-center justify-between bg-muted p-2 rounded-md">
-                        <div className="flex items-center">
-                          <FileText className="h-4 w-4 mr-2 text-primary" />
-                          <span className="text-sm truncate max-w-[240px]">{f.name}</span>
+
+                {/* Document Upload Section */}
+                <div className="space-y-6">
+                  <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Additional Documents</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <FormLabel className="text-sm font-medium text-gray-700">Upload Additional Documents</FormLabel>
+                      <p className="text-xs text-gray-500 mt-1">You can upload multiple files at once. Supported formats: PDF, DOC, DOCX, JPG, PNG</p>
+                    </div>
+                    <div>
+                      <Input 
+                        type="file" 
+                        multiple 
+                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                        onChange={(e) => {
+                          const arr = Array.from(e.target.files || []);
+                          setFiles(arr);
+                        }}
+                        className="h-11"
+                      />
+                    </div>
+                    {files.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium text-gray-700">Selected Files:</p>
+                        <div className="space-y-2">
+                          {files.map((f, i) => (
+                            <div key={i} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg border">
+                              <div className="flex items-center gap-3">
+                                <FileText className="h-4 w-4 text-blue-600" />
+                                <span className="text-sm font-medium text-gray-900 truncate max-w-[300px]">{f.name}</span>
+                                <span className="text-xs text-gray-500">({(f.size / 1024 / 1024).toFixed(2)} MB)</span>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
-                    ))}
+                    )}
                   </div>
-                )}
-              </div>
+                </div>
 
-              <Button type="submit" disabled={submitting}>
-                {submitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...
-                  </>
-                ) : (
-                  <>
-                    <Upload className="mr-2 h-4 w-4" /> Save Changes
-                  </>
-                )}
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+                {/* Action Buttons */}
+                <div className="flex items-center justify-end gap-4 pt-6 border-t">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => router.back()}
+                    className="px-6"
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    disabled={submitting}
+                    className="px-8 bg-blue-600 hover:bg-blue-700"
+                  >
+                    {submitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="mr-2 h-4 w-4" /> Save Changes
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

@@ -86,9 +86,9 @@ export default function TaxPlanningPage() {
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-tr from-blue-100 to-transparent rounded-full -translate-x-10 -translate-y-10"></div>
                 <img
-                  src="/images/tax-planning-hero.svg"
+                  src="/images/tax-planning-hero.png"
                   alt="Tax Planning Illustration"
-                  className="relative rounded-lg shadow-2xl w-full h-auto"
+                  className="relative rounded-lg w-full h-auto"
                 />
               </div>
             </FadeInSection>

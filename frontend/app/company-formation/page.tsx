@@ -8,7 +8,7 @@ import { EnhancedHeader } from "@/components/enhanced-header";
 import { EnhancedFooter } from "@/components/enhanced-footer";
 import { FadeInSection } from "@/components/fade-in-section"
 import { Building2, CheckCircle, Clock, Shield, Users, FileText, ArrowRight, Star, Zap } from "lucide-react"
-import { getBasePrice } from "@/lib/pricing"
+import { PricingDisplay } from "@/components/ui/pricing-display"
 
 export default function CompanyFormationPage() {
   return (
@@ -19,14 +19,14 @@ export default function CompanyFormationPage() {
       <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-100 py-20">
         <div className="container mx-auto px-4">
           <FadeInSection className="text-center space-y-8">
-            <Badge className="bg-green-100 text-green-800">Most Popular Service</Badge>
+            <Badge className="bg-blue-100 text-blue-800">Most Popular Service</Badge>
             <h1 className="text-5xl font-bold text-gray-900">Company Formation</h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Start your Private Limited Company, Public Limited Company, or One Person Company with complete legal
               compliance and documentation.
             </p>
             <div className="flex justify-center space-x-4">
-              <Link href={`/dashboard/company-formation-form?service=${encodeURIComponent("Company Formation")}`} passHref>
+              <Link href={`/dashboard/company-formation?service=${encodeURIComponent("Company Formation")}`} passHref>
                 <Button className="bg-blue-600 hover:bg-blue-700 px-8 py-3">Start Registration</Button>
               </Link>
 
@@ -144,14 +144,16 @@ export default function CompanyFormationPage() {
                     )}
                     <CardHeader className="text-center">
                       <CardTitle className="text-xl text-gray-900">{company.title}</CardTitle>
-                      <div className="text-3xl font-bold text-blue-600">{getBasePrice(company.priceKey) ?? "—"}</div>
+                      <div className="text-3xl font-bold text-blue-600">
+                        <PricingDisplay serviceName={company.priceKey} />
+                      </div>
                       <CardDescription>{company.description}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="space-y-3">
                         {company.features.map((feature: string, idx: number) => (
                           <div key={idx} className="flex items-center space-x-2">
-                            <CheckCircle className="h-4 w-4 text-green-500" />
+                            <CheckCircle className="h-4 w-4 text-blue-500" />
                             <span className="text-sm text-gray-600">{feature}</span>
                           </div>
                         ))}
@@ -255,7 +257,7 @@ export default function CompanyFormationPage() {
                     "Mobile number and Email ID",
                   ].map((doc, index) => (
                     <div key={index} className="flex items-center space-x-3">
-                      <CheckCircle className="h-5 w-5 text-green-500" />
+                      <CheckCircle className="h-5 w-5 text-blue-500" />
                       <span className="text-gray-700">{doc}</span>
                     </div>
                   ))}
@@ -272,7 +274,7 @@ export default function CompanyFormationPage() {
                     "Proposed company names (1-2 options)",
                   ].map((doc, index) => (
                     <div key={index} className="flex items-center space-x-3">
-                      <CheckCircle className="h-5 w-5 text-green-500" />
+                      <CheckCircle className="h-5 w-5 text-blue-500" />
                       <span className="text-gray-700">{doc}</span>
                     </div>
                   ))}
@@ -350,10 +352,10 @@ export default function CompanyFormationPage() {
                 Join thousands of entrepreneurs who have successfully registered their companies with us
               </p>
               <div className="flex justify-center space-x-4">
-                <Link href={`/dashboard/company-formation-form?service=${encodeURIComponent("Company Formation")}`} passHref>
+                <Link href={`/dashboard/company-formation?service=${encodeURIComponent("Company Formation")}`} passHref>
                   <Button className="bg-blue-600 hover:bg-blue-700 px-8 py-3 text-lg">Start Registration Now</Button>
                 </Link>
-                <Link href={`/dashboard/company-formation-form?service=${encodeURIComponent("Company Formation")}`} passHref>
+                <Link href={`/dashboard/company-formation?service=${encodeURIComponent("Company Formation")}`} passHref>
                   <Button variant="outline" className="px-8 py-3 text-lg bg-transparent">
                     Apply Now
                   </Button>

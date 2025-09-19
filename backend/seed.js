@@ -20,8 +20,12 @@ mongoose
 // Seed admin user
 async function seedAdmin() {
   try {
+    const adminEmail = process.env.ADMIN_EMAIL || "admin@comfinserv.co";
+    const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
+    const adminName = process.env.ADMIN_NAME || "Admin User";
+    
     // Check if admin already exists
-    const adminExists = await User.findOne({ email: "admin@comfinserv.co" });
+    const adminExists = await User.findOne({ email: adminEmail });
 
     if (adminExists) {
       console.log("Admin user already exists");
@@ -30,17 +34,17 @@ async function seedAdmin() {
 
     // Create admin user
     const admin = new User({
-      name: "Admin User",
-      email: "admin@comfinserv.co",
-      password: "admin123",
+      name: adminName,
+      email: adminEmail,
+      password: adminPassword,
       role: "admin",
     });
 
     await admin.save();
 
     console.log("Admin user created successfully");
-    console.log("Email: admin@comfinserv.co");
-    console.log("Password: admin123");
+    console.log(`Email: ${adminEmail}`);
+    console.log(`Password: ${adminPassword}`);
     console.log("IMPORTANT: Change these credentials in production!");
 
     process.exit(0);

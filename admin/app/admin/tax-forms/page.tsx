@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { FileText, Search, Filter, ChevronLeft, ChevronRight, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { FileText, Search, Filter, ChevronLeft, ChevronRight, Clock, CheckCircle, AlertCircle, Eye } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -246,15 +246,12 @@ export default function TaxFormsPage() {
                     <TableHead>Status</TableHead>
                     <TableHead>Documents</TableHead>
                     <TableHead>Submitted On</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {forms.map((form) => (
-                    <TableRow
-                      key={form._id}
-                      onClick={() => router.push(`/admin/tax-forms/${form._id}`)}
-                      className="cursor-pointer"
-                    >
+                    <TableRow key={form._id}>
                       <TableCell className="font-medium">{form.fullName}</TableCell>
                       <TableCell>{form.pan}</TableCell>
                       <TableCell>{form.service || '-'}</TableCell>
@@ -270,6 +267,17 @@ export default function TaxFormsPage() {
                             <Badge variant="outline" className="text-xs">Edited</Badge>
                           )}
                         </div>
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => router.push(`/admin/tax-forms/${form._id}`)}
+                          className="flex items-center gap-2"
+                        >
+                          <Eye className="h-4 w-4" />
+                          View
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}

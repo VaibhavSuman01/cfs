@@ -179,6 +179,34 @@ router.get("/me", protect, async (req, res) => {
   }
 });
 
+// @route   GET /api/users/block-details
+// @desc    Get user block details
+// @access  Private
+router.get("/block-details", protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id)
+      .select("isBlocked blockedAt blockReason blockedBy")
+      .populate('blockedBy', 'name email');
+    
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (!user.isBlocked) {
+      return res.status(400).json({ message: "User is not blocked" });
+    }
+
+    res.json({
+      blockedAt: user.blockedAt,
+      blockReason: user.blockReason,
+      blockedBy: user.blockedBy
+    });
+  } catch (error) {
+    console.error("Get block details error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 // @route   PUT /api/auth/profile
 // @desc    Update user profile
 // @access  Private

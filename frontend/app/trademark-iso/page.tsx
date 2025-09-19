@@ -92,8 +92,8 @@ export default function TrademarkISOPage() {
               {/* ISO Section */}
               <div className="space-y-8">
                 <div className="text-center space-y-4">
-                  <div className="mx-auto w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
-                    <Award className="h-10 w-10 text-green-600" />
+                  <div className="mx-auto w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center">
+                    <Award className="h-10 w-10 text-blue-600" />
                   </div>
                   <h2 className="text-3xl font-bold text-gray-900">ISO Certification</h2>
                   <p className="text-gray-600">Enhance credibility with international quality standards</p>
@@ -121,7 +121,7 @@ export default function TrademarkISOPage() {
                     },
                   ].map((service, index) => (
                     <FadeInSection key={index} delay={index * 100}>
-                      <Card className="border-2 border-gray-200 hover:border-green-300 hover:shadow-lg transition-all duration-300">
+                      <Card className="border-2 border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300">
                         <CardContent className="p-6">
                           <div className="flex justify-between items-start mb-4">
                             <div>
@@ -129,12 +129,12 @@ export default function TrademarkISOPage() {
                               <p className="text-gray-600 text-sm">{service.description}</p>
                             </div>
                             <div className="text-right">
-                              <div className="text-xl font-bold text-green-600">{service.price}</div>
+                              <div className="text-xl font-bold text-blue-600">{service.price}</div>
                               <div className="text-sm text-gray-500">{service.timeline}</div>
                             </div>
                           </div>
                           <Link href={`/trademark-iso/iso-9001`} passHref>
-                            <Button className="w-full bg-green-600 hover:bg-green-700">
+                            <Button className="w-full bg-blue-600 hover:bg-blue-700">
                               Get Started <ArrowRight className="ml-2 h-4 w-4" />
                             </Button>
                           </Link>
@@ -254,8 +254,8 @@ export default function TrademarkISOPage() {
                 <FadeInSection key={index} delay={index * 100}>
                   <Card className="text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-2">
                     <CardContent className="p-6">
-                      <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                        <benefit.icon className="h-8 w-8 text-green-600" />
+                      <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                        <benefit.icon className="h-8 w-8 text-blue-600" />
                       </div>
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">{benefit.title}</h3>
                       <p className="text-gray-600 text-sm">{benefit.description}</p>
@@ -309,7 +309,7 @@ export default function TrademarkISOPage() {
                     "Previous audit reports (if any)",
                   ].map((doc, index) => (
                     <div key={index} className="flex items-center space-x-3">
-                      <CheckCircle className="h-5 w-5 text-green-500" />
+                      <CheckCircle className="h-5 w-5 text-blue-500" />
                       <span className="text-gray-700">{doc}</span>
                     </div>
                   ))}
@@ -322,7 +322,7 @@ export default function TrademarkISOPage() {
 
       {/* CTA Section */}
       <FadeInSection>
-        <section className="py-20 bg-gradient-to-r from-blue-600 to-green-600 text-white">
+        <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-600 text-white">
           <div className="container mx-auto px-4 text-center">
             <div className="space-y-8">
               <h2 className="text-4xl font-bold">Protect Your Brand & Enhance Credibility</h2>

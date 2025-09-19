@@ -162,7 +162,7 @@ export default function AdvisoryPage() {
                       <div className="space-y-3">
                         {service.features.map((feature, idx) => (
                           <div key={idx} className="flex items-center space-x-2">
-                            <CheckCircle className="h-4 w-4 text-green-500" />
+                            <CheckCircle className="h-4 w-4 text-blue-500" />
                             <span className="text-sm text-gray-600">{feature}</span>
                           </div>
                         ))}
@@ -328,7 +328,7 @@ export default function AdvisoryPage() {
                 Get expert advisory services tailored to your business needs and accelerate your growth
               </p>
               <div className="flex justify-center space-x-4">
-                <Link href={`/dashboard/advisory-form?service=${encodeURIComponent("Business Advisory Services")}`} passHref>
+                <Link href={`/dashboard/advisory?service=${encodeURIComponent("Business Advisory Services")}`} passHref>
                   <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg">
                     Schedule Consultation
                   </Button>

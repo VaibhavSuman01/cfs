@@ -8,7 +8,7 @@ import { FloatingElements } from "@/components/floating-elements"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { getBasePrice } from "@/lib/pricing"
+import { PricingDisplay } from "@/components/ui/pricing-display"
 import Link from "next/link"
 import {
   ArrowRightLeft,
@@ -21,8 +21,7 @@ import {
   CheckCircle
 } from "lucide-react"
 
-export default function ShareTransferPage() {
-  const basePrice = getBasePrice("share transfer & capital changes") ?? "₹5,999";
+export default function ShareTransferPage() {;
   
   return (
     <div className="min-h-screen bg-white">
@@ -55,7 +54,9 @@ export default function ShareTransferPage() {
 
                 <div className="grid sm:grid-cols-3 gap-4 pt-6">
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-                    <div className="text-2xl font-bold text-blue-600">{basePrice}</div>
+                    <div className="text-2xl font-bold text-blue-600">
+                      <PricingDisplay serviceName="share transfer & capital changes" />
+                    </div>
                     <div className="text-sm text-gray-600">Per Transfer</div>
                   </div>
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
@@ -69,13 +70,13 @@ export default function ShareTransferPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 pt-6">
-                  <Link href={`/dashboard/roc-returns-form?service=${encodeURIComponent("Share Transfer")}`} passHref>
+                  <Link href={`/dashboard/roc-returns?service=${encodeURIComponent("Share Transfer")}`} passHref>
                     <Button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                       Initiate a Transfer
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
-                  <Link href={`/dashboard/roc-returns-form?service=${encodeURIComponent("Share Transfer")}`} passHref>
+                  <Link href={`/dashboard/roc-returns?service=${encodeURIComponent("Share Transfer")}`} passHref>
                     <Button
                       variant="outline"
                       className="border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white px-8 py-3 rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
@@ -90,9 +91,9 @@ export default function ShareTransferPage() {
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-tr from-blue-100 to-transparent rounded-full -translate-x-10 -translate-y-10"></div>
                 <img
-                  src="/images/share-transfer-hero.svg"
+                  src="/images/share-transfer-hero.png"
                   alt="Share Transfer Illustration"
-                  className="relative rounded-lg shadow-2xl w-full h-auto"
+                  className="relative rounded-lg w-full h-auto"
                 />
               </div>
             </FadeInSection>
@@ -162,9 +163,9 @@ export default function ShareTransferPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <ul className="space-y-3 text-left">
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Form SH-4 Drafting</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Basic Documentation</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>ROC Filing Support</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Form SH-4 Drafting</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Basic Documentation</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>ROC Filing Support</span></li>
                   </ul>
                   <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Basic</Button>
                 </CardContent>
@@ -178,10 +179,10 @@ export default function ShareTransferPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <ul className="space-y-3 text-left">
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Everything in Basic</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Priority Processing</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Expert Consultation</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Board Resolution Support</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Everything in Basic</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Priority Processing</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Expert Consultation</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Board Resolution Support</span></li>
                   </ul>
                   <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Standard</Button>
                 </CardContent>
@@ -195,10 +196,10 @@ export default function ShareTransferPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <ul className="space-y-3 text-left">
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Everything in Standard</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Multiple Share Transfers</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Legal Compliance Review</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>1 Year Support</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Everything in Standard</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Multiple Share Transfers</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Legal Compliance Review</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>1 Year Support</span></li>
                   </ul>
                   <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Premium</Button>
                 </CardContent>
@@ -285,13 +286,13 @@ export default function ShareTransferPage() {
                 Let our experts guide you through every step of the share transfer process, from drafting the deed to final approval, ensuring a smooth and compliant transaction.
               </p>
               <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <Link href={`/dashboard/roc-returns-form?service=${encodeURIComponent("Share Transfer")}`} passHref>
+                <Link href={`/dashboard/roc-returns?service=${encodeURIComponent("Share Transfer")}`} passHref>
                   <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                     Get Professional Help
                     <Scale className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
-                <Link href={`/dashboard/roc-returns-form?service=${encodeURIComponent("Share Transfer")}`} passHref>
+                <Link href={`/dashboard/roc-returns?service=${encodeURIComponent("Share Transfer")}`} passHref>
                   <Button
                     variant="outline"
                     className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent"

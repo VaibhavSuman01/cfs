@@ -115,11 +115,11 @@ export default function ResetPasswordPage() {
 
   if (isSuccess) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full">
           <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="w-8 h-8 text-green-600" />
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle className="w-8 h-8 text-blue-600" />
             </div>
             <h1 className="text-2xl font-bold text-gray-900 mb-4">
               Password Reset Successful!
@@ -140,11 +140,11 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-8 text-center">
+          <div className="bg-gradient-to-r from-blue-600 to-blue-600 p-8 text-center">
             <h1 className="text-2xl font-bold text-white mb-2">
               Reset Your Password
             </h1>
@@ -156,8 +156,8 @@ export default function ResetPasswordPage() {
           {/* Form */}
           <div className="p-8">
             {errors.general && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
-                <p className="text-red-600 text-sm font-medium">{errors.general}</p>
+              <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                <p className="text-blue-600 text-sm font-medium">{errors.general}</p>
               </div>
             )}
 
@@ -174,7 +174,7 @@ export default function ResetPasswordPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className={`w-full pl-12 pr-12 py-4 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 ${
-                      errors.password ? "border-red-500" : "border-gray-200"
+                      errors.password ? "border-blue-500" : "border-gray-200"
                     }`}
                     placeholder="Enter your new password"
                     required
@@ -192,7 +192,7 @@ export default function ResetPasswordPage() {
                   </button>
                 </div>
                 {errors.password && (
-                  <p className="text-red-500 text-xs mt-2">{errors.password}</p>
+                  <p className="text-blue-500 text-xs mt-2">{errors.password}</p>
                 )}
               </div>
 
@@ -208,7 +208,7 @@ export default function ResetPasswordPage() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     className={`w-full pl-12 pr-12 py-4 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 ${
-                      errors.confirmPassword ? "border-red-500" : "border-gray-200"
+                      errors.confirmPassword ? "border-blue-500" : "border-gray-200"
                     }`}
                     placeholder="Confirm your new password"
                     required
@@ -226,7 +226,7 @@ export default function ResetPasswordPage() {
                   </button>
                 </div>
                 {errors.confirmPassword && (
-                  <p className="text-red-500 text-xs mt-2">{errors.confirmPassword}</p>
+                  <p className="text-blue-500 text-xs mt-2">{errors.confirmPassword}</p>
                 )}
               </div>
 
@@ -234,7 +234,7 @@ export default function ResetPasswordPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 focus:ring-4 focus:ring-blue-200 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-700 focus:ring-4 focus:ring-blue-200 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center">

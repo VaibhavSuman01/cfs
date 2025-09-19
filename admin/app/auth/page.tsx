@@ -30,7 +30,7 @@ export default function AdminAuthPage() {
   // Redirect if already logged in
   useEffect(() => {
     if (isAuthenticated) {
-      router.push("/admin");
+      router.push("/admin/dashboard");
     }
   }, [isAuthenticated, router]);
 
@@ -54,7 +54,7 @@ export default function AdminAuthPage() {
     try {
       await login(loginForm.email.toLowerCase(), loginForm.password);
       toast.success("Login successful!");
-      router.push("/admin");
+      router.push("/admin/dashboard");
     } catch (error: any) {
       console.error("Login error:", error);
       toast.error(error.message || "Login failed. Please try again.");

@@ -7,10 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { CheckCircle } from 'lucide-react';
-import { getBasePrice } from "@/lib/pricing";
+import { PricingDisplay } from "@/components/ui/pricing-display";
 
 export default function NidhiCompanyPage() {
-  const basePrice = getBasePrice("nidhi company") ?? "₹34,999";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -24,7 +23,9 @@ export default function NidhiCompanyPage() {
             </CardHeader>
             <CardContent className="space-y-6 text-center">
               <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl my-4 max-w-xs mx-auto">
-                <div className="text-2xl font-bold text-blue-600">{basePrice}</div>
+                <div className="text-2xl font-bold text-blue-600">
+                  <PricingDisplay serviceName="nidhi company" />
+                </div>
                 <div className="text-sm text-gray-600">Starting Price</div>
               </div>
               <p className="text-left">
@@ -54,7 +55,7 @@ export default function NidhiCompanyPage() {
                       "Mobile number and Email ID",
                     ].map((doc, index) => (
                       <div key={index} className="flex items-center space-x-3">
-                        <CheckCircle className="h-5 w-5 text-green-500" />
+                        <CheckCircle className="h-5 w-5 text-blue-500" />
                         <span className="text-gray-700">{doc}</span>
                       </div>
                     ))}
@@ -71,7 +72,7 @@ export default function NidhiCompanyPage() {
                       "Proposed company names (1-2 options)",
                     ].map((doc, index) => (
                       <div key={index} className="flex items-center space-x-3">
-                        <CheckCircle className="h-5 w-5 text-green-500" />
+                        <CheckCircle className="h-5 w-5 text-blue-500" />
                         <span className="text-gray-700">{doc}</span>
                       </div>
                     ))}
@@ -85,7 +86,7 @@ export default function NidhiCompanyPage() {
         <FadeInSection>
           <Card className="max-w-4xl mx-auto">
             <CardContent className="space-y-6 text-center">
-              <Link href={`/dashboard/company-formation-form?service=${encodeURIComponent('Nidhi Company')}`} passHref>
+              <Link href={`/dashboard/company-formation?service=${encodeURIComponent('Nidhi Company')}`} passHref>
                 <Button className="w-full">Book This Service</Button>
               </Link>
             </CardContent>

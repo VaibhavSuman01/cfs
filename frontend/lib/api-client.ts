@@ -25,6 +25,7 @@ export const API_PATHS = {
     REGISTER: createUrl("/api/auth/register"),
     ME: createUrl("/api/auth/me"),
     PROFILE: createUrl("/api/auth/profile"),
+    PROFILE_AVATAR: createUrl("/api/auth/profile/avatar"),
     PASSWORD: createUrl("/api/auth/password"),
     REQUEST_PASSWORD_RESET: createUrl("/api/auth/request-password-reset"),
     RESET_PASSWORD: createUrl("/api/auth/reset-password"),
@@ -63,6 +64,7 @@ export const API_PATHS = {
     // Specific form endpoints
     COMPANY_FORMATION: createUrl("/api/forms/company-formation"),
     OTHER_REGISTRATION: createUrl("/api/forms/other-registration"),
+    PARTNERSHIP_FIRM: createUrl("/api/forms/partnership-firm"),
     ROC_RETURNS: createUrl("/api/forms/roc-returns"),
     REPORTS: createUrl("/api/forms/reports"),
     TRADEMARK_ISO: createUrl("/api/forms/trademark-iso"),
@@ -88,6 +90,31 @@ export const API_PATHS = {
     ROC_RETURNS_UPDATE: (id: string) => createUrl(`/api/forms/roc-returns/${id}`),
     ROC_RETURNS_UPLOAD_DOC: (formId: string) => createUrl(`/api/forms/roc-returns/document/${formId}`),
     ROC_RETURNS_DOWNLOAD_DOC: (documentId: string) => createUrl(`/api/forms/roc-returns/download/${documentId}`),
+
+    // Trademark & ISO - user CRUD and documents
+    TRADEMARK_ISO_USER_SUBMISSIONS: createUrl("/api/forms/trademark-iso/user-submissions"),
+    TRADEMARK_ISO_DETAIL: (id: string) => createUrl(`/api/forms/trademark-iso/${id}`),
+    TRADEMARK_ISO_UPDATE: (id: string) => createUrl(`/api/forms/trademark-iso/${id}`),
+    TRADEMARK_ISO_UPLOAD_DOC: (formId: string) => createUrl(`/api/forms/trademark-iso/document/${formId}`),
+    TRADEMARK_ISO_DOWNLOAD_DOC: (documentId: string) => createUrl(`/api/forms/trademark-iso/download/${documentId}`),
+
+    // Advisory - user CRUD and documents
+    ADVISORY_USER_SUBMISSIONS: createUrl("/api/forms/advisory/user-submissions"),
+    ADVISORY_DETAIL: (id: string) => createUrl(`/api/forms/advisory/${id}`),
+    ADVISORY_UPDATE: (id: string) => createUrl(`/api/forms/advisory/${id}`),
+    ADVISORY_UPLOAD_DOC: (formId: string) => createUrl(`/api/forms/advisory/document/${formId}`),
+    ADVISORY_DOWNLOAD_DOC: (documentId: string) => createUrl(`/api/forms/advisory/download/${documentId}`),
+
+    // Reports - user CRUD and documents
+    REPORTS_USER_SUBMISSIONS: createUrl("/api/forms/reports/user-submissions"),
+    REPORTS_DETAIL: (id: string) => createUrl(`/api/forms/reports/${id}`),
+    REPORTS_UPDATE: (id: string) => createUrl(`/api/forms/reports/${id}`),
+    REPORTS_UPLOAD_DOC: (formId: string) => createUrl(`/api/forms/reports/document/${formId}`),
+    REPORTS_DOWNLOAD_DOC: (documentId: string) => createUrl(`/api/forms/reports/download/${documentId}`),
+  },
+  SUPPORT: {
+    CONTACT: createUrl("/api/support/contact"),
+    BLOCK_DETAILS: createUrl("/api/support/block-details"),
   },
 };
 
@@ -115,6 +142,13 @@ export interface User {
   address?: string;
   avatarUrl?: string;
   createdAt?: string;
+  isBlocked?: boolean;
+  blockedAt?: string;
+  blockReason?: string;
+  blockedBy?: {
+    name: string;
+    email: string;
+  };
 }
 
 // Create a class for the API client

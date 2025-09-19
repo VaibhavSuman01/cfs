@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { DownloadIcon, UserIcon, CalendarIcon, SearchIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+import { DownloadIcon, UserIcon, CalendarIcon, SearchIcon, ChevronLeftIcon, ChevronRightIcon, EditIcon, TrashIcon, BanIcon, CheckCircleIcon, EyeIcon } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
 import { addDays, format } from 'date-fns';
 
@@ -16,6 +16,9 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import api from '@/lib/api-client';
 import { API_PATHS } from '@/lib/api-client';
 
@@ -29,6 +32,21 @@ interface User {
   pan?: string;
   aadhaar?: string;
   address?: string;
+  dob?: string;
+  isBlocked?: boolean;
+  blockedAt?: string;
+  blockReason?: string;
+  blockedBy?: {
+    _id: string;
+    name: string;
+    email: string;
+  };
+  unblockedAt?: string;
+  unblockedBy?: {
+    _id: string;
+    name: string;
+    email: string;
+  };
   createdAt: string;
 }
 
@@ -50,6 +68,14 @@ export default function UsersPage() {
   const [selectedRange, setSelectedRange] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  
+  // Dialog states
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showBlockDialog, setShowBlockDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [editFormData, setEditFormData] = useState<Partial<User>>({});
+  const [blockReason, setBlockReason] = useState('');
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -61,44 +87,44 @@ export default function UsersPage() {
     };
   }, [searchTerm]);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      setLoading(true);
-      try {
-        const params = new URLSearchParams();
-        params.append('page', currentPage.toString());
-        params.append('limit', pageSize.toString());
-        if (debouncedSearchTerm) {
-          params.append('search', debouncedSearchTerm);
-        }
-        if (dateRange?.from) {
-          const startDate = new Date(dateRange.from);
-          startDate.setHours(0, 0, 0, 0);
-          params.append('startDate', startDate.toISOString());
-        }
-        if (dateRange?.to) {
-          const endDate = new Date(dateRange.to);
-          endDate.setHours(23, 59, 59, 999);
-          params.append('endDate', endDate.toISOString());
-        }
-
-        const response = await api.get(`${API_PATHS.ADMIN.USERS}?${params.toString()}`);
-        setUsers(response.data.users);
-        setPagination(response.data.pagination);
-      } catch (error) {
-        console.error('Failed to fetch users:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to load user data.',
-          variant: 'destructive',
-        });
-      } finally {
-        setLoading(false);
+  const fetchUsers = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      params.append('page', currentPage.toString());
+      params.append('limit', pageSize.toString());
+      if (debouncedSearchTerm) {
+        params.append('search', debouncedSearchTerm);
       }
-    };
+      if (dateRange?.from) {
+        const startDate = new Date(dateRange.from);
+        startDate.setHours(0, 0, 0, 0);
+        params.append('startDate', startDate.toISOString());
+      }
+      if (dateRange?.to) {
+        const endDate = new Date(dateRange.to);
+        endDate.setHours(23, 59, 59, 999);
+        params.append('endDate', endDate.toISOString());
+      }
 
-    fetchUsers();
+      const response = await api.get(`${API_PATHS.ADMIN.USERS}?${params.toString()}`);
+      setUsers(response.data.users);
+      setPagination(response.data.pagination);
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load user data.',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
   }, [toast, debouncedSearchTerm, dateRange, currentPage, pageSize]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   // Reset to first page when search or date filters change
   useEffect(() => {
@@ -173,6 +199,140 @@ export default function UsersPage() {
       month: 'short',
       day: 'numeric',
     });
+  };
+
+  // Handler functions
+  const handleEditUser = (user: User) => {
+    setSelectedUser(user);
+    setEditFormData({
+      name: user.name,
+      email: user.email,
+      mobile: user.mobile,
+      pan: user.pan,
+      aadhaar: user.aadhaar,
+      fatherName: user.fatherName,
+      address: user.address,
+      dob: user.dob ? new Date(user.dob).toISOString().split('T')[0] : '',
+    });
+    setShowEditDialog(true);
+  };
+
+  const handleBlockUser = (user: User) => {
+    if (user.isBlocked) {
+      toast({
+        title: 'Warning',
+        description: 'This user is already blocked.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setSelectedUser(user);
+    setBlockReason('');
+    setShowBlockDialog(true);
+  };
+
+  const handleDeleteUser = (user: User) => {
+    setSelectedUser(user);
+    setShowDeleteDialog(true);
+  };
+
+  const handleUpdateUser = async () => {
+    if (!selectedUser) return;
+
+    try {
+      await api.put(`${API_PATHS.ADMIN.USER_UPDATE(selectedUser._id)}`, editFormData);
+      toast({
+        title: 'Success',
+        description: 'User updated successfully.',
+      });
+      setShowEditDialog(false);
+      // Refresh users list
+      fetchUsers();
+    } catch (error) {
+      console.error('Failed to update user:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to update user.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleBlockUserConfirm = async () => {
+    if (!selectedUser) return;
+
+    try {
+      await api.post(API_PATHS.ADMIN.USER_BLOCK(selectedUser._id), {
+        reason: blockReason,
+      });
+      toast({
+        title: 'Success',
+        description: 'User blocked successfully.',
+      });
+      setShowBlockDialog(false);
+      // Refresh users list
+      fetchUsers();
+    } catch (error: any) {
+      console.error('Failed to block user:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to block user.';
+      toast({
+        title: 'Error',
+        description: errorMessage,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleUnblockUser = async (user: User) => {
+    if (!user.isBlocked) {
+      toast({
+        title: 'Warning',
+        description: 'This user is not blocked.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      await api.post(`${API_PATHS.ADMIN.USER_UNBLOCK(user._id)}`);
+      toast({
+        title: 'Success',
+        description: 'User unblocked successfully.',
+      });
+      // Refresh users list
+      fetchUsers();
+    } catch (error: any) {
+      console.error('Failed to unblock user:', error);
+      const errorMessage = error.response?.data?.message || 'Failed to unblock user.';
+      toast({
+        title: 'Error',
+        description: errorMessage,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleDeleteUserConfirm = async () => {
+    if (!selectedUser) return;
+
+    try {
+      await api.delete(`${API_PATHS.ADMIN.USER_DELETE(selectedUser._id)}`);
+      toast({
+        title: 'Success',
+        description: 'User deleted successfully.',
+      });
+      setShowDeleteDialog(false);
+      // Refresh users list
+      fetchUsers();
+    } catch (error: any) {
+      console.error('Failed to delete user:', error);
+      const errorMessage = error.response?.data?.message || 'Failed to delete user.';
+      toast({
+        title: 'Error',
+        description: errorMessage,
+        variant: 'destructive',
+      });
+    }
   };
 
   return (
@@ -280,8 +440,10 @@ export default function UsersPage() {
                     <TableHead>Father's Name</TableHead>
                     <TableHead>PAN</TableHead>
                     <TableHead>Aadhar</TableHead>
-                    <TableHead>Address</TableHead>
+                    <TableHead>DOB</TableHead>
+                    <TableHead>Status</TableHead>
                     <TableHead>Joined On</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -293,8 +455,51 @@ export default function UsersPage() {
                       <TableCell>{user.fatherName || '-'}</TableCell>
                       <TableCell>{user.pan || '-'}</TableCell>
                       <TableCell>{user.aadhaar || '-'}</TableCell>
-                      <TableCell>{user.address || '-'}</TableCell>
+                      <TableCell>{user.dob ? formatDate(user.dob) : '-'}</TableCell>
+                      <TableCell>
+                        <Badge variant={user.isBlocked ? "destructive" : "default"}>
+                          {user.isBlocked ? "Blocked" : "Active"}
+                        </Badge>
+                      </TableCell>
                       <TableCell>{formatDate(user.createdAt)}</TableCell>
+                      <TableCell>
+                        <div className="flex space-x-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEditUser(user)}
+                          >
+                            <EditIcon className="h-4 w-4" />
+                          </Button>
+                          {user.isBlocked ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleUnblockUser(user)}
+                              className="text-green-600 hover:text-green-700"
+                            >
+                              <CheckCircleIcon className="h-4 w-4" />
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleBlockUser(user)}
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              <BanIcon className="h-4 w-4" />
+                            </Button>
+                          )}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDeleteUser(user)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <TrashIcon className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -385,6 +590,154 @@ export default function UsersPage() {
           </CardContent>
         </Card>
       </motion.div>
+
+      {/* Edit User Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit User Profile</DialogTitle>
+            <DialogDescription>
+              Update user information below.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid grid-cols-2 gap-4 py-4">
+            <div>
+              <Label htmlFor="name">Full Name</Label>
+              <Input
+                id="name"
+                value={editFormData.name || ''}
+                onChange={(e) => setEditFormData({...editFormData, name: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={editFormData.email || ''}
+                onChange={(e) => setEditFormData({...editFormData, email: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="mobile">Mobile</Label>
+              <Input
+                id="mobile"
+                value={editFormData.mobile || ''}
+                onChange={(e) => setEditFormData({...editFormData, mobile: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="pan">PAN</Label>
+              <Input
+                id="pan"
+                value={editFormData.pan || ''}
+                onChange={(e) => setEditFormData({...editFormData, pan: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="aadhaar">Aadhaar</Label>
+              <Input
+                id="aadhaar"
+                value={editFormData.aadhaar || ''}
+                onChange={(e) => setEditFormData({...editFormData, aadhaar: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="dob">Date of Birth</Label>
+              <Input
+                id="dob"
+                type="date"
+                value={editFormData.dob || ''}
+                onChange={(e) => setEditFormData({...editFormData, dob: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="fatherName">Father's Name</Label>
+              <Input
+                id="fatherName"
+                value={editFormData.fatherName || ''}
+                onChange={(e) => setEditFormData({...editFormData, fatherName: e.target.value})}
+              />
+            </div>
+            <div className="col-span-2">
+              <Label htmlFor="address">Address</Label>
+              <Textarea
+                id="address"
+                value={editFormData.address || ''}
+                onChange={(e) => setEditFormData({...editFormData, address: e.target.value})}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowEditDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleUpdateUser}>
+              Update User
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Block User Dialog */}
+      <Dialog open={showBlockDialog} onOpenChange={setShowBlockDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Block User</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to block this user? They will not be able to access their dashboard.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4">
+            <Label htmlFor="blockReason">Reason for blocking (optional)</Label>
+            <Textarea
+              id="blockReason"
+              placeholder="Enter reason for blocking this user..."
+              value={blockReason}
+              onChange={(e) => setBlockReason(e.target.value)}
+            />
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowBlockDialog(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleBlockUserConfirm}>
+              Block User
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete User Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete User</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this user? This action cannot be undone and will permanently remove all user data.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4">
+            <p className="text-sm text-muted-foreground">
+              User: <strong>{selectedUser?.name}</strong> ({selectedUser?.email})
+            </p>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteUserConfirm}>
+              Delete User
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

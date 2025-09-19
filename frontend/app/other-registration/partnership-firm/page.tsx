@@ -8,7 +8,7 @@ import { FloatingElements } from "@/components/floating-elements"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { getBasePrice } from "@/lib/pricing"
+import { PricingDisplay } from "@/components/ui/pricing-display"
 import {
   Users,
   CheckCircle,
@@ -26,7 +26,6 @@ import {
 import Link from "next/link"
 
 export default function PartnershipFirmPage() {
-  const basePrice = getBasePrice("partnership firm") ?? "₹2,999";
   
   return (
     <div className="min-h-screen bg-white">
@@ -59,7 +58,9 @@ export default function PartnershipFirmPage() {
 
                 <div className="grid sm:grid-cols-3 gap-4 pt-6">
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-                    <div className="text-2xl font-bold text-blue-600">{basePrice}</div>
+                    <div className="text-2xl font-bold text-blue-600">
+                      <PricingDisplay serviceName="partnership firm" />
+                    </div>
                     <div className="text-sm text-gray-600">Starting Price</div>
                   </div>
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
@@ -73,13 +74,13 @@ export default function PartnershipFirmPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                  <Link href={`/dashboard/other-registration-form?service=${encodeURIComponent("Partnership Firm Registration")}`} passHref>
+                  <Link href={`/dashboard/other-registration?service=${encodeURIComponent("Partnership Firm Registration")}`} passHref>
                     <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                       Form Your Partnership
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
-                  <Link href={`/dashboard/other-registration-form?service=${encodeURIComponent("Partnership Firm Registration")}`} passHref>
+                  <Link href={`/dashboard/other-registration?service=${encodeURIComponent("Partnership Firm Registration")}`} passHref>
                     <Button
                       variant="outline"
                       className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
@@ -94,9 +95,9 @@ export default function PartnershipFirmPage() {
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-tr from-blue-100 to-transparent rounded-full -translate-x-10 -translate-y-10"></div>
                 <img
-                  src="/images/partnership-hero.svg"
+                  src="/images/partnership-hero.png"
                   alt="Partnership Firm Illustration"
-                  className="relative rounded-lg shadow-2xl w-full h-auto"
+                  className="relative rounded-lg w-full h-auto"
                 />
               </div>
             </FadeInSection>
@@ -154,9 +155,9 @@ export default function PartnershipFirmPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <ul className="space-y-3 text-left">
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Partnership Deed Drafting</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Basic Documentation</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Registration Support</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Partnership Deed Drafting</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Basic Documentation</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Registration Support</span></li>
                   </ul>
                   <Link href={`/contact?service=${encodeURIComponent("Partnership Firm Registration - Basic")}`} passHref>
                     <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Basic</Button>
@@ -172,10 +173,10 @@ export default function PartnershipFirmPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <ul className="space-y-3 text-left">
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Everything in Basic</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Priority Processing</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Expert Consultation</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Bank Account Setup</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Everything in Basic</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Priority Processing</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Expert Consultation</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Bank Account Setup</span></li>
                   </ul>
                   <Link href={`/contact?service=${encodeURIComponent("Partnership Firm Registration - Standard")}`} passHref>
                     <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Standard</Button>
@@ -191,10 +192,10 @@ export default function PartnershipFirmPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <ul className="space-y-3 text-left">
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Everything in Standard</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>GST Registration</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Compliance Setup</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>6 Months Support</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Everything in Standard</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>GST Registration</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Compliance Setup</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>6 Months Support</span></li>
                   </ul>
                   <Link href={`/contact?service=${encodeURIComponent("Partnership Firm Registration - Premium")}`} passHref>
                     <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Premium</Button>
@@ -254,17 +255,17 @@ export default function PartnershipFirmPage() {
               <Card className="p-6">
                 <CardTitle className="mb-4 text-blue-600">For Partners</CardTitle>
                 <ul className="space-y-3 text-gray-700">
-                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-1 flex-shrink-0" /><span>PAN Card of all partners.</span></li>
-                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-1 flex-shrink-0" /><span>Identity Proof: Aadhaar Card, Driving License, or Voter ID.</span></li>
-                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-1 flex-shrink-0" /><span>Latest Address Proof: Utility bill or bank statement.</span></li>
+                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 mt-1 flex-shrink-0" /><span>PAN Card of all partners.</span></li>
+                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 mt-1 flex-shrink-0" /><span>Identity Proof: Aadhaar Card, Driving License, or Voter ID.</span></li>
+                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 mt-1 flex-shrink-0" /><span>Latest Address Proof: Utility bill or bank statement.</span></li>
                 </ul>
               </Card>
               <Card className="p-6">
                 <CardTitle className="mb-4 text-blue-600">For Firm</CardTitle>
                 <ul className="space-y-3 text-gray-700">
-                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-1 flex-shrink-0" /><span>Certified true copy of the Partnership Deed.</span></li>
-                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-1 flex-shrink-0" /><span>Proof of principal place of business (Sale deed or rental agreement).</span></li>
-                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-1 flex-shrink-0" /><span>Latest utility bill for the office address.</span></li>
+                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 mt-1 flex-shrink-0" /><span>Certified true copy of the Partnership Deed.</span></li>
+                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 mt-1 flex-shrink-0" /><span>Proof of principal place of business (Sale deed or rental agreement).</span></li>
+                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 mt-1 flex-shrink-0" /><span>Latest utility bill for the office address.</span></li>
                 </ul>
               </Card>
             </div>
@@ -325,13 +326,13 @@ export default function PartnershipFirmPage() {
                 Team up for success. Let us help you form your Partnership Firm quickly and efficiently, setting a strong foundation for your business.
               </p>
               <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <Link href={`/dashboard/other-registration-form?service=${encodeURIComponent("Partnership Firm Registration")}`} passHref>
+                <Link href={`/dashboard/other-registration?service=${encodeURIComponent("Partnership Firm Registration")}`} passHref>
                   <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                     Create My Partnership Firm
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
-                <Link href={`/dashboard/other-registration-form?service=${encodeURIComponent("Partnership Firm Registration")}`} passHref>
+                <Link href={`/dashboard/other-registration?service=${encodeURIComponent("Partnership Firm Registration")}`} passHref>
                   <Button
                     variant="outline"
                     className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent"

@@ -97,8 +97,8 @@ export default function TrademarkISOPage() {
       if (searchTerm) params.append('search', searchTerm);
       if (service) params.append('service', service);
 
-      // Use the service-forms endpoint with Trademark & ISO filter
-      const response = await api.get(`${API_PATHS.ADMIN.SERVICE_FORMS}?${params.toString()}&service=Trademark & ISO`);
+      // Use the service-forms endpoint to get all forms
+      const response = await api.get(`${API_PATHS.ADMIN.SERVICE_FORMS}?${params.toString()}`);
       
       // Filter to only show TrademarkISOForm type forms
       const trademarkISOForms = response.data.forms.filter((form: any) => form.formType === 'TrademarkISOForm');
