@@ -91,9 +91,9 @@ export default function AnnualFilingPage() {
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-tr from-blue-100 to-transparent rounded-full -translate-x-10 -translate-y-10"></div>
                 <img
-                  src="/images/roc-filing-hero.svg"
+                  src="/images/roc-filing-hero.png"
                   alt="ROC Annual Filing Illustration"
-                  className="relative rounded-lg shadow-2xl w-full h-auto"
+                  className="relative rounded-lg w-full h-auto"
                 />
               </div>
             </FadeInSection>

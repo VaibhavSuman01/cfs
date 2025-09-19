@@ -678,76 +678,82 @@ export default function NewFormPage() {
                 </div>
               )}
 
-              {/* Conditional Fields */}
-              <div className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="hasIncomeTaxLogin"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                      <div className="space-y-0.5">
-                        <FormLabel>Do you have an Income Tax login?</FormLabel>
+              {/* Income Tax Filing specific fields */}
+              {selectedService === 'Income Tax Filing' && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Income Tax Filing Details</h3>
+                  
+                  <div className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="hasIncomeTaxLogin"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                          <div className="space-y-0.5">
+                            <FormLabel>Do you have an Income Tax login?</FormLabel>
+                          </div>
+                          <FormControl>
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    {hasIncomeTaxLogin && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pl-4 border-l-2">
+                        <FormField control={form.control} name="incomeTaxLoginId" render={({ field }) => (<FormItem><FormLabel>Login ID</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
+                        <FormField control={form.control} name="incomeTaxLoginPassword" render={({ field }) => (<FormItem><FormLabel>Password</FormLabel><FormControl><Input type="text" {...field} /></FormControl><FormMessage /></FormItem>)} />
                       </div>
-                      <FormControl>
-                        <Switch checked={field.value} onCheckedChange={field.onChange} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                {hasIncomeTaxLogin && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pl-4 border-l-2">
-                    <FormField control={form.control} name="incomeTaxLoginId" render={({ field }) => (<FormItem><FormLabel>Login ID</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="incomeTaxLoginPassword" render={({ field }) => (<FormItem><FormLabel>Password</FormLabel><FormControl><Input type="text" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                    )}
                   </div>
-                )}
-              </div>
 
-              <div className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="hasHomeLoan"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                      <div className="space-y-0.5">
-                        <FormLabel>Do you have a Home Loan?</FormLabel>
+                  <div className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="hasHomeLoan"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                          <div className="space-y-0.5">
+                            <FormLabel>Do you have a Home Loan?</FormLabel>
+                          </div>
+                          <FormControl>
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    {hasHomeLoan && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pl-4 border-l-2">
+                        <FormField control={form.control} name="homeLoanSanctionDate" render={({ field }) => (<FormItem><FormLabel>Sanction Date</FormLabel><FormControl><Input type="date" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                        <FormField control={form.control} name="homeLoanAmount" render={({ field }) => (<FormItem><FormLabel>Loan Amount</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                        <FormField control={form.control} name="homeLoanCurrentDue" render={({ field }) => (<FormItem><FormLabel>Current Due</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                        <FormField control={form.control} name="homeLoanTotalInterest" render={({ field }) => (<FormItem><FormLabel>Total Interest Paid</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)} />
                       </div>
-                      <FormControl>
-                        <Switch checked={field.value} onCheckedChange={field.onChange} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                {hasHomeLoan && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pl-4 border-l-2">
-                    <FormField control={form.control} name="homeLoanSanctionDate" render={({ field }) => (<FormItem><FormLabel>Sanction Date</FormLabel><FormControl><Input type="date" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="homeLoanAmount" render={({ field }) => (<FormItem><FormLabel>Loan Amount</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="homeLoanCurrentDue" render={({ field }) => (<FormItem><FormLabel>Current Due</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="homeLoanTotalInterest" render={({ field }) => (<FormItem><FormLabel>Total Interest Paid</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                    )}
                   </div>
-                )}
-              </div>
 
-              <div className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="hasPranNumber"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                      <div className="space-y-0.5">
-                        <FormLabel>Do you have a PRAN Number?</FormLabel>
+                  <div className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="hasPranNumber"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                          <div className="space-y-0.5">
+                            <FormLabel>Do you have a PRAN Number?</FormLabel>
+                          </div>
+                          <FormControl>
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    {hasPranNumber && (
+                      <div className="pl-4 border-l-2">
+                        <FormField control={form.control} name="pranNumber" render={({ field }) => (<FormItem><FormLabel>PRAN Number</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
                       </div>
-                      <FormControl>
-                        <Switch checked={field.value} onCheckedChange={field.onChange} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                {hasPranNumber && (
-                  <div className="pl-4 border-l-2">
-                    <FormField control={form.control} name="pranNumber" render={({ field }) => (<FormItem><FormLabel>PRAN Number</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
+                    )}
                   </div>
-                )}
-              </div>
+                </div>
+              )}
 
               {/* Service-specific document uploads */}
               {selectedService === 'GST Filing' && (

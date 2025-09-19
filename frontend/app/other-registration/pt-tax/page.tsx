@@ -18,6 +18,7 @@ import {
   Zap,
   Calculator
 } from 'lucide-react';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 export default function PtTaxPage() {
 
@@ -83,11 +84,14 @@ export default function PtTaxPage() {
               </div>
             </FadeInSection>
             <FadeInSection className="hidden lg:block">
-              <div className="relative">
+            <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-tr from-blue-100 to-transparent rounded-full -translate-x-10 -translate-y-10"></div>
-                <div className="relative rounded-lg shadow-2xl w-full h-80 bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
-                  <Calculator className="h-32 w-32 text-blue-600" />
-                </div>
+                <DotLottieReact
+                  src="/lottie/Online Payment.lottie"
+                  loop
+                    autoplay
+                  className="relative rounded-lg shadow-2xl w-full h-auto"
+                />
               </div>
             </FadeInSection>
           </div>

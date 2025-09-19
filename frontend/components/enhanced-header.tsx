@@ -234,55 +234,53 @@ export function EnhancedHeader() {
             ))}
             
             {/* User section */}
-            <div 
-              className="relative"
-              onMouseEnter={() => setDropdownOpen(true)} 
-              onMouseLeave={() => setDropdownOpen(false)}
-            >
-              {isAuthenticated ? (
-                <div className="relative group">
-                  <button className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors">
-                    {user?.avatarUrl ? (
-                      <img 
-                        src={getAvatarUrl(user.avatarUrl) || ""}  
-                        alt="user avatar" 
-                        className="w-8 h-8 rounded-full" 
-                      />
-                    ) : (
-                      <UserIcon className="w-5 h-5" />
-                    )}
-                    <span className="font-medium text-sm">
-                      {user?.name}
-                    </span>
-                  </button>
-                  {dropdownOpen && (
-                    <div className="absolute right-0 z-[10000] mt-2 w-48 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                      <Link
-                        href="/dashboard"
-                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50"
-                      >
-                        <LayoutDashboard className="w-4 h-4 mr-2" />
-                        Dashboard
-                      </Link>
-                      <button
-                        onClick={handleSignOut}
-                        className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50"
-                      >
-                        <LogOut className="w-4 h-4 mr-2" />
-                        Sign Out
-                      </button>
-                    </div>
+            {isAuthenticated ? (
+              <div 
+                className="relative group"
+                onMouseEnter={() => setDropdownOpen(true)} 
+                onMouseLeave={() => setDropdownOpen(false)}
+              >
+                <button className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors py-2 px-1">
+                  {user?.avatarUrl ? (
+                    <img 
+                      src={getAvatarUrl(user.avatarUrl) || ""}  
+                      alt="user avatar" 
+                      className="w-8 h-8 rounded-full" 
+                    />
+                  ) : (
+                    <UserIcon className="w-5 h-5" />
                   )}
-                </div>
-              ) : (
-                <Button
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md shadow-sm hover:shadow-md transition-all duration-300"
-                  onClick={() => router.push("/auth")}
-                >
-                  Sign up
-                </Button>
-              )}
-            </div>
+                  <span className="font-medium text-sm">
+                    {user?.name}
+                  </span>
+                </button>
+                {dropdownOpen && (
+                  <div className="absolute right-0 z-[10000] w-48 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none -mt-1">
+                    <Link
+                      href="/dashboard"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
+                    >
+                      <LayoutDashboard className="w-4 h-4 mr-2" />
+                      Dashboard
+                    </Link>
+                    <button
+                      onClick={handleSignOut}
+                      className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Button
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md shadow-sm hover:shadow-md transition-all duration-300"
+                onClick={() => router.push("/auth")}
+              >
+                Sign up
+              </Button>
+            )}
           </nav>
 
           {/* Mobile Menu Button */}

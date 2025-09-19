@@ -91,9 +91,9 @@ export default function TrademarkRegistrationPage() {
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-tr from-blue-100 to-transparent rounded-full -translate-x-10 -translate-y-10"></div>
                 <img
-                  src="/images/trademark-hero.svg"
+                  src="/images/trademark-hero.png"
                   alt="Trademark Registration Illustration"
-                  className="relative rounded-lg shadow-2xl w-full h-auto"
+                  className="relative rounded-lg w-full h-auto"
                 />
               </div>
             </FadeInSection>

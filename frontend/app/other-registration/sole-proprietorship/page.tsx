@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { PricingDisplay } from "@/components/ui/pricing-display"
+import { LottieAnimation } from "@/components/lottie-animation"
 import Link from "next/link"
 import {
   User,
@@ -22,6 +23,7 @@ import {
   Zap,
   Rocket
 } from "lucide-react"
+import { DotLottieReact } from "@lottiefiles/dotlottie-react"
 
 export default function SoleProprietorshipPage() {
   
@@ -92,9 +94,10 @@ export default function SoleProprietorshipPage() {
             <FadeInSection className="hidden lg:block">
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-tr from-blue-100 to-transparent rounded-full -translate-x-10 -translate-y-10"></div>
-                <img
-                  src="/images/proprietorship-hero.svg"
-                  alt="Sole Proprietorship Illustration"
+                <DotLottieReact
+                  src="/lottie/Business Analysis.lottie"
+                  loop
+                    autoplay
                   className="relative rounded-lg shadow-2xl w-full h-auto"
                 />
               </div>

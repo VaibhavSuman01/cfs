@@ -84,9 +84,9 @@ export default function PayrollTaxPage() {
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-tr from-blue-100 to-transparent rounded-full -translate-x-10 -translate-y-10"></div>
                 <img
-                  src="/images/payroll-hero.svg"
+                  src="/images/payroll-hero.png"
                   alt="Payroll Tax Management Illustration"
-                  className="relative rounded-lg shadow-2xl w-full h-auto"
+                  className="relative rounded-lg w-full h-auto"
                 />
               </div>
             </FadeInSection>

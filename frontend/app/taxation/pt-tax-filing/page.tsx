@@ -17,6 +17,7 @@ import {
   Landmark,
   ShieldAlert
 } from "lucide-react"
+import { DotLottieReact } from "@lottiefiles/dotlottie-react"
 
 export default function PtTaxFilingPage() {
   const basePrice = getBasePrice("pt tax filing") ?? "As per request";
@@ -82,10 +83,11 @@ export default function PtTaxFilingPage() {
             <FadeInSection className="hidden lg:block">
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-tr from-blue-100 to-transparent rounded-full -translate-x-10 -translate-y-10"></div>
-                <img
-                  src="/images/pt-tax-hero.svg"
-                  alt="Professional Tax Filing Illustration"
-                  className="relative rounded-lg shadow-2xl w-full h-auto"
+                <DotLottieReact
+                  src="/lottie/Tax Filing.lottie"
+                  className="relative rounded-lg w-full h-auto"
+                  loop
+                  autoplay
                 />
               </div>
             </FadeInSection>
