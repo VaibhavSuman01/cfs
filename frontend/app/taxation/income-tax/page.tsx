@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
-import { getBasePrice } from "@/lib/pricing"
+import { PricingDisplay } from "@/components/ui/pricing-display"
 import {
   FileSpreadsheet,
   CheckCircle,
@@ -23,7 +23,6 @@ import {
 } from "lucide-react"
 
 export default function IncomeTaxFilingPage() {
-  const basePrice = getBasePrice("income tax filing") ?? "₹999";
   
   return (
     <div className="min-h-screen bg-white">
@@ -56,7 +55,9 @@ export default function IncomeTaxFilingPage() {
 
                 <div className="grid sm:grid-cols-3 gap-4 pt-6">
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-                    <div className="text-2xl font-bold text-blue-600">{basePrice}</div>
+                    <div className="text-2xl font-bold text-blue-600">
+                      <PricingDisplay serviceName="income tax filing" />
+                    </div>
                     <div className="text-sm text-gray-600">Starting Price</div>
                   </div>
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
@@ -70,13 +71,13 @@ export default function IncomeTaxFilingPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                  <Link href={`/tax-form?service=${encodeURIComponent("Income Tax Filing")}`} passHref>
+                  <Link href={`/dashboard/new-form?service=${encodeURIComponent("Income Tax Filing")}`} passHref>
                     <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                       File Your ITR Now
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
-                  <Link href={`/tax-form?service=${encodeURIComponent("Income Tax Filing")}`} passHref>
+                  <Link href={`/dashboard/new-form?service=${encodeURIComponent("Income Tax Filing")}`} passHref>
                     <Button
                       variant="outline"
                       className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
@@ -91,9 +92,9 @@ export default function IncomeTaxFilingPage() {
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-tr from-blue-100 to-transparent rounded-full -translate-x-10 -translate-y-10"></div>
                 <img
-                  src="/images/income-tax-hero.svg"
+                  src="/images/income-tax-hero.png"
                   alt="Income Tax Filing Illustration"
-                  className="relative rounded-lg shadow-2xl w-full h-auto"
+                  className="relative rounded-lg w-full h-auto"
                 />
               </div>
             </FadeInSection>
@@ -166,25 +167,25 @@ export default function IncomeTaxFilingPage() {
               <Card className="p-6">
                 <CardTitle className="mb-4 text-blue-600">General Documents</CardTitle>
                 <ul className="space-y-3 text-gray-700">
-                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-1 flex-shrink-0" /><span>PAN Card & Aadhaar Card</span></li>
-                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-1 flex-shrink-0" /><span>Bank Account Statements</span></li>
-                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-1 flex-shrink-0" /><span>Form 26AS, AIS & TIS</span></li>
+                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 mt-1 flex-shrink-0" /><span>PAN Card & Aadhaar Card</span></li>
+                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 mt-1 flex-shrink-0" /><span>Bank Account Statements</span></li>
+                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 mt-1 flex-shrink-0" /><span>Form 26AS, AIS & TIS</span></li>
                 </ul>
               </Card>
               <Card className="p-6">
                 <CardTitle className="mb-4 text-blue-600">For Salaried Individuals</CardTitle>
                 <ul className="space-y-3 text-gray-700">
-                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-1 flex-shrink-0" /><span>Form 16 (Part A & B)</span></li>
-                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-1 flex-shrink-0" /><span>Salary Slips</span></li>
-                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-1 flex-shrink-0" /><span>Rent Receipts for HRA</span></li>
+                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 mt-1 flex-shrink-0" /><span>Form 16 (Part A & B)</span></li>
+                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 mt-1 flex-shrink-0" /><span>Salary Slips</span></li>
+                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 mt-1 flex-shrink-0" /><span>Rent Receipts for HRA</span></li>
                 </ul>
               </Card>
               <Card className="p-6">
                 <CardTitle className="mb-4 text-blue-600">For Other Incomes</CardTitle>
                 <ul className="space-y-3 text-gray-700">
-                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-1 flex-shrink-0" /><span>Capital Gains Statements</span></li>
-                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-1 flex-shrink-0" /><span>Rental Income Details</span></li>
-                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-1 flex-shrink-0" /><span>Interest Certificates</span></li>
+                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 mt-1 flex-shrink-0" /><span>Capital Gains Statements</span></li>
+                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 mt-1 flex-shrink-0" /><span>Rental Income Details</span></li>
+                  <li className="flex items-start"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 mt-1 flex-shrink-0" /><span>Interest Certificates</span></li>
                 </ul>
               </Card>
             </div>
@@ -245,13 +246,13 @@ export default function IncomeTaxFilingPage() {
                 Let's make this tax season your easiest one yet. Get started with our expert-assisted ITR filing service today and ensure you get the best possible outcome.
               </p>
               <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <Link href={`/tax-form?service=${encodeURIComponent("Income Tax Filing")}`} passHref>
+                <Link href={`/dashboard/new-form?service=${encodeURIComponent("Income Tax Filing")}`} passHref>
                   <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                     Start My ITR Filing
                     <FileSpreadsheet className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
-                <Link href={`/tax-form?service=${encodeURIComponent("Income Tax Filing")}`} passHref>
+                <Link href={`/dashboard/new-form?service=${encodeURIComponent("Income Tax Filing")}`} passHref>
                   <Button
                     variant="outline"
                     className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent"

@@ -16,7 +16,8 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2, Save, User, Camera } from "lucide-react";
 import { toast } from "sonner";
-import api from "@/lib/api-client";
+import api, { API_PATHS } from "@/lib/api-client";
+import { getAvatarUrl } from "@/lib/avatar-utils";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -145,7 +146,7 @@ export default function ProfilePage() {
 
     try {
       toast.info("Uploading avatar...");
-      const response = await api.put("/api/auth/profile/avatar", formData);
+      const response = await api.put(API_PATHS.AUTH.PROFILE_AVATAR, formData);
       await refreshUserProfile();
       setAvatarFile(null);
       setAvatarPreview(null);
@@ -205,12 +206,7 @@ export default function ProfilePage() {
               <div className="relative">
                 <Avatar className="h-24 w-24 border-2 border-primary/20">
                   <AvatarImage
-                    src={
-                      avatarPreview ||
-                      (user?.avatarUrl
-                        ? `${process.env.NEXT_PUBLIC_API_URL}${user.avatarUrl}`
-                        : "")
-                    }
+                    src={avatarPreview || getAvatarUrl(user?.avatarUrl) || ""}
                     alt={user?.name || "User Avatar"}
                   />
                   <AvatarFallback className="text-3xl bg-primary/10 text-primary">

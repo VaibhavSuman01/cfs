@@ -256,19 +256,19 @@ export default function ContactPage() {
                 </div>
 
                 {isSuccess ? (
-                  <Card className="border-2 border-green-100 shadow-xl bg-green-50">
+                  <Card className="border-2 border-blue-100 shadow-xl bg-blue-50">
                     <CardContent className="p-8 text-center">
                       <div className="space-y-6">
-                        <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto">
+                        <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto">
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
                         </div>
-                        <h3 className="text-2xl font-bold text-green-700">Message Sent Successfully!</h3>
-                        <p className="text-green-600">Thank you for contacting us. Our team will get back to you within 24 hours.</p>
+                        <h3 className="text-2xl font-bold text-blue-700">Message Sent Successfully!</h3>
+                        <p className="text-blue-600">Thank you for contacting us. Our team will get back to you within 24 hours.</p>
                         <Button 
                           onClick={() => setIsSuccess(false)} 
-                          className="bg-green-600 hover:bg-green-700 text-white"
+                          className="bg-blue-600 hover:bg-blue-700 text-white"
                         >
                           Send Another Message
                         </Button>

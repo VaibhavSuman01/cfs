@@ -97,8 +97,8 @@ export default function OtherRegistrationPage() {
       if (searchTerm) params.append('search', searchTerm);
       if (service) params.append('service', service);
 
-      // Use the service-forms endpoint with Other Registration filter
-      const response = await api.get(`${API_PATHS.ADMIN.SERVICE_FORMS}?${params.toString()}&service=Other Registration`);
+      // Use the service-forms endpoint to get all forms
+      const response = await api.get(`${API_PATHS.ADMIN.SERVICE_FORMS}?${params.toString()}`);
       
       // Filter to only show OtherRegistrationForm type forms
       const otherRegistrationForms = response.data.forms.filter((form: any) => form.formType === 'OtherRegistrationForm');
@@ -181,6 +181,7 @@ export default function OtherRegistrationPage() {
       day: 'numeric',
     });
   };
+
 
   return (
     <div className="container mx-auto p-6">

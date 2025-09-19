@@ -70,13 +70,13 @@ export default function TrademarkRegistrationPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                  <Link href={`/dashboard/trademark-iso-form?service=${encodeURIComponent("Trademark Registration")}`} passHref>
+                  <Link href={`/dashboard/trademark-iso?service=${encodeURIComponent("Trademark Registration")}`} passHref>
                     <Button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                       Register My Trademark
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
-                  <Link href={`/dashboard/trademark-iso-form?service=${encodeURIComponent("Trademark Registration")}`} passHref>
+                  <Link href={`/dashboard/trademark-iso?service=${encodeURIComponent("Trademark Registration")}`} passHref>
                     <Button
                       variant="outline"
                       className="border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white px-8 py-3 rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
@@ -91,9 +91,9 @@ export default function TrademarkRegistrationPage() {
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-tr from-blue-100 to-transparent rounded-full -translate-x-10 -translate-y-10"></div>
                 <img
-                  src="/images/trademark-hero.svg"
+                  src="/images/trademark-hero.png"
                   alt="Trademark Registration Illustration"
-                  className="relative rounded-lg shadow-2xl w-full h-auto"
+                  className="relative rounded-lg w-full h-auto"
                 />
               </div>
             </FadeInSection>
@@ -222,13 +222,13 @@ export default function TrademarkRegistrationPage() {
                 Don't leave your brand vulnerable. Take the first step towards securing your identity today. Our team is ready to guide you through every step of the process.
               </p>
               <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <Link href={`/dashboard/trademark-iso-form?service=${encodeURIComponent("Trademark Registration")}`} passHref>
+                <Link href={`/dashboard/trademark-iso?service=${encodeURIComponent("Trademark Registration")}`} passHref>
                   <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                     Start My Registration
                     <ShieldCheck className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
-                <Link href={`/dashboard/trademark-iso-form?service=${encodeURIComponent("Trademark Registration")}`} passHref>
+                <Link href={`/dashboard/trademark-iso?service=${encodeURIComponent("Trademark Registration")}`} passHref>
                   <Button
                     variant="outline"
                     className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent"

@@ -35,11 +35,17 @@ export const API_PATHS = {
     CONTACTS: createUrl("/api/admin/contacts"),
     STATS: createUrl("/api/admin/stats"),
     USERS: createUrl("/api/admin/users"),
+    USER_DETAIL: (id: string) => createUrl(`/api/admin/users/${id}`),
+    USER_UPDATE: (id: string) => createUrl(`/api/admin/users/${id}`),
+    USER_BLOCK: (id: string) => createUrl(`/api/admin/users/${id}/block`),
+    USER_UNBLOCK: (id: string) => createUrl(`/api/admin/users/${id}/unblock`),
+    USER_DELETE: (id: string) => createUrl(`/api/admin/users/${id}`),
     USERS_DOWNLOAD: createUrl("/api/admin/users/download"),
     // Add specific form type endpoints
     ROC_RETURNS_DETAIL: (id: string) => createUrl(`/api/admin/roc-returns/${id}`),
     ROC_RETURNS_STATUS_UPDATE: (id: string) => createUrl(`/api/admin/roc-returns/${id}/status`),
     ROC_RETURNS_DOWNLOAD: (id: string, documentId: string) => createUrl(`/api/admin/roc-returns/${id}/download/${documentId}`),
+    SEND_WEEKLY_REPORT: createUrl("/api/admin/send-weekly-report"),
   },
   FORMS: {
     TAX: createUrl("/api/forms/tax"),

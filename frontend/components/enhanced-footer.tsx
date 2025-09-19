@@ -32,6 +32,15 @@ export function EnhancedFooter() {
     { name: "Legal Advisory", href: "/advisory" },
   ]
 
+  const toolsServices = [
+    { name: "Income Tax Calculator", href: "/tools/income-tax-calculator" },
+    { name: "EMI Calculator", href: "/tools/emi-calculator" },
+    { name: "GST Calculator", href: "/tools/gst-calculator" },
+    { name: "SIP Calculator", href: "/tools/sip-calculator" },
+    { name: "HSN Code Finder", href: "/tools/hsn-code-finder" },
+    { name: "Salary Calculator", href: "/tools/salary-calculator" },
+  ]
+
   const quickLinks = [
     { name: "About Us", href: "/about" },
     { name: "Contact Us", href: "/contact" },
@@ -40,7 +49,7 @@ export function EnhancedFooter() {
   return (
     <footer className="bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 text-white">
       <div className="container mx-auto px-4 py-16">
-        <div className="grid md:grid-cols-2 lg:grid-cols-6 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-7 gap-8">
           {/* Company Info */}
           <div className="lg:col-span-2 space-y-6">
             <div className="flex items-center space-x-3">

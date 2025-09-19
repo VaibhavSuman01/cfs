@@ -191,7 +191,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-50 to-blue-50 relative overflow-hidden">
       <AnimatedBackground />
 
       {/* Header */}
@@ -199,7 +199,7 @@ export default function AuthPage() {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-center space-x-3">
             <Building2 className="h-8 w-8 text-blue-600" />
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-600 bg-clip-text text-transparent">
               Com Financial Services
             </span>
           </div>
@@ -249,7 +249,7 @@ export default function AuthPage() {
               // Signup Form
               <div className="space-y-6">
                 {errors.general && (
-                  <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded-xl text-sm">
+                  <div className="bg-blue-50 border border-blue-200 text-blue-600 p-4 rounded-xl text-sm">
                     {errors.general}
                   </div>
                 )}
@@ -271,14 +271,14 @@ export default function AuthPage() {
                         })
                       }
                       className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 ${
-                        errors.fullName ? "border-red-500" : "border-gray-200"
+                        errors.fullName ? "border-blue-500" : "border-gray-200"
                       }`}
                       placeholder="Enter your full name"
                       suppressHydrationWarning
                     />
                   </div>
                   {errors.fullName && (
-                    <p className="text-red-500 text-xs mt-2">
+                    <p className="text-blue-500 text-xs mt-2">
                       {errors.fullName}
                     </p>
                   )}
@@ -298,14 +298,14 @@ export default function AuthPage() {
                         setSignupForm({ ...signupForm, email: e.target.value })
                       }
                       className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 ${
-                        errors.email ? "border-red-500" : "border-gray-200"
+                        errors.email ? "border-blue-500" : "border-gray-200"
                       }`}
                       placeholder="Enter your email"
                       suppressHydrationWarning
                     />
                   </div>
                   {errors.email && (
-                    <p className="text-red-500 text-xs mt-2">{errors.email}</p>
+                    <p className="text-blue-500 text-xs mt-2">{errors.email}</p>
                   )}
                 </div>
 
@@ -326,7 +326,7 @@ export default function AuthPage() {
                         })
                       }
                       className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 ${
-                        errors.panCard ? "border-red-500" : "border-gray-200"
+                        errors.panCard ? "border-blue-500" : "border-gray-200"
                       }`}
                       placeholder="ABCDE1234F"
                       maxLength={10}
@@ -334,7 +334,7 @@ export default function AuthPage() {
                     />
                   </div>
                   {errors.panCard && (
-                    <p className="text-red-500 text-xs mt-2">
+                    <p className="text-blue-500 text-xs mt-2">
                       {errors.panCard}
                     </p>
                   )}
@@ -358,14 +358,14 @@ export default function AuthPage() {
                       }
                       className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 ${
                         errors.dateOfBirth
-                          ? "border-red-500"
+                          ? "border-blue-500"
                           : "border-gray-200"
                       }`}
                       suppressHydrationWarning
                     />
                   </div>
                   {errors.dateOfBirth && (
-                    <p className="text-red-500 text-xs mt-2">
+                    <p className="text-blue-500 text-xs mt-2">
                       {errors.dateOfBirth}
                     </p>
                   )}
@@ -389,7 +389,7 @@ export default function AuthPage() {
                       }
                       className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 ${
                         errors.mobileNumber
-                          ? "border-red-500"
+                          ? "border-blue-500"
                           : "border-gray-200"
                       }`}
                       placeholder="Enter 10-digit mobile number"
@@ -398,7 +398,7 @@ export default function AuthPage() {
                     />
                   </div>
                   {errors.mobileNumber && (
-                    <p className="text-red-500 text-xs mt-2">
+                    <p className="text-blue-500 text-xs mt-2">
                       {errors.mobileNumber}
                     </p>
                   )}
@@ -421,7 +421,7 @@ export default function AuthPage() {
                         })
                       }
                       className={`w-full pl-12 pr-12 py-4 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 ${
-                        errors.password ? "border-red-500" : "border-gray-200"
+                        errors.password ? "border-blue-500" : "border-gray-200"
                       }`}
                       placeholder="Enter your password"
                       suppressHydrationWarning
@@ -439,7 +439,7 @@ export default function AuthPage() {
                     </button>
                   </div>
                   {errors.password && (
-                    <p className="text-red-500 text-xs mt-2">
+                    <p className="text-blue-500 text-xs mt-2">
                       {errors.password}
                     </p>
                   )}
@@ -463,7 +463,7 @@ export default function AuthPage() {
                       }
                       className={`w-full pl-12 pr-12 py-4 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 ${
                         errors.confirmPassword
-                          ? "border-red-500"
+                          ? "border-blue-500"
                           : "border-gray-200"
                       }`}
                       placeholder="Confirm your password"
@@ -484,7 +484,7 @@ export default function AuthPage() {
                     </button>
                   </div>
                   {errors.confirmPassword && (
-                    <p className="text-red-500 text-xs mt-2">
+                    <p className="text-blue-500 text-xs mt-2">
                       {errors.confirmPassword}
                     </p>
                   )}
@@ -494,7 +494,7 @@ export default function AuthPage() {
                   type="button"
                   onClick={handleSignup}
                   disabled={isLoading}
-                  className={`w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center ${
+                  className={`w-full bg-gradient-to-r from-blue-600 to-blue-600 hover:from-blue-700 hover:to-blue-700 text-white py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center ${
                     isLoading ? "opacity-75 cursor-not-allowed" : ""
                   }`}
                 >
@@ -515,7 +515,7 @@ export default function AuthPage() {
               // Login Form
               <div className="space-y-6">
                 {errors.general && (
-                  <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded-xl text-sm">
+                  <div className="bg-blue-50 border border-blue-200 text-blue-600 p-4 rounded-xl text-sm">
                     {errors.general}
                   </div>
                 )}
@@ -537,14 +537,14 @@ export default function AuthPage() {
                         })
                       }
                       className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 ${
-                        errors.emailOrPan ? "border-red-500" : "border-gray-200"
+                        errors.emailOrPan ? "border-blue-500" : "border-gray-200"
                       }`}
                       suppressHydrationWarning
                       placeholder="Enter email or PAN card"
                     />
                   </div>
                   {errors.emailOrPan && (
-                    <p className="text-red-500 text-xs mt-2">
+                    <p className="text-blue-500 text-xs mt-2">
                       {errors.emailOrPan}
                     </p>
                   )}
@@ -574,7 +574,7 @@ export default function AuthPage() {
                         setLoginForm({ ...loginForm, password: e.target.value })
                       }
                       className={`w-full pl-12 pr-12 py-4 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 ${
-                        errors.password ? "border-red-500" : "border-gray-200"
+                        errors.password ? "border-blue-500" : "border-gray-200"
                       }`}
                       placeholder="Enter your password"
                       suppressHydrationWarning
@@ -592,7 +592,7 @@ export default function AuthPage() {
                     </button>
                   </div>
                   {errors.password && (
-                    <p className="text-red-500 text-xs mt-2">
+                    <p className="text-blue-500 text-xs mt-2">
                       {errors.password}
                     </p>
                   )}
@@ -602,7 +602,7 @@ export default function AuthPage() {
                   type="button"
                   onClick={handleLogin}
                   disabled={isLoading}
-                  className={`w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center ${
+                  className={`w-full bg-gradient-to-r from-blue-600 to-blue-600 hover:from-blue-700 hover:to-blue-700 text-white py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center ${
                     isLoading ? "opacity-75 cursor-not-allowed" : ""
                   }`}
                 >
@@ -625,11 +625,11 @@ export default function AuthPage() {
             <div className="mt-8 pt-6 border-t border-gray-200">
               <div className="grid grid-cols-2 gap-4 text-center">
                 <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
-                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <CheckCircle className="w-4 h-4 text-blue-500" />
                   <span>Secure & Fast</span>
                 </div>
                 <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
-                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <CheckCircle className="w-4 h-4 text-blue-500" />
                   <span>24/7 Support</span>
                 </div>
               </div>

@@ -87,6 +87,29 @@ const UserSchema = new mongoose.Schema(
       of: Number,
       default: new Map(),
     },
+    // Block/unblock functionality
+    isBlocked: {
+      type: Boolean,
+      default: false,
+    },
+    blockedAt: {
+      type: Date,
+    },
+    blockedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    blockReason: {
+      type: String,
+      trim: true,
+    },
+    unblockedAt: {
+      type: Date,
+    },
+    unblockedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
   },
   {
     timestamps: true,

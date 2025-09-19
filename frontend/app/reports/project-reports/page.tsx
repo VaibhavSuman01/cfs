@@ -6,7 +6,7 @@ import { FadeInSection } from '@/components/fade-in-section';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { getBasePrice } from '@/lib/pricing';
+import { PricingDisplay } from '@/components/ui/pricing-display';
 import Link from 'next/link';
 import {
   FileText,
@@ -20,7 +20,6 @@ import {
 } from 'lucide-react';
 
 export default function ProjectReportsPage() {
-  const basePrice = getBasePrice("project report") ?? "As per request";
 
   return (
     <div className="min-h-screen bg-white">
@@ -50,7 +49,9 @@ export default function ProjectReportsPage() {
 
                 <div className="grid sm:grid-cols-3 gap-4 pt-6">
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-                    <div className="text-2xl font-bold text-blue-600">{basePrice}</div>
+                    <div className="text-2xl font-bold text-blue-600">
+                      <PricingDisplay serviceName="project report" />
+                    </div>
                     <div className="text-sm text-gray-600">Starting Price</div>
                   </div>
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
@@ -64,13 +65,13 @@ export default function ProjectReportsPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                  <Link href={`/dashboard/reports-form?service=${encodeURIComponent('Project Reports')}`} passHref>
+                  <Link href={`/dashboard/reports?service=${encodeURIComponent('Project Reports')}`} passHref>
                     <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                       Book This Service
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
-                  <Link href={`/dashboard/reports-form?service=${encodeURIComponent('Project Reports')}`} passHref>
+                  <Link href={`/dashboard/reports?service=${encodeURIComponent('Project Reports')}`} passHref>
                     <Button
                       variant="outline"
                       className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
@@ -173,13 +174,13 @@ export default function ProjectReportsPage() {
                 Turn your business idea into a well-documented plan with our comprehensive project reports. Secure funding, make informed decisions, and set your business on the path to success.
               </p>
               <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <Link href={`/dashboard/reports-form?service=${encodeURIComponent('Project Reports')}`} passHref>
+                <Link href={`/dashboard/reports?service=${encodeURIComponent('Project Reports')}`} passHref>
                   <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                     Get Project Report
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
-                <Link href={`/dashboard/reports-form?service=${encodeURIComponent('Project Reports')}`} passHref>
+                <Link href={`/dashboard/reports?service=${encodeURIComponent('Project Reports')}`} passHref>
                   <Button
                     variant="outline"
                     className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent"

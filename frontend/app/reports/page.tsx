@@ -6,31 +6,31 @@ import { FadeInSection } from "@/components/fade-in-section"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
-import { getBasePrice } from "@/lib/pricing"
+import { PricingDisplay } from "@/components/ui/pricing-display"
 
 const reportServices = [
   { 
     title: 'Project Reports',
     slug: 'project-reports',
-    price: getBasePrice("project report") ?? "As per request",
+    priceKey: "project report",
     description: "Comprehensive project reports for business planning and funding"
   },
   { 
     title: 'CMA Reports',
     slug: 'cma-reports',
-    price: getBasePrice("dscr/cma report") ?? "As per request",
+    priceKey: "dscr/cma report",
     description: "Credit Monitoring Arrangement reports for loan applications"
   },
   { 
     title: 'DSCR Reports',
     slug: 'dscr-reports',
-    price: getBasePrice("dscr/cma report") ?? "As per request",
+    priceKey: "dscr/cma report",
     description: "Debt Service Coverage Ratio reports for financial analysis"
   },
   { 
     title: 'Bank Reconciliation',
     slug: 'bank-reconciliation',
-    price: "As per request",
+    priceKey: "bank reconciliation",
     description: "Bank statement reconciliation and financial auditing"
   },
 ];
@@ -53,7 +53,13 @@ export default function ReportsPage() {
                     <div className="flex flex-col">
                       <span className="text-lg font-semibold">{service.title}</span>
                       <span className="text-sm text-gray-600 mt-1">{service.description}</span>
-                      <span className="text-lg font-bold text-blue-600 mt-2">{service.price}</span>
+                      <span className="text-lg font-bold text-blue-600 mt-2">
+                        {service.priceKey ? (
+                          <PricingDisplay serviceName={service.priceKey} />
+                        ) : (
+                          service.priceKey
+                        )}
+                      </span>
                     </div>
                   </Button>
                 </Link>

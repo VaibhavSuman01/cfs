@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
+import DocumentDisplay from '@/components/ui/document-display';
 import api from '@/lib/api-client';
 import { API_PATHS } from '@/lib/api-client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
@@ -18,6 +19,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import AdminReportSection from '@/components/ui/admin-report-section';
 
 // Types
 interface Document {
@@ -72,6 +74,7 @@ interface CompanyForm {
     createdAt: string;
     documentId?: string;
     sentAt?: string;
+    uploadedBy?: string;
   }>;
   createdAt: string;
   updatedAt?: string;
@@ -95,6 +98,20 @@ export default function CompanyFormDetailPage() {
   const [reportType, setReportType] = useState('Company Registration');
   const [reportFile, setReportFile] = useState<File | null>(null);
   const [sendingReport, setSendingReport] = useState(false);
+  
+  const refreshFormData = async () => {
+    try {
+      const response = await api.get(API_PATHS.ADMIN.SERVICE_FORMS);
+      const companyForms = response.data.forms.filter((f: any) => f.formType === 'CompanyForm');
+      const foundForm = companyForms.find((f: any) => f._id === id);
+      
+      if (foundForm) {
+        setForm(foundForm);
+      }
+    } catch (error) {
+      console.error('Failed to refresh form data:', error);
+    }
+  };
 
   useEffect(() => {
     if (id) {
@@ -153,34 +170,47 @@ export default function CompanyFormDetailPage() {
     try {
       setSendingReport(true);
       
-      // For now, just update local state since backend endpoint is not implemented
-      // TODO: Implement backend endpoint for sending reports
-      const newReport = {
-        message: reportMessage,
-        type: reportType,
-        documents: reportFile ? [reportFile.name] : [],
-        createdAt: new Date().toISOString()
-      };
+      // Create FormData for file upload
+      const formData = new FormData();
+      formData.append('reportType', reportType);
+      formData.append('message', reportMessage);
+      if (reportFile) {
+        formData.append('reportFile', reportFile);
+      }
 
-      // Update local form state to show the new report
-      setForm(prev => prev ? {
-        ...prev,
-        reports: [...(prev.reports || []), newReport]
-      } : null);
+      // Call the backend API to send the report
+      await api.post(`/api/admin/forms/${form._id}/send-report`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      // Refresh the form data to get the updated reports
+      const response = await api.get(API_PATHS.ADMIN.SERVICE_FORMS);
+      const companyForms = response.data.forms.filter((f: any) => f.formType === 'CompanyForm');
+      const updatedForm = companyForms.find((f: any) => f._id === form._id);
+      
+      if (updatedForm) {
+        setForm(updatedForm);
+      }
 
       setShowSendReportDialog(false);
       setReportMessage('');
       setReportType('Company Registration');
       setReportFile(null);
       
-      toast({ title: 'Success', description: 'Report added successfully. (Backend integration pending)' });
+      toast({ 
+        title: 'Success', 
+        description: 'Report sent successfully to the user.' 
+      });
     } catch (error) {
-      console.error('Failed to add report:', error);
-      toast({ title: 'Error', description: 'Failed to add report.', variant: 'destructive' });
+      console.error('Failed to send report:', error);
+      toast({ title: 'Error', description: 'Failed to send report.', variant: 'destructive' });
     } finally {
       setSendingReport(false);
     }
   };
+
 
   const getStatusBadge = (status: CompanyForm['status']) => {
     const config = {
@@ -420,99 +450,26 @@ export default function CompanyFormDetailPage() {
         </Card>
 
         {/* User Documents */}
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-blue-600" />
-              User Documents
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {(() => {
-              const userDocuments = form.documents?.filter(doc => 
-                doc.documentType !== 'admin-report' && doc.uploadedBy !== 'admin'
-              ) || [];
-              
-              return userDocuments.length > 0 ? (
-                <div className="space-y-2">
-                  {userDocuments.map((doc, index) => (
-                    <div key={doc._id || index} className="flex items-center justify-between border rounded-md p-3">
-                      <div className="flex items-center gap-3">
-                        <FileText className="h-5 w-5 text-blue-600" />
-                        <div>
-                          <p className="font-medium">{doc.originalName || doc.fileName || doc.name || `Document ${index + 1}`}</p>
-                          {doc.contentType && (
-                            <p className="text-sm text-muted-foreground">{doc.contentType}</p>
-                          )}
-                        </div>
-                      </div>
-                      <Button variant="outline" size="sm">
-                        <Download className="mr-2 h-4 w-4" />
-                        Download
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-muted-foreground">No user documents uploaded yet.</p>
-              );
-            })()
-            }
-          </CardContent>
-        </Card>
+        <DocumentDisplay
+          documents={form.documents?.filter(doc => 
+            doc.documentType !== 'admin-report' && doc.uploadedBy !== 'admin'
+          ) || []}
+          formId={form._id}
+          formType="CompanyForm"
+          title="User Documents"
+          showBulkDownload={true}
+          className="mt-6"
+        />
+
 
         {/* Admin Reports */}
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Send className="h-5 w-5 text-green-600" />
-              Sent Reports
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {(() => {
-              const adminReports = form.documents?.filter(doc => 
-                doc.documentType === 'admin-report' || doc.uploadedBy === 'admin'
-              ) || [];
-              
-              return adminReports.length > 0 ? (
-                <div className="space-y-2">
-                  {adminReports.map((doc, index) => (
-                    <div key={doc._id || index} className="border rounded-md p-3 bg-green-50">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <Send className="h-5 w-5 text-green-600" />
-                          <div>
-                            <p className="font-medium">{doc.originalName || doc.fileName || doc.name || `Report ${index + 1}`}</p>
-                            {doc.contentType && (
-                              <p className="text-sm text-muted-foreground">{doc.contentType}</p>
-                            )}
-                            {doc.reportType && (
-                              <p className="text-sm font-medium text-green-700">Type: {doc.reportType}</p>
-                            )}
-                            {doc.createdAt && (
-                              <p className="text-sm text-gray-600">Sent: {new Date(doc.createdAt).toLocaleDateString()}</p>
-                            )}
-                            {doc.message && (
-                              <p className="text-sm text-gray-600 mt-1 p-2 bg-blue-50 rounded">Message: {doc.message}</p>
-                            )}
-                          </div>
-                        </div>
-                        <Button variant="outline" size="sm">
-                          <Download className="mr-2 h-4 w-4" />
-                          Download
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-muted-foreground">No reports sent yet.</p>
-              );
-            })()
-            }
-          </CardContent>
-        </Card>
+        <AdminReportSection
+          reports={form.reports || []}
+          formId={form._id}
+          formType="CompanyForm"
+          title="Admin Reports"
+          className="mt-6"
+        />
       </motion.div>
 
       {/* Status Update Confirmation Dialog */}
@@ -541,7 +498,7 @@ export default function CompanyFormDetailPage() {
           <DialogHeader>
             <DialogTitle>Send Report</DialogTitle>
             <DialogDescription>
-              Send a report or completion document to the applicant.
+              Send a report to the user. This will appear in their dashboard (email functionality temporarily disabled).
             </DialogDescription>
           </DialogHeader>
           
@@ -593,6 +550,7 @@ export default function CompanyFormDetailPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
     </div>
   );
 }

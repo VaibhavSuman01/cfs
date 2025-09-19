@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { EnhancedHeader } from "@/components/enhanced-header";
 import { EnhancedFooter } from "@/components/enhanced-footer";
 import { FadeInSection } from "@/components/fade-in-section"
-import { getBasePrice } from "@/lib/pricing"
+import { PricingDisplay } from "@/components/ui/pricing-display"
 import {
   FileText,
   Calendar,
@@ -61,7 +61,7 @@ export default function ROCReturnsPage() {
                     "Auditor's report filing",
                     "Compliance certificate",
                   ],
-                  price: getBasePrice("annual filing (aoc-4 & mgt-7)") ?? "₹4,999",
+                  priceKey: "annual filing (aoc-4 & mgt-7)",
                   timeline: "7-10 days",
                   urgent: false,
                 },
@@ -77,7 +77,7 @@ export default function ROCReturnsPage() {
                     "Compliance with Companies Act",
                     "Digital documentation",
                   ],
-                  price: getBasePrice("board meeting & resolutions") ?? "₹2,999",
+                  priceKey: "board meeting & resolutions",
                   timeline: "3-5 days",
                   urgent: false,
                 },
@@ -93,7 +93,7 @@ export default function ROCReturnsPage() {
                     "Board resolutions",
                     "ROC notifications",
                   ],
-                  price: getBasePrice("director appointment/resignation") ?? "₹3,999",
+                  priceKey: "director appointment/resignation",
                   timeline: "5-7 days",
                   urgent: false,
                 },
@@ -109,7 +109,7 @@ export default function ROCReturnsPage() {
                     "Updated share certificates",
                     "ROC compliance",
                   ],
-                  price: getBasePrice("share transfer & capital changes") ?? "₹5,999",
+                  priceKey: "share transfer & capital changes",
                   timeline: "10-15 days",
                   urgent: false,
                 },
@@ -124,7 +124,7 @@ export default function ROCReturnsPage() {
                     "Compliance restoration",
                     "Status monitoring",
                   ],
-                  price: getBasePrice("roc default removal") ?? "₹8,999",
+                  priceKey: "roc default removal",
                   timeline: "15-20 days",
                   urgent: true,
                 },
@@ -139,7 +139,7 @@ export default function ROCReturnsPage() {
                     "Publication in gazette",
                     "Final closure certificate",
                   ],
-                  price: getBasePrice("company strike off") ?? "₹12,999",
+                  priceKey: "company strike off",
                   timeline: "60-90 days",
                   urgent: false,
                 },
@@ -147,26 +147,30 @@ export default function ROCReturnsPage() {
                 <FadeInSection key={index} delay={index * 100}>
                   <Card
                     className={`border-2 hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group ${
-                      service.urgent ? "border-red-200 hover:border-red-300" : "border-gray-200 hover:border-blue-300"
+                      service.urgent ? "border-blue-200 hover:border-blue-300" : "border-gray-200 hover:border-blue-300"
                     }`}
                   >
                     {service.urgent && (
-                      <div className="bg-red-100 text-red-800 text-xs font-medium px-3 py-1 rounded-b-lg text-center">
+                      <div className="bg-blue-100 text-blue-800 text-xs font-medium px-3 py-1 rounded-b-lg text-center">
                         Urgent Service
                       </div>
                     )}
                     <CardHeader className="text-center">
                       <div
                         className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform ${
-                          service.urgent ? "bg-red-100" : "bg-blue-100"
+                          service.urgent ? "bg-blue-100" : "bg-blue-100"
                         }`}
                       >
-                        <service.icon className={`h-8 w-8 ${service.urgent ? "text-red-600" : "text-blue-600"}`} />
+                        <service.icon className={`h-8 w-8 ${service.urgent ? "text-blue-600" : "text-blue-600"}`} />
                       </div>
                       <CardTitle className="text-xl text-gray-900">{service.title}</CardTitle>
                       <div className="space-y-2">
-                        <div className={`text-2xl font-bold ${service.urgent ? "text-red-600" : "text-blue-600"}`}>
-                          {service.price}
+                        <div className={`text-2xl font-bold ${service.urgent ? "text-blue-600" : "text-blue-600"}`}>
+                          {service.priceKey ? (
+                            <PricingDisplay serviceName={service.priceKey} />
+                          ) : (
+                            service.priceKey
+                          )}
                         </div>
                         <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
                           <Clock className="h-4 w-4" />
@@ -179,7 +183,7 @@ export default function ROCReturnsPage() {
                       <div className="space-y-3">
                         {service.features.map((feature, idx) => (
                           <div key={idx} className="flex items-center space-x-2">
-                            <CheckCircle className="h-4 w-4 text-green-500" />
+                            <CheckCircle className="h-4 w-4 text-blue-500" />
                             <span className="text-sm text-gray-600">{feature}</span>
                           </div>
                         ))}
@@ -280,15 +284,15 @@ export default function ROCReturnsPage() {
                 },
               ].map((penalty, index) => (
                 <FadeInSection key={index} delay={index * 100}>
-                  <Card className="border-2 border-red-200 hover:border-red-300 hover:shadow-lg transition-all">
+                  <Card className="border-2 border-blue-200 hover:border-blue-300 hover:shadow-lg transition-all">
                     <CardHeader className="text-center">
-                      <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
-                        <AlertTriangle className="h-8 w-8 text-red-600" />
+                      <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                        <AlertTriangle className="h-8 w-8 text-blue-600" />
                       </div>
                       <CardTitle className="text-lg text-gray-900">{penalty.violation}</CardTitle>
                     </CardHeader>
                     <CardContent className="text-center space-y-4">
-                      <div className="text-xl font-bold text-red-600">{penalty.penalty}</div>
+                      <div className="text-xl font-bold text-blue-600">{penalty.penalty}</div>
                       <p className="text-sm text-gray-600">{penalty.consequence}</p>
                     </CardContent>
                   </Card>

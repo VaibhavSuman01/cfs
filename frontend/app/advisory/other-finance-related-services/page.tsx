@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { BarChart3, CheckCircle, Clock, Users, Target, TrendingUp, ArrowRight, Shield } from "lucide-react"
+import { PricingDisplay } from "@/components/ui/pricing-display"
 
 export default function OtherFinanceRelatedServicesPage() {
   return (
@@ -23,7 +24,7 @@ export default function OtherFinanceRelatedServicesPage() {
               Comprehensive financial services to support your business growth and financial success
             </p>
             <div className="flex justify-center space-x-4">
-              <Link href={`/dashboard/advisory-form?service=${encodeURIComponent("Other Finance Related Services")}`} passHref>
+              <Link href={`/dashboard/advisory?service=${encodeURIComponent("Other Finance Related Services")}`} passHref>
                 <Button className="bg-blue-600 hover:bg-blue-700 px-8 py-3">Get Started</Button>
               </Link>
             </div>
@@ -57,7 +58,7 @@ export default function OtherFinanceRelatedServicesPage() {
                       "Financial reporting and analysis"
                     ].map((item, index) => (
                       <div key={index} className="flex items-center space-x-3">
-                        <CheckCircle className="h-5 w-5 text-green-500" />
+                        <CheckCircle className="h-5 w-5 text-blue-500" />
                         <span className="text-gray-700">{item}</span>
                       </div>
                     ))}
@@ -72,14 +73,16 @@ export default function OtherFinanceRelatedServicesPage() {
                       <BarChart3 className="h-8 w-8 text-blue-600" />
                     </div>
                     <CardTitle className="text-2xl text-gray-900">Other Finance Related Services</CardTitle>
-                    <div className="text-3xl font-bold text-blue-600">As per request</div>
+                    <div className="text-3xl font-bold text-blue-600">
+                      <PricingDisplay serviceName="other finance related services" />
+                    </div>
                     <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
                       <Clock className="h-4 w-4" />
                       <span>2-3 weeks</span>
                     </div>
             </CardHeader>
                   <CardContent className="text-center">
-                    <Link href={`/dashboard/advisory-form?service=${encodeURIComponent("Other Finance Related Services")}`} passHref>
+                    <Link href={`/dashboard/advisory?service=${encodeURIComponent("Other Finance Related Services")}`} passHref>
                       <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3">
                         Book Service <ArrowRight className="ml-2 h-5 w-5" />
                       </Button>
@@ -189,7 +192,7 @@ export default function OtherFinanceRelatedServicesPage() {
                 Get expert financial services to drive your business success
               </p>
               <div className="flex justify-center space-x-4">
-                <Link href={`/dashboard/advisory-form?service=${encodeURIComponent("Other Finance Related Services")}`} passHref>
+                <Link href={`/dashboard/advisory?service=${encodeURIComponent("Other Finance Related Services")}`} passHref>
                   <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg">
                     Get Financial Support
                   </Button>

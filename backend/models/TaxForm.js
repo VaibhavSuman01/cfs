@@ -136,6 +136,42 @@ const taxFormSchema = new mongoose.Schema({
   hasPranNumber: { type: Boolean, default: false },
   pranNumber: { type: String },
   
+  // GST Filing specific fields
+  gstFilingMonth: { type: String }, // Month for GST filing
+  gstFilingYear: { type: String }, // Year for GST filing
+  gstNumber: { type: String },
+  salesData: { type: String }, // Tally data for sales
+  purchaseData: { type: String }, // Tally data for purchases
+  bankStatement: { type: String }, // Bank statement data
+  
+  // TDS Return specific fields
+  tdsFilingMonth: { type: String }, // Month for TDS filing
+  tdsFilingYear: { type: String }, // Year for TDS filing
+  tracesUserId: { type: String }, // TRACES User ID
+  tracesPassword: { type: String }, // TRACES Password (text format for admin visibility)
+  tanNumber: { type: String }, // TAN number
+  incomeTaxUserId: { type: String }, // Income Tax User ID
+  incomeTaxPassword: { type: String }, // Income Tax Password (text format for admin visibility)
+  panNumber: { type: String }, // PAN number for TDS
+  
+  // EPFO specific fields
+  epfoUserId: { type: String }, // EPFO User ID
+  epfoPassword: { type: String }, // EPFO Password (text format for admin visibility)
+  wagesReport: { type: String }, // Wages report data
+  salarySheet: { type: String }, // Salary sheet data
+  
+  // ESIC specific fields
+  esicUserId: { type: String }, // ESIC User ID
+  esicPassword: { type: String }, // ESIC Password (text format for admin visibility)
+  esicWagesReport: { type: String }, // ESIC wages report data
+  esicSalarySheet: { type: String }, // ESIC salary sheet data
+  
+  // PT-Tax specific fields
+  ptTaxUserId: { type: String }, // PT-Tax User ID
+  ptTaxPassword: { type: String }, // PT-Tax Password (text format for admin visibility)
+  ptTaxWagesReport: { type: String }, // PT-Tax wages report data
+  ptTaxSalarySheet: { type: String }, // PT-Tax salary sheet data
+  
   documents: [documentSchema],
   // Admin-specific data section
   adminData: { type: adminDataSchema, default: () => ({}) },

@@ -8,7 +8,8 @@ import { FloatingElements } from "@/components/floating-elements"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { getBasePrice } from "@/lib/pricing"
+import { PricingDisplay } from "@/components/ui/pricing-display"
+
 import {
   Receipt,
   CheckCircle,
@@ -23,7 +24,6 @@ import {
 import Link from "next/link"
 
 export default function GstRegistrationPage() {
-  const basePrice = getBasePrice("gst registration") ?? "₹1,999";
   
   return (
     <div className="min-h-screen bg-white">
@@ -56,7 +56,9 @@ export default function GstRegistrationPage() {
 
                 <div className="grid sm:grid-cols-3 gap-4 pt-6">
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-                    <div className="text-2xl font-bold text-blue-600">{basePrice}</div>
+                    <div className="text-2xl font-bold text-blue-600">
+                      <PricingDisplay serviceName="gst registration" />
+                    </div>
                     <div className="text-sm text-gray-600">Starting Price</div>
                   </div>
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
@@ -70,13 +72,13 @@ export default function GstRegistrationPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                  <Link href={`/tax-form?service=${encodeURIComponent("GST Filing")}`} passHref>
+                  <Link href={`/dashboard/new-form?service=${encodeURIComponent("GST Filing")}`} passHref>
                     <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                       Register for GST
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
-                  <Link href={`/tax-form?service=${encodeURIComponent("GST Filing")}`} passHref>
+                  <Link href={`/dashboard/new-form?service=${encodeURIComponent("GST Filing")}`} passHref>
                     <Button
                       variant="outline"
                       className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
@@ -91,9 +93,9 @@ export default function GstRegistrationPage() {
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-tr from-blue-100 to-transparent rounded-full -translate-x-10 -translate-y-10"></div>
                 <img
-                  src="/images/gst-hero.svg"
+                  src="/images/gst-hero.png"
                   alt="GST Filing Illustration"
-                  className="relative rounded-lg shadow-2xl w-full h-auto"
+                  className="relative rounded-lg w-full h-auto"
                 />
               </div>
             </FadeInSection>
@@ -120,11 +122,11 @@ export default function GstRegistrationPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <ul className="space-y-3 text-left">
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>GST Registration</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Basic Documentation</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Registration Certificate</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>GST Registration</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Basic Documentation</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Registration Certificate</span></li>
                   </ul>
-                  <Link href={`/tax-form?service=${encodeURIComponent("GST Filing - Basic")}`} passHref>
+                  <Link href={`/dashboard/new-form?service=${encodeURIComponent("GST Filing - Basic")}`} passHref>
                     <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Basic</Button>
                   </Link>
                 </CardContent>
@@ -138,12 +140,12 @@ export default function GstRegistrationPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <ul className="space-y-3 text-left">
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Everything in Basic</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Priority Processing</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Expert Consultation</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Post-Registration Support</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Everything in Basic</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Priority Processing</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Expert Consultation</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Post-Registration Support</span></li>
                   </ul>
-                  <Link href={`/tax-form?service=${encodeURIComponent("GST Filing - Standard")}`} passHref>
+                  <Link href={`/dashboard/new-form?service=${encodeURIComponent("GST Filing - Standard")}`} passHref>
                     <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Standard</Button>
                   </Link>
                 </CardContent>
@@ -157,12 +159,12 @@ export default function GstRegistrationPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <ul className="space-y-3 text-left">
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Everything in Standard</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>Compliance Training</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>1 Year Support</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" /><span>GST Filing Assistance</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Everything in Standard</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Compliance Training</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>1 Year Support</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>GST Filing Assistance</span></li>
                   </ul>
-                  <Link href={`/tax-form?service=${encodeURIComponent("GST Filing - Premium")}`} passHref>
+                  <Link href={`/dashboard/new-form?service=${encodeURIComponent("GST Filing - Premium")}`} passHref>
                     <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Premium</Button>
                   </Link>
                 </CardContent>
@@ -236,14 +238,14 @@ export default function GstRegistrationPage() {
             <div className="max-w-3xl mx-auto">
               <Card className="p-8">
                 <ul className="space-y-4 text-gray-700 text-lg grid md:grid-cols-2 gap-x-8 gap-y-4">
-                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-green-500 mr-4 flex-shrink-0" /><span>PAN Card of Applicant</span></li>
-                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-green-500 mr-4 flex-shrink-0" /><span>Aadhaar Card</span></li>
-                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-green-500 mr-4 flex-shrink-0" /><span>Proof of Business Registration</span></li>
-                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-green-500 mr-4 flex-shrink-0" /><span>Promoter's ID & Address Proof</span></li>
-                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-green-500 mr-4 flex-shrink-0" /><span>Business Address Proof</span></li>
-                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-green-500 mr-4 flex-shrink-0" /><span>Bank Account Statement</span></li>
-                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-green-500 mr-4 flex-shrink-0" /><span>Digital Signature</span></li>
-                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-green-500 mr-4 flex-shrink-0" /><span>Letter of Authorization</span></li>
+                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>PAN Card of Applicant</span></li>
+                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Aadhaar Card</span></li>
+                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Proof of Business Registration</span></li>
+                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Promoter's ID & Address Proof</span></li>
+                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Business Address Proof</span></li>
+                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Bank Account Statement</span></li>
+                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Digital Signature</span></li>
+                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Letter of Authorization</span></li>
                 </ul>
               </Card>
             </div>
@@ -304,13 +306,13 @@ export default function GstRegistrationPage() {
                 Don't let compliance slow you down. Our experts make GST registration a hassle-free experience, so you can focus on growing your business.
               </p>
               <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <Link href={`/tax-form?service=${encodeURIComponent("GST Filing")}`} passHref>
+                <Link href={`/dashboard/new-form?service=${encodeURIComponent("GST Filing")}`} passHref>
                   <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                     Apply for GSTIN Now
                     <FileCheck className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
-                <Link href={`/tax-form?service=${encodeURIComponent("GST Filing")}`} passHref>
+                <Link href={`/dashboard/new-form?service=${encodeURIComponent("GST Filing")}`} passHref>
                   <Button
                     variant="outline"
                     className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent"

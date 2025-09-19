@@ -8,7 +8,7 @@ import { FloatingElements } from "@/components/floating-elements"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { getBasePrice } from "@/lib/pricing"
+import { PricingDisplay } from "@/components/ui/pricing-display"
 import Link from "next/link"
 import {
   UserPlus,
@@ -20,8 +20,7 @@ import {
   Phone
 } from "lucide-react"
 
-export default function DirectorChangesPage() {
-  const basePrice = getBasePrice("director appointment/resignation") ?? "₹3,999";
+export default function DirectorChangesPage() {;
   
   return (
     <div className="min-h-screen bg-white">
@@ -54,7 +53,9 @@ export default function DirectorChangesPage() {
 
                 <div className="grid sm:grid-cols-3 gap-4 pt-6">
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-                    <div className="text-2xl font-bold text-blue-600">{basePrice}</div>
+                    <div className="text-2xl font-bold text-blue-600">
+                      <PricingDisplay serviceName="director appointment/resignation" />
+                    </div>
                     <div className="text-sm text-gray-600">Per Change</div>
                   </div>
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
@@ -68,13 +69,13 @@ export default function DirectorChangesPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 pt-6">
-                  <Link href={`/dashboard/roc-returns-form?service=${encodeURIComponent("Director Changes")}`} passHref>
+                  <Link href={`/dashboard/roc-returns?service=${encodeURIComponent("Director Changes")}`} passHref>
                     <Button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                       Manage Directors
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
-                  <Link href={`/dashboard/roc-returns-form?service=${encodeURIComponent("Director Changes")}`} passHref>
+                  <Link href={`/dashboard/roc-returns?service=${encodeURIComponent("Director Changes")}`} passHref>
                     <Button
                       variant="outline"
                       className="border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white px-8 py-3 rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
@@ -89,9 +90,9 @@ export default function DirectorChangesPage() {
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-tr from-blue-100 to-transparent rounded-full -translate-x-10 -translate-y-10"></div>
                 <img
-                  src="/images/director-changes-hero.svg"
+                  src="/images/director-changes-hero.png"
                   alt="Director Changes Illustration"
-                  className="relative rounded-lg shadow-2xl w-full h-auto"
+                  className="relative rounded-lg w-full h-auto"
                 />
               </div>
             </FadeInSection>
@@ -221,13 +222,13 @@ export default function DirectorChangesPage() {
                 Our experts ensure every director appointment, resignation, or removal is handled smoothly and in full compliance with ROC regulations. Let us manage the paperwork, so you can focus on your business.
               </p>
               <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <Link href={`/dashboard/roc-returns-form?service=${encodeURIComponent("Director Changes")}`} passHref>
+                <Link href={`/dashboard/roc-returns?service=${encodeURIComponent("Director Changes")}`} passHref>
                   <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                     Get Compliance Support
                     <Scale className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
-                <Link href={`/dashboard/roc-returns-form?service=${encodeURIComponent("Director Changes")}`} passHref>
+                <Link href={`/dashboard/roc-returns?service=${encodeURIComponent("Director Changes")}`} passHref>
                   <Button
                     variant="outline"
                     className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent"

@@ -6,9 +6,10 @@ import { useAuth } from '@/providers/auth-provider';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Users, FileText, MessageSquare, BarChart3 } from 'lucide-react';
+import { Users, FileText, MessageSquare, BarChart3, Mail } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import api from '@/lib/api-client';
+import api, { API_PATHS } from '@/lib/api-client';
+import { toast } from 'sonner';
 import MultiCharts from './AnalyticsChart';
 
 interface DashboardStats {
@@ -30,6 +31,7 @@ export default function AdminDashboard() {
   const { user } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoadingStats, setIsLoadingStats] = useState(true);
+  const [isSendingReport, setIsSendingReport] = useState(false);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -49,6 +51,19 @@ export default function AdminDashboard() {
     }
   }, [user]);
 
+  const sendWeeklyReport = async () => {
+    try {
+      setIsSendingReport(true);
+      const response = await api.post(API_PATHS.ADMIN.SEND_WEEKLY_REPORT);
+      toast.success(response.data.message);
+    } catch (error: any) {
+      console.error('Failed to send weekly report:', error);
+      toast.error(error.response?.data?.message || 'Failed to send weekly report');
+    } finally {
+      setIsSendingReport(false);
+    }
+  };
+
   const formsStatusData = stats
     ? [
         { name: 'Pending', count: stats.taxForms.pending },
@@ -66,8 +81,20 @@ export default function AdminDashboard() {
     <div className="bg-gradient-to-br from-blue-700 via-blue-800 to-white/5">
       {/* Header - blue glassmorphism */}
       <div className="rounded-2xl bg-blue-600/20 backdrop-blur border border-white/20 p-6 mb-8 shadow-[0_8px_30px_rgba(31,76,255,0.15)]">
-        <h1 className="text-3xl font-bold text-white">Dashboard</h1>
-        <p className="text-sm text-white/80 mt-1">Welcome{user?.name ? `, ${user.name}` : ''}. Here’s your system overview.</p>
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl font-bold text-white">Dashboard</h1>
+            <p className="text-sm text-white/80 mt-1">Welcome{user?.name ? `, ${user.name}` : ''}. Here's your system overview.</p>
+          </div>
+          <Button
+            onClick={sendWeeklyReport}
+            disabled={isSendingReport}
+            className="bg-white/20 hover:bg-white/30 text-white border border-white/30"
+          >
+            <Mail className="mr-2 h-4 w-4" />
+            {isSendingReport ? 'Sending...' : 'Send Weekly Report'}
+          </Button>
+        </div>
       </div>
 
       {/* KPI cards */}

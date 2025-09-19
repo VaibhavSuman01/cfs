@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/providers/auth-provider";
 import {
   Card,
@@ -26,13 +26,14 @@ import {
   FileText,
   MoreHorizontal,
   CheckCircle,
-  XCircle,
   Clock,
   Eye,
   Edit3,
+  XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import api, { API_PATHS } from "@/lib/api-client";
+import jsPDF from 'jspdf';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -68,7 +69,32 @@ interface FormSubmission {
   pan?: string;
   companyName?: string;
   businessName?: string;
-  // Add other common fields
+  // User information fields
+  userId?: string;
+  userName?: string;
+  userEmail?: string;
+  userMobile?: string;
+  userPan?: string;
+  userAadhaar?: string;
+  userAddress?: string;
+  // Form data and additional fields
+  formData?: Record<string, any>;
+  documents?: Array<{
+    title?: string;
+    type?: string;
+    size?: number;
+    uploadedAt?: string;
+  }>;
+  reports?: Array<{
+    type?: string;
+    message?: string;
+    sentAt?: string;
+  }>;
+  comments?: Array<{
+    comment?: string;
+    by?: string;
+    date?: string;
+  }>;
 }
 
 export default function FormsPage() {
@@ -85,51 +111,51 @@ export default function FormsPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [serviceFilter, setServiceFilter] = useState<string>("all");
 
-  useEffect(() => {
-    const fetchForms = async () => {
+  const fetchForms = useCallback(async () => {
+    try {
+      setIsLoadingForms(true);
+      console.log("Fetching forms from:", API_PATHS.ADMIN.SERVICE_FORMS);
+      console.log("User:", user);
+      console.log("User role:", user?.role);
+      
+      // Test if we can make a simple request first
       try {
-        setIsLoadingForms(true);
-        console.log("Fetching forms from:", API_PATHS.ADMIN.SERVICE_FORMS);
-        console.log("User:", user);
-        console.log("User role:", user?.role);
-        
-        // Test if we can make a simple request first
-        try {
-          const testResponse = await api.get('/api/health');
-          console.log("Health check response:", testResponse.data);
-        } catch (healthError) {
-          console.error("Health check failed:", healthError);
-        }
-        
-        // Use service-forms endpoint to get all form types
-        const response = await api.get(API_PATHS.ADMIN.SERVICE_FORMS);
-        console.log("Forms response:", response.data);
-        
-        if (response.data && response.data.forms) {
-          setForms(response.data.forms);
-          console.log("Forms loaded successfully:", response.data.forms.length);
-        } else {
-          console.error("Invalid response format:", response.data);
-          toast.error("Invalid response format from server");
-        }
-      } catch (error: any) {
-        console.error("Failed to fetch forms:", error);
-        console.error("Error details:", error.response?.data || error.message);
-        console.error("Error status:", error.response?.status);
-        console.error("Error headers:", error.response?.headers);
-        toast.error(`Failed to load forms: ${error.response?.data?.message || error.message}`);
-      } finally {
-        setIsLoadingForms(false);
+        const testResponse = await api.get('/api/health');
+        console.log("Health check response:", testResponse.data);
+      } catch (healthError) {
+        console.error("Health check failed:", healthError);
       }
-    };
+      
+      // Use service-forms endpoint to get all form types
+      const response = await api.get(API_PATHS.ADMIN.SERVICE_FORMS);
+      console.log("Forms response:", response.data);
+      
+      if (response.data && response.data.forms) {
+        setForms(response.data.forms);
+        console.log("Forms loaded successfully:", response.data.forms.length);
+      } else {
+        console.error("Invalid response format:", response.data);
+        toast.error("Invalid response format from server");
+      }
+    } catch (error: any) {
+      console.error("Failed to fetch forms:", error);
+      console.error("Error details:", error.response?.data || error.message);
+      console.error("Error status:", error.response?.status);
+      console.error("Error headers:", error.response?.headers);
+      toast.error(`Failed to load forms: ${error.response?.data?.message || error.message}`);
+    } finally {
+      setIsLoadingForms(false);
+    }
+  }, [user]);
 
+  useEffect(() => {
     if (user && user.role === "admin") {
       console.log("User is admin, fetching forms...");
       fetchForms();
     } else {
       console.log("User is not admin or not loaded yet:", user);
     }
-  }, [user]);
+  }, [user, fetchForms]);
 
   const openFormDetails = (form: FormSubmission) => {
     setSelectedForm(form);
@@ -137,6 +163,26 @@ export default function FormsPage() {
     setComment("");
     setIsDialogOpen(true);
   };
+
+  const handleEditForm = (form: FormSubmission) => {
+    // Navigate to the appropriate edit page based on form type
+    const formType = form.formType?.toLowerCase();
+    if (formType === 'companyform') {
+      window.open(`/admin/forms/company-formation/${form._id}`, '_blank');
+    } else if (formType === 'otherregistrationform') {
+      window.open(`/admin/forms/other-registration/${form._id}`, '_blank');
+    } else if (formType === 'rocform') {
+      window.open(`/admin/forms/roc-returns/${form._id}`, '_blank');
+    } else if (formType === 'trademarkisoform') {
+      window.open(`/admin/forms/trademark-iso/${form._id}`, '_blank');
+    } else if (formType === 'advisoryform') {
+      window.open(`/admin/forms/advisory/${form._id}`, '_blank');
+    } else {
+      // Default to general form view
+      window.open(`/admin/forms/${form._id}`, '_blank');
+    }
+  };
+
 
   const handleStatusUpdate = async () => {
     if (!selectedForm) return;
@@ -364,6 +410,12 @@ export default function FormsPage() {
                               >
                                 <Eye className="mr-2 h-4 w-4" />
                                 View Details
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleEditForm(form)}
+                              >
+                                <Edit3 className="mr-2 h-4 w-4" />
+                                Edit Form
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>

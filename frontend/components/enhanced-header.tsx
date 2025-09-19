@@ -5,6 +5,7 @@ import { useAuth } from "@/providers/auth-provider";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { getAvatarUrl } from "@/lib/avatar-utils";
 import {
   Building2,
   Menu,
@@ -113,6 +114,35 @@ export function EnhancedHeader() {
         { name: "Share Transfer", href: "/roc-returns/share-transfer" },
       ],
     },
+    // {
+    //   name: "Tools",
+    //   href: "/tools",
+    //   dropdown: [
+    //     { name: "Income Tax Calculator", href: "/tools/income-tax-calculator" },
+    //     { name: "EMI Calculator", href: "/tools/emi-calculator" },
+    //     { name: "Mutual Fund Calculator", href: "/tools/mutual-fund-calculator" },
+    //     { name: "HSN Code Finder", href: "/tools/hsn-code-finder" },
+    //     { name: "SIP Calculator", href: "/tools/sip-calculator" },
+    //     { name: "GST Calculator", href: "/tools/gst-calculator" },
+    //     { name: "PPF Calculator", href: "/tools/ppf-calculator" },
+    //     { name: "GST Number Search", href: "/tools/gst-number-search" },
+    //     { name: "IFSC Code Search", href: "/tools/ifsc-code-search" },
+    //     { name: "Generate Rent Receipts", href: "/tools/rent-receipts" },
+    //     { name: "Home Loan EMI Calculator", href: "/tools/home-loan-emi" },
+    //     { name: "NPS Calculator", href: "/tools/nps-calculator" },
+    //     { name: "HRA Calculator", href: "/tools/hra-calculator" },
+    //     { name: "RD Calculator", href: "/tools/rd-calculator" },
+    //     { name: "FD Calculator", href: "/tools/fd-calculator" },
+    //     { name: "Gold Rates Today", href: "/tools/gold-rates" },
+    //     { name: "Currency Converter", href: "/tools/currency-converter" },
+    //     { name: "Compound Interest Calculator", href: "/tools/compound-interest" },
+    //     { name: "Tax Saving Calculator", href: "/tools/tax-saving" },
+    //     { name: "Get IT Refund Status", href: "/tools/it-refund-status" },
+    //     { name: "Salary Calculator", href: "/tools/salary-calculator" },
+    //     { name: "EPF Calculator", href: "/tools/epf-calculator" },
+    //     { name: "GST Number Search by Name", href: "/tools/gst-search-by-name" },
+    //   ]
+    // },
     {
       name: "Advisory",
       href: "/advisory",
@@ -144,7 +174,7 @@ export function EnhancedHeader() {
 
   return (
     <header
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+      className={`fixed top-0 w-full z-[10000] transition-all duration-300 ${
         isScrolled
           ? "bg-white/95 backdrop-blur-lg shadow-lg border-b border-blue-100"
           : "bg-white shadow-sm"
@@ -152,7 +182,7 @@ export function EnhancedHeader() {
     >
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
-                    {/* Logo and Company Name in one line */}
+          {/* Logo and Company Name in one line */}
           <Link href="/" className="flex items-center space-x-3 group">
             <div className="relative">
               <Building2 className="h-10 w-10 text-blue-600 group-hover:scale-110 transition-transform duration-300" />
@@ -185,9 +215,9 @@ export function EnhancedHeader() {
 
                 {item.dropdown && activeDropdown === item.name && (
                   <div
-                    className={`absolute top-full mt-1 bg-white rounded-lg shadow-xl border border-gray-200 py-2 animate-fadeInUp z-50 ${item.name === 'Advisory' ? 'right-0' : 'left-0'} ${item.name === 'Other Registration' ? 'w-max max-w-4xl' : 'w-64'}`}>
+                    className={`absolute top-full mt-1 bg-white rounded-lg shadow-xl border border-gray-200 py-2 animate-fadeInUp z-[10000] ${item.name === 'Advisory' ? 'right-0' : 'left-0'} ${item.name === 'Other Registration' ? 'w-max max-w-4xl' : item.name === 'Tools' ? 'w-max max-w-5xl' : 'w-64'} max-h-[80vh] overflow-y-auto`}>
                     <div
-                      className={`${item.name === 'Other Registration' ? 'grid grid-cols-3 gap-x-8 gap-y-2 p-4' : ''}`}>
+                      className={``}>
                       {item.dropdown.map((subItem) => (
                         <Link
                           key={subItem.name}
@@ -202,15 +232,21 @@ export function EnhancedHeader() {
                 )}
               </div>
             ))}
-            <div onMouseEnter={() => setDropdownOpen(true)} onClick={() => setDropdownOpen(false)}>
+            
             {/* User section */}
             {isAuthenticated ? (
-              <div
+              <div 
                 className="relative group"
+                onMouseEnter={() => setDropdownOpen(true)} 
+                onMouseLeave={() => setDropdownOpen(false)}
               >
-                <button className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors">
+                <button className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors py-2 px-1">
                   {user?.avatarUrl ? (
-                    <img src={`http://localhost:5001${user.avatarUrl}`} alt="user avatar" className="w-8 h-8 rounded-full" />
+                    <img 
+                      src={getAvatarUrl(user.avatarUrl) || ""}  
+                      alt="user avatar" 
+                      className="w-8 h-8 rounded-full" 
+                    />
                   ) : (
                     <UserIcon className="w-5 h-5" />
                   )}
@@ -219,18 +255,17 @@ export function EnhancedHeader() {
                   </span>
                 </button>
                 {dropdownOpen && (
-                  <div className="absolute right-0 z-10 mt-2 w-48 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                  <div className="absolute right-0 z-[10000] w-48 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none -mt-1">
                     <Link
                       href="/dashboard"
-                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
                     >
                       <LayoutDashboard className="w-4 h-4 mr-2" />
                       Dashboard
                     </Link>
-                  
                     <button
                       onClick={handleSignOut}
-                      className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50"
+                      className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
                     >
                       <LogOut className="w-4 h-4 mr-2" />
                       Sign Out
@@ -246,7 +281,6 @@ export function EnhancedHeader() {
                 Sign up
               </Button>
             )}
-            </div>
           </nav>
 
           {/* Mobile Menu Button */}
@@ -265,7 +299,7 @@ export function EnhancedHeader() {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="lg:hidden mt-4 pb-4 border-t border-blue-100 animate-fadeInUp">
-            <nav className="flex flex-col space-y-2 pt-4">
+            <nav className="flex flex-col space-y-2 pt-4 max-h-[80vh] overflow-y-auto">
               {navigation.map((item) => (
                 <div key={item.name} className="border-b border-gray-100 last:border-0">
                   {item.dropdown ? (
@@ -294,10 +328,10 @@ export function EnhancedHeader() {
                       </button>
                       <div
                         className={`overflow-hidden transition-all duration-300 ${
-                          mobileDropdownOpen === item.name ? 'max-h-96' : 'max-h-0'
+                          mobileDropdownOpen === item.name ? 'max-h-[400px]' : 'max-h-0'
                         }`}
                       >
-                        <div className="ml-4 space-y-1 py-1">
+                        <div className="ml-4 space-y-1 py-1 max-h-[300px] overflow-y-auto">
                           {item.dropdown.map((subItem) => (
                             <Link
                               key={subItem.name}
@@ -330,7 +364,7 @@ export function EnhancedHeader() {
               ))}
               <Button
                 className="mx-4 mt-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md"
-                onClick={() => router.push("/get-started")}
+                onClick={() => router.push("/auth")}
               >
                 Get Started
               </Button>

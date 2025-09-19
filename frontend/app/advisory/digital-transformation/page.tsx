@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { Lightbulb, CheckCircle, Clock, Users, Target, BarChart3, ArrowRight, Zap } from "lucide-react"
+import { PricingDisplay } from "@/components/ui/pricing-display"
 
 export default function DigitalTransformationPage() {
   return (
@@ -23,7 +24,7 @@ export default function DigitalTransformationPage() {
               Modernize operations with technology and digital solutions for competitive advantage
             </p>
             <div className="flex justify-center space-x-4">
-              <Link href={`/dashboard/advisory-form?service=${encodeURIComponent("Digital Transformation")}`} passHref>
+              <Link href={`/dashboard/advisory?service=${encodeURIComponent("Digital Transformation")}`} passHref>
                 <Button className="bg-blue-600 hover:bg-blue-700 px-8 py-3">Get Started</Button>
               </Link>
             </div>
@@ -57,7 +58,7 @@ export default function DigitalTransformationPage() {
                       "Digital skills training"
                     ].map((item, index) => (
                       <div key={index} className="flex items-center space-x-3">
-                        <CheckCircle className="h-5 w-5 text-green-500" />
+                        <CheckCircle className="h-5 w-5 text-blue-500" />
                         <span className="text-gray-700">{item}</span>
                       </div>
                     ))}
@@ -72,14 +73,16 @@ export default function DigitalTransformationPage() {
                       <Lightbulb className="h-8 w-8 text-blue-600" />
                     </div>
                     <CardTitle className="text-2xl text-gray-900">Digital Transformation</CardTitle>
-                    <div className="text-3xl font-bold text-blue-600">As per request</div>
+                    <div className="text-3xl font-bold text-blue-600">
+                      <PricingDisplay serviceName="digital transformation" />
+                    </div>
                     <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
                       <Clock className="h-4 w-4" />
                       <span>3-4 weeks</span>
                     </div>
                   </CardHeader>
                   <CardContent className="text-center">
-                    <Link href={`/dashboard/advisory-form?service=${encodeURIComponent("Digital Transformation")}`} passHref>
+                    <Link href={`/dashboard/advisory?service=${encodeURIComponent("Digital Transformation")}`} passHref>
                       <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3">
                         Book Service <ArrowRight className="ml-2 h-5 w-5" />
                       </Button>
@@ -189,7 +192,7 @@ export default function DigitalTransformationPage() {
                 Transform your business with cutting-edge digital solutions
               </p>
               <div className="flex justify-center space-x-4">
-                <Link href={`/dashboard/advisory-form?service=${encodeURIComponent("Digital Transformation")}`} passHref>
+                <Link href={`/dashboard/advisory?service=${encodeURIComponent("Digital Transformation")}`} passHref>
                   <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg">
                     Start Transformation
                   </Button>
