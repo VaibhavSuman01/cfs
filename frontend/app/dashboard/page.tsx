@@ -42,6 +42,7 @@ import {
 import Link from "next/link";
 import api from "@/lib/api-client";
 import { EnhancedFooter } from "@/components/enhanced-footer";
+import { maskAadhaar } from "@/lib/utils";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -452,7 +453,7 @@ export default function UserDashboard() {
                     </p>
                     <p className="text-sm font-medium text-gray-800 flex items-center">
                       <Fingerprint className="mr-2 h-4 w-4 text-gray-400" />
-                      {user?.aadhaar || "Not provided"}
+                      {maskAadhaar(user?.aadhaar)}
                     </p>
                   </div>
                   <div className="space-y-1">
