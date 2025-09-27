@@ -21,7 +21,9 @@ export function EnhancedHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [mobileDropdownOpen, setMobileDropdownOpen] = useState<string | null>(null);
+  const [mobileDropdownOpen, setMobileDropdownOpen] = useState<string | null>(
+    null
+  );
   const router = useRouter();
   const { user, logout, isAuthenticated } = useAuth();
 
@@ -38,35 +40,83 @@ export function EnhancedHeader() {
       name: "Company Formation",
       href: "/company-formation",
       dropdown: [
-        { name: "Private Limited Company", href: "/company-formation/private-limited" },
-        { name: "Public Limited Company", href: "/company-formation/public-limited" },
-        { name: "One Person Company", href: "/company-formation/one-person-company" },
+        {
+          name: "Private Limited Company",
+          href: "/company-formation/private-limited",
+        },
+        {
+          name: "Public Limited Company",
+          href: "/company-formation/public-limited",
+        },
+        {
+          name: "One Person Company",
+          href: "/company-formation/one-person-company",
+        },
         { name: "Section 8 Company", href: "/company-formation/section-8" },
         { name: "Nidhi Company", href: "/company-formation/nidhi-company" },
-        { name: "Producer Company", href: "/company-formation/producer-company" },
+        {
+          name: "Producer Company",
+          href: "/company-formation/producer-company",
+        },
       ],
     },
     {
       name: "Other Registration",
       href: "/other-registration",
       dropdown: [
-        { name: "LLP Registration", href: "/other-registration/llp-registration" },
-        { name: "Partnership Firm", href: "/other-registration/partnership-firm" },
-        { name: "Sole Proprietorship", href: "/other-registration/sole-proprietorship" },
-        { name: "MSME/Udyam Registration", href: "/other-registration/msme-udyam-registration" },
+        {
+          name: "GST Registration",
+          href: "/other-registration/gst-registration",
+        },
+        {
+          name: "LLP Registration",
+          href: "/other-registration/llp-registration",
+        },
+        {
+          name: "Partnership Firm",
+          href: "/other-registration/partnership-firm",
+        },
+        {
+          name: "Sole Proprietorship",
+          href: "/other-registration/sole-proprietorship",
+        },
+        {
+          name: "MSME/Udyam Registration",
+          href: "/other-registration/msme-udyam-registration",
+        },
         { name: "EPFO Registration", href: "/other-registration/epfo" },
         { name: "ESIC Registration", href: "/other-registration/esic" },
         { name: "PT Tax Registration", href: "/other-registration/pt-tax" },
-        { name: "IEC Registration", href: "/other-registration/iec-registration" },
-        { name: "Gumusta / Shop Registration", href: "/other-registration/gumusta-shop-registration" },
-        { name: "Fassai (Food) Licence", href: "/other-registration/fassai-food-license" },
-        { name: "Industry Licence", href: "/other-registration/industry-license" },
-        { name: "NGO Registration", href: "/other-registration/ngo-registration" },
+        {
+          name: "IEC Registration",
+          href: "/other-registration/iec-registration",
+        },
+        {
+          name: "Gumusta / Shop Registration",
+          href: "/other-registration/gumusta-shop-registration",
+        },
+        {
+          name: "Fassai (Food) Licence",
+          href: "/other-registration/fassai-food-license",
+        },
+        {
+          name: "Industry Licence",
+          href: "/other-registration/industry-license",
+        },
+        {
+          name: "NGO Registration",
+          href: "/other-registration/ngo-registration",
+        },
         { name: "PAN Application", href: "/other-registration/pan-apply" },
         { name: "TAN Application", href: "/other-registration/tan-apply" },
-        { name: "Start-up India Registration", href: "/other-registration/startup-india-registration" },
-        { name: "Digital Signature", href: "/other-registration/digital-signature" },
-        { name: "GST Registration", href: "/other-registration/gst-registration" },
+        {
+          name: "Start-up India Registration",
+          href: "/other-registration/startup-india-registration",
+        },
+        {
+          name: "Digital Signature",
+          href: "/other-registration/digital-signature",
+        },
       ],
     },
     {
@@ -90,7 +140,10 @@ export function EnhancedHeader() {
         { name: "EPFO Filing", href: "/taxation/epfo-filing" },
         { name: "ESIC Filing", href: "/taxation/esic-filing" },
         { name: "PT-Tax Filing", href: "/taxation/pt-tax-filing" },
-        { name: "Corporate Tax Filing", href: "/taxation/corporate-tax-filing" },
+        {
+          name: "Corporate Tax Filing",
+          href: "/taxation/corporate-tax-filing",
+        },
         { name: "Payroll Tax", href: "/taxation/payroll-tax" },
       ],
     },
@@ -100,8 +153,14 @@ export function EnhancedHeader() {
       dropdown: [
         { name: "Trademark Registration", href: "/trademark-iso/trademark" },
         { name: "ISO 9001 Certification", href: "/trademark-iso/iso-9001" },
-        { name: "ISO 14001 Certification", href: "/trademark-iso/iso-14001-certification" },
-        { name: "Copyright Registration", href: "/trademark-iso/copyright-registration" },
+        {
+          name: "ISO 14001 Certification",
+          href: "/trademark-iso/iso-14001-certification",
+        },
+        {
+          name: "Copyright Registration",
+          href: "/trademark-iso/copyright-registration",
+        },
       ],
     },
     {
@@ -147,22 +206,43 @@ export function EnhancedHeader() {
       name: "Advisory",
       href: "/advisory",
       dropdown: [
-        { name: "Business Strategy Consulting", href: "/advisory/business-strategy-consulting" },
-        { name: "Legal & Compliance Advisory", href: "/advisory/legal-compliance-advisory" },
-        { name: "HR & Organizational Development", href: "/advisory/hr-organizational-development" },
-        { name: "Financial Planning & Analysis", href: "/advisory/financial-planning-analysis" },
-        { name: "Digital Transformation", href: "/advisory/digital-transformation" },
+        {
+          name: "Business Strategy Consulting",
+          href: "/advisory/business-strategy-consulting",
+        },
+        {
+          name: "Legal & Compliance Advisory",
+          href: "/advisory/legal-compliance-advisory",
+        },
+        {
+          name: "HR & Organizational Development",
+          href: "/advisory/hr-organizational-development",
+        },
+        {
+          name: "Financial Planning & Analysis",
+          href: "/advisory/financial-planning-analysis",
+        },
+        {
+          name: "Digital Transformation",
+          href: "/advisory/digital-transformation",
+        },
         { name: "Startup Mentoring", href: "/advisory/startup-mentoring" },
         { name: "Tax Plan Analysis", href: "/advisory/tax-plan-analysis" },
-        { name: "Assistance for Fund Raising", href: "/advisory/assistance-for-fund-raising" },
-        { name: "Other Finance Related Services", href: "/advisory/other-finance-related-services" },
-      ]
+        {
+          name: "Assistance for Fund Raising",
+          href: "/advisory/assistance-for-fund-raising",
+        },
+        {
+          name: "Other Finance Related Services",
+          href: "/advisory/other-finance-related-services",
+        },
+      ],
     },
   ];
 
   // Toggle mobile dropdown
   const toggleMobileDropdown = (itemName: string) => {
-    setMobileDropdownOpen(prev => prev === itemName ? null : itemName);
+    setMobileDropdownOpen((prev) => (prev === itemName ? null : itemName));
   };
 
   // Sign out handler
@@ -215,9 +295,17 @@ export function EnhancedHeader() {
 
                 {item.dropdown && activeDropdown === item.name && (
                   <div
-                    className={`absolute top-full mt-1 bg-white rounded-lg shadow-xl border border-gray-200 py-2 animate-fadeInUp z-[10000] ${item.name === 'Advisory' ? 'right-0' : 'left-0'} ${item.name === 'Other Registration' ? 'w-max max-w-4xl' : item.name === 'Tools' ? 'w-max max-w-5xl' : 'w-64'} max-h-[80vh] overflow-y-auto`}>
-                    <div
-                      className={``}>
+                    className={`absolute top-full mt-1 bg-white rounded-lg shadow-xl border border-gray-200 py-2 animate-fadeInUp z-[10000] ${
+                      item.name === "Advisory" ? "right-0" : "left-0"
+                    } ${
+                      item.name === "Other Registration"
+                        ? "w-max max-w-4xl"
+                        : item.name === "Tools"
+                        ? "w-max max-w-5xl"
+                        : "w-64"
+                    } max-h-[80vh] overflow-y-auto`}
+                  >
+                    <div className={``}>
                       {item.dropdown.map((subItem) => (
                         <Link
                           key={subItem.name}
@@ -232,27 +320,25 @@ export function EnhancedHeader() {
                 )}
               </div>
             ))}
-            
+
             {/* User section */}
             {isAuthenticated ? (
-              <div 
+              <div
                 className="relative group"
-                onMouseEnter={() => setDropdownOpen(true)} 
+                onMouseEnter={() => setDropdownOpen(true)}
                 onMouseLeave={() => setDropdownOpen(false)}
               >
                 <button className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors py-2 px-1">
                   {user?.avatarUrl ? (
-                    <img 
-                      src={getAvatarUrl(user.avatarUrl) || ""}  
-                      alt="user avatar" 
-                      className="w-8 h-8 rounded-full" 
+                    <img
+                      src={getAvatarUrl(user.avatarUrl) || ""}
+                      alt="user avatar"
+                      className="w-8 h-8 rounded-full"
                     />
                   ) : (
                     <UserIcon className="w-5 h-5" />
                   )}
-                  <span className="font-medium text-sm">
-                    {user?.name}
-                  </span>
+                  <span className="font-medium text-sm">{user?.name}</span>
                 </button>
                 {dropdownOpen && (
                   <div className="absolute right-0 z-[10000] w-48 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none -mt-1">
@@ -301,7 +387,10 @@ export function EnhancedHeader() {
           <div className="lg:hidden mt-4 pb-4 border-t border-blue-100 animate-fadeInUp">
             <nav className="flex flex-col space-y-2 pt-4 max-h-[80vh] overflow-y-auto">
               {navigation.map((item) => (
-                <div key={item.name} className="border-b border-gray-100 last:border-0">
+                <div
+                  key={item.name}
+                  className="border-b border-gray-100 last:border-0"
+                >
                   {item.dropdown ? (
                     <>
                       <button
@@ -311,7 +400,9 @@ export function EnhancedHeader() {
                         <span>{item.name}</span>
                         <svg
                           className={`w-4 h-4 transition-transform duration-200 ${
-                            mobileDropdownOpen === item.name ? 'transform rotate-180' : ''
+                            mobileDropdownOpen === item.name
+                              ? "transform rotate-180"
+                              : ""
                           }`}
                           fill="none"
                           stroke="currentColor"
@@ -328,7 +419,9 @@ export function EnhancedHeader() {
                       </button>
                       <div
                         className={`overflow-hidden transition-all duration-300 ${
-                          mobileDropdownOpen === item.name ? 'max-h-[400px]' : 'max-h-0'
+                          mobileDropdownOpen === item.name
+                            ? "max-h-[400px]"
+                            : "max-h-0"
                         }`}
                       >
                         <div className="ml-4 space-y-1 py-1 max-h-[300px] overflow-y-auto">

@@ -1,40 +1,50 @@
-"use client"
+"use client";
 
+import { EnhancedHeader } from "@/components/enhanced-header";
 import { EnhancedFooter } from "@/components/enhanced-footer";
-import { FadeInSection } from "@/components/fade-in-section"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import Link from "next/link"
-import { getBasePrice } from "@/lib/pricing"
-import { 
-  TrendingUp, 
-  Users, 
-  Target, 
-  BarChart3, 
-  Lightbulb, 
-  Shield, 
-  Briefcase, 
+import { FadeInSection } from "@/components/fade-in-section";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
+import { getBasePrice } from "@/lib/pricing";
+import {
+  TrendingUp,
+  Users,
+  Target,
+  BarChart3,
+  Lightbulb,
+  Shield,
+  Briefcase,
   Calculator,
   ArrowRight,
   CheckCircle,
   Star,
   Zap,
-  Clock
-} from "lucide-react"
+  Clock,
+} from "lucide-react";
 
 export default function AdvisoryPage() {
   return (
     <div className="min-h-screen bg-white">
+      <EnhancedHeader />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-100 py-20">
         <div className="container mx-auto px-4">
           <FadeInSection className="text-center space-y-8">
-            <h1 className="text-5xl font-bold text-gray-900">Business Advisory Services</h1>
+            <h1 className="text-5xl font-bold text-gray-900">
+              Business Advisory Services
+            </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Strategic business consulting and advisory services to help your business grow, optimize operations, and
-              achieve long-term success.
+              Strategic business consulting and advisory services to help your
+              business grow, optimize operations, and achieve long-term success.
             </p>
           </FadeInSection>
         </div>
@@ -45,8 +55,12 @@ export default function AdvisoryPage() {
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center space-y-4 mb-16">
-              <h2 className="text-4xl font-bold text-gray-900">Our Advisory Services</h2>
-              <p className="text-xl text-gray-600">Expert guidance for every aspect of your business</p>
+              <h2 className="text-4xl font-bold text-gray-900">
+                Our Advisory Services
+              </h2>
+              <p className="text-xl text-gray-600">
+                Expert guidance for every aspect of your business
+              </p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -55,7 +69,8 @@ export default function AdvisoryPage() {
                   icon: TrendingUp,
                   title: "Business Strategy Consulting",
                   slug: "business-strategy-consulting",
-                  description: "Develop comprehensive business strategies for growth and market expansion",
+                  description:
+                    "Develop comprehensive business strategies for growth and market expansion",
                   features: [
                     "Market analysis and research",
                     "Competitive positioning",
@@ -70,7 +85,8 @@ export default function AdvisoryPage() {
                   icon: Shield,
                   title: "Legal & Compliance Advisory",
                   slug: "legal-compliance-advisory",
-                  description: "Navigate complex legal requirements and ensure regulatory compliance",
+                  description:
+                    "Navigate complex legal requirements and ensure regulatory compliance",
                   features: [
                     "Regulatory compliance audit",
                     "Legal risk assessment",
@@ -85,7 +101,8 @@ export default function AdvisoryPage() {
                   icon: Users,
                   title: "HR & Organizational Development",
                   slug: "hr-organizational-development",
-                  description: "Build strong teams and optimize organizational structure",
+                  description:
+                    "Build strong teams and optimize organizational structure",
                   features: [
                     "Organizational restructuring",
                     "HR policy development",
@@ -100,7 +117,8 @@ export default function AdvisoryPage() {
                   icon: Target,
                   title: "Financial Planning & Analysis",
                   slug: "financial-planning-analysis",
-                  description: "Optimize financial performance and plan for sustainable growth",
+                  description:
+                    "Optimize financial performance and plan for sustainable growth",
                   features: [
                     "Financial health assessment",
                     "Cash flow optimization",
@@ -115,7 +133,8 @@ export default function AdvisoryPage() {
                   icon: Lightbulb,
                   title: "Digital Transformation",
                   slug: "digital-transformation",
-                  description: "Modernize operations with technology and digital solutions",
+                  description:
+                    "Modernize operations with technology and digital solutions",
                   features: [
                     "Technology assessment",
                     "Digital strategy roadmap",
@@ -130,7 +149,8 @@ export default function AdvisoryPage() {
                   icon: Briefcase,
                   title: "Startup Mentoring",
                   slug: "startup-mentoring",
-                  description: "Comprehensive guidance for startups from ideation to scaling",
+                  description:
+                    "Comprehensive guidance for startups from ideation to scaling",
                   features: [
                     "Business plan development",
                     "Funding strategy and support",
@@ -148,22 +168,33 @@ export default function AdvisoryPage() {
                       <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-blue-200 transition-colors">
                         <service.icon className="h-8 w-8 text-blue-600 group-hover:scale-110 transition-transform" />
                       </div>
-                      <CardTitle className="text-xl text-gray-900">{service.title}</CardTitle>
+                      <CardTitle className="text-xl text-gray-900">
+                        {service.title}
+                      </CardTitle>
                       <div className="space-y-2">
-                        <div className="text-2xl font-bold text-blue-600">{service.price}</div>
+                        <div className="text-2xl font-bold text-blue-600">
+                          {service.price}
+                        </div>
                         <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
                           <Clock className="h-4 w-4" />
                           <span>{service.timeline}</span>
                         </div>
                       </div>
-                      <CardDescription className="text-gray-600">{service.description}</CardDescription>
+                      <CardDescription className="text-gray-600">
+                        {service.description}
+                      </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="space-y-3">
                         {service.features.map((feature, idx) => (
-                          <div key={idx} className="flex items-center space-x-2">
+                          <div
+                            key={idx}
+                            className="flex items-center space-x-2"
+                          >
                             <CheckCircle className="h-4 w-4 text-blue-500" />
-                            <span className="text-sm text-gray-600">{feature}</span>
+                            <span className="text-sm text-gray-600">
+                              {feature}
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -186,8 +217,12 @@ export default function AdvisoryPage() {
         <section className="py-20 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="text-center space-y-4 mb-16">
-              <h2 className="text-4xl font-bold text-gray-900">Why Choose Our Advisory Services?</h2>
-              <p className="text-xl text-gray-600">Experience the difference with our expert guidance</p>
+              <h2 className="text-4xl font-bold text-gray-900">
+                Why Choose Our Advisory Services?
+              </h2>
+              <p className="text-xl text-gray-600">
+                Experience the difference with our expert guidance
+              </p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -195,12 +230,14 @@ export default function AdvisoryPage() {
                 {
                   icon: Star,
                   title: "Expert Team",
-                  description: "Experienced consultants with industry expertise",
+                  description:
+                    "Experienced consultants with industry expertise",
                 },
                 {
                   icon: Target,
                   title: "Customized Solutions",
-                  description: "Tailored strategies for your specific business needs",
+                  description:
+                    "Tailored strategies for your specific business needs",
                 },
                 {
                   icon: Clock,
@@ -219,8 +256,12 @@ export default function AdvisoryPage() {
                       <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
                         <benefit.icon className="h-8 w-8 text-blue-600" />
                       </div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{benefit.title}</h3>
-                      <p className="text-gray-600 text-sm">{benefit.description}</p>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                        {benefit.title}
+                      </h3>
+                      <p className="text-gray-600 text-sm">
+                        {benefit.description}
+                      </p>
                     </CardContent>
                   </Card>
                 </FadeInSection>
@@ -235,8 +276,12 @@ export default function AdvisoryPage() {
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center space-y-4 mb-16">
-              <h2 className="text-4xl font-bold text-gray-900">Our Advisory Process</h2>
-              <p className="text-xl text-gray-600">Structured approach to deliver maximum value</p>
+              <h2 className="text-4xl font-bold text-gray-900">
+                Our Advisory Process
+              </h2>
+              <p className="text-xl text-gray-600">
+                Structured approach to deliver maximum value
+              </p>
             </div>
 
             <div className="grid md:grid-cols-4 gap-8">
@@ -244,13 +289,15 @@ export default function AdvisoryPage() {
                 {
                   step: "01",
                   title: "Discovery",
-                  description: "Understand your business, challenges, and objectives",
+                  description:
+                    "Understand your business, challenges, and objectives",
                   icon: Target,
                 },
                 {
                   step: "02",
                   title: "Analysis",
-                  description: "Conduct thorough analysis and identify opportunities",
+                  description:
+                    "Conduct thorough analysis and identify opportunities",
                   icon: TrendingUp,
                 },
                 {
@@ -274,7 +321,9 @@ export default function AdvisoryPage() {
                     <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                       <step.icon className="h-6 w-6 text-blue-600" />
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-900">{step.title}</h3>
+                    <h3 className="text-xl font-semibold text-gray-900">
+                      {step.title}
+                    </h3>
                     <p className="text-gray-600">{step.description}</p>
                   </div>
                 </FadeInSection>
@@ -289,8 +338,12 @@ export default function AdvisoryPage() {
         <section className="py-20 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="text-center space-y-4 mb-16">
-              <h2 className="text-4xl font-bold text-gray-900">Industries We Serve</h2>
-              <p className="text-xl text-gray-600">Specialized expertise across various sectors</p>
+              <h2 className="text-4xl font-bold text-gray-900">
+                Industries We Serve
+              </h2>
+              <p className="text-xl text-gray-600">
+                Specialized expertise across various sectors
+              </p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -308,7 +361,9 @@ export default function AdvisoryPage() {
                 <FadeInSection key={index} delay={index * 100}>
                   <Card className="text-center hover:shadow-lg transition-shadow">
                     <CardContent className="p-6">
-                      <h3 className="text-lg font-semibold text-gray-900">{industry}</h3>
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        {industry}
+                      </h3>
                     </CardContent>
                   </Card>
                 </FadeInSection>
@@ -323,17 +378,24 @@ export default function AdvisoryPage() {
         <section className="py-20 bg-blue-600 text-white">
           <div className="container mx-auto px-4 text-center">
             <div className="space-y-8">
-              <h2 className="text-4xl font-bold">Ready to Transform Your Business?</h2>
+              <h2 className="text-4xl font-bold">
+                Ready to Transform Your Business?
+              </h2>
               <p className="text-xl text-blue-100 max-w-2xl mx-auto">
-                Get expert advisory services tailored to your business needs and accelerate your growth
+                Get expert advisory services tailored to your business needs and
+                accelerate your growth
               </p>
               <div className="flex justify-center space-x-4">
-                <Link href={`/dashboard/advisory?service=${encodeURIComponent("Business Advisory Services")}`} passHref>
+                <Link
+                  href={`/dashboard/advisory?service=${encodeURIComponent(
+                    "Business Advisory Services"
+                  )}`}
+                  passHref
+                >
                   <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg">
                     Schedule Consultation
                   </Button>
                 </Link>
-                
               </div>
             </div>
           </div>
@@ -341,5 +403,5 @@ export default function AdvisoryPage() {
       </FadeInSection>
       <EnhancedFooter />
     </div>
-  )
+  );
 }
