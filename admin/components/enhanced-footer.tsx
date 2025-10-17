@@ -9,27 +9,62 @@ export function EnhancedFooter() {
     { name: "Public Limited Company", href: "/company-formation/public-limited" },
     { name: "One Person Company", href: "/company-formation/one-person-company" },
     { name: "Section 8 Company", href: "/company-formation/section-8" },
+    { name: "Nidhi Company", href: "/company-formation/nidhi-company" },
+    { name: "Producer Company", href: "/company-formation/producer-company" },
   ]
 
   const otherServices = [
     { name: "LLP Registration", href: "/other-registration/llp" },
     { name: "Partnership Firm", href: "/other-registration/partnership" },
+    { name: "GST Registration", href: "/other-registration/gst-registration" },
     { name: "Sole Proprietorship", href: "/other-registration/sole-proprietorship" },
-    { name: "Producer Company", href: "/company-formation/producer-company" },
+    { name: "MSME/Udyam Registration", href: "/other-registration/msme" },
+    { name: "IEC Registration", href: "/other-registration/iec" },
+    { name: "FSSAI Food License", href: "/other-registration/fssai" },
+    { name: "Gumusta Shop Registration", href: "/other-registration/gumusta" },
+    { name: "Industry License", href: "/other-registration/industry-license" },
+    { name: "NGO Registration", href: "/other-registration/ngo" },
+    { name: "PAN Apply", href: "/other-registration/pan" },
+    { name: "TAN Apply", href: "/other-registration/tan" },
+    { name: "Startup India Registration", href: "/other-registration/startup-india" },
+    { name: "Digital Signature", href: "/other-registration/digital-signature" },
+    { name: "PT Tax", href: "/other-registration/pt-tax" },
   ]
 
   const taxationServices = [
-    { name: "GST Filing", href: "/taxation/gst-registration" },
+    { name: "GST Filing", href: "/taxation/gst-filing" },
     { name: "Income Tax Filing", href: "/taxation/income-tax" },
     { name: "TDS Returns", href: "/taxation/tds-returns" },
     { name: "Tax Planning", href: "/taxation/tax-planning" },
+    { name: "EPFO Filing", href: "/taxation/epfo" },
+    { name: "ESIC Filing", href: "/taxation/esic" },
+    { name: "Corporate Tax Filing", href: "/taxation/corporate-tax" },
+  ]
+
+  const reportsServices = [
+    { name: "Project Reports", href: "/reports/project-reports" },
+    { name: "CMA Reports", href: "/reports/cma-reports" },
+    { name: "DSCR Reports", href: "/reports/dscr-reports" },
+    { name: "Bank Reconciliation", href: "/reports/bank-reconciliation" },
   ]
 
   const legalServices = [
     { name: "Trademark Registration", href: "/trademark-iso/trademark" },
-    { name: "ISO Certification", href: "/trademark-iso/iso-9001" },
+    { name: "ISO 9001 Certification", href: "/trademark-iso/iso-9001" },
+    { name: "ISO 14001 Certification", href: "/trademark-iso/iso-14001" },
     { name: "Copyright Registration", href: "/trademark-iso/copyright" },
     { name: "Legal Advisory", href: "/advisory" },
+  ]
+
+  const advisoryServices = [
+    { name: "Business Strategy Consulting", href: "/advisory/business-strategy" },
+    { name: "Financial Planning & Analysis", href: "/advisory/financial-planning" },
+    { name: "Digital Transformation", href: "/advisory/digital-transformation" },
+    { name: "HR & Organizational Development", href: "/advisory/hr-development" },
+    { name: "Legal Compliance Advisory", href: "/advisory/legal-compliance" },
+    { name: "Startup Mentoring", href: "/advisory/startup-mentoring" },
+    { name: "Tax Planning & Analysis", href: "/advisory/tax-planning" },
+    { name: "Fund Raising Assistance", href: "/advisory/fund-raising" },
   ]
 
   const quickLinks = [
@@ -44,9 +79,9 @@ export function EnhancedFooter() {
   return (
     <footer className="bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 text-white">
       <div className="container mx-auto px-4 py-16">
-        <div className="grid md:grid-cols-2 lg:grid-cols-6 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-8">
           {/* Company Info */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="xl:col-span-2 space-y-6">
             <div className="flex items-center space-x-3">
               <Building2 className="h-10 w-10 text-blue-400" />
               <div>
@@ -139,6 +174,54 @@ export function EnhancedFooter() {
             <h3 className="text-lg font-semibold text-blue-300">Taxation</h3>
             <div className="space-y-2">
               {taxationServices.map((service) => (
+                <Link
+                  key={service.name}
+                  href={service.href}
+                  className="block text-gray-400 hover:text-blue-300 transition-colors text-sm"
+                >
+                  {service.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Reports Services */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-blue-300">Reports</h3>
+            <div className="space-y-2">
+              {reportsServices.map((service) => (
+                <Link
+                  key={service.name}
+                  href={service.href}
+                  className="block text-gray-400 hover:text-blue-300 transition-colors text-sm"
+                >
+                  {service.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Legal Services */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-blue-300">Legal & IP</h3>
+            <div className="space-y-2">
+              {legalServices.map((service) => (
+                <Link
+                  key={service.name}
+                  href={service.href}
+                  className="block text-gray-400 hover:text-blue-300 transition-colors text-sm"
+                >
+                  {service.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Advisory Services */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-blue-300">Advisory</h3>
+            <div className="space-y-2">
+              {advisoryServices.map((service) => (
                 <Link
                   key={service.name}
                   href={service.href}

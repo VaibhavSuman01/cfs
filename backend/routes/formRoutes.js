@@ -62,7 +62,16 @@ router.post(
     console.log("Processing tax form upload request");
     next();
   },
-  upload.array("documents", 10), // Allow up to 10 documents with a single field
+  upload.fields([
+    { name: 'documents', maxCount: 10 },
+    { name: 'aadhaarFile', maxCount: 1 },
+    { name: 'salesDataFile', maxCount: 1 },
+    { name: 'purchaseDataFile', maxCount: 1 },
+    { name: 'bankStatementFile', maxCount: 1 },
+    { name: 'tdsDataFile', maxCount: 1 },
+    { name: 'wagesReportFile', maxCount: 1 },
+    { name: 'salarySheetFile', maxCount: 1 }
+  ]),
   handleMulterError,
   async (req, res) => {
     try {
@@ -169,39 +178,70 @@ router.post(
         }
       });
 
-      // Process each file with its document type
-      if (req.files && req.files.length > 0) {
-        console.log(`Processing ${req.files.length} uploaded files`);
+      // Process uploaded files from different field names
+      if (req.files) {
+        try {
+          // Process specific document types
+          const fileFields = [
+            { field: 'aadhaarFile', type: 'Aadhaar Card' },
+            { field: 'salesDataFile', type: 'Sales Data' },
+            { field: 'purchaseDataFile', type: 'Purchase Data' },
+            { field: 'bankStatementFile', type: 'Bank Statement' },
+            { field: 'tdsDataFile', type: 'TDS Data' },
+            { field: 'wagesReportFile', type: 'Wages Report' },
+            { field: 'salarySheetFile', type: 'Salary Sheet' }
+          ];
 
-        req.files.forEach((file, index) => {
-          const fileId = req.body[`fileId_${index}`] || `file_${index}`;
-          const docType = documentTypes[fileId] || "other";
-
-          console.log(`Processing file: ${docType}`, {
-            originalname: file.originalname,
+          // Process specific document files
+          fileFields.forEach(({ field, type }) => {
+            if (req.files[field] && req.files[field].length > 0) {
+              const file = req.files[field][0];
+              console.log(`Processing ${field}:`, {
+                originalName: file.originalname,
             mimetype: file.mimetype,
-            size: file.size,
-            extension: file.originalname.split(".").pop().toLowerCase(),
+                size: file.size
           });
 
-          // Generate a unique filename
-          const fileName = generateUniqueFilename(file.originalname);
-
-          // Add to documents array with file data
           formData.documents.push({
-            documentType: docType,
-            fileName: fileName,
+                documentType: type,
+                fileName: file.filename || `file_${Date.now()}_${field}`,
             originalName: file.originalname,
             fileType: file.mimetype,
             fileSize: file.size,
             fileData: getFileData(file),
             contentType: file.mimetype,
-            uploadedBy: 'user', // submissions here are always by the user
+                uploadedBy: 'user',
+              });
+            }
           });
 
-          // Remove the fileId field
-          delete formData[`fileId_${index}`];
-        });
+          // Process general documents
+          if (req.files['documents'] && req.files['documents'].length > 0) {
+            req.files['documents'].forEach((file, index) => {
+              console.log(`Processing general document ${index}:`, {
+                originalName: file.originalname,
+                mimetype: file.mimetype,
+                size: file.size
+              });
+              
+              formData.documents.push({
+                documentType: req.body[`documentType_${index}`] || "Additional Document",
+                fileName: file.filename || `file_${Date.now()}_${index}`,
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+                uploadedBy: 'user',
+              });
+            });
+          }
+
+          console.log("Documents processed:", formData.documents.length);
+        } catch (fileError) {
+          console.error("Error processing files:", fileError);
+          return res.status(400).json({ message: "Error processing uploaded files" });
+        }
       } else {
         console.log("No files were uploaded");
       }
@@ -366,7 +406,10 @@ router.post("/roc-returns/document/:formId", protect, upload.single("document"),
 // @route   PUT /api/forms/roc-returns/:id
 // @desc    Update a ROC returns submission
 // @access  Private
-router.put("/roc-returns/:id", protect, upload.array("documents", 10), handleMulterError, async (req, res) => {
+router.put("/roc-returns/:id", protect, upload.fields([
+    { name: 'documents', maxCount: 10 },
+    { name: 'aadhaarFile', maxCount: 1 }
+  ]), handleMulterError, async (req, res) => {
   try {
     const { id } = req.params;
     if (!isValidObjectId(id)) return res.status(400).json({ message: "Invalid form ID" });
@@ -391,10 +434,37 @@ router.put("/roc-returns/:id", protect, upload.array("documents", 10), handleMul
       docsToKeep = form.documents.filter((d) => keepIds.includes(d._id.toString()));
     }
     let newDocs = [];
-    if (req.files?.length) {
-      newDocs = req.files.map((file, index) => ({
+    if (req.files) {
+      try {
+        // Process specific document types
+        const fileFields = [
+          { field: 'aadhaarFile', type: 'Aadhaar Card' }
+        ];
+
+        // Process specific document files
+        fileFields.forEach(({ field, type }) => {
+          if (req.files[field] && req.files[field].length > 0) {
+            const file = req.files[field][0];
+            newDocs.push({
+              documentType: type,
+              fileName: file.filename || `file_${Date.now()}_${field}`,
+              originalName: file.originalname,
+              fileType: file.mimetype,
+              fileSize: file.size,
+              fileData: getFileData(file),
+              contentType: file.mimetype,
+              isEdited: true,
+              uploadedBy: req.user.role === "admin" ? "admin" : "user",
+            });
+          }
+        });
+
+        // Process general documents
+        if (req.files['documents'] && req.files['documents'].length > 0) {
+          req.files['documents'].forEach((file, index) => {
+            newDocs.push({
         documentType: req.body[`documentType_${index}`] || "General Document",
-        fileName: generateUniqueFilename(file.originalname),
+              fileName: file.filename || `file_${Date.now()}_${index}`,
         originalName: file.originalname,
         fileType: file.mimetype,
         fileSize: file.size,
@@ -402,7 +472,13 @@ router.put("/roc-returns/:id", protect, upload.array("documents", 10), handleMul
         contentType: file.mimetype,
         isEdited: true,
         uploadedBy: req.user.role === "admin" ? "admin" : "user",
-      }));
+            });
+          });
+        }
+      } catch (fileError) {
+        console.error("Error processing files:", fileError);
+        return res.status(400).json({ message: "Error processing uploaded files" });
+      }
     }
     const updated = await ROCForm.findByIdAndUpdate(
       id,
@@ -575,7 +651,18 @@ router.post("/other-registration/document/:formId", protect, upload.single("docu
 // @route   PUT /api/forms/other-registration/:id
 // @desc    Update an other registration submission
 // @access  Private
-router.put("/other-registration/:id", protect, upload.array("documents", 10), handleMulterError, async (req, res) => {
+router.put("/other-registration/:id", protect, upload.fields([
+    { name: 'documents', maxCount: 10 },
+    { name: 'aadhaarFile', maxCount: 1 },
+    { name: 'panFile', maxCount: 1 },
+    { name: 'addressProofFile', maxCount: 1 },
+    { name: 'businessAddressProofFile', maxCount: 1 },
+    { name: 'identityProofFile', maxCount: 1 },
+    { name: 'partnershipDeedFile', maxCount: 1 },
+    { name: 'mouFile', maxCount: 1 },
+    { name: 'bankAccountFile', maxCount: 1 },
+    { name: 'businessRegistrationFile', maxCount: 1 }
+  ]), handleMulterError, async (req, res) => {
   try {
     const { id } = req.params;
     if (!isValidObjectId(id)) return res.status(400).json({ message: "Invalid form ID" });
@@ -599,10 +686,45 @@ router.put("/other-registration/:id", protect, upload.array("documents", 10), ha
       docsToKeep = form.documents.filter((d) => keepIds.includes(d._id.toString()));
     }
     let newDocs = [];
-    if (req.files?.length) {
-      newDocs = req.files.map((file, index) => ({
+    if (req.files) {
+      try {
+        // Process specific document types
+        const fileFields = [
+          { field: 'aadhaarFile', type: 'Aadhaar Card' },
+          { field: 'panFile', type: 'PAN Card' },
+          { field: 'addressProofFile', type: 'Address Proof' },
+          { field: 'businessAddressProofFile', type: 'Business Address Proof' },
+          { field: 'identityProofFile', type: 'Identity Proof' },
+          { field: 'partnershipDeedFile', type: 'Partnership Deed' },
+          { field: 'mouFile', type: 'MOU' },
+          { field: 'bankAccountFile', type: 'Bank Account' },
+          { field: 'businessRegistrationFile', type: 'Business Registration' }
+        ];
+
+        // Process specific document files
+        fileFields.forEach(({ field, type }) => {
+          if (req.files[field] && req.files[field].length > 0) {
+            const file = req.files[field][0];
+            newDocs.push({
+              documentType: type,
+              fileName: file.filename || `file_${Date.now()}_${field}`,
+              originalName: file.originalname,
+              fileType: file.mimetype,
+              fileSize: file.size,
+              fileData: getFileData(file),
+              contentType: file.mimetype,
+              isEdited: true,
+              uploadedBy: req.user.role === "admin" ? "admin" : "user",
+            });
+          }
+        });
+
+        // Process general documents
+        if (req.files['documents'] && req.files['documents'].length > 0) {
+          req.files['documents'].forEach((file, index) => {
+            newDocs.push({
         documentType: req.body[`documentType_${index}`] || "General Document",
-        fileName: generateUniqueFilename(file.originalname),
+              fileName: file.filename || `file_${Date.now()}_${index}`,
         originalName: file.originalname,
         fileType: file.mimetype,
         fileSize: file.size,
@@ -610,7 +732,13 @@ router.put("/other-registration/:id", protect, upload.array("documents", 10), ha
         contentType: file.mimetype,
         isEdited: true,
         uploadedBy: req.user.role === "admin" ? "admin" : "user",
-      }));
+            });
+          });
+        }
+      } catch (fileError) {
+        console.error("Error processing files:", fileError);
+        return res.status(400).json({ message: "Error processing uploaded files" });
+      }
     }
     const updated = await OtherRegistrationForm.findByIdAndUpdate(
       id,
@@ -833,7 +961,17 @@ router.post(
 router.put(
   "/company-formation/:id",
   protect,
-  upload.array("documents", 10),
+  upload.fields([
+    { name: 'documents', maxCount: 10 },
+    { name: 'aadhaarFile', maxCount: 1 },
+    { name: 'panFile', maxCount: 1 },
+    { name: 'addressProofFile', maxCount: 1 },
+    { name: 'directorPhotosFile', maxCount: 1 },
+    { name: 'moaFile', maxCount: 1 },
+    { name: 'aoaFile', maxCount: 1 },
+    { name: 'dinFile', maxCount: 1 },
+    { name: 'dscFile', maxCount: 1 }
+  ]),
   handleMulterError,
   async (req, res) => {
     try {
@@ -888,10 +1026,44 @@ router.put(
 
       // Prepare new documents from uploads
       let newDocs = [];
-      if (req.files && req.files.length > 0) {
-        newDocs = req.files.map((file, index) => ({
+      if (req.files) {
+        try {
+          // Process specific document types
+          const fileFields = [
+            { field: 'aadhaarFile', type: 'Aadhaar Card' },
+            { field: 'panFile', type: 'PAN Card' },
+            { field: 'addressProofFile', type: 'Address Proof' },
+            { field: 'directorPhotosFile', type: 'Director Photos' },
+            { field: 'moaFile', type: 'Memorandum of Association' },
+            { field: 'aoaFile', type: 'Articles of Association' },
+            { field: 'dinFile', type: 'DIN Application' },
+            { field: 'dscFile', type: 'Digital Signature Certificate' }
+          ];
+
+          // Process specific document files
+          fileFields.forEach(({ field, type }) => {
+            if (req.files[field] && req.files[field].length > 0) {
+              const file = req.files[field][0];
+              newDocs.push({
+                documentType: type,
+                fileName: file.filename || `file_${Date.now()}_${field}`,
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+                isEdited: true,
+                uploadedBy: req.user.role === "admin" ? "admin" : "user",
+              });
+            }
+          });
+
+          // Process general documents
+          if (req.files['documents'] && req.files['documents'].length > 0) {
+            req.files['documents'].forEach((file, index) => {
+              newDocs.push({
           documentType: req.body[`documentType_${index}`] || "General Document",
-          fileName: Date.now() + "-" + Math.round(Math.random() * 1e9) + path.extname(file.originalname),
+                fileName: file.filename || `file_${Date.now()}_${index}`,
           originalName: file.originalname,
           fileType: file.mimetype,
           fileSize: file.size,
@@ -899,7 +1071,13 @@ router.put(
           contentType: file.mimetype,
           isEdited: true,
           uploadedBy: req.user.role === "admin" ? "admin" : "user",
-        }));
+              });
+            });
+          }
+        } catch (fileError) {
+          console.error("Error processing files:", fileError);
+          return res.status(400).json({ message: "Error processing uploaded files" });
+        }
       }
 
       const updated = await CompanyForm.findByIdAndUpdate(
@@ -1004,7 +1182,20 @@ router.get("/user-submissions", protect, async (req, res) => {
 
     // Combine all forms and add a type field to identify the source
     const allSubmissions = [
-      ...taxForms.map(form => ({ ...form.toObject(), formType: 'TaxForm' })),
+      ...taxForms.map(form => {
+        const formObj = form.toObject();
+        // Normalize TaxForm reports from adminData.reports to reports array
+        if (formObj.adminData && formObj.adminData.reports) {
+          formObj.reports = formObj.adminData.reports.map(report => ({
+            type: report.type,
+            message: report.message,
+            sentAt: report.sentAt,
+            sentBy: report.sentBy,
+            documentId: report.document ? report.document._id : null
+          }));
+        }
+        return { ...formObj, formType: 'TaxForm' };
+      }),
       ...companyForms.map(form => ({ ...form.toObject(), formType: 'CompanyForm' })),
       ...rocForms.map(form => ({ ...form.toObject(), formType: 'ROCForm' })),
       ...otherRegistrationForms.map(form => ({ ...form.toObject(), formType: 'OtherRegistrationForm' })),
@@ -1103,6 +1294,7 @@ router.get("/user-submissions/:id", protect, async (req, res) => {
 router.get("/download/:documentId", protect, async (req, res) => {
   try {
     const documentId = req.params.documentId;
+    console.log(`Attempting to download document: ${documentId} for user: ${req.user.email}`);
 
     // Find documents that match the document ID string
     // This approach avoids ObjectId casting errors
@@ -1110,7 +1302,14 @@ router.get("/download/:documentId", protect, async (req, res) => {
 
     if (isValidObjectId(documentId)) {
       // If it's a valid ObjectId, we can use it directly
-      query = { "documents._id": documentId };
+      // For TaxForm, we need to search in adminData.reports.document._id
+      // For other forms, we search in documents._id
+      query = { 
+        $or: [
+          { "documents._id": documentId },
+          { "adminData.reports.document._id": documentId }
+        ]
+      };
     } else {
       // If it's not a valid ObjectId, we need to use string comparison
       // This is a fallback and should be avoided in production
@@ -1121,26 +1320,70 @@ router.get("/download/:documentId", protect, async (req, res) => {
       });
     }
 
-    // Find the tax form containing the document
-    const taxForm = await TaxForm.findOne(query);
+    // Search across all form models
+    const models = [
+      { model: TaxForm, name: 'TaxForm' },
+      { model: CompanyForm, name: 'CompanyForm' },
+      { model: ROCForm, name: 'ROCForm' },
+      { model: OtherRegistrationForm, name: 'OtherRegistrationForm' },
+      { model: ReportsForm, name: 'ReportsForm' },
+      { model: TrademarkISOForm, name: 'TrademarkISOForm' },
+      { model: AdvisoryForm, name: 'AdvisoryForm' }
+    ];
 
-    if (!taxForm) {
-      return res.status(404).json({ message: "Document not found" });
-    }
+    let form = null;
+    let document = null;
 
-    // Check if the tax form belongs to the logged-in user or if user is admin
-    if (taxForm.email !== req.user.email && req.user.role !== "admin") {
+    // Search each model for the document
+    for (const { model, name } of models) {
+      try {
+        console.log(`Searching in ${name} model for document: ${documentId}`);
+        const foundForm = await model.findOne(query);
+        if (foundForm) {
+          console.log(`Found form in ${name} model:`, foundForm._id);
+          // Check if the form belongs to the logged-in user or if user is admin
+          if (foundForm.email !== req.user.email && req.user.role !== "admin") {
       return res
         .status(403)
         .json({ message: "Not authorized to access this document" });
     }
 
-    // Find the specific document in the documents array
-    const document = taxForm.documents.find(
+          // For TaxForm, check adminData.reports for embedded documents
+          if (name === 'TaxForm' && foundForm.adminData && foundForm.adminData.reports) {
+            for (const report of foundForm.adminData.reports) {
+              if (report.document && report.document._id.toString() === documentId) {
+                console.log(`Found document in TaxForm adminData.reports:`, report.document._id, report.document.originalName);
+                form = foundForm;
+                document = report.document;
+                break;
+              }
+            }
+            if (document) break;
+          }
+
+          // Find the specific document in the documents array (for non-TaxForm or fallback)
+          if (!document) {
+            const foundDocument = foundForm.documents.find(
       (doc) => doc._id.toString() === documentId
     );
 
-    if (!document) {
+            if (foundDocument) {
+              console.log(`Found document in ${name} model:`, foundDocument._id, foundDocument.originalName);
+              form = foundForm;
+              document = foundDocument;
+              break;
+            } else {
+              console.log(`Document not found in ${name} model documents array`);
+            }
+          }
+        }
+      } catch (err) {
+        // Continue searching in other models if this one fails
+        continue;
+      }
+    }
+
+    if (!form || !document) {
       return res.status(404).json({ message: "Document not found" });
     }
 
@@ -1602,7 +1845,16 @@ router.put(
     console.log("Processing tax form update request for ID:", req.params.id);
     next();
   },
-  upload.array("documents", 10),
+  upload.fields([
+    { name: 'documents', maxCount: 10 },
+    { name: 'aadhaarFile', maxCount: 1 },
+    { name: 'salesDataFile', maxCount: 1 },
+    { name: 'purchaseDataFile', maxCount: 1 },
+    { name: 'bankStatementFile', maxCount: 1 },
+    { name: 'tdsDataFile', maxCount: 1 },
+    { name: 'wagesReportFile', maxCount: 1 },
+    { name: 'salarySheetFile', maxCount: 1 }
+  ]),
   handleMulterError,
   async (req, res) => {
     try {
@@ -1674,8 +1926,40 @@ router.put(
 
       // Handle new uploaded files
       let newDocuments = [];
-      if (req.files && req.files.length > 0) {
-        req.files.forEach((file, index) => {
+      if (req.files) {
+        try {
+          // Process specific document types
+          const fileFields = [
+            { field: 'aadhaarFile', type: 'Aadhaar Card' },
+            { field: 'salesDataFile', type: 'Sales Data' },
+            { field: 'purchaseDataFile', type: 'Purchase Data' },
+            { field: 'bankStatementFile', type: 'Bank Statement' },
+            { field: 'tdsDataFile', type: 'TDS Data' },
+            { field: 'wagesReportFile', type: 'Wages Report' },
+            { field: 'salarySheetFile', type: 'Salary Sheet' }
+          ];
+
+          // Process specific document files
+          fileFields.forEach(({ field, type }) => {
+            if (req.files[field] && req.files[field].length > 0) {
+              const file = req.files[field][0];
+              newDocuments.push({
+                documentType: type,
+                fileName: file.filename || `file_${Date.now()}_${field}`,
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+                uploadedBy: 'user',
+                uploadDate: new Date(),
+              });
+            }
+          });
+
+          // Process general documents
+          if (req.files['documents'] && req.files['documents'].length > 0) {
+            req.files['documents'].forEach((file, index) => {
           const fileId = req.body[`fileId_${index}`] || `file_${index}`;
           const docType = documentTypes[fileId] || "other";
 
@@ -1696,6 +1980,11 @@ router.put(
             uploadDate: new Date(),
           });
         });
+          }
+        } catch (fileError) {
+          console.error("Error processing files:", fileError);
+          return res.status(400).json({ message: "Error processing uploaded files" });
+        }
       }
 
       // Combine existing and new documents
@@ -1776,7 +2065,17 @@ router.put(
 router.post(
   "/company-formation",
   protect,
-  upload.array("documents", 10),
+  upload.fields([
+    { name: 'documents', maxCount: 10 },
+    { name: 'aadhaarFile', maxCount: 1 },
+    { name: 'panFile', maxCount: 1 },
+    { name: 'addressProofFile', maxCount: 1 },
+    { name: 'directorPhotosFile', maxCount: 1 },
+    { name: 'moaFile', maxCount: 1 },
+    { name: 'aoaFile', maxCount: 1 },
+    { name: 'dinFile', maxCount: 1 },
+    { name: 'dscFile', maxCount: 1 }
+  ]),
   handleMulterError,
   async (req, res) => {
     try {
@@ -1892,26 +2191,66 @@ router.post(
 
       console.log("Final form data:", JSON.stringify(formData, null, 2));
 
-      if (req.files && req.files.length > 0) {
+      // Process uploaded files from different field names
+      formData.documents = [];
+      
+      if (req.files) {
         try {
-          formData.documents = req.files.map((file, index) => {
-            console.log(`Processing file ${index}:`, {
+          // Process specific document types
+          const fileFields = [
+            { field: 'aadhaarFile', type: 'Aadhaar Card' },
+            { field: 'panFile', type: 'PAN Card' },
+            { field: 'addressProofFile', type: 'Address Proof' },
+            { field: 'directorPhotosFile', type: 'Director Photos' },
+            { field: 'moaFile', type: 'Memorandum of Association' },
+            { field: 'aoaFile', type: 'Articles of Association' },
+            { field: 'dinFile', type: 'DIN Application' },
+            { field: 'dscFile', type: 'Digital Signature Certificate' }
+          ];
+
+          // Process specific document files
+          fileFields.forEach(({ field, type }) => {
+            if (req.files[field] && req.files[field].length > 0) {
+              const file = req.files[field][0];
+              console.log(`Processing ${field}:`, {
               originalName: file.originalname,
               mimetype: file.mimetype,
-              size: file.size,
-              hasBuffer: !!file.buffer
-            });
-            
-            return {
-              documentType: req.body[`documentType_${index}`] || "General Document",
+                size: file.size
+              });
+              
+              formData.documents.push({
+                documentType: type,
+                fileName: file.filename || `file_${Date.now()}_${field}`,
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+              });
+            }
+          });
+
+          // Process general documents
+          if (req.files['documents'] && req.files['documents'].length > 0) {
+            req.files['documents'].forEach((file, index) => {
+              console.log(`Processing general document ${index}:`, {
+                originalName: file.originalname,
+                mimetype: file.mimetype,
+                size: file.size
+              });
+              
+              formData.documents.push({
+                documentType: req.body[`documentType_${index}`] || "Additional Document",
               fileName: file.filename || `file_${Date.now()}_${index}`,
               originalName: file.originalname,
               fileType: file.mimetype,
               fileSize: file.size,
               fileData: getFileData(file),
               contentType: file.mimetype,
-            };
           });
+            });
+          }
+
           console.log("Documents processed:", formData.documents.length);
         } catch (fileError) {
           console.error("Error processing files:", fileError);
@@ -2121,7 +2460,10 @@ router.post(
 router.post(
   "/roc-returns",
   protect,
-  upload.array("documents", 10),
+  upload.fields([
+    { name: 'documents', maxCount: 10 },
+    { name: 'aadhaarFile', maxCount: 1 }
+  ]),
   handleMulterError,
   async (req, res) => {
     try {
@@ -2193,37 +2535,64 @@ router.post(
         documents: [],
       };
 
-      // Process uploaded files
-      if (req.files && req.files.length > 0) {
-        console.log(`Processing ${req.files.length} uploaded files`);
+      // Process uploaded files from different field names
+      if (req.files) {
+        try {
+          // Process specific document types
+          const fileFields = [
+            { field: 'aadhaarFile', type: 'Aadhaar Card' }
+          ];
 
-        req.files.forEach((file, index) => {
-          const docType = req.body[`documentType_${index}`] || "General Document";
-
-          console.log(`Processing file: ${docType}`, {
-            originalname: file.originalname,
+          // Process specific document files
+          fileFields.forEach(({ field, type }) => {
+            if (req.files[field] && req.files[field].length > 0) {
+              const file = req.files[field][0];
+              console.log(`Processing ${field}:`, {
+                originalName: file.originalname,
             mimetype: file.mimetype,
-            size: file.size,
-            extension: file.originalname.split(".").pop().toLowerCase(),
+                size: file.size
+              });
+              
+              formData.documents.push({
+                documentType: type,
+                fileName: file.filename || `file_${Date.now()}_${field}`,
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+                uploadedBy: 'user',
+              });
+            }
           });
 
-          // Generate a unique filename
-          const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-          const ext = path.extname(file.originalname);
-          const fileName = uniqueSuffix + ext;
-
-          // Add to documents array with file data stored in Buffer
+          // Process general documents
+          if (req.files['documents'] && req.files['documents'].length > 0) {
+            req.files['documents'].forEach((file, index) => {
+              console.log(`Processing general document ${index}:`, {
+                originalName: file.originalname,
+                mimetype: file.mimetype,
+                size: file.size
+              });
+              
           formData.documents.push({
-            documentType: docType,
-            fileName: fileName,
+                documentType: req.body[`documentType_${index}`] || "General Document",
+                fileName: file.filename || `file_${Date.now()}_${index}`,
             originalName: file.originalname,
             fileType: file.mimetype,
             fileSize: file.size,
             fileData: getFileData(file),
             contentType: file.mimetype,
-            uploadedBy: 'user', // submissions here are always by the user
+                uploadedBy: 'user',
           });
         });
+          }
+
+          console.log("Documents processed:", formData.documents.length);
+        } catch (fileError) {
+          console.error("Error processing files:", fileError);
+          return res.status(400).json({ message: "Error processing uploaded files" });
+        }
       } else {
         console.log("No files were uploaded");
         return res.status(400).json({ message: "At least one document is required" });
@@ -2269,7 +2638,10 @@ router.post(
 router.post(
   "/reports",
   protect,
-  upload.array("documents", 10),
+  upload.fields([
+    { name: 'documents', maxCount: 10 },
+    { name: 'aadhaarFile', maxCount: 1 }
+  ]),
   handleMulterError,
   async (req, res) => {
     try {
@@ -2344,16 +2716,50 @@ router.post(
         selectedPackage: selectedPackage || "Basic",
       };
 
-      if (req.files && req.files.length > 0) {
-        formData.documents = req.files.map((file, index) => ({
+      // Process uploaded files from different field names
+      if (req.files) {
+        try {
+          formData.documents = [];
+          
+          // Process specific document types
+          const fileFields = [
+            { field: 'aadhaarFile', type: 'Aadhaar Card' }
+          ];
+
+          // Process specific document files
+          fileFields.forEach(({ field, type }) => {
+            if (req.files[field] && req.files[field].length > 0) {
+              const file = req.files[field][0];
+              formData.documents.push({
+                documentType: type,
+                fileName: file.filename || `file_${Date.now()}_${field}`,
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+              });
+            }
+          });
+
+          // Process general documents
+          if (req.files['documents'] && req.files['documents'].length > 0) {
+            req.files['documents'].forEach((file, index) => {
+              formData.documents.push({
           documentType: req.body[`documentType_${index}`] || "General Document",
-          fileName: file.filename,
+                fileName: file.filename || `file_${Date.now()}_${index}`,
           originalName: file.originalname,
           fileType: file.mimetype,
           fileSize: file.size,
           fileData: getFileData(file),
           contentType: file.mimetype,
-        }));
+              });
+            });
+          }
+        } catch (fileError) {
+          console.error("Error processing files:", fileError);
+          return res.status(400).json({ message: "Error processing uploaded files" });
+        }
       }
 
       const reportsForm = new ReportsForm(formData);
@@ -2379,7 +2785,10 @@ router.post(
 router.post(
   "/trademark-iso",
   protect,
-  upload.array("documents", 10),
+  upload.fields([
+    { name: 'documents', maxCount: 10 },
+    { name: 'aadhaarFile', maxCount: 1 }
+  ]),
   handleMulterError,
   async (req, res) => {
     try {
@@ -2452,16 +2861,50 @@ router.post(
         selectedPackage: selectedPackage || "Basic",
       };
 
-      if (req.files && req.files.length > 0) {
-        formData.documents = req.files.map((file, index) => ({
+      // Process uploaded files from different field names
+      if (req.files) {
+        try {
+          formData.documents = [];
+          
+          // Process specific document types
+          const fileFields = [
+            { field: 'aadhaarFile', type: 'Aadhaar Card' }
+          ];
+
+          // Process specific document files
+          fileFields.forEach(({ field, type }) => {
+            if (req.files[field] && req.files[field].length > 0) {
+              const file = req.files[field][0];
+              formData.documents.push({
+                documentType: type,
+                fileName: file.filename || `file_${Date.now()}_${field}`,
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+              });
+            }
+          });
+
+          // Process general documents
+          if (req.files['documents'] && req.files['documents'].length > 0) {
+            req.files['documents'].forEach((file, index) => {
+              formData.documents.push({
           documentType: req.body[`documentType_${index}`] || "General Document",
-          fileName: file.filename,
+                fileName: file.filename || `file_${Date.now()}_${index}`,
           originalName: file.originalname,
           fileType: file.mimetype,
           fileSize: file.size,
           fileData: getFileData(file),
           contentType: file.mimetype,
-        }));
+              });
+            });
+          }
+        } catch (fileError) {
+          console.error("Error processing files:", fileError);
+          return res.status(400).json({ message: "Error processing uploaded files" });
+        }
       }
 
       const trademarkISOForm = new TrademarkISOForm(formData);
@@ -2487,7 +2930,10 @@ router.post(
 router.post(
   "/advisory",
   protect,
-  upload.array("documents", 10),
+  upload.fields([
+    { name: 'documents', maxCount: 10 },
+    { name: 'aadhaarFile', maxCount: 1 }
+  ]),
   handleMulterError,
   async (req, res) => {
     try {
@@ -2566,16 +3012,50 @@ router.post(
         selectedPackage: selectedPackage || "Basic",
       };
 
-      if (req.files && req.files.length > 0) {
-        formData.documents = req.files.map((file, index) => ({
+      // Process uploaded files from different field names
+      if (req.files) {
+        try {
+          formData.documents = [];
+          
+          // Process specific document types
+          const fileFields = [
+            { field: 'aadhaarFile', type: 'Aadhaar Card' }
+          ];
+
+          // Process specific document files
+          fileFields.forEach(({ field, type }) => {
+            if (req.files[field] && req.files[field].length > 0) {
+              const file = req.files[field][0];
+              formData.documents.push({
+                documentType: type,
+                fileName: file.filename || `file_${Date.now()}_${field}`,
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+              });
+            }
+          });
+
+          // Process general documents
+          if (req.files['documents'] && req.files['documents'].length > 0) {
+            req.files['documents'].forEach((file, index) => {
+              formData.documents.push({
           documentType: req.body[`documentType_${index}`] || "General Document",
-          fileName: file.filename,
+                fileName: file.filename || `file_${Date.now()}_${index}`,
           originalName: file.originalname,
           fileType: file.mimetype,
           fileSize: file.size,
           fileData: getFileData(file),
           contentType: file.mimetype,
-        }));
+              });
+            });
+          }
+        } catch (fileError) {
+          console.error("Error processing files:", fileError);
+          return res.status(400).json({ message: "Error processing uploaded files" });
+        }
       }
 
       const advisoryForm = new AdvisoryForm(formData);
@@ -2595,13 +3075,225 @@ router.post(
   }
 );
 
+// @route   POST /api/forms/other-registration
+// @desc    Submit other registration form with documents
+// @access  Private
+router.post(
+  "/other-registration",
+  protect,
+  upload.fields([
+    { name: 'documents', maxCount: 10 },
+    { name: 'aadhaarFile', maxCount: 1 },
+    { name: 'panFile', maxCount: 1 },
+    { name: 'addressProofFile', maxCount: 1 },
+    { name: 'businessProofFile', maxCount: 1 },
+    { name: 'partnershipDeedFile', maxCount: 1 },
+    { name: 'llpAgreementFile', maxCount: 1 }
+  ]),
+  handleMulterError,
+  async (req, res) => {
+    try {
+      console.log("Other registration form submission received");
+      console.log("Request body:", req.body);
+      console.log("Files received:", req.files ? Object.keys(req.files).length : "No files");
+      
+      const {
+        fullName,
+        email,
+        phone,
+        pan,
+        service,
+        subService,
+        businessName,
+        businessType,
+        businessAddress,
+        city,
+        state,
+        pincode,
+        registrationType,
+        businessActivity,
+        partners,
+        authorizedCapital,
+        paidUpCapital,
+        numberOfPartners,
+        numberOfDirectors,
+        businessStage,
+        industry,
+        expectedRevenue,
+        hasGstNumber,
+        gstNumber,
+        hasBankAccount,
+        bankName,
+        accountNumber,
+        ifscCode,
+        hasDigitalSignature,
+        requiresCompliance,
+        selectedPackage,
+        description,
+      } = req.body;
+
+      // Validate required fields
+      if (!fullName || !email || !phone || !pan || !service || !businessName || !businessType || !businessAddress || !city || !state || !pincode || !registrationType) {
+        return res.status(400).json({ 
+          message: "Missing required fields. Please fill in all mandatory fields." 
+        });
+      }
+
+      // Parse partners safely if provided
+      let parsedPartners = [];
+      if (partners) {
+        try {
+          parsedPartners = JSON.parse(partners);
+        } catch (parseError) {
+          console.error("Error parsing partners:", parseError);
+          return res.status(400).json({ message: "Invalid partners data format" });
+        }
+      }
+
+      const formData = {
+        user: req.user._id,
+        fullName,
+        email,
+        phone,
+        pan: pan.toUpperCase(),
+        service,
+        subService: subService || registrationType,
+        businessName,
+        businessType,
+        businessAddress,
+        city,
+        state,
+        pincode,
+        registrationType,
+        businessActivity: businessActivity || "",
+        partners: parsedPartners,
+        authorizedCapital: authorizedCapital || "",
+        paidUpCapital: paidUpCapital || "",
+        numberOfPartners: numberOfPartners || "",
+        numberOfDirectors: numberOfDirectors || "",
+        businessStage: businessStage || "",
+        industry: industry || "",
+        expectedRevenue: expectedRevenue || "",
+        hasGstNumber: hasGstNumber === 'true',
+        gstNumber: gstNumber || "",
+        hasBankAccount: hasBankAccount === 'true',
+        bankName: bankName || "",
+        accountNumber: accountNumber || "",
+        ifscCode: ifscCode || "",
+        hasDigitalSignature: hasDigitalSignature === 'true',
+        requiresCompliance: requiresCompliance === 'true',
+        selectedPackage: selectedPackage || "Basic",
+        description: description || "",
+        status: "Pending",
+        documents: [],
+      };
+
+      // Process uploaded files from different field names
+      if (req.files) {
+        try {
+          // Process specific document types
+          const fileFields = [
+            { field: 'aadhaarFile', type: 'Aadhaar Card' },
+            { field: 'panFile', type: 'PAN Card' },
+            { field: 'addressProofFile', type: 'Address Proof' },
+            { field: 'businessProofFile', type: 'Business Proof' },
+            { field: 'partnershipDeedFile', type: 'Partnership Deed' },
+            { field: 'llpAgreementFile', type: 'LLP Agreement' }
+          ];
+
+          // Process specific document files
+          fileFields.forEach(({ field, type }) => {
+            if (req.files[field] && req.files[field].length > 0) {
+              const file = req.files[field][0];
+              console.log(`Processing ${field}:`, {
+                originalName: file.originalname,
+                mimetype: file.mimetype,
+                size: file.size
+              });
+              
+              formData.documents.push({
+                documentType: type,
+                fileName: file.filename || `file_${Date.now()}_${field}`,
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+              });
+            }
+          });
+
+          // Process general documents
+          if (req.files['documents'] && req.files['documents'].length > 0) {
+            req.files['documents'].forEach((file, index) => {
+              console.log(`Processing general document ${index}:`, {
+                originalName: file.originalname,
+                mimetype: file.mimetype,
+                size: file.size
+              });
+              
+              formData.documents.push({
+                documentType: req.body[`documentType_${index}`] || "Additional Document",
+                fileName: file.filename || `file_${Date.now()}_${index}`,
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+              });
+            });
+          }
+
+          console.log("Documents processed:", formData.documents.length);
+        } catch (fileError) {
+          console.error("Error processing files:", fileError);
+          return res.status(400).json({ message: "Error processing uploaded files" });
+        }
+      }
+
+      console.log("Creating OtherRegistrationForm instance...");
+      const otherRegistrationForm = new OtherRegistrationForm(formData);
+      console.log("OtherRegistrationForm instance created, saving...");
+      
+      try {
+        await otherRegistrationForm.save();
+        console.log("OtherRegistrationForm saved successfully with ID:", otherRegistrationForm._id);
+      } catch (saveError) {
+        console.error("Error saving OtherRegistrationForm:", saveError);
+        if (saveError.code === 11000) {
+          return res.status(400).json({ 
+            message: "A form for this service already exists. You can only submit one form per service." 
+          });
+        }
+        throw saveError;
+      }
+
+      res.status(201).json({
+        success: true,
+        message: "Other registration form submitted successfully",
+        formId: otherRegistrationForm._id,
+        documents: formData.documents.length,
+      });
+    } catch (error) {
+      console.error("Error submitting other registration form:", error);
+      res.status(500).json({
+        message: "Server error while submitting other registration form",
+        error: error.message,
+      });
+    }
+  }
+);
+
 // @route   POST /api/forms/service
 // @desc    Submit generic service form with documents
 // @access  Private
 router.post(
   "/service",
   protect,
-  upload.array("documents", 10),
+  upload.fields([
+    { name: 'documents', maxCount: 10 },
+    { name: 'aadhaarFile', maxCount: 1 }
+  ]),
   handleMulterError,
   async (req, res) => {
     try {
@@ -2723,16 +3415,49 @@ router.post(
       console.log('Selected model:', Model.modelName);
 
       // Handle file uploads
-      if (req.files && req.files.length > 0) {
-        formData.documents = req.files.map((file, index) => ({
+      if (req.files) {
+        try {
+          formData.documents = [];
+          
+          // Process specific document types
+          const fileFields = [
+            { field: 'aadhaarFile', type: 'Aadhaar Card' }
+          ];
+
+          // Process specific document files
+          fileFields.forEach(({ field, type }) => {
+            if (req.files[field] && req.files[field].length > 0) {
+              const file = req.files[field][0];
+              formData.documents.push({
+                documentType: type,
+                fileName: file.filename || `file_${Date.now()}_${field}`,
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+              });
+            }
+          });
+
+          // Process general documents
+          if (req.files['documents'] && req.files['documents'].length > 0) {
+            req.files['documents'].forEach((file, index) => {
+              formData.documents.push({
           documentType: req.body[`documentType_file_${index}`] || "General Document",
-          fileName: file.filename,
+                fileName: file.filename || `file_${Date.now()}_${index}`,
           originalName: file.originalname,
           fileType: file.mimetype,
           fileSize: file.size,
           fileData: getFileData(file),
           contentType: file.mimetype,
-        }));
+              });
+            });
+          }
+        } catch (fileError) {
+          console.error("Error processing files:", fileError);
+          return res.status(400).json({ message: "Error processing uploaded files" });
+        }
       }
 
       // Save to appropriate model

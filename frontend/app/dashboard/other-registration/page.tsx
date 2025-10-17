@@ -111,6 +111,10 @@ export default function OtherRegistrationPage() {
         }
       });
 
+      // Add service and subService fields for backend compatibility
+      formData.append("service", "Other Registration");
+      formData.append("subService", data.registrationType);
+
       // Append specific document files
       if (aadhaarFile) formData.append("aadhaarFile", aadhaarFile);
       if (panFile) formData.append("panFile", panFile);

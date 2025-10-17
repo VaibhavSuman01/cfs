@@ -78,6 +78,14 @@ export default function ROCReturnsPage() {
         }
       });
 
+      // Add service and subService fields for backend compatibility
+      formData.append("service", "ROC Returns");
+      formData.append("subService", data.returnType);
+      
+      // Map frontend field names to backend expectations
+      formData.append("cin", data.cinNumber);
+      formData.append("companyType", "Private Limited"); // Default value
+
       // Append Aadhaar file if uploaded
       if (aadhaarFile) {
         formData.append("aadhaarFile", aadhaarFile);

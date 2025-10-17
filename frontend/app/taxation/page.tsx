@@ -8,6 +8,7 @@ import { FadeInSection } from "@/components/fade-in-section"
 import { Calculator, FileText, TrendingUp, Shield, CheckCircle, ArrowRight, Clock, Users, Building } from "lucide-react"
 import Link from "next/link";
 import { PricingDisplay } from "@/components/ui/pricing-display"
+import { getServiceCardClasses, getServiceBackgroundColor, getServiceIconColor, getServicePriceColor } from "@/lib/service-colors"
 
 export default function TaxationPage() {
   return (
@@ -175,14 +176,14 @@ export default function TaxationPage() {
                 },
               ].map((service, index) => (
                 <FadeInSection key={index} delay={index * 100}>
-                  <Card className="border-2 border-gray-200 hover:border-blue-300 hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group">
+                  <Card className={getServiceCardClasses('Taxation')}>
                     <CardHeader className="text-center">
-                      <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-blue-200 transition-colors">
-                        <service.icon className="h-8 w-8 text-blue-600 group-hover:scale-110 transition-transform" />
+                      <div className={getServiceBackgroundColor('Taxation')}>
+                        <service.icon className={`h-8 w-8 ${getServiceIconColor('Taxation')}`} />
                       </div>
                       <CardTitle className="text-xl text-gray-900">{service.title}</CardTitle>
                       <div className="space-y-2">
-                        <div className="text-2xl font-bold text-blue-600">
+                        <div className={getServicePriceColor('Taxation')}>
                           {service.priceKey ? (
                             <PricingDisplay serviceName={service.priceKey} />
                           ) : (

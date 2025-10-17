@@ -26,7 +26,6 @@ const reportsFormSchema = z.object({
   reportType: z.string().min(1, "Report type is required"),
   subject: z.string().min(1, "Subject is required"),
   description: z.string().min(1, "Description is required"),
-  priority: z.string().optional(),
   dueDate: z.string().optional(),
   projectDetails: z.string().optional(),
   businessType: z.string().optional(),
@@ -52,7 +51,6 @@ export default function ReportsPage() {
       reportType: "",
       subject: "",
       description: "",
-      priority: "",
       dueDate: "",
       projectDetails: "",
       businessType: "",
@@ -72,6 +70,17 @@ export default function ReportsPage() {
         }
       });
 
+      // Add service and subService fields for backend compatibility
+      formData.append("service", "Reports");
+      formData.append("subService", data.reportType);
+      
+      // Map frontend field names to backend expectations
+      formData.append("businessName", data.subject); // Use subject as business name
+      formData.append("businessType", data.businessType || "Other");
+      formData.append("businessAddress", "Not provided");
+      formData.append("reportPeriod", "Current Year");
+      formData.append("reportPurpose", data.description);
+
       // Append Aadhaar file if uploaded
       if (aadhaarFile) {
         formData.append("aadhaarFile", aadhaarFile);
@@ -90,9 +99,17 @@ export default function ReportsPage() {
 
       toast.success("Report request submitted successfully");
       router.push("/dashboard/reports");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to submit reports form:", error);
-      toast.error("Failed to submit report request. Please try again.");
+      
+      // Handle specific error cases
+      if (error.response?.status === 400 && error.response?.data?.message?.includes("already exists")) {
+        toast.error("Already submitted for this Year. You can only submit one form per service.");
+      } else if (error.response?.status === 409) {
+        toast.error("Already submitted for this Year. You can only submit one form per service.");
+      } else {
+        toast.error("Failed to submit report request. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -231,35 +248,7 @@ export default function ReportsPage() {
                             <SelectItem value="cma-reports">CMA Reports</SelectItem>
                             <SelectItem value="dscr-reports">DSCR Reports</SelectItem>
                             <SelectItem value="bank-reconciliation">Bank Reconciliation</SelectItem>
-                            <SelectItem value="financial-analysis">Financial Analysis</SelectItem>
-                            <SelectItem value="business-valuation">Business Valuation</SelectItem>
-                            <SelectItem value="feasibility-study">Feasibility Study</SelectItem>
-                            <SelectItem value="market-research">Market Research</SelectItem>
-                            <SelectItem value="compliance-audit">Compliance Audit</SelectItem>
                             <SelectItem value="other">Other</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="priority"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Priority</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select priority" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="low">Low</SelectItem>
-                            <SelectItem value="medium">Medium</SelectItem>
-                            <SelectItem value="high">High</SelectItem>
-                            <SelectItem value="urgent">Urgent</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />

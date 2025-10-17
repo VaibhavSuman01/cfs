@@ -51,30 +51,28 @@ export default function GstRegistrationPage() {
                   </span>
                 </h1>
                 <p className="text-xl text-gray-600 leading-relaxed">
-                  Get your business GST-compliant. Register for a Goods and Services Tax Identification Number (GSTIN) to legally collect taxes and claim input tax credits.
+                  Stay compliant with monthly GST return filing. Our experts handle your GSTR-1 and GSTR-3B returns, ensuring timely submission and avoiding penalties.
                 </p>
 
                 <div className="grid sm:grid-cols-3 gap-4 pt-6">
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-                    <div className="text-2xl font-bold text-blue-600">
-                      <PricingDisplay serviceName="gst registration" />
-                    </div>
-                    <div className="text-sm text-gray-600">Starting Price</div>
+                    <div className="text-2xl font-bold text-blue-600">₹2,999</div>
+                    <div className="text-sm text-gray-600">Fixed Price</div>
                   </div>
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-                    <div className="text-2xl font-bold text-blue-600">2-6 Days</div>
-                    <div className="text-sm text-gray-600">Processing Time</div>
+                    <div className="text-2xl font-bold text-blue-600">Monthly</div>
+                    <div className="text-sm text-gray-600">Filing Frequency</div>
                   </div>
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-                    <div className="text-2xl font-bold text-blue-600">₹40L+</div>
-                    <div className="text-sm text-gray-600">Turnover Limit</div>
+                    <div className="text-2xl font-bold text-blue-600">GSTR-1,3B</div>
+                    <div className="text-sm text-gray-600">Returns Included</div>
                   </div>
                 </div>
 
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                   <Link href={`/dashboard/new-form?service=${encodeURIComponent("GST Filing")}`} passHref>
                     <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                      Register for GST
+                      Start GST Filing
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
@@ -108,64 +106,29 @@ export default function GstRegistrationPage() {
         <section className="py-20">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-4xl mx-auto mb-16">
-              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">Choose Your GST Filing Package</h2>
+              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">GST Filing Service</h2>
               <p className="text-lg text-gray-600">
-                Select the package that best fits your GST filing requirements
+                Complete monthly GST return filing service at a fixed price
               </p>
             </div>
-            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              <Card className="border-2 border-blue-200 hover:border-blue-400 hover:shadow-xl transition-all duration-300">
-                <CardHeader className="text-center pb-4">
-                  <CardTitle className="text-2xl font-bold text-blue-600">Basic</CardTitle>
-                  <div className="text-4xl font-bold text-gray-900">₹1,999</div>
-                  <p className="text-sm text-gray-600">Starting Price</p>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <ul className="space-y-3 text-left">
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>GST Registration</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Basic Documentation</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Registration Certificate</span></li>
-                  </ul>
-                  <Link href={`/dashboard/new-form?service=${encodeURIComponent("GST Filing - Basic")}`} passHref>
-                    <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Basic</Button>
-                  </Link>
-                </CardContent>
-              </Card>
-
+            <div className="max-w-2xl mx-auto">
               <Card className="border-2 border-blue-400 hover:border-blue-600 hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 <CardHeader className="text-center pb-4">
-                  <CardTitle className="text-2xl font-bold text-blue-600">Standard</CardTitle>
-                  <div className="text-4xl font-bold text-gray-900">₹2,999</div>
-                  <p className="text-sm text-gray-600">Most Popular</p>
+                  <CardTitle className="text-3xl font-bold text-blue-600">Monthly GST Filing</CardTitle>
+                  <div className="text-5xl font-bold text-gray-900">₹2,999</div>
+                  <p className="text-lg text-gray-600">Fixed Price per Month</p>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <ul className="space-y-3 text-left">
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Everything in Basic</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Priority Processing</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Expert Consultation</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Post-Registration Support</span></li>
+                <CardContent className="space-y-6">
+                  <ul className="space-y-4 text-left text-lg">
+                    <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>GSTR-1 Return Filing</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>GSTR-3B Return Filing</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Data Compilation & Validation</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Timely Submission</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Penalty Avoidance</span></li>
+                    <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Expert Support</span></li>
                   </ul>
-                  <Link href={`/dashboard/new-form?service=${encodeURIComponent("GST Filing - Standard")}`} passHref>
-                    <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Standard</Button>
-                  </Link>
-                </CardContent>
-              </Card>
-
-              <Card className="border-2 border-blue-200 hover:border-blue-400 hover:shadow-xl transition-all duration-300">
-                <CardHeader className="text-center pb-4">
-                  <CardTitle className="text-2xl font-bold text-blue-600">Premium</CardTitle>
-                  <div className="text-4xl font-bold text-gray-900">₹4,999</div>
-                  <p className="text-sm text-gray-600">Complete Solution</p>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <ul className="space-y-3 text-left">
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Everything in Standard</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Compliance Training</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>1 Year Support</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>GST Filing Assistance</span></li>
-                  </ul>
-                  <Link href={`/dashboard/new-form?service=${encodeURIComponent("GST Filing - Premium")}`} passHref>
-                    <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Premium</Button>
+                  <Link href={`/dashboard/new-form?service=${encodeURIComponent("GST Filing")}`} passHref>
+                    <Button className="w-full bg-blue-600 hover:bg-blue-700 text-lg py-4">Start GST Filing Service</Button>
                   </Link>
                 </CardContent>
               </Card>
@@ -179,26 +142,26 @@ export default function GstRegistrationPage() {
         <section className="py-20 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-4xl mx-auto mb-16">
-              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">Benefits of GST Filing</h2>
+              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">Benefits of GST Filing Service</h2>
               <p className="text-lg text-gray-600">
-                Registering for GST provides your business with a range of advantages, from legal recognition to competitive strength.
+                Our monthly GST filing service ensures your business stays compliant and penalty-free.
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               <Card className="text-center p-6 border-2 border-transparent hover:border-blue-200 hover:shadow-xl transition-all">
                 <FileCheck className="mx-auto h-12 w-12 text-blue-500 mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Legal Recognition</h3>
-                <p className="text-gray-600">Your business is recognized as a legitimate, law-abiding supplier of goods or services.</p>
+                <h3 className="text-xl font-semibold mb-2">Timely Compliance</h3>
+                <p className="text-gray-600">Never miss a deadline with our systematic monthly filing process.</p>
               </Card>
               <Card className="text-center p-6 border-2 border-transparent hover:border-blue-200 hover:shadow-xl transition-all">
-                <Receipt className="mx-auto h-12 w-12 text-blue-500 mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Input Tax Credit</h3>
-                <p className="text-gray-600">Claim credit on taxes paid on inputs and use it to offset the tax you owe on outputs.</p>
+                <Shield className="mx-auto h-12 w-12 text-blue-500 mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Penalty Protection</h3>
+                <p className="text-gray-600">Avoid late fees and penalties with our expert filing service.</p>
               </Card>
               <Card className="text-center p-6 border-2 border-transparent hover:border-blue-200 hover:shadow-xl transition-all">
                 <TrendingUp className="mx-auto h-12 w-12 text-blue-500 mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Inter-State Trade</h3>
-                <p className="text-gray-600">Conduct business across state lines without restrictions and expand your market reach.</p>
+                <h3 className="text-xl font-semibold mb-2">Input Tax Credit</h3>
+                <p className="text-gray-600">Maximize your ITC claims with accurate return filing.</p>
               </Card>
             </div>
           </div>
@@ -210,16 +173,16 @@ export default function GstRegistrationPage() {
         <section className="py-20">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-4xl mx-auto mb-16">
-              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">Simple Online Registration Process</h2>
+              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">Simple GST Filing Process</h2>
               <p className="text-lg text-gray-600">
-                Our streamlined process ensures you get your GSTIN quickly and efficiently.
+                Our streamlined monthly process ensures your GST returns are filed accurately and on time.
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              <Card className="p-6 text-center"><CardTitle className="mb-4 text-blue-600">1. Submit Documents</CardTitle><p className="text-gray-600">Provide your PAN, Aadhaar, and business details.</p></Card>
-              <Card className="p-6 text-center"><CardTitle className="mb-4 text-blue-600">2. Application Filing</CardTitle><p className="text-gray-600">We file Form REG-01 on your behalf on the GST portal.</p></Card>
-              <Card className="p-6 text-center"><CardTitle className="mb-4 text-blue-600">3. Officer Review</CardTitle><p className="text-gray-600">A GST officer reviews your application for accuracy.</p></Card>
-              <Card className="p-6 text-center"><CardTitle className="mb-4 text-blue-600">4. GSTIN Issued</CardTitle><p className="text-gray-600">Receive your GST Filing Certificate and unique GSTIN.</p></Card>
+              <Card className="p-6 text-center"><CardTitle className="mb-4 text-blue-600">1. Share Data</CardTitle><p className="text-gray-600">Provide your sales and purchase data for the month.</p></Card>
+              <Card className="p-6 text-center"><CardTitle className="mb-4 text-blue-600">2. Data Processing</CardTitle><p className="text-gray-600">We compile and validate your transaction data.</p></Card>
+              <Card className="p-6 text-center"><CardTitle className="mb-4 text-blue-600">3. Return Preparation</CardTitle><p className="text-gray-600">GSTR-1 and GSTR-3B returns are prepared and reviewed.</p></Card>
+              <Card className="p-6 text-center"><CardTitle className="mb-4 text-blue-600">4. Filing & Confirmation</CardTitle><p className="text-gray-600">Returns are filed on GST portal with confirmation receipt.</p></Card>
             </div>
           </div>
         </section>
@@ -230,22 +193,22 @@ export default function GstRegistrationPage() {
         <section className="py-20 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-4xl mx-auto mb-16">
-              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">Documents Required for GST Filing</h2>
+              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">Data Required for GST Filing</h2>
               <p className="text-lg text-gray-600">
-                The documentation process is straightforward. You'll need the following:
+                For monthly GST filing, we need the following transaction data from you:
               </p>
             </div>
             <div className="max-w-3xl mx-auto">
               <Card className="p-8">
                 <ul className="space-y-4 text-gray-700 text-lg grid md:grid-cols-2 gap-x-8 gap-y-4">
-                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>PAN Card of Applicant</span></li>
-                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Aadhaar Card</span></li>
-                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Proof of Business Registration</span></li>
-                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Promoter's ID & Address Proof</span></li>
-                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Business Address Proof</span></li>
-                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Bank Account Statement</span></li>
-                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Digital Signature</span></li>
-                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Letter of Authorization</span></li>
+                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Sales Invoices</span></li>
+                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Purchase Invoices</span></li>
+                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Bank Statements</span></li>
+                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Credit/Debit Notes</span></li>
+                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Export/Import Data</span></li>
+                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Advance Receipts</span></li>
+                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>Reverse Charge Entries</span></li>
+                  <li className="flex items-center"><CheckCircle className="h-6 w-6 text-blue-500 mr-4 flex-shrink-0" /><span>HSN/SAC Details</span></li>
                 </ul>
               </Card>
             </div>
@@ -260,26 +223,26 @@ export default function GstRegistrationPage() {
             <div className="text-center max-w-4xl mx-auto mb-16">
               <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">GST Filing FAQs</h2>
               <p className="text-lg text-gray-600">
-                Find answers to common questions about GST registration.
+                Find answers to common questions about GST return filing.
               </p>
             </div>
             <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
               {[
                 {
-                  question: "Who is required to get GST registration?",
-                  answer: "Any business with an annual turnover exceeding ₹40 lakh (for goods) or ₹20 lakh (for services) must register. It's also mandatory for e-commerce sellers, inter-state suppliers, and casual taxable persons, regardless of turnover."
+                  question: "What is the due date for GST returns?",
+                  answer: "GSTR-1 is due by the 11th of the following month, and GSTR-3B is due by the 20th of the following month. For quarterly filers, the due dates are different."
                 },
                 {
-                  question: "Is there a fee for GST registration?",
-                  answer: "No, there are no government fees for GST registration. The process is free of cost on the official GST portal. Charges may only apply if you hire a professional for assistance."
+                  question: "What happens if I miss the filing deadline?",
+                  answer: "Late filing attracts penalties of ₹200 per day (₹100 for CGST + ₹100 for SGST) with a maximum of ₹5,000 per return. Our service ensures timely filing to avoid these penalties."
                 },
                 {
-                  question: "How long is a GST registration valid?",
-                  answer: "A standard GST registration is valid until it is surrendered by the taxpayer or cancelled by the authorities. It does not have an expiry date."
+                  question: "What returns are included in the service?",
+                  answer: "Our monthly service includes GSTR-1 (outward supplies) and GSTR-3B (summary return). Additional returns like GSTR-9 (annual return) are charged separately."
                 },
                 {
-                  question: "Can I register for GST voluntarily?",
-                  answer: "Yes, businesses that do not meet the turnover threshold can still register for GST voluntarily. This allows them to claim input tax credit and conduct inter-state trade legally."
+                  question: "How do I provide my transaction data?",
+                  answer: "You can share your data through Excel files, PDF invoices, or through our secure online portal. We also accept data from popular accounting software like Tally, QuickBooks, etc."
                 }
               ].map((faq, index) => (
                 <FadeInSection key={index} delay={index * 100}>
@@ -301,14 +264,14 @@ export default function GstRegistrationPage() {
         <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
           <div className="container mx-auto px-4 text-center">
             <div className="max-w-4xl mx-auto space-y-8">
-              <h2 className="text-4xl lg:text-5xl font-bold">Get Your Business GST Ready</h2>
+              <h2 className="text-4xl lg:text-5xl font-bold">Start Your GST Filing Service</h2>
               <p className="text-xl text-blue-100 leading-relaxed">
-                Don't let compliance slow you down. Our experts make GST registration a hassle-free experience, so you can focus on growing your business.
+                Don't let compliance slow you down. Our experts handle your monthly GST returns, so you can focus on growing your business.
               </p>
               <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
                 <Link href={`/dashboard/new-form?service=${encodeURIComponent("GST Filing")}`} passHref>
                   <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                    Apply for GSTIN Now
+                    Start GST Filing Service
                     <FileCheck className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>

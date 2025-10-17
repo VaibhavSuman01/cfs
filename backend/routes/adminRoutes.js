@@ -13,11 +13,7 @@ const sendEmail = require("../utils/email");
 const emailTemplates = require("../utils/emailTemplates");
 const mongoose = require("mongoose");
 const isValidObjectId = mongoose.Types.ObjectId.isValid;
-const {
-  getFileData,
-  cleanupTempFiles,
-  generateUniqueFilename,
-} = require("../utils/fileHandler");
+const { getFileData, cleanupTempFiles, generateUniqueFilename } = require("../utils/fileHandler");
 
 // Import all the new models
 const CompanyForm = require("../models/CompanyForm");
@@ -112,39 +108,25 @@ router.delete("/service-forms/:id/reports/:reportId", async (req, res) => {
 
     // Validate IDs
     if (!isValidObjectId(id)) {
-      return res.status(400).json({
-        message: "Invalid form ID format. Must be a 24-character hex string.",
-      });
+      return res.status(400).json({ message: "Invalid form ID format. Must be a 24-character hex string." });
     }
     if (!isValidObjectId(reportId)) {
-      return res.status(400).json({
-        message: "Invalid report ID format. Must be a 24-character hex string.",
-      });
+      return res.status(400).json({ message: "Invalid report ID format. Must be a 24-character hex string." });
     }
 
     // Determine model based on service
     let model;
-    if (
-      service === "Company Formation" ||
-      (service || "").includes("Company")
-    ) {
+    if (service === 'Company Formation' || (service || '').includes('Company')) {
       model = CompanyForm;
-    } else if (
-      service === "Other Registration" ||
-      (service || "").includes("Registration")
-    ) {
+    } else if (service === 'Other Registration' || (service || '').includes('Registration')) {
       model = OtherRegistrationForm;
-    } else if (service === "ROC Returns" || (service || "").includes("ROC")) {
+    } else if (service === 'ROC Returns' || (service || '').includes('ROC')) {
       model = ROCForm;
-    } else if (service === "Reports" || (service || "").includes("Report")) {
+    } else if (service === 'Reports' || (service || '').includes('Report')) {
       model = ReportsForm;
-    } else if (
-      service === "Trademark & ISO" ||
-      (service || "").includes("Trademark") ||
-      (service || "").includes("ISO")
-    ) {
+    } else if (service === 'Trademark & ISO' || (service || '').includes('Trademark') || (service || '').includes('ISO')) {
       model = TrademarkISOForm;
-    } else if (service === "Advisory" || (service || "").includes("Advisory")) {
+    } else if (service === 'Advisory' || (service || '').includes('Advisory')) {
       model = AdvisoryForm;
     } else {
       model = TaxForm;
@@ -156,9 +138,7 @@ router.delete("/service-forms/:id/reports/:reportId", async (req, res) => {
     }
 
     // Find report
-    const reportIndex = (form.reports || []).findIndex(
-      (r) => r._id.toString() === reportId
-    );
+    const reportIndex = (form.reports || []).findIndex(r => r._id.toString() === reportId);
     if (reportIndex === -1) {
       return res.status(404).json({ message: "Report not found" });
     }
@@ -172,9 +152,7 @@ router.delete("/service-forms/:id/reports/:reportId", async (req, res) => {
     // Remove attached document if present
     let removedDocument = null;
     if (docId && form.documents && form.documents.length) {
-      const docIndex = form.documents.findIndex(
-        (d) => d._id.toString() === docId
-      );
+      const docIndex = form.documents.findIndex(d => d._id.toString() === docId);
       if (docIndex !== -1) {
         removedDocument = form.documents[docIndex];
         form.documents.splice(docIndex, 1);
@@ -194,14 +172,105 @@ router.delete("/service-forms/:id/reports/:reportId", async (req, res) => {
   }
 });
 
+// @route   GET /api/admin/forms/:id/documents/:documentId
+// @desc    Download document from any form (admin access)
+// @access  Private/Admin
+router.get("/forms/:id/documents/:documentId", protect, async (req, res) => {
+  console.log('Admin download endpoint reached:', req.url);
+  try {
+    const { id, documentId } = req.params;
+
+    console.log(`Admin download request: formId=${id}, documentId=${documentId}`);
+    console.log(`User:`, req.user ? { id: req.user._id, role: req.user.role, email: req.user.email } : 'No user');
+
+    // Check if user is admin
+    if (req.user.role !== 'admin') {
+      console.log('Access denied: User is not admin');
+      return res.status(403).json({ message: 'Access denied. Admin role required.' });
+    }
+
+    if (!isValidObjectId(id) || !isValidObjectId(documentId)) {
+      return res.status(400).json({ message: "Invalid ID format" });
+    }
+
+    console.log(`Admin downloading document: ${documentId} from form: ${id}`);
+
+    // Search across all form models
+    const models = [
+      { model: TaxForm, name: 'TaxForm' },
+      { model: CompanyForm, name: 'CompanyForm' },
+      { model: ROCForm, name: 'ROCForm' },
+      { model: OtherRegistrationForm, name: 'OtherRegistrationForm' },
+      { model: ReportsForm, name: 'ReportsForm' },
+      { model: TrademarkISOForm, name: 'TrademarkISOForm' },
+      { model: AdvisoryForm, name: 'AdvisoryForm' }
+    ];
+
+    let form = null;
+    let document = null;
+
+    // Search each model for the form and document
+    for (const { model, name } of models) {
+      try {
+        form = await model.findById(id);
+        if (form) {
+          console.log(`Found form in ${name} model:`, form._id);
+          
+          // For TaxForm, check adminData.reports for embedded documents
+          if (name === 'TaxForm' && form.adminData && form.adminData.reports) {
+            for (const report of form.adminData.reports) {
+              if (report.document && report.document._id.toString() === documentId) {
+                console.log(`Found document in TaxForm adminData.reports:`, report.document._id);
+                document = report.document;
+                break;
+              }
+            }
+            if (document) break;
+          }
+
+          // Find the specific document in the documents array (for non-TaxForm or fallback)
+          if (!document) {
+            document = form.documents.find(
+              (doc) => doc._id.toString() === documentId
+            );
+
+            if (document) {
+              console.log(`Found document in ${name} model documents array:`, document._id);
+              break;
+            }
+          }
+        }
+      } catch (err) {
+        console.error(`Error searching in ${name} model:`, err);
+        continue;
+      }
+    }
+
+    if (!form || !document) {
+      return res.status(404).json({ message: "Document not found" });
+    }
+    
+    res.set({
+      "Content-Type": document.contentType || document.fileType || "application/octet-stream",
+      "Content-Disposition": `attachment; filename="${document.originalName || document.fileName || "document"}"`,
+    });
+    
+    res.send(document.fileData);
+  } catch (error) {
+    console.error("Error downloading document:", error);
+    res.status(500).json({ message: "Server error while downloading document" });
+  }
+});
+
 // @route   GET /api/admin/forms/:id
 // @desc    Get single tax form submission
 // @access  Private/Admin
 router.get("/forms/:id", validateObjectId(), async (req, res) => {
   try {
     const id = req.params.id;
-
-    const form = await TaxForm.findById(id).select("-documents.fileData"); // Exclude file data to reduce payload size
+    
+    const form = await TaxForm.findById(id)
+      .select("-documents.fileData"); // Exclude file data to reduce payload size
 
     if (!form) {
       return res.status(404).json({ message: "Form not found" });
@@ -214,231 +283,178 @@ router.get("/forms/:id", validateObjectId(), async (req, res) => {
   }
 });
 
-// @route   GET /api/admin/forms/:id/documents/:documentId
-// @desc    Download a document from a tax form submission (admin access)
-// @access  Private/Admin
-router.get(
-  "/forms/:id/documents/:documentId",
-  validateObjectId("id"),
-  async (req, res) => {
-    try {
-      const formId = req.params.id;
-      const documentId = req.params.documentId;
-
-      // Validate documentId
-      if (!isValidObjectId(documentId)) {
-        return res.status(400).json({
-          message:
-            "Invalid document ID format. Must be a 24-character hex string.",
-        });
-      }
-
-      // Find the tax form containing the document
-      const taxForm = await TaxForm.findById(formId);
-
-      if (!taxForm) {
-        return res.status(404).json({ message: "Form not found" });
-      }
-
-      // Find the specific document in the documents array
-      const document = taxForm.documents.find(
-        (doc) => doc._id.toString() === documentId
-      );
-
-      if (!document) {
-        return res.status(404).json({ message: "Document not found" });
-      }
-
-      // Set response headers
-      res.set({
-        "Content-Type": document.contentType,
-        "Content-Disposition": `attachment; filename="${
-          document.originalName || document.fileName || "document"
-        }"`,
-      });
-
-      // Send the file data
-      res.send(document.fileData);
-    } catch (error) {
-      console.error("Error downloading document:", error);
-      res.status(500).json({ message: "Server error" });
-    }
-  }
-);
 
 // @route   POST /api/admin/forms/:id/send-report
 // @desc    Send a report to the user
 // @access  Private/Admin
-router.post(
-  "/forms/:id/send-report",
-  validateObjectId(),
-  upload.single("reportFile"),
-  async (req, res) => {
-    try {
-      const { reportType, message, attachmentIds } = req.body;
-      const id = req.params.id;
-
-      // Validate required fields
-      if (!reportType || !message) {
-        return res
-          .status(400)
-          .json({ message: "Report type and message are required" });
-      }
-
-      // Find the form - try different models
-      let form = null;
-      let formModel = null;
-
-      // Try to find the form in different collections
-      const models = [
-        { model: TaxForm, name: "TaxForm" },
-        { model: CompanyForm, name: "CompanyForm" },
-        { model: OtherRegistrationForm, name: "OtherRegistrationForm" },
-        { model: ROCForm, name: "ROCForm" },
-        { model: ReportsForm, name: "ReportsForm" },
-        { model: TrademarkISOForm, name: "TrademarkISOForm" },
-        { model: AdvisoryForm, name: "AdvisoryForm" },
-      ];
-
-      for (const { model, name } of models) {
-        try {
-          form = await model.findById(id);
-          if (form) {
-            formModel = model;
-            break;
-          }
-        } catch (error) {
-          // Continue to next model if this one fails
-          continue;
+router.post("/forms/:id/send-report", validateObjectId(), upload.single('reportFile'), async (req, res) => {
+  try {
+    const { reportType, message, attachmentIds } = req.body;
+    const id = req.params.id;
+    
+    // Validate required fields
+    if (!reportType || !message) {
+      return res.status(400).json({ message: "Report type and message are required" });
+    }
+    
+    // Find the form - try different models
+    let form = null;
+    let formModel = null;
+    
+    // Try to find the form in different collections
+    const models = [
+      { model: TaxForm, name: 'TaxForm' },
+      { model: CompanyForm, name: 'CompanyForm' },
+      { model: OtherRegistrationForm, name: 'OtherRegistrationForm' },
+      { model: ROCForm, name: 'ROCForm' },
+      { model: ReportsForm, name: 'ReportsForm' },
+      { model: TrademarkISOForm, name: 'TrademarkISOForm' },
+      { model: AdvisoryForm, name: 'AdvisoryForm' }
+    ];
+    
+    for (const { model, name } of models) {
+      try {
+        form = await model.findById(id);
+        if (form) {
+          formModel = model;
+          break;
         }
+      } catch (error) {
+        // Continue to next model if this one fails
+        continue;
       }
-
-      if (!form) {
-        return res.status(404).json({ message: "Form not found" });
-      }
-
-      // Ensure user is authenticated
-      if (!req.user || !req.user._id) {
-        return res.status(401).json({ message: "User not authenticated" });
-      }
-
-      // Get user email from the form
-      const userEmail = form.email;
-
-      // TODO: Implement email sending functionality
-      // This would typically involve:
-      // 1. Creating an email with the message
-      // 2. Attaching any documents specified by attachmentIds
-      // 3. Sending the email to the user
-
-      let newReportDocument = null;
-      let documentId = undefined;
-
-      if (req.file) {
-        // Use getFileData utility to handle both disk and memory storage
-        const fileData = getFileData(req.file);
-
-        // Check if this is a TaxForm to store in adminData section
-        if (formModel.modelName === "TaxForm") {
-          // Initialize adminData if it doesn't exist
-          if (!form.adminData) {
-            form.adminData = { reports: [], documents: [], notes: [] };
-          }
-
-          // Create admin report with embedded document
-          const adminReport = {
-            type: reportType,
-            message: message,
-            sentAt: new Date(),
-            sentBy: req.user._id,
-            document: {
-              fileName: req.file.originalname,
-              originalName: req.file.originalname,
-              fileType: req.file.mimetype,
-              fileSize: req.file.size,
-              fileData: fileData,
-              contentType: req.file.mimetype,
-              uploadDate: new Date(),
-            },
-          };
-
-          form.adminData.reports.push(adminReport);
-          documentId =
-            form.adminData.reports[form.adminData.reports.length - 1]._id;
-        } else {
-          // For non-TaxForm models, use the existing documents array approach
-          newReportDocument = {
-            documentType: "admin-report",
+    }
+    
+    if (!form) {
+      return res.status(404).json({ message: "Form not found" });
+    }
+    
+    // Ensure user is authenticated
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({ message: "User not authenticated" });
+    }
+    
+    // Get user email from the form
+    const userEmail = form.email;
+    
+    // TODO: Implement email sending functionality
+    // This would typically involve:
+    // 1. Creating an email with the message
+    // 2. Attaching any documents specified by attachmentIds
+    // 3. Sending the email to the user
+    
+        let newReportDocument = null;
+    let documentId = undefined;
+    
+    if (req.file) {
+      // Use getFileData utility to handle both disk and memory storage
+      const fileData = getFileData(req.file);
+      
+      // Check if this is a TaxForm to store in adminData section
+      if (formModel.modelName === 'TaxForm') {
+        // Initialize adminData if it doesn't exist
+        if (!form.adminData) {
+          form.adminData = { reports: [], documents: [], notes: [] };
+        }
+        
+        // Create admin report with embedded document
+        const adminReport = {
+          type: reportType,
+          message: message,
+          sentAt: new Date(),
+          sentBy: req.user._id,
+          document: {
             fileName: req.file.originalname,
             originalName: req.file.originalname,
             fileType: req.file.mimetype,
             fileSize: req.file.size,
             fileData: fileData,
             contentType: req.file.mimetype,
-            uploadedBy: "admin",
-            reportType: reportType,
-            message: message,
-            createdAt: new Date(),
-          };
-          form.documents.push(newReportDocument);
-          documentId = form.documents[form.documents.length - 1]._id;
-        }
-
-        // Clean up temporary files (only applies to disk storage)
-        cleanupTempFiles([req.file]);
-      }
-
-      // Update the form to record that a report was sent
-      // For TaxForms, the report is already stored in adminData.reports
-      // For other forms, we still use the general reports array for tracking
-      if (formModel.modelName !== "TaxForm") {
-        form.reports.push({
-          type: reportType,
+            uploadDate: new Date()
+          }
+        };
+        
+        form.adminData.reports.push(adminReport);
+        documentId = form.adminData.reports[form.adminData.reports.length - 1]._id;
+      } else {
+        // For non-TaxForm models, use the existing documents array approach
+        newReportDocument = {
+          documentType: 'admin-report',
+          fileName: req.file.originalname,
+          originalName: req.file.originalname,
+          fileType: req.file.mimetype,
+          fileSize: req.file.size,
+          fileData: fileData,
+          contentType: req.file.mimetype,
+          uploadedBy: 'admin',
+          reportType: reportType,
           message: message,
-          sentAt: new Date(),
-          sentBy: req.user._id,
-          documentId: documentId,
-        });
+          createdAt: new Date(),
+        };
+        form.documents.push(newReportDocument);
+        documentId = form.documents[form.documents.length - 1]._id;
       }
+      
+      // Clean up temporary files (only applies to disk storage)
+      cleanupTempFiles([req.file]);
+    }
 
-      await form.save();
-
-      // EMAIL SENDING DISABLED FOR REPORTS
-      // Note: Email notifications for report distribution have been disabled
-      // The report is still generated and stored in the database
-      // Users can access reports through their dashboard
-      console.log(
-        `Report generated and stored for user ${userEmail} - Email notification disabled`
-      );
-
-      res.json({ success: true, message: "Report sent successfully" });
-    } catch (error) {
-      console.error("Send report error:", error);
-
-      // Handle specific mongoose validation errors
-      if (error.name === "ValidationError") {
-        const validationErrors = Object.values(error.errors).map(
-          (err) => err.message
-        );
-        return res.status(400).json({
-          message: "Validation failed",
-          errors: validationErrors,
-        });
-      }
-
-      // Handle mongoose cast errors (invalid ObjectId)
-      if (error.name === "CastError") {
-        return res.status(400).json({ message: "Invalid ID format" });
-      }
-
-      res.status(500).json({
-        message: "Server error",
-        error:
-          process.env.NODE_ENV === "development" ? error.message : undefined,
+    // Update the form to record that a report was sent
+    // For TaxForms, the report is already stored in adminData.reports
+    // For other forms, we still use the general reports array for tracking
+    if (formModel.modelName !== 'TaxForm') {
+      form.reports.push({
+        type: reportType,
+        message: message,
+        sentAt: new Date(),
+        sentBy: req.user._id,
+        documentId: documentId
       });
     }
+
+    await form.save();
+
+    // Send an email to the user
+    try {
+      const emailSubject = `A new report has been sent to you: ${reportType}`;
+      const emailMessage = `Hello ${form.fullName},\n\nA new report of type '${reportType}' has been sent to you by the admin.\n\nMessage from admin: ${message}\n\nYou can view and download the report from your dashboard.\n\nThank you,\nCom Finserv Team`;
+
+      await sendEmail({
+        email: userEmail,
+        subject: emailSubject,
+        message: emailMessage,
+      });
+
+      console.log(`Report email sent to ${userEmail}`);
+    } catch (emailError) {
+      console.error(`Failed to send report email to ${userEmail}:`, emailError);
+      // Don't block the response for email failure, just log it
+    }
+    
+    res.json({ success: true, message: "Report sent successfully" });
+  } catch (error) {
+    console.error("Send report error:", error);
+    
+    // Handle specific mongoose validation errors
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ 
+        message: "Validation failed", 
+        errors: validationErrors 
+      });
+    }
+    
+    // Handle mongoose cast errors (invalid ObjectId)
+    if (error.name === 'CastError') {
+      return res.status(400).json({ message: "Invalid ID format" });
+    }
+    
+    res.status(500).json({ 
+      message: "Server error", 
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined 
+    });
   }
-);
+});
 
 // @route   PUT /api/admin/forms/:id/status
 // @desc    Update form status
@@ -460,13 +476,13 @@ router.put("/forms/:id/status", validateObjectId(), async (req, res) => {
 
     // Define all form models to search
     const formModels = [
-      { model: TaxForm, name: "TaxForm" },
-      { model: CompanyForm, name: "CompanyForm" },
-      { model: ROCForm, name: "ROCForm" },
-      { model: OtherRegistrationForm, name: "OtherRegistrationForm" },
-      { model: ReportsForm, name: "ReportsForm" },
-      { model: TrademarkISOForm, name: "TrademarkISOForm" },
-      { model: AdvisoryForm, name: "AdvisoryForm" },
+      { model: TaxForm, name: 'TaxForm' },
+      { model: CompanyForm, name: 'CompanyForm' },
+      { model: ROCForm, name: 'ROCForm' },
+      { model: OtherRegistrationForm, name: 'OtherRegistrationForm' },
+      { model: ReportsForm, name: 'ReportsForm' },
+      { model: TrademarkISOForm, name: 'TrademarkISOForm' },
+      { model: AdvisoryForm, name: 'AdvisoryForm' }
     ];
 
     let form = null;
@@ -493,7 +509,7 @@ router.put("/forms/:id/status", validateObjectId(), async (req, res) => {
     // Update form status
     form.status = status;
     form.updatedAt = Date.now();
-
+    
     // Add comment if provided
     if (comment) {
       if (!form.adminComments) {
@@ -502,7 +518,7 @@ router.put("/forms/:id/status", validateObjectId(), async (req, res) => {
       form.adminComments.push({
         comment,
         createdAt: new Date(),
-        createdBy: "admin",
+        createdBy: 'admin'
       });
     }
 
@@ -512,7 +528,7 @@ router.put("/forms/:id/status", validateObjectId(), async (req, res) => {
       success: true,
       message: "Form status updated",
       form,
-      formType,
+      formType
     });
   } catch (error) {
     console.error("Update status error:", error);
@@ -545,76 +561,41 @@ router.get("/stats", async (req, res) => {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
       const start = new Date(d.getFullYear(), d.getMonth(), 1);
       const end = new Date(d.getFullYear(), d.getMonth() + 1, 1);
-      const label = start.toLocaleString("en-US", { month: "short" });
-      months.push({
-        year: start.getFullYear(),
-        month: start.getMonth() + 1,
-        start,
-        end,
-        label,
-      });
+      const label = start.toLocaleString('en-US', { month: 'short' });
+      months.push({ year: start.getFullYear(), month: start.getMonth() + 1, start, end, label });
     }
 
     // Aggregations
     const usersAgg = await User.aggregate([
-      { $match: { role: "user", createdAt: { $gte: months[0].start } } },
-      {
-        $group: {
-          _id: { y: { $year: "$createdAt" }, m: { $month: "$createdAt" } },
-          count: { $sum: 1 },
-        },
-      },
+      { $match: { role: 'user', createdAt: { $gte: months[0].start } } },
+      { $group: { _id: { y: { $year: '$createdAt' }, m: { $month: '$createdAt' } }, count: { $sum: 1 } } }
     ]);
 
     const contactsAgg = await Contact.aggregate([
       { $match: { createdAt: { $gte: months[0].start } } },
-      {
-        $group: {
-          _id: { y: { $year: "$createdAt" }, m: { $month: "$createdAt" } },
-          count: { $sum: 1 },
-        },
-      },
+      { $group: { _id: { y: { $year: '$createdAt' }, m: { $month: '$createdAt' } }, count: { $sum: 1 } } }
     ]);
 
     const formsAgg = await TaxForm.aggregate([
       { $match: { createdAt: { $gte: months[0].start } } },
-      {
-        $group: {
-          _id: {
-            y: { $year: "$createdAt" },
-            m: { $month: "$createdAt" },
-            status: "$status",
-          },
-          count: { $sum: 1 },
-        },
-      },
+      { $group: { _id: { y: { $year: '$createdAt' }, m: { $month: '$createdAt' }, status: '$status' }, count: { $sum: 1 } } }
     ]);
 
     // Map aggregations to last-12-month arrays
     const usersMonthly = months.map(({ year, month, label }) => {
-      const hit = usersAgg.find((a) => a._id.y === year && a._id.m === month);
+      const hit = usersAgg.find(a => a._id.y === year && a._id.m === month);
       return { month: label, users: hit ? hit.count : 0 };
     });
 
     const contactsMonthly = months.map(({ year, month, label }) => {
-      const hit = contactsAgg.find(
-        (a) => a._id.y === year && a._id.m === month
-      );
+      const hit = contactsAgg.find(a => a._id.y === year && a._id.m === month);
       return { month: label, contacts: hit ? hit.count : 0 };
     });
 
     const formsTrendMonthly = months.map(({ year, month, label }) => {
-      const pendingHit = formsAgg.find(
-        (a) =>
-          a._id.y === year && a._id.m === month && a._id.status === "Pending"
-      );
-      const reviewedHit = formsAgg.find(
-        (a) =>
-          a._id.y === year && a._id.m === month && a._id.status === "Reviewed"
-      );
-      const filedHit = formsAgg.find(
-        (a) => a._id.y === year && a._id.m === month && a._id.status === "Filed"
-      );
+      const pendingHit = formsAgg.find(a => a._id.y === year && a._id.m === month && a._id.status === 'Pending');
+      const reviewedHit = formsAgg.find(a => a._id.y === year && a._id.m === month && a._id.status === 'Reviewed');
+      const filedHit = formsAgg.find(a => a._id.y === year && a._id.m === month && a._id.status === 'Filed');
       return {
         month: label,
         pending: pendingHit ? pendingHit.count : 0,
@@ -699,11 +680,9 @@ router.get("/users", async (req, res) => {
     }
 
     const users = await User.find(filter)
-      .select(
-        "name fatherName mobile email address pan aadhaar dob createdAt isBlocked blockedAt blockReason blockedBy unblockedAt unblockedBy"
-      )
-      .populate("blockedBy", "name email")
-      .populate("unblockedBy", "name email")
+      .select("name fatherName mobile email address pan aadhaar dob createdAt isBlocked blockedAt blockReason blockedBy unblockedAt unblockedBy")
+      .populate('blockedBy', 'name email')
+      .populate('unblockedBy', 'name email')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit));
@@ -732,8 +711,8 @@ router.get("/users/:id", validateObjectId(), async (req, res) => {
   try {
     const user = await User.findById(req.params.id)
       .select("-password")
-      .populate("blockedBy", "name email")
-      .populate("unblockedBy", "name email");
+      .populate('blockedBy', 'name email')
+      .populate('unblockedBy', 'name email');
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -751,9 +730,8 @@ router.get("/users/:id", validateObjectId(), async (req, res) => {
 // @access  Private/Admin
 router.put("/users/:id", validateObjectId(), async (req, res) => {
   try {
-    const { name, email, mobile, pan, aadhaar, fatherName, address, dob } =
-      req.body;
-
+    const { name, email, mobile, pan, aadhaar, fatherName, address, dob } = req.body;
+    
     const user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -761,10 +739,7 @@ router.put("/users/:id", validateObjectId(), async (req, res) => {
 
     // Check if email is being changed and if it already exists
     if (email && email !== user.email) {
-      const existingUser = await User.findOne({
-        email,
-        _id: { $ne: req.params.id },
-      });
+      const existingUser = await User.findOne({ email, _id: { $ne: req.params.id } });
       if (existingUser) {
         return res.status(400).json({ message: "Email already exists" });
       }
@@ -785,17 +760,15 @@ router.put("/users/:id", validateObjectId(), async (req, res) => {
     res.json({ message: "User updated successfully", user });
   } catch (error) {
     console.error("Update user error:", error);
-
+    
     // Handle specific MongoDB errors
     if (error.code === 11000) {
       const field = Object.keys(error.keyPattern)[0];
-      return res.status(400).json({
-        message: `${
-          field.charAt(0).toUpperCase() + field.slice(1)
-        } already exists`,
+      return res.status(400).json({ 
+        message: `${field.charAt(0).toUpperCase() + field.slice(1)} already exists` 
       });
     }
-
+    
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -806,7 +779,7 @@ router.put("/users/:id", validateObjectId(), async (req, res) => {
 router.post("/users/:id/block", validateObjectId(), async (req, res) => {
   try {
     const { reason } = req.body;
-
+    
     const user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -825,12 +798,8 @@ router.post("/users/:id/block", validateObjectId(), async (req, res) => {
 
     // Send email notification to user
     try {
-      const adminUser = await User.findById(req.user._id).select("name email");
-      const emailTemplate = emailTemplates.userBlocked(
-        user.name,
-        reason,
-        adminUser?.name || "Admin"
-      );
+      const adminUser = await User.findById(req.user._id).select('name email');
+      const emailTemplate = emailTemplates.userBlocked(user.name, reason, adminUser?.name || 'Admin');
 
       await sendEmail({
         email: user.email,
@@ -841,10 +810,7 @@ router.post("/users/:id/block", validateObjectId(), async (req, res) => {
 
       console.log(`Block notification email sent to ${user.email}`);
     } catch (emailError) {
-      console.error(
-        `Failed to send block notification email to ${user.email}:`,
-        emailError
-      );
+      console.error(`Failed to send block notification email to ${user.email}:`, emailError);
     }
 
     res.json({ message: "User blocked successfully" });
@@ -876,11 +842,8 @@ router.post("/users/:id/unblock", validateObjectId(), async (req, res) => {
 
     // Send email notification to user
     try {
-      const adminUser = await User.findById(req.user._id).select("name email");
-      const emailTemplate = emailTemplates.userUnblocked(
-        user.name,
-        adminUser?.name || "Admin"
-      );
+      const adminUser = await User.findById(req.user._id).select('name email');
+      const emailTemplate = emailTemplates.userUnblocked(user.name, adminUser?.name || 'Admin');
 
       await sendEmail({
         email: user.email,
@@ -891,10 +854,7 @@ router.post("/users/:id/unblock", validateObjectId(), async (req, res) => {
 
       console.log(`Unblock notification email sent to ${user.email}`);
     } catch (emailError) {
-      console.error(
-        `Failed to send unblock notification email to ${user.email}:`,
-        emailError
-      );
+      console.error(`Failed to send unblock notification email to ${user.email}:`, emailError);
     }
 
     res.json({ message: "User unblocked successfully" });
@@ -970,19 +930,19 @@ router.get("/users/download", async (req, res) => {
       { header: "PAN", key: "pan", width: 15 },
       { header: "Aadhaar Number", key: "aadhaar", width: 18 },
       { header: "Date of Birth", key: "dob", width: 15 },
-      { header: "Registered On", key: "createdAt", width: 15 },
+      { header: "Registered On", key: "createdAt", width: 15 }
     ];
 
     // Style the header row
     worksheet.getRow(1).font = { bold: true };
     worksheet.getRow(1).fill = {
-      type: "pattern",
-      pattern: "solid",
-      fgColor: { argb: "FFE0E0E0" },
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFE0E0E0' }
     };
 
     // Add rows
-    users.forEach((user) => {
+    users.forEach(user => {
       worksheet.addRow({
         name: user.name || "N/A",
         fatherName: user.fatherName || "N/A",
@@ -992,13 +952,13 @@ router.get("/users/download", async (req, res) => {
         pan: user.pan || "N/A",
         aadhaar: user.aadhaar || "N/A",
         dob: user.dob ? new Date(user.dob).toLocaleDateString() : "N/A",
-        createdAt: new Date(user.createdAt).toLocaleDateString(),
+        createdAt: new Date(user.createdAt).toLocaleDateString()
       });
     });
 
     // Generate buffer instead of writing directly to response
     const buffer = await workbook.xlsx.writeBuffer();
-
+    
     // Set response headers
     res.setHeader(
       "Content-Type",
@@ -1006,9 +966,7 @@ router.get("/users/download", async (req, res) => {
     );
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename=registered_users_${
-        new Date().toISOString().split("T")[0]
-      }.xlsx`
+      `attachment; filename=registered_users_${new Date().toISOString().split('T')[0]}.xlsx`
     );
     res.setHeader("Content-Length", buffer.length);
 
@@ -1036,7 +994,7 @@ router.post("/contacts/:id/reply", validateObjectId(), async (req, res) => {
       await sendEmail({
         email: contact.email,
         subject: `Re: Your inquiry about ${contact.service}`,
-        message: `Dear ${contact.name},\n\nThank you for reaching out to us. Here is the response to your query:\n\n${message}\n\nBest regards,\nThe Com Finance Team`,
+        message: `Dear ${contact.name},\n\nThank you for reaching out to us. Here is the response to your query:\n\n${message}\n\nBest regards,\nThe Com Finserv Team`,
       });
 
       contact.replied = true;
@@ -1059,22 +1017,14 @@ router.post("/contacts/:id/reply", validateObjectId(), async (req, res) => {
 router.get("/test-forms", async (req, res) => {
   try {
     // Check all models for forms
-    const [
-      taxCount,
-      companyCount,
-      rocCount,
-      otherCount,
-      reportsCount,
-      trademarkCount,
-      advisoryCount,
-    ] = await Promise.all([
+    const [taxCount, companyCount, rocCount, otherCount, reportsCount, trademarkCount, advisoryCount] = await Promise.all([
       TaxForm.countDocuments(),
       CompanyForm.countDocuments(),
       ROCForm.countDocuments(),
       OtherRegistrationForm.countDocuments(),
       ReportsForm.countDocuments(),
       TrademarkISOForm.countDocuments(),
-      AdvisoryForm.countDocuments(),
+      AdvisoryForm.countDocuments()
     ]);
 
     res.json({
@@ -1086,16 +1036,9 @@ router.get("/test-forms", async (req, res) => {
         OtherRegistrationForm: otherCount,
         ReportsForm: reportsCount,
         TrademarkISOForm: trademarkCount,
-        AdvisoryForm: advisoryCount,
+        AdvisoryForm: advisoryCount
       },
-      total:
-        taxCount +
-        companyCount +
-        rocCount +
-        otherCount +
-        reportsCount +
-        trademarkCount +
-        advisoryCount,
+      total: taxCount + companyCount + rocCount + otherCount + reportsCount + trademarkCount + advisoryCount
     });
   } catch (error) {
     console.error("Test forms error:", error);
@@ -1121,8 +1064,8 @@ router.get("/service-forms", async (req, res) => {
     // Build filter object
     const filter = {};
 
-    if (service && service !== "all") filter.service = service;
-    if (status && status !== "all") filter.status = status;
+    if (service && service !== 'all') filter.service = service;
+    if (status && status !== 'all') filter.status = status;
 
     // Unified search across common fields
     if (search) {
@@ -1144,69 +1087,25 @@ router.get("/service-forms", async (req, res) => {
     }
 
     // Fetch forms from ALL models
-    const [
-      taxForms,
-      companyForms,
-      rocForms,
-      otherRegistrationForms,
-      reportsForms,
-      trademarkISOForms,
-      advisoryForms,
-    ] = await Promise.all([
-      TaxForm.find(filter)
-        .select("-documents.fileData")
-        .populate("user", "name email mobile pan")
-        .sort({ createdAt: -1 }),
-      CompanyForm.find(filter)
-        .select("-documents.fileData")
-        .populate("user", "name email mobile pan")
-        .sort({ createdAt: -1 }),
-      ROCForm.find(filter)
-        .select("-documents.fileData")
-        .populate("user", "name email mobile pan")
-        .sort({ createdAt: -1 }),
-      OtherRegistrationForm.find(filter)
-        .select("-documents.fileData")
-        .populate("user", "name email mobile pan")
-        .sort({ createdAt: -1 }),
-      ReportsForm.find(filter)
-        .select("-documents.fileData")
-        .populate("user", "name email mobile pan")
-        .sort({ createdAt: -1 }),
-      TrademarkISOForm.find(filter)
-        .select("-documents.fileData")
-        .populate("user", "name email mobile pan")
-        .sort({ createdAt: -1 }),
-      AdvisoryForm.find(filter)
-        .select("-documents.fileData")
-        .populate("user", "name email mobile pan")
-        .sort({ createdAt: -1 }),
+    const [taxForms, companyForms, rocForms, otherRegistrationForms, reportsForms, trademarkISOForms, advisoryForms] = await Promise.all([
+      TaxForm.find(filter).select("-documents.fileData").populate('user', 'name email mobile pan').sort({ createdAt: -1 }),
+      CompanyForm.find(filter).select("-documents.fileData").populate('user', 'name email mobile pan').sort({ createdAt: -1 }),
+      ROCForm.find(filter).select("-documents.fileData").populate('user', 'name email mobile pan').sort({ createdAt: -1 }),
+      OtherRegistrationForm.find(filter).select("-documents.fileData").populate('user', 'name email mobile pan').sort({ createdAt: -1 }),
+      ReportsForm.find(filter).select("-documents.fileData").populate('user', 'name email mobile pan').sort({ createdAt: -1 }),
+      TrademarkISOForm.find(filter).select("-documents.fileData").populate('user', 'name email mobile pan').sort({ createdAt: -1 }),
+      AdvisoryForm.find(filter).select("-documents.fileData").populate('user', 'name email mobile pan').sort({ createdAt: -1 })
     ]);
 
     // Combine all forms and add form type identifier
     const allForms = [
-      ...taxForms.map((form) => ({ ...form.toObject(), formType: "TaxForm" })),
-      ...companyForms.map((form) => ({
-        ...form.toObject(),
-        formType: "CompanyForm",
-      })),
-      ...rocForms.map((form) => ({ ...form.toObject(), formType: "ROCForm" })),
-      ...otherRegistrationForms.map((form) => ({
-        ...form.toObject(),
-        formType: "OtherRegistrationForm",
-      })),
-      ...reportsForms.map((form) => ({
-        ...form.toObject(),
-        formType: "ReportsForm",
-      })),
-      ...trademarkISOForms.map((form) => ({
-        ...form.toObject(),
-        formType: "TrademarkISOForm",
-      })),
-      ...advisoryForms.map((form) => ({
-        ...form.toObject(),
-        formType: "AdvisoryForm",
-      })),
+      ...taxForms.map(form => ({ ...form.toObject(), formType: 'TaxForm' })),
+      ...companyForms.map(form => ({ ...form.toObject(), formType: 'CompanyForm' })),
+      ...rocForms.map(form => ({ ...form.toObject(), formType: 'ROCForm' })),
+      ...otherRegistrationForms.map(form => ({ ...form.toObject(), formType: 'OtherRegistrationForm' })),
+      ...reportsForms.map(form => ({ ...form.toObject(), formType: 'ReportsForm' })),
+      ...trademarkISOForms.map(form => ({ ...form.toObject(), formType: 'TrademarkISOForm' })),
+      ...advisoryForms.map(form => ({ ...form.toObject(), formType: 'AdvisoryForm' }))
     ];
 
     // Sort all forms by creation date (newest first)
@@ -1238,70 +1137,62 @@ router.get("/forms/service", admin, async (req, res) => {
   try {
     const { service, status, search } = req.query;
     let query = {};
-
+    
     // Filter by service type
-    if (service && service !== "all") {
+    if (service && service !== 'all') {
       query.service = service;
     }
-
+    
     // Filter by status
-    if (status && status !== "all") {
+    if (status && status !== 'all') {
       query.status = status;
     }
-
+    
     // Search functionality
     if (search) {
-      const searchRegex = new RegExp(search, "i");
+      const searchRegex = new RegExp(search, 'i');
       query.$or = [
         { businessName: searchRegex },
         { companyName: searchRegex },
         { fullName: searchRegex },
-        { email: searchRegex },
+        { email: searchRegex }
       ];
     }
-
+    
     // Determine which model to use based on service category
     let forms = [];
     let model;
-
-    if (service === "Company Formation" || service.includes("Company")) {
+    
+    if (service === 'Company Formation' || service.includes('Company')) {
       model = CompanyForm;
-    } else if (
-      service === "Other Registration" ||
-      service.includes("Registration")
-    ) {
+    } else if (service === 'Other Registration' || service.includes('Registration')) {
       model = OtherRegistrationForm;
-    } else if (service === "ROC Returns" || service.includes("ROC")) {
+    } else if (service === 'ROC Returns' || service.includes('ROC')) {
       model = ROCForm;
-    } else if (service === "Reports" || service.includes("Report")) {
+    } else if (service === 'Reports' || service.includes('Report')) {
       model = ReportsForm;
-    } else if (
-      service === "Trademark & ISO" ||
-      service.includes("Trademark") ||
-      service.includes("ISO")
-    ) {
+    } else if (service === 'Trademark & ISO' || service.includes('Trademark') || service.includes('ISO')) {
       model = TrademarkISOForm;
-    } else if (service === "Advisory" || service.includes("Advisory")) {
+    } else if (service === 'Advisory' || service.includes('Advisory')) {
       model = AdvisoryForm;
     } else {
       // Default to TaxForm for taxation services
       model = TaxForm;
     }
-
+    
     // Fetch forms with pagination
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
-
-    forms = await model
-      .find(query)
-      .populate("user", "name email mobile pan")
+    
+    forms = await model.find(query)
+      .populate('user', 'name email mobile pan')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
-
+    
     const total = await model.countDocuments(query);
-
+    
     res.json({
       success: true,
       forms,
@@ -1309,97 +1200,105 @@ router.get("/forms/service", admin, async (req, res) => {
         current: page,
         total: Math.ceil(total / limit),
         hasNext: page * limit < total,
-        hasPrev: page > 1,
-      },
+        hasPrev: page > 1
+      }
     });
   } catch (error) {
-    console.error("Error fetching service forms:", error);
-    res.status(500).json({ success: false, message: "Failed to fetch forms" });
+    console.error('Error fetching service forms:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch forms' });
   }
 });
 
 // @route   PUT /api/admin/roc-returns/:id/status
 // @desc    Update ROC returns form status and upload completion documents
 // @access  Private/Admin
-router.put(
-  "/roc-returns/:id/status",
-  upload.array("completionDocuments", 10),
-  async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { status, remarks, completionNotes } = req.body;
+router.put("/roc-returns/:id/status", upload.array("completionDocuments", 10), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, remarks, completionNotes } = req.body;
 
-      if (!isValidObjectId(id)) {
-        return res.status(400).json({ message: "Invalid form ID" });
-      }
-
-      if (!status || !["Pending", "Reviewed", "Filed"].includes(status)) {
-        return res.status(400).json({
-          message: "Invalid status. Must be Pending, Reviewed, or Filed",
-        });
-      }
-
-      const rocForm = await ROCForm.findById(id);
-      if (!rocForm) {
-        return res.status(404).json({ message: "ROC returns form not found" });
-      }
-
-      const updateData = {
-        status,
-        updatedAt: new Date(),
-      };
-
-      // Add admin remarks if provided
-      if (remarks) {
-        updateData.remarks = remarks;
-      }
-
-      // Add completion notes if status is Filed
-      if (status === "Filed" && completionNotes) {
-        updateData.completionNotes = completionNotes;
-      }
-
-      // Process completion documents if status is Filed
-      if (status === "Filed" && req.files && req.files.length > 0) {
-        const completionDocs = req.files.map((file, index) => ({
-          documentType:
-            req.body[`documentType_${index}`] || "Completion Document",
-          fileName: generateUniqueFilename(file.originalname),
-          originalName: file.originalname,
-          fileType: file.mimetype,
-          fileSize: file.size,
-          fileData: getFileData(file),
-          contentType: file.mimetype,
-          uploadedBy: "admin",
-          isCompletionDocument: true,
-        }));
-
-        updateData.completionDocuments = completionDocs;
-      }
-
-      const updatedForm = await ROCForm.findByIdAndUpdate(id, updateData, {
-        new: true,
-        runValidators: true,
-      }).select("-documents.fileData -completionDocuments.fileData");
-
-      // Email notification for ROC returns status update disabled
-      console.log(
-        `ROC returns form status updated to ${status} for ${rocForm.fullName} - email notification disabled`
-      );
-
-      res.json({
-        success: true,
-        message: "ROC returns form status updated successfully",
-        data: updatedForm,
-      });
-    } catch (error) {
-      console.error("Error updating ROC returns form status:", error);
-      res
-        .status(500)
-        .json({ message: "Server error while updating form status" });
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({ message: "Invalid form ID" });
     }
+
+    if (!status || !["Pending", "Reviewed", "Filed"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status. Must be Pending, Reviewed, or Filed" });
+    }
+
+    const rocForm = await ROCForm.findById(id);
+    if (!rocForm) {
+      return res.status(404).json({ message: "ROC returns form not found" });
+    }
+
+    const updateData = {
+      status,
+      updatedAt: new Date(),
+    };
+
+    // Add admin remarks if provided
+    if (remarks) {
+      updateData.remarks = remarks;
+    }
+
+    // Add completion notes if status is Filed
+    if (status === "Filed" && completionNotes) {
+      updateData.completionNotes = completionNotes;
+    }
+
+    // Process completion documents if status is Filed
+    if (status === "Filed" && req.files && req.files.length > 0) {
+      const completionDocs = req.files.map((file, index) => ({
+        documentType: req.body[`documentType_${index}`] || "Completion Document",
+        fileName: generateUniqueFilename(file.originalname),
+        originalName: file.originalname,
+        fileType: file.mimetype,
+        fileSize: file.size,
+        fileData: getFileData(file),
+        contentType: file.mimetype,
+        uploadedBy: 'admin',
+        isCompletionDocument: true,
+      }));
+
+      updateData.completionDocuments = completionDocs;
+    }
+
+    const updatedForm = await ROCForm.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true, runValidators: true }
+    ).select("-documents.fileData -completionDocuments.fileData");
+
+    // Send email notification to user about status update
+    try {
+      await sendEmail({
+        to: rocForm.email,
+        subject: `ROC Returns Form Status Updated - ${status}`,
+        html: `
+          <h2>ROC Returns Form Status Update</h2>
+          <p>Dear ${rocForm.fullName},</p>
+          <p>Your ROC returns form for <strong>${rocForm.companyName}</strong> has been updated.</p>
+          <p><strong>New Status:</strong> ${status}</p>
+          ${remarks ? `<p><strong>Remarks:</strong> ${remarks}</p>` : ''}
+          ${status === "Filed" && completionNotes ? `<p><strong>Completion Notes:</strong> ${completionNotes}</p>` : ''}
+          <p>You can view the updated status in your dashboard.</p>
+          <p>Best regards,<br>Com Financial Services Team</p>
+        `
+      });
+    } catch (emailError) {
+      console.error("Failed to send status update email:", emailError);
+      // Don't fail the request if email fails
+    }
+
+    res.json({
+      success: true,
+      message: "ROC returns form status updated successfully",
+      data: updatedForm,
+    });
+  } catch (error) {
+    console.error("Error updating ROC returns form status:", error);
+    res.status(500).json({ message: "Server error while updating form status" });
   }
-);
+});
 
 // @route   GET /api/admin/roc-returns/:id
 // @desc    Get specific ROC returns form details for admin
@@ -1414,7 +1313,7 @@ router.get("/roc-returns/:id", async (req, res) => {
 
     const rocForm = await ROCForm.findById(id)
       .select("-documents.fileData -completionDocuments.fileData")
-      .populate("user", "name email mobile pan");
+      .populate('user', 'name email mobile pan');
 
     if (!rocForm) {
       return res.status(404).json({ message: "ROC returns form not found" });
@@ -1426,11 +1325,10 @@ router.get("/roc-returns/:id", async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching ROC returns form details:", error);
-    res
-      .status(500)
-      .json({ message: "Server error while fetching form details" });
+    res.status(500).json({ message: "Server error while fetching form details" });
   }
 });
+
 
 // @route   GET /api/admin/roc-returns/:id/download/:documentId
 // @desc    Download document from ROC returns form (admin access)
@@ -1449,15 +1347,11 @@ router.get("/roc-returns/:id/download/:documentId", async (req, res) => {
     }
 
     // Find document in either documents or completionDocuments array
-    let document = rocForm.documents.find(
-      (d) => d._id.toString() === documentId
-    );
+    let document = rocForm.documents.find(d => d._id.toString() === documentId);
     let isCompletionDoc = false;
 
     if (!document) {
-      document = rocForm.completionDocuments?.find(
-        (d) => d._id.toString() === documentId
-      );
+      document = rocForm.completionDocuments?.find(d => d._id.toString() === documentId);
       isCompletionDoc = true;
     }
 
@@ -1467,129 +1361,192 @@ router.get("/roc-returns/:id/download/:documentId", async (req, res) => {
 
     res.set({
       "Content-Type": document.contentType,
-      "Content-Disposition": `attachment; filename="${
-        document.originalName || document.fileName || "document"
-      }"`,
+      "Content-Disposition": `attachment; filename="${document.originalName || document.fileName || "document"}"`,
     });
 
     res.send(document.fileData);
   } catch (error) {
     console.error("Error downloading ROC returns document:", error);
-    res
-      .status(500)
-      .json({ message: "Server error while downloading document" });
+    res.status(500).json({ message: "Server error while downloading document" });
   }
 });
 
 // @route   POST /api/admin/send-weekly-report
 // @desc    Send weekly admin report to all admins
 // @access  Private/Admin
-// Weekly admin report functionality removed - email notifications disabled
+router.post("/send-weekly-report", async (req, res) => {
+  try {
+    // Get all admin users
+    const admins = await User.find({ role: 'admin' }).select('name email');
+    
+    if (admins.length === 0) {
+      return res.status(404).json({ message: "No admin users found" });
+    }
+
+    // Calculate weekly stats
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    const [newUsers, newForms, pendingForms, newContacts] = await Promise.all([
+      User.countDocuments({ 
+        role: 'user', 
+        createdAt: { $gte: oneWeekAgo } 
+      }),
+      TaxForm.countDocuments({ 
+        createdAt: { $gte: oneWeekAgo } 
+      }),
+      TaxForm.countDocuments({ 
+        status: 'Pending' 
+      }),
+      Contact.countDocuments({ 
+        createdAt: { $gte: oneWeekAgo } 
+      })
+    ]);
+
+    const stats = {
+      newUsers,
+      newForms,
+      pendingForms,
+      newContacts
+    };
+
+    // Send email to each admin
+    const emailPromises = admins.map(async (admin) => {
+      try {
+        const emailTemplate = emailTemplates.weeklyAdminReport(admin.name, stats);
+        
+        await sendEmail({
+          email: admin.email,
+          subject: emailTemplate.subject,
+          html: emailTemplate.html,
+          text: emailTemplate.text,
+        });
+
+        console.log(`Weekly report sent to ${admin.email}`);
+        return { success: true, email: admin.email };
+      } catch (error) {
+        console.error(`Failed to send weekly report to ${admin.email}:`, error);
+        return { success: false, email: admin.email, error: error.message };
+      }
+    });
+
+    const results = await Promise.all(emailPromises);
+    const successful = results.filter(r => r.success).length;
+    const failed = results.filter(r => !r.success).length;
+
+    res.json({
+      message: `Weekly report sent to ${successful} admins, ${failed} failed`,
+      stats,
+      results
+    });
+
+  } catch (error) {
+    console.error("Send weekly report error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
 
 // @route   POST /api/admin/forms/:formId/reports
 // @desc    Create an admin report with documents for a specific form
 // @access  Private/Admin
-router.post(
-  "/forms/:formId/reports",
-  upload.array("documents", 10),
-  async (req, res) => {
-    try {
-      const { formId } = req.params;
-      const { message, reportType, formType } = req.body;
+router.post("/forms/:formId/reports", upload.array("documents", 10), async (req, res) => {
+  try {
+    const { formId } = req.params;
+    const { message, reportType, formType } = req.body;
 
-      if (!message || !reportType) {
-        return res
-          .status(400)
-          .json({ message: "Message and report type are required" });
-      }
-
-      // Determine which model to use based on formType
-      let Model;
-      switch (formType) {
-        case "CompanyForm":
-          Model = CompanyForm;
-          break;
-        case "OtherRegistrationForm":
-          Model = OtherRegistrationForm;
-          break;
-        case "ROCForm":
-          Model = ROCForm;
-          break;
-        case "ReportsForm":
-          Model = ReportsForm;
-          break;
-        case "TrademarkISOForm":
-          Model = TrademarkISOForm;
-          break;
-        case "AdvisoryForm":
-          Model = AdvisoryForm;
-          break;
-        case "TaxForm":
-          Model = TaxForm;
-          break;
-        default:
-          return res.status(400).json({ message: "Invalid form type" });
-      }
-
-      // Find the form
-      const form = await Model.findById(formId);
-      if (!form) {
-        return res.status(404).json({ message: "Form not found" });
-      }
-
-      // Process uploaded documents
-      const documents = [];
-      if (req.files && req.files.length > 0) {
-        for (const file of req.files) {
-          documents.push({
-            documentType: "admin-report",
-            fileName: generateUniqueFilename(file.originalname),
-            originalName: file.originalname,
-            fileType: file.mimetype,
-            fileSize: file.size,
-            fileData: getFileData(file),
-            contentType: file.mimetype,
-            uploadedBy: "admin",
-            uploadDate: new Date(),
-          });
-        }
-      }
-
-      // Create the report
-      const report = {
-        message,
-        type: reportType,
-        documents: documents.map((doc) => doc._id || doc),
-        sentAt: new Date(),
-        sentBy: req.user.name || req.user.email,
-      };
-
-      // Add the report to the form
-      if (!form.reports) {
-        form.reports = [];
-      }
-      form.reports.push(report);
-
-      // If documents were uploaded, add them to the form's documents array
-      if (documents.length > 0) {
-        if (!form.documents) {
-          form.documents = [];
-        }
-        form.documents.push(...documents);
-      }
-
-      await form.save();
-
-      res.status(201).json({
-        message: "Admin report created successfully",
-        reportId: report._id,
-        documentsCount: documents.length,
-      });
-    } catch (error) {
-      console.error("Error creating admin report:", error);
-      res.status(500).json({ message: "Server error" });
+    if (!message || !reportType) {
+      return res.status(400).json({ message: "Message and report type are required" });
     }
+
+    // Determine which model to use based on formType
+    let Model;
+    switch (formType) {
+      case 'CompanyForm':
+        Model = CompanyForm;
+        break;
+      case 'OtherRegistrationForm':
+        Model = OtherRegistrationForm;
+        break;
+      case 'ROCForm':
+        Model = ROCForm;
+        break;
+      case 'ReportsForm':
+        Model = ReportsForm;
+        break;
+      case 'TrademarkISOForm':
+        Model = TrademarkISOForm;
+        break;
+      case 'AdvisoryForm':
+        Model = AdvisoryForm;
+        break;
+      case 'TaxForm':
+        Model = TaxForm;
+        break;
+      default:
+        return res.status(400).json({ message: "Invalid form type" });
+    }
+
+    // Find the form
+    const form = await Model.findById(formId);
+    if (!form) {
+      return res.status(404).json({ message: "Form not found" });
+    }
+
+    // Process uploaded documents
+    const documents = [];
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        documents.push({
+          documentType: 'admin-report',
+          fileName: generateUniqueFilename(file.originalname),
+          originalName: file.originalname,
+          fileType: file.mimetype,
+          fileSize: file.size,
+          fileData: getFileData(file),
+          contentType: file.mimetype,
+          uploadedBy: 'admin',
+          uploadDate: new Date(),
+        });
+      }
+    }
+
+    // Create the report
+    const report = {
+      message,
+      type: reportType,
+      documents: documents.map(doc => doc._id || doc),
+      sentAt: new Date(),
+      sentBy: req.user.name || req.user.email,
+    };
+
+    // Add the report to the form
+    if (!form.reports) {
+      form.reports = [];
+    }
+    form.reports.push(report);
+
+    // If documents were uploaded, add them to the form's documents array
+    if (documents.length > 0) {
+      if (!form.documents) {
+        form.documents = [];
+      }
+      form.documents.push(...documents);
+    }
+
+    await form.save();
+
+    res.status(201).json({
+      message: "Admin report created successfully",
+      reportId: report._id,
+      documentsCount: documents.length
+    });
+
+  } catch (error) {
+    console.error("Error creating admin report:", error);
+    res.status(500).json({ message: "Server error" });
   }
-);
+});
 
 module.exports = router;

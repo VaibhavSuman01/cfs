@@ -126,9 +126,13 @@ export default function PartnershipFirmPage() {
       // Append form data
       Object.entries(data).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
-          formData.append(key, value);
+          formData.append(key, String(value));
         }
       });
+
+      // Add service and subService fields
+      formData.append("service", "Other Registration");
+      formData.append("subService", "Partnership Firm Registration");
 
       // Append partners data
       formData.append("partners", JSON.stringify(partners));
@@ -173,9 +177,17 @@ export default function PartnershipFirmPage() {
 
       toast.success("Partnership firm registration application submitted successfully");
       router.push("/dashboard/partnership-firm");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to submit partnership firm form:", error);
-      toast.error("Failed to submit partnership firm application. Please try again.");
+      
+      // Handle specific error cases
+      if (error.response?.status === 400 && error.response?.data?.message?.includes("already exists")) {
+        toast.error("Already submitted for this Year. You can only submit one form per service.");
+      } else if (error.response?.status === 409) {
+        toast.error("Already submitted for this Year. You can only submit one form per service.");
+      } else {
+        toast.error("Failed to submit partnership firm application. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }

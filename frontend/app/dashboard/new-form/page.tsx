@@ -177,10 +177,11 @@ export default function NewFormPage() {
   const form = useForm<TaxFormValues>({
     resolver: zodResolver(taxFormSchema),
     defaultValues: {
-      fullName: user?.name || '',
-      email: user?.email || '',
-      phone: user?.mobile || '',
-      pan: user?.pan || '',
+      fullName: '',
+      email: '',
+      phone: '',
+      pan: '',
+      aadhaar: '',
       service: '',
       year: '',
       hasIncomeTaxLogin: false,
@@ -193,6 +194,28 @@ export default function NewFormPage() {
       homeLoanTotalInterest: '',
       hasPranNumber: false,
       pranNumber: '',
+      // GST Filing specific fields
+      gstFilingMonth: '',
+      gstFilingYear: '',
+      gstNumber: '',
+      // TDS Return specific fields
+      tdsFilingMonth: '',
+      tdsFilingYear: '',
+      tracesUserId: '',
+      tracesPassword: '',
+      tanNumber: '',
+      incomeTaxUserId: '',
+      incomeTaxPassword: '',
+      panNumber: '',
+      // EPFO specific fields
+      epfoUserId: '',
+      epfoPassword: '',
+      // ESIC specific fields
+      esicUserId: '',
+      esicPassword: '',
+      // PT-Tax specific fields
+      ptTaxUserId: '',
+      ptTaxPassword: '',
     },
   });
 
@@ -200,6 +223,16 @@ export default function NewFormPage() {
   const hasHomeLoan = form.watch('hasHomeLoan');
   const hasPranNumber = form.watch('hasPranNumber');
   const selectedService = form.watch('service');
+
+  // Populate form with user data when loaded
+  useEffect(() => {
+    if (user && !isLoading) {
+      form.setValue('fullName', user.name || '');
+      form.setValue('email', user.email || '');
+      form.setValue('phone', user.mobile || '');
+      form.setValue('pan', user.pan || '');
+    }
+  }, [user, isLoading, form]);
 
   // Preselect service from query param
   useEffect(() => {
@@ -272,9 +305,17 @@ export default function NewFormPage() {
 
       toast.success('Tax form submitted successfully');
       router.push('/dashboard');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to submit tax form:', error);
-      toast.error('Failed to submit tax form. Please try again.');
+      
+      // Handle specific error cases
+      if (error.response?.status === 400 && error.response?.data?.message?.includes("already exists")) {
+        toast.error("Already submitted for this Year. You can only submit one form per service.");
+      } else if (error.response?.status === 409) {
+        toast.error("Already submitted for this Year. You can only submit one form per service.");
+      } else {
+        toast.error('Failed to submit tax form. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
     }

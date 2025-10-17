@@ -70,9 +70,13 @@ export default function AdvisoryPage() {
       // Append form data
       Object.entries(data).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
-          formData.append(key, value);
+          formData.append(key, String(value));
         }
       });
+
+      // Add service and subService fields
+      formData.append("service", "Advisory");
+      formData.append("subService", data.advisoryType);
 
       // Append Aadhaar file if uploaded
       if (aadhaarFile) {
@@ -92,9 +96,17 @@ export default function AdvisoryPage() {
 
       toast.success("Advisory request submitted successfully");
       router.push("/dashboard/advisory");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to submit advisory form:", error);
-      toast.error("Failed to submit advisory form. Please try again.");
+      
+      // Handle specific error cases
+      if (error.response?.status === 400 && error.response?.data?.message?.includes("already exists")) {
+        toast.error("Already submitted for this Year. You can only submit one form per service.");
+      } else if (error.response?.status === 409) {
+        toast.error("Already submitted for this Year. You can only submit one form per service.");
+      } else {
+        toast.error("Failed to submit advisory form. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }

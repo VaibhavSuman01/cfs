@@ -119,7 +119,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-6 gap-6">
+            <div className="grid md:grid-cols-3 lg:grid-cols-7 gap-6">
               {[
                 {
                   icon: Building2,
@@ -159,6 +159,12 @@ export default function HomePage() {
                   title: "Reports",
                   href: "/reports",
                   description: "Business analytics and financial reports",
+                },
+                {
+                  icon: Users,
+                  title: "Advisory",
+                  href: "/advisory",
+                  description: "Business consulting and advisory services",
                 },
               ].map((service, index) => (
                 <FadeInSection key={index} delay={index * 100}>
