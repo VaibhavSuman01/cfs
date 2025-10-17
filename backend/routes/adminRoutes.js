@@ -172,6 +172,96 @@ router.delete("/service-forms/:id/reports/:reportId", async (req, res) => {
   }
 });
 
+// @route   GET /api/admin/forms/:id/documents/:documentId
+// @desc    Download document from any form (admin access)
+// @access  Private/Admin
+router.get("/forms/:id/documents/:documentId", protect, async (req, res) => {
+  console.log('Admin download endpoint reached:', req.url);
+  try {
+    const { id, documentId } = req.params;
+
+    console.log(`Admin download request: formId=${id}, documentId=${documentId}`);
+    console.log(`User:`, req.user ? { id: req.user._id, role: req.user.role, email: req.user.email } : 'No user');
+
+    // Check if user is admin
+    if (req.user.role !== 'admin') {
+      console.log('Access denied: User is not admin');
+      return res.status(403).json({ message: 'Access denied. Admin role required.' });
+    }
+
+    if (!isValidObjectId(id) || !isValidObjectId(documentId)) {
+      return res.status(400).json({ message: "Invalid ID format" });
+    }
+
+    console.log(`Admin downloading document: ${documentId} from form: ${id}`);
+
+    // Search across all form models
+    const models = [
+      { model: TaxForm, name: 'TaxForm' },
+      { model: CompanyForm, name: 'CompanyForm' },
+      { model: ROCForm, name: 'ROCForm' },
+      { model: OtherRegistrationForm, name: 'OtherRegistrationForm' },
+      { model: ReportsForm, name: 'ReportsForm' },
+      { model: TrademarkISOForm, name: 'TrademarkISOForm' },
+      { model: AdvisoryForm, name: 'AdvisoryForm' }
+    ];
+
+    let form = null;
+    let document = null;
+
+    // Search each model for the form and document
+    for (const { model, name } of models) {
+      try {
+        form = await model.findById(id);
+        if (form) {
+          console.log(`Found form in ${name} model:`, form._id);
+          
+          // For TaxForm, check adminData.reports for embedded documents
+          if (name === 'TaxForm' && form.adminData && form.adminData.reports) {
+            for (const report of form.adminData.reports) {
+              if (report.document && report.document._id.toString() === documentId) {
+                console.log(`Found document in TaxForm adminData.reports:`, report.document._id);
+                document = report.document;
+                break;
+              }
+            }
+            if (document) break;
+          }
+
+          // Find the specific document in the documents array (for non-TaxForm or fallback)
+          if (!document) {
+            document = form.documents.find(
+              (doc) => doc._id.toString() === documentId
+            );
+
+            if (document) {
+              console.log(`Found document in ${name} model documents array:`, document._id);
+              break;
+            }
+          }
+        }
+      } catch (err) {
+        console.error(`Error searching in ${name} model:`, err);
+        continue;
+      }
+    }
+
+    if (!form || !document) {
+      return res.status(404).json({ message: "Document not found" });
+    }
+    
+    res.set({
+      "Content-Type": document.contentType || document.fileType || "application/octet-stream",
+      "Content-Disposition": `attachment; filename="${document.originalName || document.fileName || "document"}"`,
+    });
+    
+    res.send(document.fileData);
+  } catch (error) {
+    console.error("Error downloading document:", error);
+    res.status(500).json({ message: "Server error while downloading document" });
+  }
+});
+
 // @route   GET /api/admin/forms/:id
 // @desc    Get single tax form submission
 // @access  Private/Admin
@@ -193,49 +283,6 @@ router.get("/forms/:id", validateObjectId(), async (req, res) => {
   }
 });
 
-// @route   GET /api/admin/forms/:id/documents/:documentId
-// @desc    Download a document from a tax form submission (admin access)
-// @access  Private/Admin
-router.get("/forms/:id/documents/:documentId", validateObjectId('id'), async (req, res) => {
-  try {
-    const formId = req.params.id;
-    const documentId = req.params.documentId;
-    
-    // Validate documentId
-    if (!isValidObjectId(documentId)) {
-      return res.status(400).json({ 
-        message: "Invalid document ID format. Must be a 24-character hex string." 
-      });
-    }
-    
-    // Find the tax form containing the document
-    const taxForm = await TaxForm.findById(formId);
-    
-    if (!taxForm) {
-      return res.status(404).json({ message: "Form not found" });
-    }
-    
-    // Find the specific document in the documents array
-    const document = taxForm.documents.find(doc => doc._id.toString() === documentId);
-    
-    if (!document) {
-      return res.status(404).json({ message: "Document not found" });
-    }
-    
-    // Set response headers
-    res.set({
-      'Content-Type': document.contentType,
-      'Content-Disposition': `attachment; filename="${document.originalName || document.fileName || 'document'}"`
-    });
-    
-    // Send the file data
-    res.send(document.fileData);
-    
-  } catch (error) {
-    console.error("Error downloading document:", error);
-    res.status(500).json({ message: "Server error" });
-  }
-});
 
 // @route   POST /api/admin/forms/:id/send-report
 // @desc    Send a report to the user
@@ -1282,6 +1329,7 @@ router.get("/roc-returns/:id", async (req, res) => {
   }
 });
 
+
 // @route   GET /api/admin/roc-returns/:id/download/:documentId
 // @desc    Download document from ROC returns form (admin access)
 // @access  Private/Admin
@@ -1397,6 +1445,8 @@ router.post("/send-weekly-report", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
+
 
 // @route   POST /api/admin/forms/:formId/reports
 // @desc    Create an admin report with documents for a specific form

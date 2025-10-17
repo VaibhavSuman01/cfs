@@ -176,27 +176,32 @@ export function EnhancedHeader() {
     <header
       className={`fixed top-0 w-full z-[10000] transition-all duration-300 ${
         isScrolled
-          ? "bg-white/95 backdrop-blur-lg shadow-lg border-b border-blue-100"
-          : "bg-white shadow-sm"
+          ? "bg-white/95 backdrop-blur-lg shadow-xl border-b border-blue-100"
+          : "bg-white/90 backdrop-blur-sm shadow-md"
       }`}
     >
-      <div className="container mx-auto px-4 py-3">
+      <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          {/* Logo and Company Name in one line */}
-          <Link href="/" className="flex items-center space-x-3 group">
+          {/* Enhanced Logo and Company Name */}
+          <Link href="/" className="flex items-center space-x-4 group">
             <div className="relative">
-              <Building2 className="h-10 w-10 text-blue-600 group-hover:scale-110 transition-transform duration-300" />
-              <div className="absolute inset-0 bg-blue-600 rounded-full opacity-20 scale-0 group-hover:scale-150 transition-transform duration-300"></div>
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
+                <Building2 className="h-7 w-7 text-white group-hover:scale-110 transition-transform duration-300" />
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl opacity-0 group-hover:opacity-20 scale-0 group-hover:scale-110 transition-all duration-300"></div>
             </div>
-            <div className="flex items-center space-x-2">
-              <span className="text-lg font-bold text-blue-600">
+            <div className="flex flex-col">
+              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent group-hover:from-blue-500 group-hover:to-blue-600 transition-all duration-300">
                 Com Financial Services
+              </span>
+              <span className="text-xs text-gray-500 font-medium -mt-1">
+                Your Business Partner
               </span>
             </div>
           </Link>
 
-          {/* Desktop Navigation - Single line */}
-          <nav className="hidden lg:flex items-center space-x-6">
+          {/* Enhanced Desktop Navigation */}
+          <nav className="hidden lg:flex items-center space-x-2">
             {navigation.map((item) => (
               <div
                 key={item.name}
@@ -206,168 +211,371 @@ export function EnhancedHeader() {
               >
                 <Link
                   href={item.href}
-                  className="relative px-2 py-2 text-gray-700 hover:text-blue-600 transition-colors duration-200 text-sm font-medium"
+                  className="relative px-4 py-3 text-gray-700 hover:text-blue-600 transition-all duration-300 text-sm font-semibold rounded-lg hover:bg-blue-50/50 group-hover:shadow-sm"
                 >
                   {item.name}
-                  {/* Blue underline on hover */}
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
+                  {/* Enhanced underline effect */}
+                  <span className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-300 group-hover:w-3/4 rounded-full"></span>
                 </Link>
 
                 {item.dropdown && activeDropdown === item.name && (
                   <div
-                    className={`absolute top-full mt-1 bg-white rounded-lg shadow-xl border border-gray-200 py-2 animate-fadeInUp z-[10000] ${item.name === 'Advisory' ? 'right-0' : 'left-0'} ${item.name === 'Other Registration' ? 'w-max max-w-4xl' : item.name === 'Tools' ? 'w-max max-w-5xl' : 'w-64'} max-h-[80vh] overflow-y-auto`}>
-                    <div
-                      className={``}>
-                      {item.dropdown.map((subItem) => (
-                        <Link
-                          key={subItem.name}
-                          href={subItem.href}
-                          className="block px-4 py-3 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                        >
-                          {subItem.name}
-                        </Link>
-                      ))}
-                    </div>
+                    className={`absolute top-full mt-2 bg-white rounded-xl shadow-2xl border border-gray-100 py-4 animate-fadeInUp z-[10000] ${item.name === 'Advisory' ? 'right-0' : 'left-0'} ${item.name === 'Other Registration' ? 'w-max max-w-6xl' : item.name === 'Tools' ? 'w-max max-w-5xl' : 'w-72'} max-h-[80vh] overflow-y-auto backdrop-blur-sm`}>
+                    {item.name === 'Other Registration' ? (
+                      // Mega Menu for Other Registration
+                      <div className="px-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                          {/* Column 1: Business Registrations */}
+                          <div className="space-y-3">
+                            <h4 className="text-sm font-bold text-blue-600 uppercase tracking-wide border-b border-blue-100 pb-2">
+                              Business Registrations
+                            </h4>
+                            {item.dropdown.slice(0, 6).map((subItem) => (
+                              <Link
+                                key={subItem.name}
+                                href={subItem.href}
+                                className="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 rounded-lg transition-all duration-300 hover:translate-x-1 group"
+                              >
+                                <span className="group-hover:font-medium">{subItem.name}</span>
+                              </Link>
+                            ))}
+                          </div>
+
+                          {/* Column 2: Government Registrations */}
+                          <div className="space-y-3">
+                            <h4 className="text-sm font-bold text-blue-600 uppercase tracking-wide border-b border-blue-100 pb-2">
+                              Government Registrations
+                            </h4>
+                            {item.dropdown.slice(6, 12).map((subItem) => (
+                              <Link
+                                key={subItem.name}
+                                href={subItem.href}
+                                className="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 rounded-lg transition-all duration-300 hover:translate-x-1 group"
+                              >
+                                <span className="group-hover:font-medium">{subItem.name}</span>
+                              </Link>
+                            ))}
+                          </div>
+
+                          {/* Column 3: Tax & Compliance */}
+                          <div className="space-y-3">
+                            <h4 className="text-sm font-bold text-blue-600 uppercase tracking-wide border-b border-blue-100 pb-2">
+                              Tax & Compliance
+                            </h4>
+                            {item.dropdown.slice(12, 18).map((subItem) => (
+                              <Link
+                                key={subItem.name}
+                                href={subItem.href}
+                                className="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 rounded-lg transition-all duration-300 hover:translate-x-1 group"
+                              >
+                                <span className="group-hover:font-medium">{subItem.name}</span>
+                              </Link>
+                            ))}
+                          </div>
+
+                        </div>
+                        
+                        {/* Bottom CTA Section */}
+                        <div className="mt-6 pt-4 border-t border-gray-100">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm font-semibold text-gray-800">Need Help Choosing?</p>
+                              <p className="text-xs text-gray-500">Our experts can guide you to the right service</p>
+                            </div>
+                            <Link
+                              href="/contact"
+                              className="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-medium rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
+                            >
+                              Get Consultation
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      // Regular dropdown for other items
+                      <div className="px-2">
+                        {item.dropdown.map((subItem) => (
+                          <Link
+                            key={subItem.name}
+                            href={subItem.href}
+                            className="block px-4 py-3 text-sm text-gray-600 hover:text-blue-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 rounded-lg transition-all duration-300 hover:translate-x-1 group"
+                          >
+                            <span className="group-hover:font-medium">{subItem.name}</span>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
             ))}
             
-            {/* User section */}
+            {/* Enhanced User section */}
             {isAuthenticated ? (
               <div 
                 className="relative group"
                 onMouseEnter={() => setDropdownOpen(true)} 
                 onMouseLeave={() => setDropdownOpen(false)}
               >
-                <button className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors py-2 px-1">
+                <button className="flex items-center space-x-3 text-gray-700 hover:text-blue-600 transition-all duration-300 py-2 px-3 rounded-lg hover:bg-blue-50/50 group">
                   {user?.avatarUrl ? (
-                    <img 
-                      src={getAvatarUrl(user.avatarUrl) || ""}  
-                      alt="user avatar" 
-                      className="w-8 h-8 rounded-full" 
-                    />
+                    <div className="relative">
+                      <img 
+                        src={getAvatarUrl(user.avatarUrl) || ""}  
+                        alt="user avatar" 
+                        className="w-9 h-9 rounded-full ring-2 ring-blue-100 group-hover:ring-blue-300 transition-all duration-300" 
+                      />
+                      <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                    </div>
                   ) : (
-                    <UserIcon className="w-5 h-5" />
+                    <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <UserIcon className="w-5 h-5 text-white" />
+                    </div>
                   )}
-                  <span className="font-medium text-sm">
-                    {user?.name}
-                  </span>
+                  <div className="flex flex-col items-start">
+                    <span className="font-semibold text-sm text-gray-800 group-hover:text-blue-600 transition-colors">
+                      {user?.name}
+                    </span>
+                    <span className="text-xs text-gray-500">Welcome back</span>
+                  </div>
                 </button>
                 {dropdownOpen && (
-                  <div className="absolute right-0 z-[10000] w-48 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none -mt-1">
+                  <div className="absolute right-0 z-[10000] w-56 rounded-xl bg-white shadow-2xl border border-gray-100 py-2 mt-2 backdrop-blur-sm">
+                    <div className="px-4 py-3 border-b border-gray-100">
+                      <p className="text-sm font-medium text-gray-800">{user?.name}</p>
+                      <p className="text-xs text-gray-500">{user?.email}</p>
+                    </div>
                     <Link
                       href="/dashboard"
-                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
+                      className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 transition-all duration-300 hover:translate-x-1 group"
                     >
-                      <LayoutDashboard className="w-4 h-4 mr-2" />
-                      Dashboard
+                      <LayoutDashboard className="w-4 h-4 mr-3 text-blue-500" />
+                      <span className="group-hover:font-medium">Dashboard</span>
                     </Link>
                     <button
                       onClick={handleSignOut}
-                      className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
+                      className="w-full text-left flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-red-50 hover:to-red-100 transition-all duration-300 hover:translate-x-1 group"
                     >
-                      <LogOut className="w-4 h-4 mr-2" />
-                      Sign Out
+                      <LogOut className="w-4 h-4 mr-3 text-red-500" />
+                      <span className="group-hover:font-medium">Sign Out</span>
                     </button>
                   </div>
                 )}
               </div>
             ) : (
-              <Button
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md shadow-sm hover:shadow-md transition-all duration-300"
-                onClick={() => router.push("/auth")}
-              >
-                Sign up
-              </Button>
+              <div className="flex items-center space-x-3">
+                <Button
+                  variant="ghost"
+                  className="text-gray-700 hover:text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-lg transition-all duration-300"
+                  onClick={() => router.push("/auth")}
+                >
+                  Sign In
+                </Button>
+                <Button
+                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                  onClick={() => router.push("/auth")}
+                >
+                  Get Started
+                </Button>
+              </div>
             )}
           </nav>
 
-          {/* Mobile Menu Button */}
+          {/* Enhanced Mobile Menu Button */}
           <button
-            className="lg:hidden p-2 rounded-lg hover:bg-blue-50 transition-colors"
+            className="lg:hidden p-3 rounded-xl hover:bg-blue-50 transition-all duration-300 hover:scale-105 group"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            {isMenuOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
+            <div className="relative">
+              {isMenuOpen ? (
+                <X className="h-6 w-6 text-gray-700 group-hover:text-blue-600 transition-colors" />
+              ) : (
+                <Menu className="h-6 w-6 text-gray-700 group-hover:text-blue-600 transition-colors" />
+              )}
+            </div>
           </button>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Enhanced Mobile Navigation */}
         {isMenuOpen && (
-          <div className="lg:hidden mt-4 pb-4 border-t border-blue-100 animate-fadeInUp">
-            <nav className="flex flex-col space-y-2 pt-4 max-h-[80vh] overflow-y-auto">
+          <div className="lg:hidden mt-6 pb-6 border-t border-gradient-to-r from-blue-100 to-blue-200 animate-fadeInUp">
+            <nav className="flex flex-col space-y-3 pt-6 max-h-[80vh] overflow-y-auto">
               {navigation.map((item) => (
-                <div key={item.name} className="border-b border-gray-100 last:border-0">
+                <div key={item.name} className="bg-gray-50/50 rounded-xl p-1">
                   {item.dropdown ? (
                     <>
                       <button
                         onClick={() => toggleMobileDropdown(item.name)}
-                        className="w-full flex items-center justify-between px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        className="w-full flex items-center justify-between px-4 py-4 text-gray-700 hover:text-blue-600 hover:bg-white rounded-lg transition-all duration-300 group"
                       >
-                        <span>{item.name}</span>
-                        <svg
-                          className={`w-4 h-4 transition-transform duration-200 ${
-                            mobileDropdownOpen === item.name ? 'transform rotate-180' : ''
-                          }`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 9l-7 7-7-7"
-                          />
-                        </svg>
+                        <span className="font-semibold group-hover:text-blue-600">{item.name}</span>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-xs text-gray-500 bg-blue-100 px-2 py-1 rounded-full">
+                            {item.dropdown.length} services
+                          </span>
+                          <svg
+                            className={`w-5 h-5 transition-transform duration-300 ${
+                              mobileDropdownOpen === item.name ? 'transform rotate-180 text-blue-600' : 'text-gray-400'
+                            }`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 9l-7 7-7-7"
+                            />
+                          </svg>
+                        </div>
                       </button>
                       <div
-                        className={`overflow-hidden transition-all duration-300 ${
-                          mobileDropdownOpen === item.name ? 'max-h-[400px]' : 'max-h-0'
+                        className={`overflow-hidden transition-all duration-500 ${
+                          mobileDropdownOpen === item.name ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
                         }`}
                       >
-                        <div className="ml-4 space-y-1 py-1 max-h-[300px] overflow-y-auto">
-                          {item.dropdown.map((subItem) => (
-                            <Link
-                              key={subItem.name}
-                              href={subItem.href}
-                              className="block px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                              onClick={() => {
-                                setIsMenuOpen(false);
-                                setMobileDropdownOpen(null);
-                              }}
-                            >
-                              {subItem.name}
-                            </Link>
-                          ))}
-                        </div>
+                        {item.name === 'Other Registration' ? (
+                          // Mega Menu for Mobile - Other Registration
+                          <div className="ml-4 space-y-4 py-3 max-h-[500px] overflow-y-auto">
+                            {/* Business Registrations */}
+                            <div className="space-y-2">
+                              <h5 className="text-xs font-bold text-blue-600 uppercase tracking-wide border-b border-blue-100 pb-1">
+                                Business Registrations
+                              </h5>
+                              {item.dropdown.slice(0, 6).map((subItem) => (
+                                <Link
+                                  key={subItem.name}
+                                  href={subItem.href}
+                                  className="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 rounded-lg transition-all duration-300 hover:translate-x-2 group"
+                                  onClick={() => {
+                                    setIsMenuOpen(false);
+                                    setMobileDropdownOpen(null);
+                                  }}
+                                >
+                                  <span className="group-hover:font-medium">{subItem.name}</span>
+                                </Link>
+                              ))}
+                            </div>
+
+                            {/* Government Registrations */}
+                            <div className="space-y-2">
+                              <h5 className="text-xs font-bold text-blue-600 uppercase tracking-wide border-b border-blue-100 pb-1">
+                                Government Registrations
+                              </h5>
+                              {item.dropdown.slice(6, 12).map((subItem) => (
+                                <Link
+                                  key={subItem.name}
+                                  href={subItem.href}
+                                  className="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 rounded-lg transition-all duration-300 hover:translate-x-2 group"
+                                  onClick={() => {
+                                    setIsMenuOpen(false);
+                                    setMobileDropdownOpen(null);
+                                  }}
+                                >
+                                  <span className="group-hover:font-medium">{subItem.name}</span>
+                                </Link>
+                              ))}
+                            </div>
+
+                            {/* Tax & Compliance */}
+                            <div className="space-y-2">
+                              <h5 className="text-xs font-bold text-blue-600 uppercase tracking-wide border-b border-blue-100 pb-1">
+                                Tax & Compliance
+                              </h5>
+                              {item.dropdown.slice(12, 18).map((subItem) => (
+                                <Link
+                                  key={subItem.name}
+                                  href={subItem.href}
+                                  className="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 rounded-lg transition-all duration-300 hover:translate-x-2 group"
+                                  onClick={() => {
+                                    setIsMenuOpen(false);
+                                    setMobileDropdownOpen(null);
+                                  }}
+                                >
+                                  <span className="group-hover:font-medium">{subItem.name}</span>
+                                </Link>
+                              ))}
+                            </div>
+
+                            {/* Specialized Services */}
+                            <div className="space-y-2">
+                              <h5 className="text-xs font-bold text-blue-600 uppercase tracking-wide border-b border-blue-100 pb-1">
+                                Specialized Services
+                              </h5>
+                              {item.dropdown.slice(18).map((subItem) => (
+                                <Link
+                                  key={subItem.name}
+                                  href={subItem.href}
+                                  className="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 rounded-lg transition-all duration-300 hover:translate-x-2 group"
+                                  onClick={() => {
+                                    setIsMenuOpen(false);
+                                    setMobileDropdownOpen(null);
+                                  }}
+                                >
+                                  <span className="group-hover:font-medium">{subItem.name}</span>
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        ) : (
+                          // Regular mobile dropdown for other items
+                          <div className="ml-4 space-y-2 py-3 max-h-[400px] overflow-y-auto">
+                            {item.dropdown.map((subItem) => (
+                              <Link
+                                key={subItem.name}
+                                href={subItem.href}
+                                className="block px-4 py-3 text-sm text-gray-600 hover:text-blue-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 rounded-lg transition-all duration-300 hover:translate-x-2 group"
+                                onClick={() => {
+                                  setIsMenuOpen(false);
+                                  setMobileDropdownOpen(null);
+                                }}
+                              >
+                                <span className="group-hover:font-medium">{subItem.name}</span>
+                              </Link>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </>
                   ) : (
                     <Link
                       href={item.href}
-                      className="block px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      className="block px-4 py-4 text-gray-700 hover:text-blue-600 hover:bg-white rounded-lg transition-all duration-300 font-semibold group"
                       onClick={() => {
                         setIsMenuOpen(false);
                         setMobileDropdownOpen(null);
                       }}
                     >
-                      {item.name}
+                      <span className="group-hover:text-blue-600">{item.name}</span>
                     </Link>
                   )}
                 </div>
               ))}
-              <Button
-                className="mx-4 mt-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md"
-                onClick={() => router.push("/auth")}
-              >
-                Get Started
-              </Button>
+              
+              {/* Enhanced Mobile Auth Buttons */}
+              <div className="flex flex-col space-y-3 pt-4">
+                <Button
+                  variant="outline"
+                  className="w-full text-gray-700 border-gray-300 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50 py-3 rounded-xl transition-all duration-300"
+                  onClick={() => {
+                    router.push("/auth");
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  Sign In
+                </Button>
+                <Button
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                  onClick={() => {
+                    router.push("/auth");
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  Get Started
+                </Button>
+              </div>
             </nav>
           </div>
         )}

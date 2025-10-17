@@ -58,6 +58,34 @@ export default function AdminReportSection({ reports, formId, formType, title = 
     }
   };
 
+  const handleDownloadReport = async (report: AdminReport) => {
+    try {
+      const reportId = report._id || 'unknown';
+      setDownloading(reportId);
+      
+      console.log('Attempting to download report:', {
+        reportId,
+        formId,
+        formType,
+        report: report,
+        documentId: (report as any).documentId
+      });
+      
+      // Check if report has documentId (for non-TaxForm reports)
+      if ((report as any).documentId) {
+        console.log(`Downloading document ${(report as any).documentId} from form ${formId}`);
+        await api.downloadFile(`/api/admin/forms/${formId}/documents/${(report as any).documentId}`, 
+          `report-${reportId}.pdf`);
+      } else {
+        console.warn('No documentId found for report:', report);
+      }
+    } catch (error) {
+      console.error('Failed to download report:', error);
+    } finally {
+      setDownloading(null);
+    }
+  };
+
   if (!reports || reports.length === 0) {
     return null;
   }
@@ -102,7 +130,9 @@ export default function AdminReportSection({ reports, formId, formType, title = 
         <div className="space-y-4">
           {reports.map((report, index) => {
             const hasDocument = report.documents && report.documents.length > 0;
+            const hasDocumentId = !!(report as any).documentId;
             const reportDate = report.sentAt || report.createdAt;
+            const reportId = report._id || 'unknown';
             
             return (
               <div key={report._id || index} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
@@ -121,8 +151,8 @@ export default function AdminReportSection({ reports, formId, formType, title = 
                     <p className="text-gray-900 mb-3">{report.message}</p>
                     <div className="flex items-center gap-4 text-sm text-gray-500">
                       <div className="flex items-center gap-1">
-                        <span className={`px-2 py-1 rounded text-xs ${hasDocument ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                          {hasDocument ? 'Has Documents' : 'No Documents'}
+                        <span className={`px-2 py-1 rounded text-xs ${hasDocument || hasDocumentId ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                          {hasDocument || hasDocumentId ? 'Has Documents' : 'No Documents'}
                         </span>
                       </div>
                       <div className="flex items-center gap-1">
@@ -135,7 +165,7 @@ export default function AdminReportSection({ reports, formId, formType, title = 
                           <span>{report.sentBy}</span>
                         </div>
                       )}
-                      {hasDocument && (
+                      {(hasDocument || hasDocumentId) && (
                         <div className="flex items-center gap-1">
                           <FileText className="h-4 w-4" />
                           <span>{Array.isArray(report.documents) ? report.documents.length : 1} document(s)</span>
@@ -143,6 +173,29 @@ export default function AdminReportSection({ reports, formId, formType, title = 
                       )}
                     </div>
                   </div>
+                  {(hasDocumentId || hasDocument) && (
+                    <div className="ml-4">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDownloadReport(report)}
+                        disabled={downloading === reportId}
+                        className="border-green-600 text-green-600 hover:bg-green-50 hover:text-green-700"
+                      >
+                        {downloading === reportId ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Downloading...
+                          </>
+                        ) : (
+                          <>
+                            <Download className="mr-2 h-4 w-4" />
+                            Download
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  )}
                 </div>
                 {index < reports.length - 1 && <Separator className="mt-4" />}
               </div>

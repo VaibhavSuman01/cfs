@@ -23,12 +23,21 @@ const companyFormSchema = z.object({
   phone: z.string().min(10, "Phone number must be at least 10 digits"),
   pan: z.string().regex(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "Invalid PAN format"),
   aadhaar: z.string().regex(/^\d{12}$/, "Aadhaar must be exactly 12 digits").optional(),
-  companyType: z.string().min(1, "Company type is required"),
+  service: z.string().min(1, "Service is required"),
+  subService: z.string().optional(),
   companyName: z.string().min(1, "Company name is required"),
   businessActivity: z.string().min(1, "Business activity is required"),
   proposedCapital: z.string().min(1, "Proposed capital is required"),
-  directorsCount: z.string().min(1, "Number of directors is required"),
-  registeredOffice: z.string().min(1, "Registered office address is required"),
+  registeredOfficeAddress: z.string().min(1, "Registered office address is required"),
+  city: z.string().min(1, "City is required"),
+  state: z.string().min(1, "State is required"),
+  pincode: z.string().min(6, "Pincode must be at least 6 digits"),
+  directors: z.string().optional(),
+  hasDigitalSignature: z.boolean().optional(),
+  hasBankAccount: z.boolean().optional(),
+  requiresGstRegistration: z.boolean().optional(),
+  requiresCompliance: z.boolean().optional(),
+  selectedPackage: z.string().optional(),
   description: z.string().optional(),
 });
 
@@ -56,12 +65,21 @@ export default function CompanyFormationPage() {
       phone: user?.mobile || "",
       pan: user?.pan || "",
       aadhaar: user?.aadhaar || "",
-      companyType: "",
+      service: "Company Formation",
+      subService: "",
       companyName: "",
       businessActivity: "",
       proposedCapital: "",
-      directorsCount: "",
-      registeredOffice: "",
+      registeredOfficeAddress: "",
+      city: "",
+      state: "",
+      pincode: "",
+      directors: "",
+      hasDigitalSignature: false,
+      hasBankAccount: false,
+      requiresGstRegistration: false,
+      requiresCompliance: false,
+      selectedPackage: "Basic",
       description: "",
     },
   });
@@ -75,7 +93,7 @@ export default function CompanyFormationPage() {
       // Append form data
       Object.entries(data).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
-          formData.append(key, value);
+          formData.append(key, String(value));
         }
       });
 
@@ -102,10 +120,18 @@ export default function CompanyFormationPage() {
 
       toast.success("Company formation application submitted successfully");
       router.push("/dashboard/company-formation");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to submit company formation form:", error);
-      toast.error("Failed to submit company formation application. Please try again.");
-      } finally {
+      
+      // Handle specific error cases
+      if (error.response?.status === 400 && error.response?.data?.message?.includes("already exists")) {
+        toast.error("Already submitted for this Year. You can only submit one form per service.");
+      } else if (error.response?.status === 409) {
+        toast.error("Already submitted for this Year. You can only submit one form per service.");
+      } else {
+        toast.error("Failed to submit company formation application. Please try again.");
+      }
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -270,7 +296,27 @@ export default function CompanyFormationPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name="companyType"
+                    name="service"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Service *</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select service" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="Company Formation">Company Formation</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="subService"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Company Type *</FormLabel>
@@ -334,19 +380,47 @@ export default function CompanyFormationPage() {
                   />
                   <FormField
                     control={form.control}
-                    name="directorsCount"
+                    name="city"
                     render={({ field }) => (
-                      <><FormItem>
-                        <FormLabel>Number of Directors *</FormLabel></FormItem><FormControl>
-                          <Input {...field} placeholder="Enter number of directors" />
-                        </FormControl><FormMessage />
-                      </>
+                      <FormItem>
+                        <FormLabel>City *</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Enter city" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="state"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>State *</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Enter state" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="pincode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Pincode *</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Enter pincode" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
                     )}
                   />
                 </div>
                 <FormField
                   control={form.control}
-                  name="registeredOffice"
+                  name="registeredOfficeAddress"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Registered Office Address *</FormLabel>
@@ -370,7 +444,104 @@ export default function CompanyFormationPage() {
                     </FormItem>
                   )}
                 />
-            </div>
+              </div>
+
+              {/* Additional Requirements */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Additional Requirements</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="hasDigitalSignature"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <input
+                            type="checkbox"
+                            checked={field.value}
+                            onChange={field.onChange}
+                            className="h-4 w-4"
+                          />
+                        </FormControl>
+                        <FormLabel>Has Digital Signature</FormLabel>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="hasBankAccount"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <input
+                            type="checkbox"
+                            checked={field.value}
+                            onChange={field.onChange}
+                            className="h-4 w-4"
+                          />
+                        </FormControl>
+                        <FormLabel>Has Bank Account</FormLabel>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="requiresGstRegistration"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <input
+                            type="checkbox"
+                            checked={field.value}
+                            onChange={field.onChange}
+                            className="h-4 w-4"
+                          />
+                        </FormControl>
+                        <FormLabel>Requires GST Registration</FormLabel>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="requiresCompliance"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <input
+                            type="checkbox"
+                            checked={field.value}
+                            onChange={field.onChange}
+                            className="h-4 w-4"
+                          />
+                        </FormControl>
+                        <FormLabel>Requires Compliance</FormLabel>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <FormField
+                  control={form.control}
+                  name="selectedPackage"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Package Selection</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select package" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Basic">Basic</SelectItem>
+                          <SelectItem value="Standard">Standard</SelectItem>
+                          <SelectItem value="Premium">Premium</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               {/* Document Upload */}
               <div className="space-y-4">

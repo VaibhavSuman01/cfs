@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { getBasePrice } from "@/lib/pricing"
+import { getServiceCardClasses, getServiceBackgroundColor, getServiceIconColor, getServicePriceColor } from "@/lib/service-colors"
 import { 
   TrendingUp, 
   Users, 
@@ -143,14 +144,14 @@ export default function AdvisoryPage() {
                 },
               ].map((service, index) => (
                 <FadeInSection key={index} delay={index * 100}>
-                  <Card className="border-2 border-gray-200 hover:border-blue-300 hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group">
+                  <Card className={getServiceCardClasses('Advisory')}>
                     <CardHeader className="text-center">
-                      <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-blue-200 transition-colors">
-                        <service.icon className="h-8 w-8 text-blue-600 group-hover:scale-110 transition-transform" />
+                      <div className={getServiceBackgroundColor('Advisory')}>
+                        <service.icon className={`h-8 w-8 ${getServiceIconColor('Advisory')}`} />
                       </div>
                       <CardTitle className="text-xl text-gray-900">{service.title}</CardTitle>
                       <div className="space-y-2">
-                        <div className="text-2xl font-bold text-blue-600">{service.price}</div>
+                        <div className={getServicePriceColor('Advisory')}>{service.price}</div>
                         <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
                           <Clock className="h-4 w-4" />
                           <span>{service.timeline}</span>

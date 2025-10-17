@@ -70,9 +70,13 @@ export default function TrademarkISOPage() {
       // Append form data
       Object.entries(data).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
-          formData.append(key, value);
+          formData.append(key, String(value));
         }
       });
+
+      // Add service and subService fields
+      formData.append("service", "Trademark & ISO");
+      formData.append("subService", data.serviceType);
 
       // Append Aadhaar file if uploaded
       if (aadhaarFile) {

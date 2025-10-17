@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { PricingDisplay } from "@/components/ui/pricing-display"
+import { getServiceCardClasses, getServiceBackgroundColor, getServiceIconColor, getServicePriceColor } from "@/lib/service-colors"
 import { Users, FileText, Building, Handshake, CheckCircle, ArrowRight, Shield, Clock, Globe } from "lucide-react"
 
 
@@ -215,14 +216,14 @@ export default function OtherRegistrationPage() {
                 },
               ].map((registration, index) => (
                 <FadeInSection key={index} delay={index * 100}>
-                  <Card className="border-2 border-gray-200 hover:border-blue-300 hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group">
+                  <Card className={getServiceCardClasses('Other Registration')}>
                     <CardHeader className="text-center">
-                      <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-blue-200 transition-colors">
-                        <registration.icon className="h-8 w-8 text-blue-600 group-hover:scale-110 transition-transform" />
+                      <div className={getServiceBackgroundColor('Other Registration')}>
+                        <registration.icon className={`h-8 w-8 ${getServiceIconColor('Other Registration')}`} />
                       </div>
                       <CardTitle className="text-xl text-gray-900">{registration.title}</CardTitle>
                       <div className="space-y-2">
-                        <div className="text-2xl font-bold text-blue-600">
+                        <div className={getServicePriceColor('Other Registration')}>
                           {registration.priceKey ? (
                             <PricingDisplay serviceName={registration.priceKey} />
                           ) : (

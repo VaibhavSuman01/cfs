@@ -314,7 +314,7 @@ export default function TaxFormDetailPage() {
                             {report.message && <p className="text-xs text-gray-600 mt-1">{report.message}</p>}
                           </div>
                           <Button size="sm" variant="outline" onClick={() => handleDownload({
-                            _id: report._id,
+                            _id: (report.document as any)._id,
                             originalName: report.document.originalName,
                             fileName: report.document.fileName
                           } as Document)}><Download className="mr-2 h-4 w-4"/>Download</Button>

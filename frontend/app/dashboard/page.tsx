@@ -156,7 +156,12 @@ export default function UserDashboard() {
   const handleDownloadLatestReport = async (form: FormSubmission) => {
     try {
       const latest = (form.reports || []).slice().reverse().find(r => r.documentId);
-      if (!latest || !latest.documentId) return;
+      if (!latest || !latest.documentId) {
+        console.log('No report with documentId found for form:', form._id);
+        return;
+      }
+      
+      console.log('Attempting to download document:', latest.documentId, 'for form:', form._id);
       const defaultName = latest.type ? `report-${latest.type}.pdf` : `report-${latest.documentId}`;
       await api.downloadFile(`/api/forms/download/${latest.documentId}`, defaultName);
     } catch (e) {
@@ -260,6 +265,7 @@ export default function UserDashboard() {
     
     // Map service names to more readable labels
     const serviceMap: Record<string, string> = {
+      'GST Registration': 'GST Registration',
       'GST Filing': 'GST Filing',
       'Income Tax Filing': 'Income Tax Filing',
       'TDS Returns': 'TDS Returns',
@@ -276,7 +282,6 @@ export default function UserDashboard() {
       'LLP Registration': 'LLP Registration',
       'Partnership Firm': 'Partnership Firm',
       'Sole Proprietorship': 'Sole Proprietorship',
-      'GST Registration': 'GST Registration',
       'MSME Registration': 'MSME Registration',
       'FSSAI Food License': 'FSSAI Food License',
       'Digital Signature': 'Digital Signature',
@@ -341,6 +346,7 @@ export default function UserDashboard() {
     {
       name: "Other Registration",
       items: [
+        "GST Registration",
         "LLP Registration",
         "Partnership Firm",
         "Proprietorship",
@@ -357,7 +363,6 @@ export default function UserDashboard() {
         "TAN Apply",
         "Start-up India Registration",
         "Digital Registration",
-        "GST Filing",
       ],
     },
     {
@@ -531,7 +536,7 @@ export default function UserDashboard() {
                                   {category.name === 'Taxation' ? (
                                     <Button variant="outline" size="sm" asChild>
                                       <Link
-                                        href={`/dashboard/new-form=${encodeURIComponent(service)}`}
+                                        href={`/dashboard/new-form?service=${encodeURIComponent(service)}`}
                                       >
                                         File Now{" "}
                                         <ChevronRight className="ml-2 h-4 w-4" />
