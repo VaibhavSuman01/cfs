@@ -56,7 +56,7 @@ export default function GstRegistrationPage() {
 
                 <div className="grid sm:grid-cols-3 gap-4 pt-6">
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-                    <div className="text-2xl font-bold text-blue-600">₹2,999</div>
+                    <div className="text-2xl font-bold text-blue-600">₹1,499</div>
                     <div className="text-sm text-gray-600">Fixed Price</div>
                   </div>
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
@@ -115,7 +115,7 @@ export default function GstRegistrationPage() {
               <Card className="border-2 border-blue-400 hover:border-blue-600 hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 <CardHeader className="text-center pb-4">
                   <CardTitle className="text-3xl font-bold text-blue-600">Monthly GST Filing</CardTitle>
-                  <div className="text-5xl font-bold text-gray-900">₹2,999</div>
+                  <div className="text-5xl font-bold text-gray-900">₹1,499</div>
                   <p className="text-lg text-gray-600">Fixed Price per Month</p>
                 </CardHeader>
                 <CardContent className="space-y-6">

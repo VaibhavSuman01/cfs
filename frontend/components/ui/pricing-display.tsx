@@ -18,7 +18,7 @@ export function PricingDisplay({
   const pricing = getServicePricing(serviceName);
   
   if (!pricing?.basePrice) {
-    return <span className={className}>Price not available</span>;
+    return <span className={className}>As per request</span>;
   }
 
   const priceText = pricing.basePrice;
@@ -60,7 +60,7 @@ export function PackagePricingDisplay({
   const pricing = getServicePricing(serviceName);
   
   if (!pricing?.packages?.[packageType]) {
-    return <span className={className}>Price not available</span>;
+    return <span className={className}>As per request</span>;
   }
 
   const priceText = pricing.packages[packageType];
