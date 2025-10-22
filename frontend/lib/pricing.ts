@@ -53,8 +53,8 @@ const PRICING_RAW: Record<string, ServicePricing> = {
     tooltip: "Prices may vary based on complexity and industry standards"
   },
   "gst filing": { 
-    basePrice: "As per request*",
-    packages: { BASIC: "As per request*" },
+    basePrice: "₹1,499*",
+    packages: { BASIC: "₹1,499*" },
     tooltip: "Prices vary based on filing frequency, complexity, and industry standards"
   },
   "income tax filing": { 

@@ -43,15 +43,14 @@ export default function TaxationPage() {
                   icon: TrendingUp,
                   title: "GST Filing",
                   button: "gst-filing",
-                  description: "Registration and monthly/quarterly GST compliance (GSTR-1, GSTR-3B) with ITC support",
+                  description: "Monthly/quarterly GST compliance (GSTR-1, GSTR-3B) with ITC support",
                   features: [
-                    "GST registration & portal setup",
                     "GSTR-1 (outward supplies) filing",
                     "GSTR-3B summary return filing",
                     "E-invoice/e-way bill guidance",
                     "Input Tax Credit reconciliation",
                   ],
-                  priceKey: "gst registration",
+                  priceKey: "gst filing",
                   timeline: "3-7 days",
                 },
                 {
