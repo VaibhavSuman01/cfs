@@ -1,22 +1,44 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { Building2, Phone, Mail, MapPin, Facebook, Twitter, Linkedin, Instagram } from "lucide-react"
+import Link from "next/link";
+import {
+  Building2,
+  Phone,
+  Mail,
+  MapPin,
+  Facebook,
+  Twitter,
+  Linkedin,
+  Instagram,
+} from "lucide-react";
 
 export function EnhancedFooter() {
   const companyServices = [
-    { name: "Private Limited Company", href: "/company-formation/private-limited" },
-    { name: "Public Limited Company", href: "/company-formation/public-limited" },
-    { name: "One Person Company", href: "/company-formation/one-person-company" },
+    {
+      name: "Private Limited Company",
+      href: "/company-formation/private-limited",
+    },
+    {
+      name: "Public Limited Company",
+      href: "/company-formation/public-limited",
+    },
+    {
+      name: "One Person Company",
+      href: "/company-formation/one-person-company",
+    },
     { name: "Section 8 Company", href: "/company-formation/section-8" },
     { name: "Nidhi Company", href: "/company-formation/nidhi-company" },
     { name: "Producer Company", href: "/company-formation/producer-company" },
-  ]
+  ];
 
   const otherServices = [
+    { name: "GST Registration", href: "/other-registration/gst-registration" },
     { name: "LLP Registration", href: "/other-registration/llp" },
     { name: "Partnership Firm", href: "/other-registration/partnership" },
-    { name: "Sole Proprietorship", href: "/other-registration/sole-proprietorship" },
+    {
+      name: "Sole Proprietorship",
+      href: "/other-registration/sole-proprietorship",
+    },
     { name: "MSME/Udyam Registration", href: "/other-registration/msme" },
     { name: "IEC Registration", href: "/other-registration/iec" },
     { name: "FSSAI Food License", href: "/other-registration/fssai" },
@@ -25,13 +47,18 @@ export function EnhancedFooter() {
     { name: "NGO Registration", href: "/other-registration/ngo" },
     { name: "PAN Apply", href: "/other-registration/pan" },
     { name: "TAN Apply", href: "/other-registration/tan" },
-    { name: "Startup India Registration", href: "/other-registration/startup-india" },
-    { name: "Digital Signature", href: "/other-registration/digital-signature" },
+    {
+      name: "Startup India Registration",
+      href: "/other-registration/startup-india",
+    },
+    {
+      name: "Digital Signature",
+      href: "/other-registration/digital-signature",
+    },
     { name: "PT Tax", href: "/other-registration/pt-tax" },
-  ]
+  ];
 
   const taxationServices = [
-    { name: "GST Registration", href: "/other-registration/gst-registration" },
     { name: "GST Filing", href: "/taxation/gst-filing" },
     { name: "Income Tax Filing", href: "/taxation/income-tax" },
     { name: "TDS Returns", href: "/taxation/tds-returns" },
@@ -39,14 +66,14 @@ export function EnhancedFooter() {
     { name: "EPFO Filing", href: "/taxation/epfo" },
     { name: "ESIC Filing", href: "/taxation/esic" },
     { name: "Corporate Tax Filing", href: "/taxation/corporate-tax" },
-  ]
+  ];
 
   const reportsServices = [
     { name: "Project Reports", href: "/reports/project-reports" },
     { name: "CMA Reports", href: "/reports/cma-reports" },
     { name: "DSCR Reports", href: "/reports/dscr-reports" },
     { name: "Bank Reconciliation", href: "/reports/bank-reconciliation" },
-  ]
+  ];
 
   const legalServices = [
     { name: "Trademark Registration", href: "/trademark-iso/trademark" },
@@ -54,18 +81,30 @@ export function EnhancedFooter() {
     { name: "ISO 14001 Certification", href: "/trademark-iso/iso-14001" },
     { name: "Copyright Registration", href: "/trademark-iso/copyright" },
     { name: "Legal Advisory", href: "/advisory" },
-  ]
+  ];
 
   const advisoryServices = [
-    { name: "Business Strategy Consulting", href: "/advisory/business-strategy" },
-    { name: "Financial Planning & Analysis", href: "/advisory/financial-planning" },
-    { name: "Digital Transformation", href: "/advisory/digital-transformation" },
-    { name: "HR & Organizational Development", href: "/advisory/hr-development" },
+    {
+      name: "Business Strategy Consulting",
+      href: "/advisory/business-strategy",
+    },
+    {
+      name: "Financial Planning & Analysis",
+      href: "/advisory/financial-planning",
+    },
+    {
+      name: "Digital Transformation",
+      href: "/advisory/digital-transformation",
+    },
+    {
+      name: "HR & Organizational Development",
+      href: "/advisory/hr-development",
+    },
     { name: "Legal Compliance Advisory", href: "/advisory/legal-compliance" },
     { name: "Startup Mentoring", href: "/advisory/startup-mentoring" },
     { name: "Tax Planning & Analysis", href: "/advisory/tax-planning" },
     { name: "Fund Raising Assistance", href: "/advisory/fund-raising" },
-  ]
+  ];
 
   const toolsServices = [
     { name: "Income Tax Calculator", href: "/tools/income-tax-calculator" },
@@ -74,23 +113,26 @@ export function EnhancedFooter() {
     { name: "SIP Calculator", href: "/tools/sip-calculator" },
     { name: "HSN Code Finder", href: "/tools/hsn-code-finder" },
     { name: "Salary Calculator", href: "/tools/salary-calculator" },
-  ]
+  ];
 
   const quickLinks = [
     { name: "About Us", href: "/about" },
     { name: "Contact Us", href: "/contact" },
-  ]
+  ];
 
   return (
     <footer className="bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 text-white relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-20">
-        <div className="w-full h-full" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          backgroundRepeat: 'repeat'
-        }}></div>
+        <div
+          className="w-full h-full"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundRepeat: "repeat",
+          }}
+        ></div>
       </div>
-      
+
       <div className="container mx-auto px-4 py-20 relative z-10">
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-8 lg:gap-12">
@@ -105,19 +147,23 @@ export function EnhancedFooter() {
                   <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-blue-300 to-blue-200 bg-clip-text text-transparent">
                     Com Financial Services
                   </h2>
-                  <p className="text-blue-300 font-medium">Your Trusted Business Partner</p>
+                  <p className="text-blue-300 font-medium">
+                    Your Trusted Business Partner
+                  </p>
                 </div>
               </div>
-              
+
               <p className="text-gray-300 leading-relaxed text-lg max-w-md">
-                Empowering businesses with comprehensive legal, financial, and compliance solutions. 
-                Your success is our commitment.
+                Empowering businesses with comprehensive legal, financial, and
+                compliance solutions. Your success is our commitment.
               </p>
             </div>
 
             {/* Contact Information */}
             <div className="space-y-4">
-              <h4 className="text-xl font-semibold text-blue-300 mb-4">Get in Touch</h4>
+              <h4 className="text-xl font-semibold text-blue-300 mb-4">
+                Get in Touch
+              </h4>
               <div className="space-y-4">
                 <div className="flex items-start space-x-4 group">
                   <div className="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center group-hover:bg-blue-600/30 transition-colors">
@@ -128,7 +174,7 @@ export function EnhancedFooter() {
                     <p className="text-gray-400">0612-4535604</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start space-x-4 group">
                   <div className="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center group-hover:bg-blue-600/30 transition-colors">
                     <Mail className="h-5 w-5 text-blue-400" />
@@ -138,14 +184,18 @@ export function EnhancedFooter() {
                     <p className="text-gray-400">info@comfinserv.co</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start space-x-4 group">
                   <div className="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center group-hover:bg-blue-600/30 transition-colors">
                     <MapPin className="h-5 w-5 text-blue-400" />
                   </div>
                   <div>
                     <p className="text-gray-300 font-medium">Address</p>
-                    <p className="text-gray-400">211, NP Exhibition Road<br />Patna, Bihar-800001</p>
+                    <p className="text-gray-400">
+                      211, NP Exhibition Road
+                      <br />
+                      Patna, Bihar-800001
+                    </p>
                   </div>
                 </div>
               </div>
@@ -159,7 +209,7 @@ export function EnhancedFooter() {
                   { icon: Facebook, href: "#", label: "Facebook" },
                   { icon: Twitter, href: "#", label: "Twitter" },
                   { icon: Linkedin, href: "#", label: "LinkedIn" },
-                  { icon: Instagram, href: "#", label: "Instagram" }
+                  { icon: Instagram, href: "#", label: "Instagram" },
                 ].map((social) => (
                   <a
                     key={social.label}
@@ -179,7 +229,9 @@ export function EnhancedFooter() {
             {/* Company Formation */}
             <div className="space-y-6">
               <div className="space-y-1">
-                <h3 className="text-xl font-bold text-blue-300">Company Formation</h3>
+                <h3 className="text-xl font-bold text-blue-300">
+                  Company Formation
+                </h3>
                 <div className="w-12 h-1 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
               </div>
               <div className="space-y-3">
@@ -189,7 +241,9 @@ export function EnhancedFooter() {
                     href={service.href}
                     className="block text-gray-400 hover:text-blue-300 transition-all duration-300 hover:translate-x-1 text-sm group"
                   >
-                    <span className="group-hover:text-blue-300">{service.name}</span>
+                    <span className="group-hover:text-blue-300">
+                      {service.name}
+                    </span>
                   </Link>
                 ))}
               </div>
@@ -198,7 +252,9 @@ export function EnhancedFooter() {
             {/* Other Registration */}
             <div className="space-y-6">
               <div className="space-y-1">
-                <h3 className="text-xl font-bold text-blue-300">Other Registration</h3>
+                <h3 className="text-xl font-bold text-blue-300">
+                  Other Registration
+                </h3>
                 <div className="w-12 h-1 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
               </div>
               <div className="space-y-3">
@@ -208,7 +264,9 @@ export function EnhancedFooter() {
                     href={service.href}
                     className="block text-gray-400 hover:text-blue-300 transition-all duration-300 hover:translate-x-1 text-sm group"
                   >
-                    <span className="group-hover:text-blue-300">{service.name}</span>
+                    <span className="group-hover:text-blue-300">
+                      {service.name}
+                    </span>
                   </Link>
                 ))}
               </div>
@@ -227,7 +285,9 @@ export function EnhancedFooter() {
                     href={service.href}
                     className="block text-gray-400 hover:text-blue-300 transition-all duration-300 hover:translate-x-1 text-sm group"
                   >
-                    <span className="group-hover:text-blue-300">{service.name}</span>
+                    <span className="group-hover:text-blue-300">
+                      {service.name}
+                    </span>
                   </Link>
                 ))}
               </div>
@@ -236,7 +296,9 @@ export function EnhancedFooter() {
             {/* Reports & Legal */}
             <div className="space-y-6">
               <div className="space-y-1">
-                <h3 className="text-xl font-bold text-blue-300">Reports & Legal</h3>
+                <h3 className="text-xl font-bold text-blue-300">
+                  Reports & Legal
+                </h3>
                 <div className="w-12 h-1 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
               </div>
               <div className="space-y-3">
@@ -246,7 +308,9 @@ export function EnhancedFooter() {
                     href={service.href}
                     className="block text-gray-400 hover:text-blue-300 transition-all duration-300 hover:translate-x-1 text-sm group"
                   >
-                    <span className="group-hover:text-blue-300">{service.name}</span>
+                    <span className="group-hover:text-blue-300">
+                      {service.name}
+                    </span>
                   </Link>
                 ))}
                 <div className="pt-2 border-t border-gray-700">
@@ -256,7 +320,9 @@ export function EnhancedFooter() {
                       href={service.href}
                       className="block text-gray-400 hover:text-blue-300 transition-all duration-300 hover:translate-x-1 text-sm group"
                     >
-                      <span className="group-hover:text-blue-300">{service.name}</span>
+                      <span className="group-hover:text-blue-300">
+                        {service.name}
+                      </span>
                     </Link>
                   ))}
                 </div>
@@ -270,7 +336,9 @@ export function EnhancedFooter() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="space-y-6">
               <div className="space-y-1">
-                <h3 className="text-xl font-bold text-blue-300">Advisory Services</h3>
+                <h3 className="text-xl font-bold text-blue-300">
+                  Advisory Services
+                </h3>
                 <div className="w-12 h-1 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -280,7 +348,9 @@ export function EnhancedFooter() {
                     href={service.href}
                     className="block text-gray-400 hover:text-blue-300 transition-all duration-300 hover:translate-x-1 text-sm group"
                   >
-                    <span className="group-hover:text-blue-300">{service.name}</span>
+                    <span className="group-hover:text-blue-300">
+                      {service.name}
+                    </span>
                   </Link>
                 ))}
               </div>
@@ -288,7 +358,9 @@ export function EnhancedFooter() {
 
             <div className="space-y-6">
               <div className="space-y-1">
-                <h3 className="text-xl font-bold text-blue-300">Tools & Calculators</h3>
+                <h3 className="text-xl font-bold text-blue-300">
+                  Tools & Calculators
+                </h3>
                 <div className="w-12 h-1 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -298,7 +370,9 @@ export function EnhancedFooter() {
                     href={service.href}
                     className="block text-gray-400 hover:text-blue-300 transition-all duration-300 hover:translate-x-1 text-sm group"
                   >
-                    <span className="group-hover:text-blue-300">{service.name}</span>
+                    <span className="group-hover:text-blue-300">
+                      {service.name}
+                    </span>
                   </Link>
                 ))}
               </div>
@@ -314,35 +388,43 @@ export function EnhancedFooter() {
                 &copy; 2024 Com Financial Services. All rights reserved.
               </p>
               <p className="text-gray-500 text-xs">
-                Empowering businesses across India with trusted financial solutions.
+                Empowering businesses across India with trusted financial
+                solutions.
               </p>
             </div>
-            
+
             <div className="flex flex-wrap justify-center lg:justify-end gap-6 text-sm">
               {quickLinks.map((link) => (
-                <Link 
+                <Link
                   key={link.name}
-                  href={link.href} 
+                  href={link.href}
                   className="text-gray-400 hover:text-blue-300 transition-colors duration-300 hover:scale-105"
                 >
                   {link.name}
                 </Link>
               ))}
-              <Link href="/privacy-policy" className="text-gray-400 hover:text-blue-300 transition-colors duration-300 hover:scale-105">
+              <Link
+                href="/privacy-policy"
+                className="text-gray-400 hover:text-blue-300 transition-colors duration-300 hover:scale-105"
+              >
                 Privacy Policy
               </Link>
-              <Link href="/terms-of-service" className="text-gray-400 hover:text-blue-300 transition-colors duration-300 hover:scale-105">
+              <Link
+                href="/terms-of-service"
+                className="text-gray-400 hover:text-blue-300 transition-colors duration-300 hover:scale-105"
+              >
                 Terms of Service
               </Link>
-              <Link href="/refund-policy" className="text-gray-400 hover:text-blue-300 transition-colors duration-300 hover:scale-105">
+              <Link
+                href="/refund-policy"
+                className="text-gray-400 hover:text-blue-300 transition-colors duration-300 hover:scale-105"
+              >
                 Refund Policy
               </Link>
             </div>
           </div>
         </div>
       </div>
-
     </footer>
-  )
+  );
 }
-

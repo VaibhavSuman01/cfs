@@ -19,7 +19,9 @@ export function EnhancedHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [mobileDropdownOpen, setMobileDropdownOpen] = useState<string | null>(null);
+  const [mobileDropdownOpen, setMobileDropdownOpen] = useState<string | null>(
+    null
+  );
   const [user, setUser] = useState<any>(null);
   const router = useRouter();
 
@@ -80,7 +82,7 @@ export function EnhancedHeader() {
       name: "Taxation",
       href: "/taxation",
       dropdown: [
-        { name: "GST Filing", href: "/taxation/gst-registration" },
+        { name: "GST Filing", href: "/taxation/gst-filing" },
         { name: "Income Tax Filing", href: "/taxation/income-tax" },
         { name: "TDS Returns", href: "/taxation/tds-returns" },
         { name: "Tax Planning", href: "/taxation/tax-planning" },
@@ -111,7 +113,7 @@ export function EnhancedHeader() {
 
   // Toggle mobile dropdown
   const toggleMobileDropdown = (itemName: string) => {
-    setMobileDropdownOpen(prev => prev === itemName ? null : itemName);
+    setMobileDropdownOpen((prev) => (prev === itemName ? null : itemName));
   };
 
   // Sign out handler
@@ -133,7 +135,7 @@ export function EnhancedHeader() {
     >
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
-                    {/* Logo and Company Name in one line */}
+          {/* Logo and Company Name in one line */}
           <Link href="/" className="flex items-center space-x-3 group">
             <div className="relative">
               <Building2 className="h-10 w-10 text-blue-600 group-hover:scale-110 transition-transform duration-300" />
@@ -179,7 +181,7 @@ export function EnhancedHeader() {
                 )}
               </div>
             ))}
-            
+
             {/* User section */}
             {!user ? (
               <Button
@@ -208,7 +210,7 @@ export function EnhancedHeader() {
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gray-900 transition-all duration-300 group-hover:w-full"></span>
                 </button>
                 {dropdownOpen && (
-                  <div 
+                  <div
                     className="absolute top-full left-0 mt-1 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-2 animate-fadeInUp z-50"
                     onMouseEnter={() => setDropdownOpen(true)}
                     onMouseLeave={() => setDropdownOpen(false)}
@@ -258,7 +260,10 @@ export function EnhancedHeader() {
           <div className="lg:hidden mt-4 pb-4 border-t border-blue-100 animate-fadeInUp">
             <nav className="flex flex-col space-y-2 pt-4">
               {navigation.map((item) => (
-                <div key={item.name} className="border-b border-gray-100 last:border-0">
+                <div
+                  key={item.name}
+                  className="border-b border-gray-100 last:border-0"
+                >
                   {item.dropdown ? (
                     <>
                       <button
@@ -268,7 +273,9 @@ export function EnhancedHeader() {
                         <span>{item.name}</span>
                         <svg
                           className={`w-4 h-4 transition-transform duration-200 ${
-                            mobileDropdownOpen === item.name ? 'transform rotate-180' : ''
+                            mobileDropdownOpen === item.name
+                              ? "transform rotate-180"
+                              : ""
                           }`}
                           fill="none"
                           stroke="currentColor"
@@ -285,7 +292,9 @@ export function EnhancedHeader() {
                       </button>
                       <div
                         className={`overflow-hidden transition-all duration-300 ${
-                          mobileDropdownOpen === item.name ? 'max-h-96' : 'max-h-0'
+                          mobileDropdownOpen === item.name
+                            ? "max-h-96"
+                            : "max-h-0"
                         }`}
                       >
                         <div className="ml-4 space-y-1 py-1">

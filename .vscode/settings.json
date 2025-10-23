@@ -3,16 +3,23 @@
     "aadhaar",
     "argb",
     "Comfin",
+    "dscr",
     "EPFO",
     "ESIC",
     "exceljs",
+    "fassai",
     "FSSAI",
+    "gumasta",
+    "gumusta",
+    "IFSC",
+    "Licence",
     "MSME",
     "Nidhi",
     "officedocument",
     "openxmlformats",
     "PSARA",
     "Serv",
-    "spreadsheetml"
+    "spreadsheetml",
+    "Udyam"
   ]
 }

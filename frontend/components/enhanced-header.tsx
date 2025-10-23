@@ -21,7 +21,9 @@ export function EnhancedHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [mobileDropdownOpen, setMobileDropdownOpen] = useState<string | null>(null);
+  const [mobileDropdownOpen, setMobileDropdownOpen] = useState<string | null>(
+    null
+  );
   const router = useRouter();
   const { user, logout, isAuthenticated } = useAuth();
 
@@ -38,35 +40,83 @@ export function EnhancedHeader() {
       name: "Company Formation",
       href: "/company-formation",
       dropdown: [
-        { name: "Private Limited Company", href: "/company-formation/private-limited" },
-        { name: "Public Limited Company", href: "/company-formation/public-limited" },
-        { name: "One Person Company", href: "/company-formation/one-person-company" },
+        {
+          name: "Private Limited Company",
+          href: "/company-formation/private-limited",
+        },
+        {
+          name: "Public Limited Company",
+          href: "/company-formation/public-limited",
+        },
+        {
+          name: "One Person Company",
+          href: "/company-formation/one-person-company",
+        },
         { name: "Section 8 Company", href: "/company-formation/section-8" },
         { name: "Nidhi Company", href: "/company-formation/nidhi-company" },
-        { name: "Producer Company", href: "/company-formation/producer-company" },
+        {
+          name: "Producer Company",
+          href: "/company-formation/producer-company",
+        },
       ],
     },
     {
       name: "Other Registration",
       href: "/other-registration",
       dropdown: [
-        { name: "LLP Registration", href: "/other-registration/llp-registration" },
-        { name: "Partnership Firm", href: "/other-registration/partnership-firm" },
-        { name: "Sole Proprietorship", href: "/other-registration/sole-proprietorship" },
-        { name: "MSME/Udyam Registration", href: "/other-registration/msme-udyam-registration" },
+        {
+          name: "GST Registration",
+          href: "/other-registration/gst-registration",
+        },
+        {
+          name: "LLP Registration",
+          href: "/other-registration/llp-registration",
+        },
+        {
+          name: "Partnership Firm",
+          href: "/other-registration/partnership-firm",
+        },
+        {
+          name: "Sole Proprietorship",
+          href: "/other-registration/sole-proprietorship",
+        },
+        {
+          name: "MSME/Udyam Registration",
+          href: "/other-registration/msme-udyam-registration",
+        },
         { name: "EPFO Registration", href: "/other-registration/epfo" },
         { name: "ESIC Registration", href: "/other-registration/esic" },
         { name: "PT Tax Registration", href: "/other-registration/pt-tax" },
-        { name: "IEC Registration", href: "/other-registration/iec-registration" },
-        { name: "Gumusta / Shop Registration", href: "/other-registration/gumusta-shop-registration" },
-        { name: "Fassai (Food) Licence", href: "/other-registration/fassai-food-license" },
-        { name: "Industry Licence", href: "/other-registration/industry-license" },
-        { name: "NGO Registration", href: "/other-registration/ngo-registration" },
+        {
+          name: "IEC Registration",
+          href: "/other-registration/iec-registration",
+        },
+        {
+          name: "Gumusta / Shop Registration",
+          href: "/other-registration/gumusta-shop-registration",
+        },
+        {
+          name: "Fassai (Food) Licence",
+          href: "/other-registration/fassai-food-license",
+        },
+        {
+          name: "Industry Licence",
+          href: "/other-registration/industry-license",
+        },
+        {
+          name: "NGO Registration",
+          href: "/other-registration/ngo-registration",
+        },
         { name: "PAN Application", href: "/other-registration/pan-apply" },
         { name: "TAN Application", href: "/other-registration/tan-apply" },
-        { name: "Start-up India Registration", href: "/other-registration/startup-india-registration" },
-        { name: "Digital Signature", href: "/other-registration/digital-signature" },
-        { name: "GST Registration", href: "/other-registration/gst-registration" },
+        {
+          name: "Start-up India Registration",
+          href: "/other-registration/startup-india-registration",
+        },
+        {
+          name: "Digital Signature",
+          href: "/other-registration/digital-signature",
+        },
       ],
     },
     {
@@ -90,7 +140,10 @@ export function EnhancedHeader() {
         { name: "EPFO Filing", href: "/taxation/epfo-filing" },
         { name: "ESIC Filing", href: "/taxation/esic-filing" },
         { name: "PT-Tax Filing", href: "/taxation/pt-tax-filing" },
-        { name: "Corporate Tax Filing", href: "/taxation/corporate-tax-filing" },
+        {
+          name: "Corporate Tax Filing",
+          href: "/taxation/corporate-tax-filing",
+        },
         { name: "Payroll Tax", href: "/taxation/payroll-tax" },
       ],
     },
@@ -100,8 +153,14 @@ export function EnhancedHeader() {
       dropdown: [
         { name: "Trademark Registration", href: "/trademark-iso/trademark" },
         { name: "ISO 9001 Certification", href: "/trademark-iso/iso-9001" },
-        { name: "ISO 14001 Certification", href: "/trademark-iso/iso-14001-certification" },
-        { name: "Copyright Registration", href: "/trademark-iso/copyright-registration" },
+        {
+          name: "ISO 14001 Certification",
+          href: "/trademark-iso/iso-14001-certification",
+        },
+        {
+          name: "Copyright Registration",
+          href: "/trademark-iso/copyright-registration",
+        },
       ],
     },
     {
@@ -147,22 +206,43 @@ export function EnhancedHeader() {
       name: "Advisory",
       href: "/advisory",
       dropdown: [
-        { name: "Business Strategy Consulting", href: "/advisory/business-strategy-consulting" },
-        { name: "Legal & Compliance Advisory", href: "/advisory/legal-compliance-advisory" },
-        { name: "HR & Organizational Development", href: "/advisory/hr-organizational-development" },
-        { name: "Financial Planning & Analysis", href: "/advisory/financial-planning-analysis" },
-        { name: "Digital Transformation", href: "/advisory/digital-transformation" },
+        {
+          name: "Business Strategy Consulting",
+          href: "/advisory/business-strategy-consulting",
+        },
+        {
+          name: "Legal & Compliance Advisory",
+          href: "/advisory/legal-compliance-advisory",
+        },
+        {
+          name: "HR & Organizational Development",
+          href: "/advisory/hr-organizational-development",
+        },
+        {
+          name: "Financial Planning & Analysis",
+          href: "/advisory/financial-planning-analysis",
+        },
+        {
+          name: "Digital Transformation",
+          href: "/advisory/digital-transformation",
+        },
         { name: "Startup Mentoring", href: "/advisory/startup-mentoring" },
         { name: "Tax Plan Analysis", href: "/advisory/tax-plan-analysis" },
-        { name: "Assistance for Fund Raising", href: "/advisory/assistance-for-fund-raising" },
-        { name: "Other Finance Related Services", href: "/advisory/other-finance-related-services" },
-      ]
+        {
+          name: "Assistance for Fund Raising",
+          href: "/advisory/assistance-for-fund-raising",
+        },
+        {
+          name: "Other Finance Related Services",
+          href: "/advisory/other-finance-related-services",
+        },
+      ],
     },
   ];
 
   // Toggle mobile dropdown
   const toggleMobileDropdown = (itemName: string) => {
-    setMobileDropdownOpen(prev => prev === itemName ? null : itemName);
+    setMobileDropdownOpen((prev) => (prev === itemName ? null : itemName));
   };
 
   // Sign out handler
@@ -220,8 +300,17 @@ export function EnhancedHeader() {
 
                 {item.dropdown && activeDropdown === item.name && (
                   <div
-                    className={`absolute top-full mt-2 bg-white rounded-xl shadow-2xl border border-gray-100 py-4 animate-fadeInUp z-[10000] ${item.name === 'Advisory' ? 'right-0' : 'left-0'} ${item.name === 'Other Registration' ? 'w-max max-w-6xl' : item.name === 'Tools' ? 'w-max max-w-5xl' : 'w-72'} max-h-[80vh] overflow-y-auto backdrop-blur-sm`}>
-                    {item.name === 'Other Registration' ? (
+                    className={`absolute top-full mt-2 bg-white rounded-xl shadow-2xl border border-gray-100 py-4 animate-fadeInUp z-[10000] ${
+                      item.name === "Advisory" ? "right-0" : "left-0"
+                    } ${
+                      item.name === "Other Registration"
+                        ? "w-max max-w-6xl"
+                        : item.name === "Tools"
+                        ? "w-max max-w-5xl"
+                        : "w-72"
+                    } max-h-[80vh] overflow-y-auto backdrop-blur-sm`}
+                  >
+                    {item.name === "Other Registration" ? (
                       // Mega Menu for Other Registration
                       <div className="px-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -236,7 +325,9 @@ export function EnhancedHeader() {
                                 href={subItem.href}
                                 className="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 rounded-lg transition-all duration-300 hover:translate-x-1 group"
                               >
-                                <span className="group-hover:font-medium">{subItem.name}</span>
+                                <span className="group-hover:font-medium">
+                                  {subItem.name}
+                                </span>
                               </Link>
                             ))}
                           </div>
@@ -252,7 +343,9 @@ export function EnhancedHeader() {
                                 href={subItem.href}
                                 className="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 rounded-lg transition-all duration-300 hover:translate-x-1 group"
                               >
-                                <span className="group-hover:font-medium">{subItem.name}</span>
+                                <span className="group-hover:font-medium">
+                                  {subItem.name}
+                                </span>
                               </Link>
                             ))}
                           </div>
@@ -268,19 +361,24 @@ export function EnhancedHeader() {
                                 href={subItem.href}
                                 className="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 rounded-lg transition-all duration-300 hover:translate-x-1 group"
                               >
-                                <span className="group-hover:font-medium">{subItem.name}</span>
+                                <span className="group-hover:font-medium">
+                                  {subItem.name}
+                                </span>
                               </Link>
                             ))}
                           </div>
-
                         </div>
-                        
+
                         {/* Bottom CTA Section */}
                         <div className="mt-6 pt-4 border-t border-gray-100">
                           <div className="flex items-center justify-between">
                             <div>
-                              <p className="text-sm font-semibold text-gray-800">Need Help Choosing?</p>
-                              <p className="text-xs text-gray-500">Our experts can guide you to the right service</p>
+                              <p className="text-sm font-semibold text-gray-800">
+                                Need Help Choosing?
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                Our experts can guide you to the right service
+                              </p>
                             </div>
                             <Link
                               href="/contact"
@@ -300,7 +398,9 @@ export function EnhancedHeader() {
                             href={subItem.href}
                             className="block px-4 py-3 text-sm text-gray-600 hover:text-blue-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 rounded-lg transition-all duration-300 hover:translate-x-1 group"
                           >
-                            <span className="group-hover:font-medium">{subItem.name}</span>
+                            <span className="group-hover:font-medium">
+                              {subItem.name}
+                            </span>
                           </Link>
                         ))}
                       </div>
@@ -309,21 +409,21 @@ export function EnhancedHeader() {
                 )}
               </div>
             ))}
-            
+
             {/* Enhanced User section */}
             {isAuthenticated ? (
-              <div 
+              <div
                 className="relative group"
-                onMouseEnter={() => setDropdownOpen(true)} 
+                onMouseEnter={() => setDropdownOpen(true)}
                 onMouseLeave={() => setDropdownOpen(false)}
               >
                 <button className="flex items-center space-x-3 text-gray-700 hover:text-blue-600 transition-all duration-300 py-2 px-3 rounded-lg hover:bg-blue-50/50 group">
                   {user?.avatarUrl ? (
                     <div className="relative">
-                      <img 
-                        src={getAvatarUrl(user.avatarUrl) || ""}  
-                        alt="user avatar" 
-                        className="w-9 h-9 rounded-full ring-2 ring-blue-100 group-hover:ring-blue-300 transition-all duration-300" 
+                      <img
+                        src={getAvatarUrl(user.avatarUrl) || ""}
+                        alt="user avatar"
+                        className="w-9 h-9 rounded-full ring-2 ring-blue-100 group-hover:ring-blue-300 transition-all duration-300"
                       />
                       <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
                     </div>
@@ -342,7 +442,9 @@ export function EnhancedHeader() {
                 {dropdownOpen && (
                   <div className="absolute right-0 z-[10000] w-56 rounded-xl bg-white shadow-2xl border border-gray-100 py-2 mt-2 backdrop-blur-sm">
                     <div className="px-4 py-3 border-b border-gray-100">
-                      <p className="text-sm font-medium text-gray-800">{user?.name}</p>
+                      <p className="text-sm font-medium text-gray-800">
+                        {user?.name}
+                      </p>
                       <p className="text-xs text-gray-500">{user?.email}</p>
                     </div>
                     <Link
@@ -408,14 +510,18 @@ export function EnhancedHeader() {
                         onClick={() => toggleMobileDropdown(item.name)}
                         className="w-full flex items-center justify-between px-4 py-4 text-gray-700 hover:text-blue-600 hover:bg-white rounded-lg transition-all duration-300 group"
                       >
-                        <span className="font-semibold group-hover:text-blue-600">{item.name}</span>
+                        <span className="font-semibold group-hover:text-blue-600">
+                          {item.name}
+                        </span>
                         <div className="flex items-center space-x-2">
                           <span className="text-xs text-gray-500 bg-blue-100 px-2 py-1 rounded-full">
                             {item.dropdown.length} services
                           </span>
                           <svg
                             className={`w-5 h-5 transition-transform duration-300 ${
-                              mobileDropdownOpen === item.name ? 'transform rotate-180 text-blue-600' : 'text-gray-400'
+                              mobileDropdownOpen === item.name
+                                ? "transform rotate-180 text-blue-600"
+                                : "text-gray-400"
                             }`}
                             fill="none"
                             stroke="currentColor"
@@ -433,10 +539,12 @@ export function EnhancedHeader() {
                       </button>
                       <div
                         className={`overflow-hidden transition-all duration-500 ${
-                          mobileDropdownOpen === item.name ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
+                          mobileDropdownOpen === item.name
+                            ? "max-h-[600px] opacity-100"
+                            : "max-h-0 opacity-0"
                         }`}
                       >
-                        {item.name === 'Other Registration' ? (
+                        {item.name === "Other Registration" ? (
                           // Mega Menu for Mobile - Other Registration
                           <div className="ml-4 space-y-4 py-3 max-h-[500px] overflow-y-auto">
                             {/* Business Registrations */}
@@ -454,7 +562,9 @@ export function EnhancedHeader() {
                                     setMobileDropdownOpen(null);
                                   }}
                                 >
-                                  <span className="group-hover:font-medium">{subItem.name}</span>
+                                  <span className="group-hover:font-medium">
+                                    {subItem.name}
+                                  </span>
                                 </Link>
                               ))}
                             </div>
@@ -474,7 +584,9 @@ export function EnhancedHeader() {
                                     setMobileDropdownOpen(null);
                                   }}
                                 >
-                                  <span className="group-hover:font-medium">{subItem.name}</span>
+                                  <span className="group-hover:font-medium">
+                                    {subItem.name}
+                                  </span>
                                 </Link>
                               ))}
                             </div>
@@ -494,7 +606,9 @@ export function EnhancedHeader() {
                                     setMobileDropdownOpen(null);
                                   }}
                                 >
-                                  <span className="group-hover:font-medium">{subItem.name}</span>
+                                  <span className="group-hover:font-medium">
+                                    {subItem.name}
+                                  </span>
                                 </Link>
                               ))}
                             </div>
@@ -514,7 +628,9 @@ export function EnhancedHeader() {
                                     setMobileDropdownOpen(null);
                                   }}
                                 >
-                                  <span className="group-hover:font-medium">{subItem.name}</span>
+                                  <span className="group-hover:font-medium">
+                                    {subItem.name}
+                                  </span>
                                 </Link>
                               ))}
                             </div>
@@ -532,7 +648,9 @@ export function EnhancedHeader() {
                                   setMobileDropdownOpen(null);
                                 }}
                               >
-                                <span className="group-hover:font-medium">{subItem.name}</span>
+                                <span className="group-hover:font-medium">
+                                  {subItem.name}
+                                </span>
                               </Link>
                             ))}
                           </div>
@@ -548,12 +666,14 @@ export function EnhancedHeader() {
                         setMobileDropdownOpen(null);
                       }}
                     >
-                      <span className="group-hover:text-blue-600">{item.name}</span>
+                      <span className="group-hover:text-blue-600">
+                        {item.name}
+                      </span>
                     </Link>
                   )}
                 </div>
               ))}
-              
+
               {/* Enhanced Mobile Auth Buttons */}
               <div className="flex flex-col space-y-3 pt-4">
                 <Button
