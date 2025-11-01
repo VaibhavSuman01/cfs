@@ -33,29 +33,31 @@ export function EnhancedFooter() {
 
   const otherServices = [
     { name: "GST Registration", href: "/other-registration/gst-registration" },
-    { name: "LLP Registration", href: "/other-registration/llp" },
-    { name: "Partnership Firm", href: "/other-registration/partnership" },
+    { name: "LLP Registration", href: "/other-registration/llp-registration" },
+    { name: "Partnership Firm", href: "/other-registration/partnership-firm" },
     {
       name: "Sole Proprietorship",
       href: "/other-registration/sole-proprietorship",
     },
-    { name: "MSME/Udyam Registration", href: "/other-registration/msme" },
-    { name: "IEC Registration", href: "/other-registration/iec" },
-    { name: "FSSAI Food License", href: "/other-registration/fssai" },
-    { name: "Gumusta Shop Registration", href: "/other-registration/gumusta" },
-    { name: "Industry License", href: "/other-registration/industry-license" },
-    { name: "NGO Registration", href: "/other-registration/ngo" },
-    { name: "PAN Apply", href: "/other-registration/pan" },
-    { name: "TAN Apply", href: "/other-registration/tan" },
+    { name: "MSME/Udyam Registration", href: "/other-registration/msme-udyam-registration" },
+    { name: "EPFO Registration", href: "/other-registration/epfo" },
+    { name: "ESIC Registration", href: "/other-registration/esic" },
+    { name: "PT Tax Registration", href: "/other-registration/pt-tax" },
+    { name: "IEC Registration", href: "/other-registration/iec-registration" },
+    { name: "Gumusta / Shop Registration", href: "/other-registration/gumusta-shop-registration" },
+    { name: "Fassai (Food) Licence", href: "/other-registration/fassai-food-license" },
+    { name: "Industry Licence", href: "/other-registration/industry-license" },
+    { name: "NGO Registration", href: "/other-registration/ngo-registration" },
+    { name: "PAN Application", href: "/other-registration/pan-apply" },
+    { name: "TAN Application", href: "/other-registration/tan-apply" },
     {
-      name: "Startup India Registration",
-      href: "/other-registration/startup-india",
+      name: "Start-up India Registration",
+      href: "/other-registration/startup-india-registration",
     },
     {
       name: "Digital Signature",
       href: "/other-registration/digital-signature",
     },
-    { name: "PT Tax", href: "/other-registration/pt-tax" },
   ];
 
   const taxationServices = [
@@ -63,9 +65,11 @@ export function EnhancedFooter() {
     { name: "Income Tax Filing", href: "/taxation/income-tax" },
     { name: "TDS Returns", href: "/taxation/tds-returns" },
     { name: "Tax Planning", href: "/taxation/tax-planning" },
-    { name: "EPFO Filing", href: "/taxation/epfo" },
-    { name: "ESIC Filing", href: "/taxation/esic" },
-    { name: "Corporate Tax Filing", href: "/taxation/corporate-tax" },
+    { name: "EPFO Filing", href: "/taxation/epfo-filing" },
+    { name: "ESIC Filing", href: "/taxation/esic-filing" },
+    { name: "PT-Tax Filing", href: "/taxation/pt-tax-filing" },
+    { name: "Corporate Tax Filing", href: "/taxation/corporate-tax-filing" },
+    { name: "Payroll Tax", href: "/taxation/payroll-tax" },
   ];
 
   const reportsServices = [
@@ -75,35 +79,45 @@ export function EnhancedFooter() {
     { name: "Bank Reconciliation", href: "/reports/bank-reconciliation" },
   ];
 
+  const rocReturnsServices = [
+    { name: "Annual Filing", href: "/roc-returns/annual-filing" },
+    { name: "Board Resolutions", href: "/roc-returns/board-resolutions" },
+    { name: "Director Changes", href: "/roc-returns/director-changes" },
+    { name: "Share Transfer", href: "/roc-returns/share-transfer" },
+  ];
+
   const legalServices = [
     { name: "Trademark Registration", href: "/trademark-iso/trademark" },
     { name: "ISO 9001 Certification", href: "/trademark-iso/iso-9001" },
-    { name: "ISO 14001 Certification", href: "/trademark-iso/iso-14001" },
-    { name: "Copyright Registration", href: "/trademark-iso/copyright" },
-    { name: "Legal Advisory", href: "/advisory" },
+    { name: "ISO 14001 Certification", href: "/trademark-iso/iso-14001-certification" },
+    { name: "Copyright Registration", href: "/trademark-iso/copyright-registration" },
   ];
 
   const advisoryServices = [
     {
       name: "Business Strategy Consulting",
-      href: "/advisory/business-strategy",
+      href: "/advisory/business-strategy-consulting",
+    },
+    {
+      name: "Legal & Compliance Advisory",
+      href: "/advisory/legal-compliance-advisory",
+    },
+    {
+      name: "HR & Organizational Development",
+      href: "/advisory/hr-organizational-development",
     },
     {
       name: "Financial Planning & Analysis",
-      href: "/advisory/financial-planning",
+      href: "/advisory/financial-planning-analysis",
     },
     {
       name: "Digital Transformation",
       href: "/advisory/digital-transformation",
     },
-    {
-      name: "HR & Organizational Development",
-      href: "/advisory/hr-development",
-    },
-    { name: "Legal Compliance Advisory", href: "/advisory/legal-compliance" },
     { name: "Startup Mentoring", href: "/advisory/startup-mentoring" },
-    { name: "Tax Planning & Analysis", href: "/advisory/tax-planning" },
-    { name: "Fund Raising Assistance", href: "/advisory/fund-raising" },
+    { name: "Tax Plan Analysis", href: "/advisory/tax-plan-analysis" },
+    { name: "Assistance for Fund Raising", href: "/advisory/assistance-for-fund-raising" },
+    { name: "Other Finance Related Services", href: "/advisory/other-finance-related-services" },
   ];
 
   const toolsServices = [
@@ -224,8 +238,8 @@ export function EnhancedFooter() {
             </div>
           </div>
 
-          {/* Services Grid - 4 columns on large screens */}
-          <div className="lg:col-span-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* Services Grid - 6 columns on large screens */}
+          <div className="lg:col-span-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
             {/* Company Formation */}
             <div className="space-y-6">
               <div className="space-y-1">
@@ -293,11 +307,11 @@ export function EnhancedFooter() {
               </div>
             </div>
 
-            {/* Reports & Legal */}
+            {/* Reports */}
             <div className="space-y-6">
               <div className="space-y-1">
                 <h3 className="text-xl font-bold text-blue-300">
-                  Reports & Legal
+                  Reports
                 </h3>
                 <div className="w-12 h-1 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
               </div>
@@ -313,19 +327,52 @@ export function EnhancedFooter() {
                     </span>
                   </Link>
                 ))}
-                <div className="pt-2 border-t border-gray-700">
-                  {legalServices.map((service) => (
-                    <Link
-                      key={service.name}
-                      href={service.href}
-                      className="block text-gray-400 hover:text-blue-300 transition-all duration-300 hover:translate-x-1 text-sm group"
-                    >
-                      <span className="group-hover:text-blue-300">
-                        {service.name}
-                      </span>
-                    </Link>
-                  ))}
-                </div>
+              </div>
+            </div>
+
+            {/* Trademark & ISO */}
+            <div className="space-y-6">
+              <div className="space-y-1">
+                <h3 className="text-xl font-bold text-blue-300">
+                  Trademark & ISO
+                </h3>
+                <div className="w-12 h-1 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
+              </div>
+              <div className="space-y-3">
+                {legalServices.map((service) => (
+                  <Link
+                    key={service.name}
+                    href={service.href}
+                    className="block text-gray-400 hover:text-blue-300 transition-all duration-300 hover:translate-x-1 text-sm group"
+                  >
+                    <span className="group-hover:text-blue-300">
+                      {service.name}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* ROC Returns */}
+            <div className="space-y-6">
+              <div className="space-y-1">
+                <h3 className="text-xl font-bold text-blue-300">
+                  ROC Returns
+                </h3>
+                <div className="w-12 h-1 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
+              </div>
+              <div className="space-y-3">
+                {rocReturnsServices.map((service) => (
+                  <Link
+                    key={service.name}
+                    href={service.href}
+                    className="block text-gray-400 hover:text-blue-300 transition-all duration-300 hover:translate-x-1 text-sm group"
+                  >
+                    <span className="group-hover:text-blue-300">
+                      {service.name}
+                    </span>
+                  </Link>
+                ))}
               </div>
             </div>
           </div>

@@ -79,29 +79,50 @@ export default function SalaryCalculatorPage() {
     // Calculate taxable income after standard deduction
     const taxableIncome = Math.max(0, taxableSalary - standardDeduction);
 
-    // Calculate income tax (simplified calculation)
+    // Calculate income tax using progressive tax slabs (New Regime 2024-25)
     let incomeTax = 0;
-    if (taxableIncome > 1500000) {
-      incomeTax = (taxableIncome - 1500000) * 0.3 + 1500000 * 0.2;
-    } else if (taxableIncome > 1200000) {
-      incomeTax = (taxableIncome - 1200000) * 0.2 + 1200000 * 0.15;
-    } else if (taxableIncome > 900000) {
-      incomeTax = (taxableIncome - 900000) * 0.15 + 900000 * 0.1;
-    } else if (taxableIncome > 600000) {
-      incomeTax = (taxableIncome - 600000) * 0.1 + 600000 * 0.05;
-    } else if (taxableIncome > 300000) {
-      incomeTax = (taxableIncome - 300000) * 0.05;
+    let remainingIncome = taxableIncome;
+    
+    // Tax slabs for FY 2024-25 (New Regime)
+    if (remainingIncome > 1500000) {
+      incomeTax += (remainingIncome - 1500000) * 0.30;
+      remainingIncome = 1500000;
     }
+    if (remainingIncome > 1200000) {
+      incomeTax += (remainingIncome - 1200000) * 0.20;
+      remainingIncome = 1200000;
+    }
+    if (remainingIncome > 900000) {
+      incomeTax += (remainingIncome - 900000) * 0.15;
+      remainingIncome = 900000;
+    }
+    if (remainingIncome > 600000) {
+      incomeTax += (remainingIncome - 600000) * 0.10;
+      remainingIncome = 600000;
+    }
+    if (remainingIncome > 300000) {
+      incomeTax += (remainingIncome - 300000) * 0.05;
+      remainingIncome = 300000;
+    }
+    // No tax for income up to ₹3,00,000
 
     // Add cess (4% of income tax)
     const cess = incomeTax * 0.04;
     const totalTax = incomeTax + cess;
 
-    // Calculate deductions
+    // Calculate deductions (Indian standards)
+    // EPF: 12% of basic salary (both employee and employer contribute, but only employee's share is deducted)
     const pf = parseFloat(formData.pf) || (basicSalary * 0.12);
-    const esi = parseFloat(formData.esi) || (grossSalary * 0.0075);
+    
+    // ESI: 0.75% of gross salary (only if gross salary <= ₹21,000)
+    const esi = grossSalary <= 21000 ? (parseFloat(formData.esi) || (grossSalary * 0.0075)) : 0;
+    
+    // Professional Tax: Varies by state, default ₹200/month (₹2,400/year)
     const professionalTax = parseFloat(formData.professionalTax) || 200;
-    const tds = parseFloat(formData.tds) || totalTax / 12;
+    
+    // TDS: Tax deducted at source (monthly tax)
+    const tds = parseFloat(formData.tds) || (totalTax / 12);
+    
     const otherDeductions = parseFloat(formData.otherDeductions) || 0;
 
     const totalDeductions = pf + esi + professionalTax + tds + otherDeductions;

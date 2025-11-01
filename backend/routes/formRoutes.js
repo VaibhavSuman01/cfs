@@ -18,6 +18,7 @@ const ROCForm = require("../models/ROCForm");
 const ReportsForm = require("../models/ReportsForm");
 const TrademarkISOForm = require("../models/TrademarkISOForm");
 const AdvisoryForm = require("../models/AdvisoryForm");
+const PartnershipForm = require("../models/PartnershipForm");
 
 // @route   GET /api/forms/check-pan/:pan
 // @desc    Check if a PAN number already exists in the system
@@ -2469,7 +2470,7 @@ router.post(
     try {
       console.log("ROC returns form submission received");
       console.log("Request body:", req.body);
-      console.log("Files received:", req.files ? req.files.length : "No files");
+      console.log("Files received:", req.files ? Object.keys(req.files).length : "No files");
       
       const {
         fullName,
@@ -2480,6 +2481,7 @@ router.post(
         subService,
         companyName,
         cin,
+        cinNumber, // Handle both cin and cinNumber
         companyType,
         registeredOfficeAddress,
         financialYear,
@@ -2496,9 +2498,42 @@ router.post(
         selectedPackage,
       } = req.body;
 
-      if (!fullName || !email || !phone || !pan || !service || !companyName || !cin || !companyType || !registeredOfficeAddress || !financialYear) {
-        console.log("Missing required fields");
-        return res.status(400).json({ message: "All required fields must be provided" });
+      // Use cin or cinNumber, whichever is provided
+      const finalCin = cin || cinNumber;
+      
+      // Handle companyType if it comes as an array
+      let cleanCompanyType = companyType;
+      if (Array.isArray(companyType)) {
+        cleanCompanyType = companyType.length > 0 ? companyType[0] : '';
+      } else if (companyType && typeof companyType === 'string') {
+        // Remove any appended fields that might have gotten concatenated
+        cleanCompanyType = companyType.split('  ')[0].trim();
+        cleanCompanyType = cleanCompanyType.split(' subService:')[0].trim();
+      }
+      
+      // Handle registeredOfficeAddress if it comes as an array
+      let cleanRegisteredOfficeAddress = registeredOfficeAddress;
+      if (Array.isArray(registeredOfficeAddress)) {
+        cleanRegisteredOfficeAddress = registeredOfficeAddress.length > 0 ? registeredOfficeAddress[0] : '';
+      }
+
+      if (!fullName || !email || !phone || !pan || !service || !companyName || !finalCin || !cleanCompanyType || !cleanRegisteredOfficeAddress || !financialYear) {
+        console.log("Missing required fields", {
+          fullName: !!fullName,
+          email: !!email,
+          phone: !!phone,
+          pan: !!pan,
+          service: !!service,
+          companyName: !!companyName,
+          cin: !!finalCin,
+          companyType: !!cleanCompanyType,
+          registeredOfficeAddress: !!registeredOfficeAddress,
+          financialYear: !!financialYear
+        });
+        return res.status(400).json({ 
+          message: "All required fields must be provided",
+          details: "Please ensure all mandatory fields are filled correctly."
+        });
       }
 
       const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
@@ -2509,17 +2544,17 @@ router.post(
 
       const formData = {
         user: req.user._id,
-        fullName,
-        email,
-        phone,
-        pan: pan.toUpperCase(),
-        service,
-        subService: subService || service,
-        companyName,
-        cin,
-        companyType,
-        registeredOfficeAddress,
-        financialYear,
+        fullName: fullName.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
+        pan: pan.toUpperCase().trim(),
+        service: service.trim(),
+        subService: (subService || service).trim(),
+        companyName: companyName.trim(),
+        cin: finalCin.trim(),
+        companyType: String(cleanCompanyType).trim(),
+        registeredOfficeAddress: String(cleanRegisteredOfficeAddress).trim(),
+        financialYear: financialYear.trim(),
         boardMeetingDate,
         resolutionType,
         directorName,
@@ -2676,7 +2711,17 @@ router.post(
         selectedPackage,
       } = req.body;
 
-      if (!fullName || !email || !phone || !pan || !service || !businessName || !businessType || !businessAddress || !reportPeriod || !reportPurpose) {
+      // Handle businessType if it comes as an array
+      let processedBusinessType = businessType;
+      if (Array.isArray(businessType)) {
+        // If it's an array, join with comma or take first value
+        processedBusinessType = businessType.length > 0 ? businessType[0] : '';
+      }
+      if (!processedBusinessType || processedBusinessType.trim() === '') {
+        return res.status(400).json({ message: "Business type is required" });
+      }
+
+      if (!fullName || !email || !phone || !pan || !service || !businessName || !businessAddress || !reportPeriod || !reportPurpose) {
         return res.status(400).json({ message: "All required fields must be provided" });
       }
 
@@ -2694,7 +2739,7 @@ router.post(
         service,
         subService: subService || service,
         businessName,
-        businessType,
+        businessType: String(processedBusinessType).trim(),
         businessAddress,
         reportPeriod,
         reportPurpose,
@@ -2770,6 +2815,12 @@ router.post(
         formId: reportsForm._id,
       });
     } catch (error) {
+      // Handle duplicate key error for the compound index (user, subService, reportPeriod)
+      if (error.code === 11000) {
+        return res.status(409).json({
+          message: `Already submitted for this Year. You have already submitted a form for this sub-service (${req.body?.subService || req.body?.service || "selected"}) for the report period ${req.body?.reportPeriod || "the selected period"}. You can only submit one form per sub-service each period.`,
+        });
+      }
       console.error("Error submitting reports form:", error);
       res.status(500).json({
         message: "Server error while submitting reports form",
@@ -2915,6 +2966,12 @@ router.post(
         formId: trademarkISOForm._id,
       });
     } catch (error) {
+      // Handle duplicate key error for the compound index (user, subService)
+      if (error.code === 11000) {
+        return res.status(409).json({
+          message: `Already submitted for this Year. You have already submitted a form for this sub-service (${req.body?.subService || req.body?.service || "selected"}). You can only submit one form per sub-service.`,
+        });
+      }
       console.error("Error submitting trademark & ISO form:", error);
       res.status(500).json({
         message: "Server error while submitting trademark & ISO form",
@@ -3066,6 +3123,12 @@ router.post(
         formId: advisoryForm._id,
       });
     } catch (error) {
+      // Handle duplicate key error for the compound index (user, subService)
+      if (error.code === 11000) {
+        return res.status(409).json({
+          message: `Already submitted for this Year. You have already submitted a form for this sub-service (${req.body?.subService || req.body?.service || "selected"}). You can only submit one form per sub-service.`,
+        });
+      }
       console.error("Error submitting advisory form:", error);
       res.status(500).json({
         message: "Server error while submitting advisory form",
@@ -3278,6 +3341,189 @@ router.post(
       console.error("Error submitting other registration form:", error);
       res.status(500).json({
         message: "Server error while submitting other registration form",
+        error: error.message,
+      });
+    }
+  }
+);
+
+// @route   POST /api/forms/partnership-firm
+// @desc    Submit partnership firm form with documents
+// @access  Private
+router.post(
+  "/partnership-firm",
+  protect,
+  upload.fields([
+    { name: 'documents', maxCount: 10 },
+    { name: 'aadhaarFile', maxCount: 1 },
+    { name: 'panFile', maxCount: 1 },
+    { name: 'addressProofFile', maxCount: 1 },
+    { name: 'businessAddressProofFile', maxCount: 1 },
+    { name: 'partnershipDeedFile', maxCount: 1 },
+    { name: 'municipalTaxReceipt', maxCount: 1 }
+  ]),
+  handleMulterError,
+  async (req, res) => {
+    try {
+      console.log("Partnership firm form submission received");
+      console.log("Request body:", req.body);
+      console.log("Files received:", req.files ? Object.keys(req.files).length : "No files");
+      
+      const {
+        fullName,
+        email,
+        phone,
+        pan,
+        service,
+        subService,
+        businessName,
+        businessAddress,
+        city,
+        state,
+        pincode,
+        businessDetails,
+        partners,
+        partnershipDeedDate,
+        partnershipDeedNotarized,
+        partnershipDeedStampDuty,
+        addressProofType,
+        ownerName,
+        ownerPan,
+        ownerAadhaar,
+        requiresGstRegistration,
+        requiresBankAccount,
+        requiresCompliance,
+        selectedPackage,
+      } = req.body;
+
+      if (!fullName || !email || !phone || !pan || !service || !businessName || !businessAddress || !city || !state || !pincode || !businessDetails) {
+        return res.status(400).json({ message: "All required fields must be provided" });
+      }
+
+      const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+      if (!panRegex.test(pan)) {
+        return res.status(400).json({ message: "Invalid PAN format" });
+      }
+
+      // Parse partners data if it's a string
+      let parsedPartners = [];
+      if (partners) {
+        try {
+          parsedPartners = typeof partners === 'string' ? JSON.parse(partners) : partners;
+        } catch (e) {
+          console.error("Error parsing partners:", e);
+          return res.status(400).json({ message: "Invalid partners data format" });
+        }
+      }
+
+      const formData = {
+        user: req.user._id,
+        fullName,
+        email,
+        phone,
+        pan,
+        service,
+        subService: subService || service,
+        businessName,
+        businessAddress,
+        city,
+        state,
+        pincode,
+        businessDetails,
+        partners: parsedPartners,
+        partnershipDeedDate,
+        partnershipDeedNotarized: partnershipDeedNotarized === 'true',
+        partnershipDeedStampDuty,
+        addressProofType,
+        ownerName,
+        ownerPan,
+        ownerAadhaar,
+        requiresGstRegistration: requiresGstRegistration === 'true',
+        requiresBankAccount: requiresBankAccount === 'true',
+        requiresCompliance: requiresCompliance === 'true',
+        selectedPackage: selectedPackage || "Basic",
+        documents: [],
+      };
+
+      // Process uploaded files
+      if (req.files) {
+        try {
+          // Process specific document types
+          const fileFields = [
+            { field: 'aadhaarFile', type: 'Aadhaar Card' },
+            { field: 'panFile', type: 'PAN Card' },
+            { field: 'addressProofFile', type: 'Address Proof' },
+            { field: 'businessAddressProofFile', type: 'Business Address Proof' },
+            { field: 'partnershipDeedFile', type: 'Partnership Deed' },
+            { field: 'municipalTaxReceipt', type: 'Municipal Tax Receipt' }
+          ];
+
+          // Process specific document files
+          fileFields.forEach(({ field, type }) => {
+            if (req.files[field] && req.files[field].length > 0) {
+              const file = req.files[field][0];
+              formData.documents.push({
+                documentType: type,
+                fileName: file.filename || `file_${Date.now()}_${field}`,
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+                uploadedBy: 'user',
+              });
+            }
+          });
+
+          // Process general documents
+          if (req.files['documents'] && req.files['documents'].length > 0) {
+            req.files['documents'].forEach((file, index) => {
+              formData.documents.push({
+                documentType: req.body[`documentType_${index}`] || "Additional Document",
+                fileName: file.filename || `file_${Date.now()}_${index}`,
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+                uploadedBy: 'user',
+              });
+            });
+          }
+
+          console.log("Documents processed:", formData.documents.length);
+        } catch (fileError) {
+          console.error("Error processing files:", fileError);
+          return res.status(400).json({ message: "Error processing uploaded files" });
+        }
+      }
+
+      console.log("Creating PartnershipForm instance...");
+      const partnershipForm = new PartnershipForm(formData);
+      console.log("PartnershipForm instance created, saving...");
+      
+      try {
+        await partnershipForm.save();
+        console.log("PartnershipForm saved successfully with ID:", partnershipForm._id);
+      } catch (saveError) {
+        console.error("Error saving PartnershipForm:", saveError);
+        if (saveError.code === 11000) {
+          return res.status(409).json({ 
+            message: `Already submitted for this Year. You have already submitted a form for this sub-service (${req.body?.subService || req.body?.service || "selected"}). You can only submit one form per sub-service.`
+          });
+        }
+        throw saveError;
+      }
+
+      res.status(201).json({
+        success: true,
+        message: "Partnership firm form submitted successfully",
+        formId: partnershipForm._id,
+      });
+    } catch (error) {
+      console.error("Error submitting partnership firm form:", error);
+      res.status(500).json({
+        message: "Server error while submitting partnership firm form",
         error: error.message,
       });
     }

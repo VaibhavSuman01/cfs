@@ -297,11 +297,7 @@ export default function NewFormPage() {
         }
       });
 
-      await api.post('/api/forms/tax', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      await api.post('/api/forms/tax', formData);
 
       toast.success('Tax form submitted successfully');
       router.push('/dashboard');

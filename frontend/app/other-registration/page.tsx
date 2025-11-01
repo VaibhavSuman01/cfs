@@ -18,6 +18,7 @@ import {
   getServiceBackgroundColor,
   getServiceIconColor,
   getServicePriceColor,
+  getServicePageHeroBackground,
 } from "@/lib/service-colors";
 import {
   Users,
@@ -36,7 +37,7 @@ export default function OtherRegistrationPage() {
     <div className="min-h-screen bg-white">
       <EnhancedHeader />
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-100 py-20">
+      <section className={`relative overflow-hidden ${getServicePageHeroBackground("Other Registration")} py-20`}>
         <div className="container mx-auto px-4">
           <FadeInSection className="text-center space-y-8">
             <h1 className="text-5xl font-bold text-gray-900">
@@ -259,9 +260,9 @@ export default function OtherRegistrationPage() {
                         )}
                       >
                         <registration.icon
-                          className={`h-8 w-8 ${getServiceIconColor(
+                          className={getServiceIconColor(
                             "Other Registration"
-                          )}`}
+                          )}
                         />
                       </div>
                       <CardTitle className="text-xl text-gray-900">

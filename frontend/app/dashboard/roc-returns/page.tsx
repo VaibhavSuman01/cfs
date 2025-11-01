@@ -26,6 +26,8 @@ const rocReturnsSchema = z.object({
   returnType: z.string().min(1, "Return type is required"),
   companyName: z.string().min(1, "Company name is required"),
   cinNumber: z.string().min(1, "CIN number is required"),
+  companyType: z.string().min(1, "Company type is required"),
+  registeredOfficeAddress: z.string().min(1, "Registered office address is required"),
   financialYear: z.string().min(1, "Financial year is required"),
   dueDate: z.string().optional(),
   description: z.string().optional(),
@@ -59,6 +61,8 @@ export default function ROCReturnsPage() {
       returnType: "",
       companyName: "",
       cinNumber: "",
+      companyType: "",
+      registeredOfficeAddress: "",
       financialYear: "",
       dueDate: "",
       description: "",
@@ -71,20 +75,32 @@ export default function ROCReturnsPage() {
 
       const formData = new FormData();
 
-      // Append form data
-      Object.entries(data).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          formData.append(key, value);
-        }
-      });
+      // Append personal information fields
+      formData.append("fullName", data.fullName);
+      formData.append("email", data.email);
+      formData.append("phone", data.phone);
+      formData.append("pan", data.pan);
+      if (data.aadhaar) {
+        formData.append("aadhaar", data.aadhaar);
+      }
 
       // Add service and subService fields for backend compatibility
       formData.append("service", "ROC Returns");
       formData.append("subService", data.returnType);
       
-      // Map frontend field names to backend expectations
-      formData.append("cin", data.cinNumber);
-      formData.append("companyType", "Private Limited"); // Default value
+      // Append company details - map frontend field names to backend expectations
+      formData.append("companyName", data.companyName);
+      formData.append("cin", data.cinNumber); // Map cinNumber to cin
+      formData.append("cinNumber", data.cinNumber); // Also send as cinNumber for compatibility
+      formData.append("companyType", data.companyType);
+      formData.append("registeredOfficeAddress", data.registeredOfficeAddress);
+      formData.append("financialYear", data.financialYear);
+      if (data.dueDate) {
+        formData.append("dueDate", data.dueDate);
+      }
+      if (data.description) {
+        formData.append("description", data.description);
+      }
 
       // Append Aadhaar file if uploaded
       if (aadhaarFile) {
@@ -96,17 +112,21 @@ export default function ROCReturnsPage() {
         formData.append("documents", file);
       });
 
-      await api.post(API_PATHS.FORMS.ROC_RETURNS, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      await api.post(API_PATHS.FORMS.ROC_RETURNS, formData);
 
       toast.success("ROC returns application submitted successfully");
       router.push("/dashboard/roc-returns");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to submit ROC returns form:", error);
-      toast.error("Failed to submit ROC returns application. Please try again.");
+      
+      // Handle specific error cases
+      if (error.response?.status === 400 && error.response?.data?.message?.includes("already exists")) {
+        toast.error("Already submitted for this Year. You can only submit one form per service.");
+      } else if (error.response?.status === 409) {
+        toast.error("Already submitted for this Year. You can only submit one form per service.");
+      } else {
+        toast.error("Failed to submit ROC returns application. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -283,6 +303,31 @@ export default function ROCReturnsPage() {
                   />
                   <FormField
                     control={form.control}
+                    name="companyType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Company Type *</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select company type" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="Private Limited">Private Limited</SelectItem>
+                            <SelectItem value="Public Limited">Public Limited</SelectItem>
+                            <SelectItem value="One Person Company">One Person Company</SelectItem>
+                            <SelectItem value="Limited Liability Partnership">Limited Liability Partnership</SelectItem>
+                            <SelectItem value="Partnership">Partnership</SelectItem>
+                            <SelectItem value="Sole Proprietorship">Sole Proprietorship</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
                     name="financialYear"
                     render={({ field }) => (
                       <FormItem>
@@ -319,6 +364,19 @@ export default function ROCReturnsPage() {
                     )}
                   />
                 </div>
+                <FormField
+                  control={form.control}
+                  name="registeredOfficeAddress"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Registered Office Address *</FormLabel>
+                      <FormControl>
+                        <Textarea {...field} rows={3} placeholder="Enter complete registered office address" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name="description"

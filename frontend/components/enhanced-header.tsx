@@ -64,10 +64,7 @@ export function EnhancedHeader() {
       name: "Other Registration",
       href: "/other-registration",
       dropdown: [
-        {
-          name: "GST Registration",
-          href: "/other-registration/gst-registration",
-        },
+        // Business Registrations (0-5)
         {
           name: "LLP Registration",
           href: "/other-registration/llp-registration",
@@ -81,16 +78,24 @@ export function EnhancedHeader() {
           href: "/other-registration/sole-proprietorship",
         },
         {
+          name: "Digital Signature",
+          href: "/other-registration/digital-signature",
+        },
+        {
+          name: "IEC Registration",
+          href: "/other-registration/iec-registration",
+        },
+        {
+          name: "NGO Registration",
+          href: "/other-registration/ngo-registration",
+        },
+        // Government Registrations (6-12)
+        {
           name: "MSME/Udyam Registration",
           href: "/other-registration/msme-udyam-registration",
         },
         { name: "EPFO Registration", href: "/other-registration/epfo" },
         { name: "ESIC Registration", href: "/other-registration/esic" },
-        { name: "PT Tax Registration", href: "/other-registration/pt-tax" },
-        {
-          name: "IEC Registration",
-          href: "/other-registration/iec-registration",
-        },
         {
           name: "Gumusta / Shop Registration",
           href: "/other-registration/gumusta-shop-registration",
@@ -104,19 +109,17 @@ export function EnhancedHeader() {
           href: "/other-registration/industry-license",
         },
         {
-          name: "NGO Registration",
-          href: "/other-registration/ngo-registration",
-        },
-        { name: "PAN Application", href: "/other-registration/pan-apply" },
-        { name: "TAN Application", href: "/other-registration/tan-apply" },
-        {
           name: "Start-up India Registration",
           href: "/other-registration/startup-india-registration",
         },
+        // Tax & Compliance (13-16)
         {
-          name: "Digital Signature",
-          href: "/other-registration/digital-signature",
+          name: "GST Registration",
+          href: "/other-registration/gst-registration",
         },
+        { name: "PT Tax Registration", href: "/other-registration/pt-tax" },
+        { name: "PAN Application", href: "/other-registration/pan-apply" },
+        { name: "TAN Application", href: "/other-registration/tan-apply" },
       ],
     },
     {
@@ -337,7 +340,7 @@ export function EnhancedHeader() {
                             <h4 className="text-sm font-bold text-blue-600 uppercase tracking-wide border-b border-blue-100 pb-2">
                               Government Registrations
                             </h4>
-                            {item.dropdown.slice(6, 12).map((subItem) => (
+                            {item.dropdown.slice(6, 13).map((subItem) => (
                               <Link
                                 key={subItem.name}
                                 href={subItem.href}
@@ -355,7 +358,7 @@ export function EnhancedHeader() {
                             <h4 className="text-sm font-bold text-blue-600 uppercase tracking-wide border-b border-blue-100 pb-2">
                               Tax & Compliance
                             </h4>
-                            {item.dropdown.slice(12, 18).map((subItem) => (
+                            {item.dropdown.slice(13, 17).map((subItem) => (
                               <Link
                                 key={subItem.name}
                                 href={subItem.href}

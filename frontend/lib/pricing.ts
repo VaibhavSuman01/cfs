@@ -48,13 +48,13 @@ const PRICING_RAW: Record<string, ServicePricing> = {
     tooltip: "Prices vary based on company size, complexity, and industry standards"
   },
   "gst registration": { 
-    basePrice: "₹2,999*", 
-    packages: { BASIC: "₹2,999*", STANDARD: "₹4,999*" },
+    basePrice: "₹1,999*", 
+    packages: { BASIC: "₹1,999*", STANDARD: "₹2,999*", PREMIUM: "₹4,999*" },
     tooltip: "Prices may vary based on complexity and industry standards"
   },
   "gst filing": { 
-    basePrice: "₹1,499*",
-    packages: { BASIC: "₹1,499*" },
+    basePrice: "₹1,499*/per month",
+    packages: { BASIC: "₹1,499*/per month" },
     tooltip: "Prices vary based on filing frequency, complexity, and industry standards"
   },
   "income tax filing": { 
@@ -64,17 +64,17 @@ const PRICING_RAW: Record<string, ServicePricing> = {
   },
   "tds returns (per qtr)": { 
     basePrice: "₹2,499*", 
-    packages: { BASIC: "₹2,499*", STANDARD: "₹4,999*", PREMIUM: "₹6,999*" },
+    packages: { BASIC: "₹2,499*" },
     tooltip: "Prices may vary based on complexity and industry standards"
   },
   "tax planning": { 
-    basePrice: "₹4,999*", 
-    packages: { BASIC: "₹4,999*" },
+    basePrice: "As per request*",
+    packages: { BASIC: "As per request*" },
     tooltip: "Prices may vary based on complexity and industry standards"
   },
   "corporate tax (company)": { 
-    basePrice: "₹9,999*", 
-    packages: { BASIC: "₹9,999*" },
+    basePrice: "As per request*",
+    packages: { BASIC: "As per request*" },
     tooltip: "Prices may vary based on complexity and industry standards"
   },
   "payroll tax (per month)": { 
@@ -84,12 +84,12 @@ const PRICING_RAW: Record<string, ServicePricing> = {
   },
   "annual filing (aoc-4 & mgt-7)": { 
     basePrice: "₹9,999*", 
-    packages: { BASIC: "₹9,999*", STANDARD: "₹24,999*", PREMIUM: "₹34,999*" },
+    packages: { BASIC: "₹9,999*", STANDARD: "₹14,999*", PREMIUM: "As per request*" },
     tooltip: "Prices may vary based on complexity and industry standards"
   },
   "board meeting & resolutions": { 
-    basePrice: "₹1,999*", 
-    packages: { BASIC: "₹1,999*", STANDARD: "₹2,999*", PREMIUM: "₹4,999*" },
+    basePrice: "₹1,999*/per resolution",
+    packages: { BASIC: "₹1,999*/per resolution" },
     tooltip: "Prices may vary based on complexity and industry standards"
   },
   "director appointment/resignation": { 
@@ -98,8 +98,8 @@ const PRICING_RAW: Record<string, ServicePricing> = {
     tooltip: "Prices may vary based on complexity and industry standards"
   },
   "share transfer & capital changes": { 
-    basePrice: "₹4,999*", 
-    packages: { BASIC: "₹4,999*", STANDARD: "₹6,999*", PREMIUM: "₹9,999*" },
+    basePrice: "₹6,999*", 
+    packages: { BASIC: "₹6,999*" },
     tooltip: "Prices may vary based on complexity and industry standards"
   },
   "roc default removal": { 
@@ -113,8 +113,8 @@ const PRICING_RAW: Record<string, ServicePricing> = {
     tooltip: "Prices may vary based on complexity and industry standards"
   },
   "llp registration": { 
-    basePrice: "₹9,999*", 
-    packages: { BASIC: "₹9,999*", STANDARD: "₹14,999*", PREMIUM: "₹24,999*" },
+    basePrice: "₹7,999*", 
+    packages: { BASIC: "₹7,999*", STANDARD: "₹9,999*", PREMIUM: "₹14,999*" },
     tooltip: "Prices may vary based on complexity and industry standards"
   },
   "partnership firm": { 
@@ -123,13 +123,13 @@ const PRICING_RAW: Record<string, ServicePricing> = {
     tooltip: "Prices may vary based on complexity and industry standards"
   },
   "sole proprietorship": { 
-    basePrice: "₹1,999*", 
-    packages: { BASIC: "₹1,999*" },
+    basePrice: "₹999*", 
+    packages: { BASIC: "₹999*" },
     tooltip: "Prices may vary based on complexity and industry standards"
   },
   "section 8 company": { 
-    basePrice: "₹18,999*", 
-    packages: { BASIC: "₹18,999*", STANDARD: "₹24,999*", PREMIUM: "₹29,999*" },
+    basePrice: "₹14,999*", 
+    packages: { BASIC: "₹14,999*", STANDARD: "₹24,999*", PREMIUM: "₹30,999*" },
     tooltip: "Prices may vary based on complexity and industry standards"
   },
   "producer company": { 
@@ -169,21 +169,38 @@ const PRICING_RAW: Record<string, ServicePricing> = {
     basePrice: "As per request*",
     tooltip: "Prices vary based on project complexity, scope, and industry standards"
   },
+  "bank reconciliation": { 
+    basePrice: "As per request*",
+    tooltip: "Prices vary based on complexity, scope, and industry standards"
+  },
   "dscr/cma report": { 
     basePrice: "As per request*",
     tooltip: "Prices vary based on report complexity, scope, and industry standards"
   },
   // Additional services not in CSV - all as per request
+  "epfo registration": { 
+    basePrice: "₹2,499*",
+    packages: { BASIC: "₹2,499*" },
+    tooltip: "Prices may vary based on complexity and industry standards"
+  },
   "epfo filing": { 
-    basePrice: "As per request*",
+    basePrice: "₹2,499*",
+    packages: { BASIC: "₹2,499*" },
     tooltip: "Prices vary based on filing complexity, employee count, and industry standards"
   },
+  "esic registration": { 
+    basePrice: "₹2,499*",
+    packages: { BASIC: "₹2,499*" },
+    tooltip: "Prices may vary based on complexity and industry standards"
+  },
   "esic filing": { 
-    basePrice: "As per request*",
+    basePrice: "₹2,499*",
+    packages: { BASIC: "₹2,499*" },
     tooltip: "Prices vary based on filing complexity, employee count, and industry standards"
   },
   "pt tax filing": { 
-    basePrice: "As per request*",
+    basePrice: "₹2,499*",
+    packages: { BASIC: "₹2,499*" },
     tooltip: "Prices vary based on filing complexity, employee count, and industry standards"
   },
   "fassai food license": { 
@@ -191,16 +208,18 @@ const PRICING_RAW: Record<string, ServicePricing> = {
     tooltip: "Prices vary based on license type, business size, and industry standards"
   },
   "iec registration": { 
-    basePrice: "As per request*",
-    tooltip: "Prices vary based on business type, export volume, and industry standards"
+    basePrice: "₹1,499*",
+    packages: { BASIC: "₹1,499*" },
+    tooltip: "Prices may vary based on complexity and industry standards"
   },
   "industry license": { 
     basePrice: "As per request*",
     tooltip: "Prices vary based on industry type, business size, and regulatory requirements"
   },
   "msme udyam registration": { 
-    basePrice: "As per request*",
-    tooltip: "Prices vary based on business size, complexity, and industry standards"
+    basePrice: "₹999*",
+    packages: { BASIC: "₹999*" },
+    tooltip: "Prices may vary based on complexity and industry standards"
   },
   "ngo registration": { 
     basePrice: "As per request*",
@@ -228,7 +247,6 @@ const PRICING_RAW: Record<string, ServicePricing> = {
 const ALIASES: Record<string, string> = {
   "tds returns": "tds returns (per qtr)",
   "gst": "gst registration",
-  "gst filing": "gst registration",
   "income tax": "income tax filing",
   "opc": "one person company (opc)",
   "private limited": "private limited company",
@@ -245,12 +263,14 @@ const ALIASES: Record<string, string> = {
   "producer": "producer company",
   "nidhi": "nidhi company",
   "gumusta": "form 3/gumasta",
+  "gumusta shop registration": "form 3/gumasta",
   "shop establishment": "form 3/gumasta",
+  "shop & establishment": "form 3/gumasta",
   "pan apply": "pan/tan card apply",
   "tan apply": "pan/tan card apply",
   "cma report": "dscr/cma report",
   "dscr report": "dscr/cma report",
-  "bank reconciliation": "project report",
+  "bank reconciliation": "bank reconciliation",
   "project reports": "project report",
   "iso 9001": "iso 9001:2015",
   "iso 14001": "iso 14001:2015",
@@ -266,8 +286,12 @@ const ALIASES: Record<string, string> = {
   "corporate tax filing": "corporate tax (company)",
   "payroll": "payroll tax (per month)",
   "payroll tax": "payroll tax (per month)",
+  "epfo registration": "epfo registration",
   "epfo": "epfo filing",
+  "epfo filing": "epfo filing",
+  "esic registration": "esic registration",
   "esic": "esic filing",
+  "esic filing": "esic filing",
   "pt tax": "pt tax filing",
   "pt filing": "pt tax filing",
   "fssai": "fassai food license",

@@ -1,5 +1,6 @@
 "use client"
 
+import { EnhancedHeader } from "@/components/enhanced-header";
 import { EnhancedFooter } from "@/components/enhanced-footer";
 import { FadeInSection } from "@/components/fade-in-section"
 import { Button } from "@/components/ui/button"
@@ -7,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { getBasePrice } from "@/lib/pricing"
-import { getServiceCardClasses, getServiceBackgroundColor, getServiceIconColor, getServicePriceColor } from "@/lib/service-colors"
+import { getServiceCardClasses, getServiceBackgroundColor, getServiceIconColor, getServicePriceColor, getServicePageHeroBackground } from "@/lib/service-colors"
 import { 
   TrendingUp, 
   Users, 
@@ -23,13 +24,12 @@ import {
   Zap,
   Clock
 } from "lucide-react"
-
 export default function AdvisoryPage() {
   return (
     <div className="min-h-screen bg-white">
-
+      <EnhancedHeader />
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-100 py-20">
+      <section className={`relative overflow-hidden ${getServicePageHeroBackground("Advisory")} py-20`}>
         <div className="container mx-auto px-4">
           <FadeInSection className="text-center space-y-8">
             <h1 className="text-5xl font-bold text-gray-900">Business Advisory Services</h1>
@@ -131,23 +131,56 @@ export default function AdvisoryPage() {
                   icon: Briefcase,
                   title: "Startup Mentoring",
                   slug: "startup-mentoring",
-                  description: "Comprehensive guidance for startups from ideation to scaling",
+                  description: "Comprehensive guidance for startups from ideation to scaling with expert mentorship",
                   features: [
                     "Business plan development",
                     "Funding strategy and support",
                     "Market entry planning",
                     "Operational setup guidance",
                     "Investor pitch preparation",
+                    "Growth and scaling strategies",
                   ],
                   price: "As per request",
                   timeline: "1-2 weeks",
+                },
+                {
+                  icon: Calculator,
+                  title: "Tax Plan Analysis",
+                  slug: "tax-plan-analysis",
+                  description: "Optimize your tax strategy and maximize savings with expert tax planning and analysis",
+                  features: [
+                    "Tax strategy development",
+                    "Deduction optimization",
+                    "Tax planning for businesses",
+                    "Investment tax analysis",
+                    "Compliance review",
+                    "Tax saving recommendations",
+                  ],
+                  price: "As per request",
+                  timeline: "1-2 weeks",
+                },
+                {
+                  icon: BarChart3,
+                  title: "Other Finance Related Services",
+                  slug: "other-finance-related-services",
+                  description: "Comprehensive financial services to support your business growth and financial success",
+                  features: [
+                    "Investment analysis and planning",
+                    "Financial risk management",
+                    "Budget planning and forecasting",
+                    "Financial modeling",
+                    "Cost analysis and optimization",
+                    "Financial reporting and analysis",
+                  ],
+                  price: "As per request",
+                  timeline: "2-3 weeks",
                 },
               ].map((service, index) => (
                 <FadeInSection key={index} delay={index * 100}>
                   <Card className={getServiceCardClasses('Advisory')}>
                     <CardHeader className="text-center">
                       <div className={getServiceBackgroundColor('Advisory')}>
-                        <service.icon className={`h-8 w-8 ${getServiceIconColor('Advisory')}`} />
+                        <service.icon className={getServiceIconColor('Advisory')} />
                       </div>
                       <CardTitle className="text-xl text-gray-900">{service.title}</CardTitle>
                       <div className="space-y-2">
@@ -329,7 +362,7 @@ export default function AdvisoryPage() {
                 Get expert advisory services tailored to your business needs and accelerate your growth
               </p>
               <div className="flex justify-center space-x-4">
-                <Link href={`/dashboard/advisory?service=${encodeURIComponent("Business Advisory Services")}`} passHref>
+                      <Link href={`/contact?service=${encodeURIComponent("Advisory")}&subService=${encodeURIComponent("Business Advisory Services")}`} passHref>
                   <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg">
                     Schedule Consultation
                   </Button>

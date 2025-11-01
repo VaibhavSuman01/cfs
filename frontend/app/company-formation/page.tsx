@@ -9,6 +9,7 @@ import { EnhancedFooter } from "@/components/enhanced-footer";
 import { FadeInSection } from "@/components/fade-in-section"
 import { Building2, CheckCircle, Clock, Shield, Users, FileText, ArrowRight, Star, Zap } from "lucide-react"
 import { PricingDisplay } from "@/components/ui/pricing-display"
+import { getServicePageHeroBackground } from "@/lib/service-colors"
 
 export default function CompanyFormationPage() {
   return (
@@ -16,7 +17,7 @@ export default function CompanyFormationPage() {
       <EnhancedHeader />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-100 py-20">
+      <section className={`relative overflow-hidden ${getServicePageHeroBackground("Company Formation")} py-20`}>
         <div className="container mx-auto px-4">
           <FadeInSection className="text-center space-y-8">
             <Badge className="bg-blue-100 text-blue-800">Most Popular Service</Badge>
