@@ -75,9 +75,7 @@ export default function CompanyFormationEditPage() {
         formData.append(`fileId_${idx}`, `file_${idx}`);
       });
 
-      await api.put(API_PATHS.FORMS.COMPANY_FORMATION_UPDATE(id), formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await api.put(API_PATHS.FORMS.COMPANY_FORMATION_UPDATE(id), formData);
 
       toast.success("Form updated successfully");
       router.push(`/dashboard/company-formation/${id}`);

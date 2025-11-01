@@ -24,7 +24,7 @@ export default function DigitalTransformationPage() {
               Modernize operations with technology and digital solutions for competitive advantage
             </p>
             <div className="flex justify-center space-x-4">
-              <Link href={`/dashboard/advisory?service=${encodeURIComponent("Digital Transformation")}`} passHref>
+              <Link href={`/contact?service=${encodeURIComponent("Advisory")}&subService=${encodeURIComponent("Digital Transformation")}`} passHref>
                 <Button className="bg-blue-600 hover:bg-blue-700 px-8 py-3">Get Started</Button>
               </Link>
             </div>
@@ -82,7 +82,7 @@ export default function DigitalTransformationPage() {
                     </div>
                   </CardHeader>
                   <CardContent className="text-center">
-                    <Link href={`/dashboard/advisory?service=${encodeURIComponent("Digital Transformation")}`} passHref>
+                    <Link href={`/contact?service=${encodeURIComponent("Advisory")}&subService=${encodeURIComponent("Digital Transformation")}`} passHref>
                       <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3">
                         Book Service <ArrowRight className="ml-2 h-5 w-5" />
                       </Button>
@@ -192,7 +192,7 @@ export default function DigitalTransformationPage() {
                 Transform your business with cutting-edge digital solutions
               </p>
               <div className="flex justify-center space-x-4">
-                <Link href={`/dashboard/advisory?service=${encodeURIComponent("Digital Transformation")}`} passHref>
+                <Link href={`/contact?service=${encodeURIComponent("Advisory")}&subService=${encodeURIComponent("Digital Transformation")}`} passHref>
                   <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg">
                     Start Transformation
                   </Button>

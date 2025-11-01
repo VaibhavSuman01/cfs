@@ -64,20 +64,22 @@ export default function EPFCalculator() {
     let epsBalance = 0;
     const monthlyData = [];
     
-    // Calculate month by month
+    // Calculate month by month (EPF interest is credited annually, but for calculator we compound monthly)
+    const annualInterestRate = 0.085; // Current EPF rate is 8.5% (varies by year)
+    const monthlyInterestRate = annualInterestRate / 12;
+    
     for (let month = 1; month <= totalMonths; month++) {
-      // Add contributions
-      epfBalance += monthlyEmployeeContribution + monthlyEpfContribution;
-      epsBalance += monthlyEpsContribution;
+      // Calculate opening balance for the month (includes previous month's contributions + interest)
+      const openingEpfBalance = month === 1 ? 0 : epfBalance;
+      const openingEpsBalance = month === 1 ? 0 : epsBalance;
       
-      // Add interest (assuming 8.5% annual rate)
-      const annualInterestRate = 0.085;
-      const monthlyInterestRate = annualInterestRate / 12;
+      // Add this month's contributions
+      epfBalance = openingEpfBalance + monthlyEmployeeContribution + monthlyEpfContribution;
+      epsBalance = openingEpsBalance + monthlyEpsContribution;
       
-      if (month > 1) {
-        epfBalance += epfBalance * monthlyInterestRate;
-        epsBalance += epsBalance * monthlyInterestRate;
-      }
+      // Apply monthly interest (compounded)
+      epfBalance = epfBalance * (1 + monthlyInterestRate);
+      epsBalance = epsBalance * (1 + monthlyInterestRate);
       
       monthlyData.push({
         month: month,

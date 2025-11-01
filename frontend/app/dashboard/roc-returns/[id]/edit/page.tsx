@@ -73,9 +73,7 @@ export default function ROCReturnsEditPage() {
         formData.append(`fileId_${idx}`, `file_${idx}`);
       });
 
-      await api.put(API_PATHS.FORMS.ROC_RETURNS_UPDATE(id), formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await api.put(API_PATHS.FORMS.ROC_RETURNS_UPDATE(id), formData);
 
       toast.success("Form updated successfully");
       router.push(`/dashboard/roc-returns/${id}`);

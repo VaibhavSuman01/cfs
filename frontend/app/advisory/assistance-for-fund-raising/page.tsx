@@ -24,7 +24,7 @@ export default function AssistanceForFundRaisingPage() {
               Get expert guidance to raise funds and secure investment for your business growth
             </p>
             <div className="flex justify-center space-x-4">
-              <Link href={`/dashboard/advisory?service=${encodeURIComponent("Assistance for Fund Raising")}`} passHref>
+              <Link href={`/contact?service=${encodeURIComponent("Advisory")}&subService=${encodeURIComponent("Assistance for Fund Raising")}`} passHref>
                 <Button className="bg-blue-600 hover:bg-blue-700 px-8 py-3">Get Started</Button>
               </Link>
             </div>
@@ -82,7 +82,7 @@ export default function AssistanceForFundRaisingPage() {
                     </div>
             </CardHeader>
                   <CardContent className="text-center">
-                    <Link href={`/dashboard/advisory?service=${encodeURIComponent("Assistance for Fund Raising")}`} passHref>
+                    <Link href={`/contact?service=${encodeURIComponent("Advisory")}&subService=${encodeURIComponent("Assistance for Fund Raising")}`} passHref>
                       <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3">
                         Book Service <ArrowRight className="ml-2 h-5 w-5" />
                       </Button>
@@ -192,7 +192,7 @@ export default function AssistanceForFundRaisingPage() {
                 Get expert assistance to secure the funding your business needs
               </p>
               <div className="flex justify-center space-x-4">
-                <Link href={`/dashboard/advisory?service=${encodeURIComponent("Assistance for Fund Raising")}`} passHref>
+                <Link href={`/contact?service=${encodeURIComponent("Advisory")}&subService=${encodeURIComponent("Assistance for Fund Raising")}`} passHref>
                   <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg">
                     Start Fund Raising
                   </Button>

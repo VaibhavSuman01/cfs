@@ -117,11 +117,7 @@ export default function EditFormPage() {
         formData.append('existingDocuments', doc._id);
       });
 
-      await api.put(`/api/forms/tax/${id}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      await api.put(`/api/forms/tax/${id}`, formData);
       
       toast.success('Tax form updated successfully');
       router.push('/dashboard');

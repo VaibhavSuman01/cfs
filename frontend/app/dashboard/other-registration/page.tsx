@@ -135,17 +135,21 @@ export default function OtherRegistrationPage() {
         formData.append("documents", file);
       });
 
-      await api.post(API_PATHS.FORMS.OTHER_REGISTRATION, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      await api.post(API_PATHS.FORMS.OTHER_REGISTRATION, formData);
 
       toast.success("Registration application submitted successfully");
       router.push("/dashboard/other-registration");
     } catch (error) {
       console.error("Failed to submit registration form:", error);
-      toast.error("Failed to submit registration application. Please try again.");
+      
+      // Handle specific error cases
+      if (error.response?.status === 400 && error.response?.data?.message?.includes("already exists")) {
+        toast.error("Already submitted for this Year. You can only submit one form per service.");
+      } else if (error.response?.status === 409) {
+        toast.error("Already submitted for this Year. You can only submit one form per service.");
+      } else {
+        toast.error("Failed to submit registration application. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }

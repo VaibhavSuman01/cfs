@@ -9,6 +9,7 @@ import { EnhancedFooter } from "@/components/enhanced-footer";
 import { FadeInSection } from "@/components/fade-in-section"
 import { Shield, Award, Search, FileText, CheckCircle, ArrowRight, Globe, Star, Zap } from "lucide-react"
 import { getBasePrice } from "@/lib/pricing"
+import { getServicePageHeroBackground } from "@/lib/service-colors"
 
 export default function TrademarkISOPage() {
   return (
@@ -16,7 +17,7 @@ export default function TrademarkISOPage() {
       <EnhancedHeader />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-100 py-20">
+      <section className={`relative overflow-hidden ${getServicePageHeroBackground("Trademark & ISO")} py-20`}>
         <div className="container mx-auto px-4">
           <FadeInSection className="text-center space-y-8">
             <h1 className="text-5xl font-bold text-gray-900">Trademark & ISO Certification</h1>

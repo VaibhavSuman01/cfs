@@ -66,7 +66,7 @@ export default function IncomeTaxCalculatorPage() {
 
   const calculateTax = () => {
     const income = parseFloat(formData.annualIncome) || 0;
-    const age = parseInt(formData.age) || 0;
+    const age = formData.age;
     const year = formData.financialYear;
     
     // Calculate total deductions
@@ -75,7 +75,16 @@ export default function IncomeTaxCalculatorPage() {
     }, 0);
 
     // Calculate taxable income
-    const taxableIncome = Math.max(0, income - totalDeductions);
+    let taxableIncome = Math.max(0, income - totalDeductions);
+
+    // Apply senior citizen rebate (for old regime only)
+    if (year === "2023-24") {
+      if (age === "60-80" && taxableIncome <= 500000) {
+        taxableIncome = Math.max(0, taxableIncome - 50000); // Rebate under Section 87A
+      } else if (age === "above-80" && taxableIncome <= 500000) {
+        taxableIncome = Math.max(0, taxableIncome - 50000);
+      }
+    }
 
     // Get tax slabs for the selected year
     const slabs = taxSlabs[year];
@@ -86,10 +95,13 @@ export default function IncomeTaxCalculatorPage() {
     for (const slab of slabs) {
       if (remainingIncome <= 0) break;
       
-      const taxableInSlab = Math.min(remainingIncome, slab.max - slab.min);
-      const taxInSlab = (taxableInSlab * slab.rate) / 100;
+      // Calculate taxable amount in this slab
+      const slabMin = Math.max(slab.min, 0);
+      const slabMax = slab.max === Infinity ? remainingIncome : slab.max;
+      const taxableInSlab = Math.min(remainingIncome, slabMax - slabMin);
       
       if (taxableInSlab > 0) {
+        const taxInSlab = (taxableInSlab * slab.rate) / 100;
         taxBreakdown.push({
           ...slab,
           taxableAmount: taxableInSlab,
@@ -98,6 +110,11 @@ export default function IncomeTaxCalculatorPage() {
         totalTax += taxInSlab;
         remainingIncome -= taxableInSlab;
       }
+    }
+
+    // Apply rebate under Section 87A for taxable income up to ₹5,00,000 (FY 2023-24)
+    if (year === "2023-24" && taxableIncome <= 500000) {
+      totalTax = Math.max(0, totalTax - 12500); // Rebate up to ₹12,500
     }
 
     // Add cess (4% of total tax)

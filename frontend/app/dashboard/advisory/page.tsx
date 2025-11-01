@@ -88,11 +88,7 @@ export default function AdvisoryPage() {
         formData.append("documents", file);
       });
 
-      await api.post(API_PATHS.FORMS.ADVISORY, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      await api.post(API_PATHS.FORMS.ADVISORY, formData);
 
       toast.success("Advisory request submitted successfully");
       router.push("/dashboard/advisory");

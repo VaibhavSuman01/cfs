@@ -169,11 +169,7 @@ export default function PartnershipFirmPage() {
         }
       });
 
-      await api.post(API_PATHS.FORMS.PARTNERSHIP_FIRM, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      await api.post(API_PATHS.FORMS.PARTNERSHIP_FIRM, formData);
 
       toast.success("Partnership firm registration application submitted successfully");
       router.push("/dashboard/partnership-firm");

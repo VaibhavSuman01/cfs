@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { EnhancedHeader } from '@/components/enhanced-header';
 import { EnhancedFooter } from "@/components/enhanced-footer";
 import { FadeInSection } from "@/components/fade-in-section";
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 import { Search, FileText, Info, Copy } from "lucide-react";
 
 const hsnCodes = [
@@ -216,10 +217,35 @@ const hsnCodes = [
   { code: "1200", description: "Starches; inulin", gstRate: 0 }
 ];
 
+interface HSNCode {
+  code: string;
+  description: string;
+  gstRate: number;
+}
+
 export default function HSNCodeFinderPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [selectedCode, setSelectedCode] = useState(null);
+  const [searchResults, setSearchResults] = useState<HSNCode[]>([]);
+  const [selectedCode, setSelectedCode] = useState<HSNCode | null>(null);
+  const { toast } = useToast();
+
+  // Auto-search with debouncing
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    const debounceTimer = setTimeout(() => {
+      const filtered = hsnCodes.filter(item =>
+        item.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setSearchResults(filtered);
+    }, 300);
+
+    return () => clearTimeout(debounceTimer);
+  }, [searchTerm]);
 
   const handleSearch = () => {
     if (!searchTerm.trim()) {
@@ -235,11 +261,22 @@ export default function HSNCodeFinderPage() {
     setSearchResults(filtered);
   };
 
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text);
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      toast({
+        title: "Copied to clipboard",
+        description: `HSN Code ${text} has been copied`,
+      });
+    }).catch(() => {
+      toast({
+        title: "Failed to copy",
+        description: "Please try again",
+        variant: "destructive",
+      });
+    });
   };
 
-  const getGSTRateColor = (rate) => {
+  const getGSTRateColor = (rate: number) => {
     if (rate === 0) return "bg-green-100 text-green-800";
     if (rate <= 5) return "bg-blue-100 text-blue-800";
     if (rate <= 12) return "bg-yellow-100 text-yellow-800";
@@ -273,7 +310,7 @@ export default function HSNCodeFinderPage() {
                       Search HSN Codes
                     </CardTitle>
                     <CardDescription>
-                      Search by HSN code or product description
+                      Search by HSN code or product description (auto-searches as you type)
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
@@ -346,6 +383,8 @@ export default function HSNCodeFinderPage() {
                                     e.stopPropagation();
                                     copyToClipboard(item.code);
                                   }}
+                                  className="hover:bg-blue-50"
+                                  title="Copy HSN Code"
                                 >
                                   <Copy className="w-4 h-4" />
                                 </Button>

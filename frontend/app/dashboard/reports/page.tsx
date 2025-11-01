@@ -91,11 +91,7 @@ export default function ReportsPage() {
         formData.append("documents", file);
       });
 
-      await api.post(API_PATHS.FORMS.REPORTS, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      await api.post(API_PATHS.FORMS.REPORTS, formData);
 
       toast.success("Report request submitted successfully");
       router.push("/dashboard/reports");

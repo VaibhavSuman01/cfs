@@ -8,7 +8,7 @@ import { FadeInSection } from "@/components/fade-in-section"
 import { Calculator, FileText, TrendingUp, Shield, CheckCircle, ArrowRight, Clock, Users, Building } from "lucide-react"
 import Link from "next/link";
 import { PricingDisplay } from "@/components/ui/pricing-display"
-import { getServiceCardClasses, getServiceBackgroundColor, getServiceIconColor, getServicePriceColor } from "@/lib/service-colors"
+import { getServiceCardClasses, getServiceBackgroundColor, getServiceIconColor, getServicePriceColor, getServicePageHeroBackground } from "@/lib/service-colors"
 
 export default function TaxationPage() {
   return (
@@ -16,7 +16,7 @@ export default function TaxationPage() {
       <EnhancedHeader />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-100 py-20">
+      <section className={`relative overflow-hidden ${getServicePageHeroBackground("Taxation")} py-20`}>
         <div className="container mx-auto px-4">
           <FadeInSection className="text-center space-y-8">
             <h1 className="text-5xl font-bold text-gray-900">Taxation Services</h1>
@@ -178,7 +178,7 @@ export default function TaxationPage() {
                   <Card className={getServiceCardClasses('Taxation')}>
                     <CardHeader className="text-center">
                       <div className={getServiceBackgroundColor('Taxation')}>
-                        <service.icon className={`h-8 w-8 ${getServiceIconColor('Taxation')}`} />
+                        <service.icon className={getServiceIconColor('Taxation')} />
                       </div>
                       <CardTitle className="text-xl text-gray-900">{service.title}</CardTitle>
                       <div className="space-y-2">

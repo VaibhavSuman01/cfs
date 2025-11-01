@@ -112,11 +112,7 @@ export default function CompanyFormationPage() {
         formData.append("documents", file);
       });
 
-      await api.post(API_PATHS.FORMS.COMPANY_FORMATION, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      await api.post(API_PATHS.FORMS.COMPANY_FORMATION, formData);
 
       toast.success("Company formation application submitted successfully");
       router.push("/dashboard/company-formation");
