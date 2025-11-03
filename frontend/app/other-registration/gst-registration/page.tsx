@@ -1,13 +1,19 @@
 "use client";
 
-import { EnhancedHeader } from '@/components/enhanced-header';
-import { EnhancedFooter } from '@/components/enhanced-footer';
-import { FadeInSection } from '@/components/fade-in-section';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { PricingDisplay } from '@/components/ui/pricing-display';
-import Link from 'next/link';
+import { EnhancedHeader } from "@/components/enhanced-header";
+import { EnhancedFooter } from "@/components/enhanced-footer";
+import { FadeInSection } from "@/components/fade-in-section";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { PricingDisplay } from "@/components/ui/pricing-display";
+import Link from "next/link";
 import {
   Shield,
   CheckCircle,
@@ -16,11 +22,10 @@ import {
   Award,
   Zap,
   Building,
-  Calculator
-} from 'lucide-react';
+  Calculator,
+} from "lucide-react";
 
 export default function GstRegistrationPage() {
-
   return (
     <div className="min-h-screen bg-white">
       <EnhancedHeader />
@@ -44,7 +49,11 @@ export default function GstRegistrationPage() {
                   </span>
                 </h1>
                 <p className="text-xl text-gray-600 leading-relaxed">
-                  Goods and Services Tax (GST) is an indirect tax used in India on the supply of goods and services. GST Filing is mandatory for businesses whose turnover exceeds the prescribed threshold limit. It helps in consolidating multiple indirect taxes into a single tax structure.
+                  Goods and Services Tax (GST) is an indirect tax used in India
+                  on the supply of goods and services. GST Filing is mandatory
+                  for businesses whose turnover exceeds the prescribed threshold
+                  limit. It helps in consolidating multiple indirect taxes into
+                  a single tax structure.
                 </p>
 
                 <div className="grid sm:grid-cols-3 gap-4 pt-6">
@@ -52,26 +61,40 @@ export default function GstRegistrationPage() {
                     <div className="text-2xl font-bold text-blue-600">
                       <PricingDisplay serviceName="gst registration" />
                     </div>
-                <div className="text-sm text-gray-600">Starting Price</div>
-              </div>
+                    <div className="text-sm text-gray-600">Starting Price</div>
+                  </div>
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-                    <div className="text-2xl font-bold text-blue-600">7-10 Days</div>
+                    <div className="text-2xl font-bold text-blue-600">
+                      7-10 Days
+                    </div>
                     <div className="text-sm text-gray-600">Processing Time</div>
                   </div>
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-                    <div className="text-2xl font-bold text-blue-600">Mandatory</div>
+                    <div className="text-2xl font-bold text-blue-600">
+                      Mandatory
+                    </div>
                     <div className="text-sm text-gray-600">For Business</div>
                   </div>
                 </div>
 
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                  <Link href={`/dashboard/other-registration?service=${encodeURIComponent('GST Registration')}`} passHref>
+                  <Link
+                    href={`/dashboard/other-registration?service=${encodeURIComponent(
+                      "GST Registration"
+                    )}`}
+                    passHref
+                  >
                     <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                       Register GST
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
-                  <Link href={`/dashboard/other-registration?service=${encodeURIComponent('GST Registration')}`} passHref>
+                  <Link
+                    href={`/dashboard/other-registration?service=${encodeURIComponent(
+                      "GST Registration"
+                    )}`}
+                    passHref
+                  >
                     <Button
                       variant="outline"
                       className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
@@ -85,7 +108,7 @@ export default function GstRegistrationPage() {
             <FadeInSection className="hidden lg:block">
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-tr from-blue-100 to-transparent rounded-full -translate-x-10 -translate-y-10"></div>
-                <div className="relative rounded-lg shadow-2xl w-full h-80 bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
+                <div className="relative rounded-lg w-full h-80 flex items-center justify-center">
                   <Calculator className="h-32 w-32 text-blue-600" />
                 </div>
               </div>
@@ -99,7 +122,9 @@ export default function GstRegistrationPage() {
         <section className="py-20 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-4xl mx-auto mb-16">
-              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">What is GST?</h2>
+              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">
+                What is GST?
+              </h2>
               <p className="text-lg text-gray-600">
                 The unified indirect tax system for goods and services in India
               </p>
@@ -107,18 +132,30 @@ export default function GstRegistrationPage() {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               <Card className="text-center p-6 border-2 border-transparent hover:border-blue-200 hover:shadow-xl transition-all">
                 <Building className="mx-auto h-12 w-12 text-blue-500 mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Business Compliance</h3>
-                <p className="text-gray-600">Mandatory registration for businesses above threshold limit.</p>
+                <h3 className="text-xl font-semibold mb-2">
+                  Business Compliance
+                </h3>
+                <p className="text-gray-600">
+                  Mandatory registration for businesses above threshold limit.
+                </p>
               </Card>
               <Card className="text-center p-6 border-2 border-transparent hover:border-blue-200 hover:shadow-xl transition-all">
                 <Shield className="mx-auto h-12 w-12 text-blue-500 mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Tax Consolidation</h3>
-                <p className="text-gray-600">Unified tax structure replacing multiple indirect taxes.</p>
+                <h3 className="text-xl font-semibold mb-2">
+                  Tax Consolidation
+                </h3>
+                <p className="text-gray-600">
+                  Unified tax structure replacing multiple indirect taxes.
+                </p>
               </Card>
               <Card className="text-center p-6 border-2 border-transparent hover:border-blue-200 hover:shadow-xl transition-all">
                 <Award className="mx-auto h-12 w-12 text-blue-500 mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Legal Requirement</h3>
-                <p className="text-gray-600">Essential for legal business operations and tax compliance.</p>
+                <h3 className="text-xl font-semibold mb-2">
+                  Legal Requirement
+                </h3>
+                <p className="text-gray-600">
+                  Essential for legal business operations and tax compliance.
+                </p>
               </Card>
             </div>
           </div>
@@ -130,7 +167,9 @@ export default function GstRegistrationPage() {
         <section className="py-20">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-4xl mx-auto mb-16">
-              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">Choose Your GST Package</h2>
+              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">
+                Choose Your GST Package
+              </h2>
               <p className="text-lg text-gray-600">
                 Select the package that best fits your business needs
               </p>
@@ -138,56 +177,116 @@ export default function GstRegistrationPage() {
             <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
               <Card className="border-2 border-blue-200 hover:border-blue-400 hover:shadow-xl transition-all duration-300">
                 <CardHeader className="text-center pb-4">
-                  <CardTitle className="text-2xl font-bold text-blue-600">Basic</CardTitle>
+                  <CardTitle className="text-2xl font-bold text-blue-600">
+                    Basic
+                  </CardTitle>
                   <div className="text-4xl font-bold text-gray-900">₹1,999</div>
                   <p className="text-sm text-gray-600">Starting Price</p>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <ul className="space-y-3 text-left">
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>GST Registration Application</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Basic Documentation Support</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Registration Certificate</span></li>
+                    <li className="flex items-center">
+                      <CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" />
+                      <span>GST Registration Application</span>
+                    </li>
+                    <li className="flex items-center">
+                      <CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" />
+                      <span>Basic Documentation Support</span>
+                    </li>
+                    <li className="flex items-center">
+                      <CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" />
+                      <span>Registration Certificate</span>
+                    </li>
                   </ul>
-                  <Link href={`/dashboard/other-registration?service=${encodeURIComponent('GST Registration - Basic')}`} passHref>
-                    <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Basic</Button>
+                  <Link
+                    href={`/dashboard/other-registration?service=${encodeURIComponent(
+                      "GST Registration - Basic"
+                    )}`}
+                    passHref
+                  >
+                    <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                      Choose Basic
+                    </Button>
                   </Link>
                 </CardContent>
               </Card>
 
               <Card className="border-2 border-blue-400 hover:border-blue-600 hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 <CardHeader className="text-center pb-4">
-                  <CardTitle className="text-2xl font-bold text-blue-600">Standard</CardTitle>
+                  <CardTitle className="text-2xl font-bold text-blue-600">
+                    Standard
+                  </CardTitle>
                   <div className="text-4xl font-bold text-gray-900">₹2,999</div>
                   <p className="text-sm text-gray-600">Most Popular</p>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <ul className="space-y-3 text-left">
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Everything in Basic</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Priority Processing</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Expert Consultation</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Post-Registration Support</span></li>
+                    <li className="flex items-center">
+                      <CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" />
+                      <span>Everything in Basic</span>
+                    </li>
+                    <li className="flex items-center">
+                      <CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" />
+                      <span>Priority Processing</span>
+                    </li>
+                    <li className="flex items-center">
+                      <CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" />
+                      <span>Expert Consultation</span>
+                    </li>
+                    <li className="flex items-center">
+                      <CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" />
+                      <span>Post-Registration Support</span>
+                    </li>
                   </ul>
-                  <Link href={`/dashboard/other-registration?service=${encodeURIComponent('GST Registration - Standard')}`} passHref>
-                    <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Standard</Button>
+                  <Link
+                    href={`/dashboard/other-registration?service=${encodeURIComponent(
+                      "GST Registration - Standard"
+                    )}`}
+                    passHref
+                  >
+                    <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                      Choose Standard
+                    </Button>
                   </Link>
                 </CardContent>
               </Card>
 
               <Card className="border-2 border-blue-200 hover:border-blue-400 hover:shadow-xl transition-all duration-300">
                 <CardHeader className="text-center pb-4">
-                  <CardTitle className="text-2xl font-bold text-blue-600">Premium</CardTitle>
+                  <CardTitle className="text-2xl font-bold text-blue-600">
+                    Premium
+                  </CardTitle>
                   <div className="text-4xl font-bold text-gray-900">₹4,999</div>
                   <p className="text-sm text-gray-600">Complete Solution</p>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <ul className="space-y-3 text-left">
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Everything in Standard</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>Compliance Training</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>1 Year Support</span></li>
-                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" /><span>GST Filing Assistance</span></li>
+                    <li className="flex items-center">
+                      <CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" />
+                      <span>Everything in Standard</span>
+                    </li>
+                    <li className="flex items-center">
+                      <CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" />
+                      <span>Compliance Training</span>
+                    </li>
+                    <li className="flex items-center">
+                      <CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" />
+                      <span>1 Year Support</span>
+                    </li>
+                    <li className="flex items-center">
+                      <CheckCircle className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" />
+                      <span>GST Filing Assistance</span>
+                    </li>
                   </ul>
-                  <Link href={`/dashboard/other-registration?service=${encodeURIComponent('GST Registration - Premium')}`} passHref>
-                    <Button className="w-full bg-blue-600 hover:bg-blue-700">Choose Premium</Button>
+                  <Link
+                    href={`/dashboard/other-registration?service=${encodeURIComponent(
+                      "GST Registration - Premium"
+                    )}`}
+                    passHref
+                  >
+                    <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                      Choose Premium
+                    </Button>
                   </Link>
                 </CardContent>
               </Card>
@@ -201,7 +300,9 @@ export default function GstRegistrationPage() {
         <section className="py-20">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-4xl mx-auto mb-16">
-              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">GST Registration Process</h2>
+              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">
+                GST Registration Process
+              </h2>
               <p className="text-lg text-gray-600">
                 Our streamlined process for GST registration
               </p>
@@ -210,24 +311,48 @@ export default function GstRegistrationPage() {
               <div className="hidden md:block absolute top-1/2 left-0 w-full h-0.5"></div>
               <div className="grid md:grid-cols-4 gap-16 relative">
                 <div className="text-center space-y-4">
-                  <div className="relative inline-block"><div className="w-20 h-20 mx-auto bg-blue-500 text-white rounded-full flex items-center justify-center text-2xl font-bold">1</div></div>
+                  <div className="relative inline-block">
+                    <div className="w-20 h-20 mx-auto bg-blue-500 text-white rounded-full flex items-center justify-center text-2xl font-bold">
+                      1
+                    </div>
+                  </div>
                   <h3 className="text-xl font-semibold">Application</h3>
-                  <p className="text-gray-600">Submit GST registration application with business details.</p>
+                  <p className="text-gray-600">
+                    Submit GST registration application with business details.
+                  </p>
                 </div>
                 <div className="text-center space-y-4">
-                  <div className="relative inline-block"><div className="w-20 h-20 mx-auto bg-blue-500 text-white rounded-full flex items-center justify-center text-2xl font-bold">2</div></div>
+                  <div className="relative inline-block">
+                    <div className="w-20 h-20 mx-auto bg-blue-500 text-white rounded-full flex items-center justify-center text-2xl font-bold">
+                      2
+                    </div>
+                  </div>
                   <h3 className="text-xl font-semibold">Documentation</h3>
-                  <p className="text-gray-600">Complete documentation and verification process.</p>
+                  <p className="text-gray-600">
+                    Complete documentation and verification process.
+                  </p>
                 </div>
                 <div className="text-center space-y-4">
-                  <div className="relative inline-block"><div className="w-20 h-20 mx-auto bg-blue-500 text-white rounded-full flex items-center justify-center text-2xl font-bold">3</div></div>
+                  <div className="relative inline-block">
+                    <div className="w-20 h-20 mx-auto bg-blue-500 text-white rounded-full flex items-center justify-center text-2xl font-bold">
+                      3
+                    </div>
+                  </div>
                   <h3 className="text-xl font-semibold">Verification</h3>
-                  <p className="text-gray-600">Business verification and document validation.</p>
+                  <p className="text-gray-600">
+                    Business verification and document validation.
+                  </p>
                 </div>
                 <div className="text-center space-y-4">
-                  <div className="relative inline-block"><div className="w-20 h-20 mx-auto bg-blue-500 text-white rounded-full flex items-center justify-center text-2xl font-bold">4</div></div>
+                  <div className="relative inline-block">
+                    <div className="w-20 h-20 mx-auto bg-blue-500 text-white rounded-full flex items-center justify-center text-2xl font-bold">
+                      4
+                    </div>
+                  </div>
                   <h3 className="text-xl font-semibold">Registration</h3>
-                  <p className="text-gray-600">GST registration and certificate issuance.</p>
+                  <p className="text-gray-600">
+                    GST registration and certificate issuance.
+                  </p>
                 </div>
               </div>
             </div>
@@ -240,18 +365,32 @@ export default function GstRegistrationPage() {
         <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
           <div className="container mx-auto px-4 text-center">
             <div className="max-w-4xl mx-auto space-y-8">
-              <h2 className="text-4xl lg:text-5xl font-bold">Ready to Get GST Compliant?</h2>
+              <h2 className="text-4xl lg:text-5xl font-bold">
+                Ready to Get GST Compliant?
+              </h2>
               <p className="text-xl text-blue-100 leading-relaxed">
-                Ensure your business operates legally and efficiently with GST registration. Get started today and streamline your tax compliance process.
+                Ensure your business operates legally and efficiently with GST
+                registration. Get started today and streamline your tax
+                compliance process.
               </p>
               <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <Link href={`/dashboard/other-registration?service=${encodeURIComponent('GST Registration')}`} passHref>
+                <Link
+                  href={`/dashboard/other-registration?service=${encodeURIComponent(
+                    "GST Registration"
+                  )}`}
+                  passHref
+                >
                   <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                     Start Registration
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
-                <Link href={`/dashboard/other-registration?service=${encodeURIComponent('GST Registration')}`} passHref>
+                <Link
+                  href={`/dashboard/other-registration?service=${encodeURIComponent(
+                    "GST Registration"
+                  )}`}
+                  passHref
+                >
                   <Button
                     variant="outline"
                     className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
@@ -263,7 +402,7 @@ export default function GstRegistrationPage() {
             </div>
           </div>
         </section>
-        </FadeInSection>
+      </FadeInSection>
 
       <EnhancedFooter />
     </div>

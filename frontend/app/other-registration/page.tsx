@@ -37,7 +37,11 @@ export default function OtherRegistrationPage() {
     <div className="min-h-screen bg-white">
       <EnhancedHeader />
       {/* Hero Section */}
-      <section className={`relative overflow-hidden ${getServicePageHeroBackground("Other Registration")} py-20`}>
+      <section
+        className={`relative overflow-hidden ${getServicePageHeroBackground(
+          "Other Registration"
+        )} py-20`}
+      >
         <div className="container mx-auto px-4">
           <FadeInSection className="text-center space-y-8">
             <h1 className="text-5xl font-bold text-gray-900">
@@ -167,7 +171,7 @@ export default function OtherRegistrationPage() {
                     "Employee pension scheme",
                     "Insurance benefits",
                   ],
-                  price: "As per request",
+                  priceKey: "epfo registration",
                   timeline: "3-5 days",
                 },
                 {
@@ -183,7 +187,7 @@ export default function OtherRegistrationPage() {
                     "Disablement benefits",
                     "Social security scheme",
                   ],
-                  price: "As per request",
+                  priceKey: "esic registration",
                   timeline: "3-5 days",
                 },
                 {
@@ -215,7 +219,7 @@ export default function OtherRegistrationPage() {
                     "Access to international markets",
                     "Avail government export schemes",
                   ],
-                  price: "As per request",
+                  priceKey: "iec registration",
                   timeline: "1-2 days",
                 },
                 {
@@ -247,7 +251,7 @@ export default function OtherRegistrationPage() {
                     "Priority in government tenders",
                     "No renewal required",
                   ],
-                  price: "As per request",
+                  priceKey: "msme udyam registration",
                   timeline: "1-2 days",
                 },
               ].map((registration, index) => (
@@ -260,9 +264,7 @@ export default function OtherRegistrationPage() {
                         )}
                       >
                         <registration.icon
-                          className={getServiceIconColor(
-                            "Other Registration"
-                          )}
+                          className={getServiceIconColor("Other Registration")}
                         />
                       </div>
                       <CardTitle className="text-xl text-gray-900">
