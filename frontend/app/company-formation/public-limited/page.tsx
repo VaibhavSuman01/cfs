@@ -192,7 +192,7 @@ export default function PublicLimitedCompanyPage() {
                     Basic
                   </CardTitle>
                   <div className="text-4xl font-bold text-gray-900">
-                    ₹15,999
+                    ₹14,999
                   </div>
                   <p className="text-sm text-gray-600">Starting Price</p>
                 </CardHeader>

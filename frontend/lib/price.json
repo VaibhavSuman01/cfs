@@ -196,9 +196,9 @@
     "tooltip": "Prices may vary based on complexity and industry standards"
   },
   "public limited company": {
-    "basePrice": "₹15,999*",
+    "basePrice": "₹14,999*",
     "packages": {
-      "BASIC": "₹15,999*",
+      "BASIC": "₹14,999*",
       "STANDARD": "₹24,999*",
       "PREMIUM": "₹30,999*"
     },
