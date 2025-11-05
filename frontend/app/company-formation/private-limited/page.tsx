@@ -215,6 +215,118 @@ export default function PrivateLimitedCompanyPage() {
         </section>
       </FadeInSection>
 
+      {/* Pricing */}
+      <FadeInSection>
+        <section className="py-20 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white">
+          <div className="container mx-auto px-4">
+            <div className="text-center space-y-6 mb-16">
+              <h2 className="text-4xl font-bold">Transparent Pricing</h2>
+              <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+                No hidden charges. What you see is what you pay. Choose the package that suits your needs.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              {[
+                {
+                  name: "Basic Package",
+                  price: "BASIC",
+                  popular: false,
+                  features: [
+                    "Company Name Search & Reservation",
+                    "DSC for 2 Directors",
+                    "DIN for 2 Directors",
+                    "MOA & AOA Drafting",
+                    "Company Incorporation",
+                    "Certificate of Incorporation",
+                    "PAN & TAN Application",
+                  ],
+                },
+                {
+                  name: "Standard Package",
+                  price: "STANDARD",
+                  popular: true,
+                  features: [
+                    "Company Name Search & Reservation",
+                    "DSC for 2 Directors",
+                    "DIN for 2 Directors",
+                    "MOA & AOA Drafting",
+                    "Company Incorporation",
+                    "Certificate of Incorporation",
+                    "PAN & TAN Application",
+                    "GST Filing",
+
+                  ],
+                },
+                {
+                  name: "Premium Package",
+                  price: "PREMIUM",
+                  popular: false,
+                  features: [
+                    "Company Name Search & Reservation",
+                    "DSC for 2 Directors",
+                    "DIN for 2 Directors",
+                    "MOA & AOA Drafting",
+                    "Company Incorporation",
+                    "Certificate of Incorporation",
+                    "PAN & TAN Application",
+                    "GST Filing",
+                    "EPFO Registration",
+                    "ESI Registration",
+                    "PT Tax Registration",
+                    "Bank Account Opening Assistance",
+                    "Detailed MOA & AOA Drafting",
+                    "Expert Assistance"
+                  ],
+                },
+              ].map((pkg, index) => (
+                <FadeInSection key={index} delay={index * 100}>
+                  <Card
+                    className={`relative border-2 hover:shadow-2xl transition-all duration-300 hover:scale-105 ${
+                      pkg.popular
+                        ? "border-blue-400 bg-white/15 backdrop-blur-sm"
+                        : "border-white/20 bg-white/10 backdrop-blur-sm"
+                    }`}
+                  >
+                    {pkg.popular && (
+                      <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                        <Badge className="bg-blue-400 text-blue-900 px-4 py-1">Most Popular</Badge>
+                      </div>
+                    )}
+                    <CardHeader className="text-center">
+                      <CardTitle className="text-2xl font-bold">{pkg.name}</CardTitle>
+                      <div className="text-4xl font-bold text-blue-400 my-4">
+                        <PackagePricingDisplay serviceName="private limited company" packageType={pkg.price as "BASIC" | "STANDARD" | "PREMIUM" } />
+                      </div>
+                      <p className="text-blue-100">One-time payment</p>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {pkg.features.map((feature, idx) => (
+                        <div key={idx} className="flex items-center space-x-3">
+                          <CheckCircle className="h-5 w-5 text-blue-400 flex-shrink-0" />
+                          <span className="text-blue-100 text-sm">{feature}</span>
+                        </div>
+                      ))}
+                      <Link href={`/dashboard/company-formation?service=${encodeURIComponent("Private Limited Company")}`} passHref>
+                        <Button
+                          className={`w-full mt-6 ${
+                            pkg.popular
+                              ? "bg-blue-400 text-blue-900 hover:bg-blue-300"
+                              : "bg-white/20 text-white hover:bg-white/30"
+                          } transition-all duration-300 hover:scale-105`}
+                        >
+                          Choose This Package
+                        </Button>
+                      </Link>
+                    </CardContent>
+                  </Card>
+                </FadeInSection>
+              ))}
+            </div>
+          </div>
+        </section>
+      </FadeInSection>
+
       {/* Registration Process */}
       <FadeInSection>
         <section className="py-20 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white">
@@ -455,118 +567,6 @@ export default function PrivateLimitedCompanyPage() {
                   </CardContent>
                 </Card>
               </div>
-            </div>
-          </div>
-        </section>
-      </FadeInSection>
-
-      {/* Pricing */}
-      <FadeInSection>
-        <section className="py-20 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white">
-          <div className="container mx-auto px-4">
-            <div className="text-center space-y-6 mb-16">
-              <h2 className="text-4xl font-bold">Transparent Pricing</h2>
-              <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-                No hidden charges. What you see is what you pay. Choose the package that suits your needs.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              {[
-                {
-                  name: "Basic Package",
-                  price: "BASIC",
-                  popular: false,
-                  features: [
-                    "Company Name Search & Reservation",
-                    "DSC for 2 Directors",
-                    "DIN for 2 Directors",
-                    "MOA & AOA Drafting",
-                    "Company Incorporation",
-                    "Certificate of Incorporation",
-                    "PAN & TAN Application",
-                  ],
-                },
-                {
-                  name: "Standard Package",
-                  price: "STANDARD",
-                  popular: true,
-                  features: [
-                    "Company Name Search & Reservation",
-                    "DSC for 2 Directors",
-                    "DIN for 2 Directors",
-                    "MOA & AOA Drafting",
-                    "Company Incorporation",
-                    "Certificate of Incorporation",
-                    "PAN & TAN Application",
-                    "GST Filing",
-
-                  ],
-                },
-                {
-                  name: "Premium Package",
-                  price: "PREMIUM",
-                  popular: false,
-                  features: [
-                    "Company Name Search & Reservation",
-                    "DSC for 2 Directors",
-                    "DIN for 2 Directors",
-                    "MOA & AOA Drafting",
-                    "Company Incorporation",
-                    "Certificate of Incorporation",
-                    "PAN & TAN Application",
-                    "GST Filing",
-                    "EPFO Registration",
-                    "ESI Registration",
-                    "PT Tax Registration",
-                    "Bank Account Opening Assistance",
-                    "Detailed MOA & AOA Drafting",
-                    "Expert Assistance"
-                  ],
-                },
-              ].map((pkg, index) => (
-                <FadeInSection key={index} delay={index * 100}>
-                  <Card
-                    className={`relative border-2 hover:shadow-2xl transition-all duration-300 hover:scale-105 ${
-                      pkg.popular
-                        ? "border-blue-400 bg-white/15 backdrop-blur-sm"
-                        : "border-white/20 bg-white/10 backdrop-blur-sm"
-                    }`}
-                  >
-                    {pkg.popular && (
-                      <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                        <Badge className="bg-blue-400 text-blue-900 px-4 py-1">Most Popular</Badge>
-                      </div>
-                    )}
-                    <CardHeader className="text-center">
-                      <CardTitle className="text-2xl font-bold">{pkg.name}</CardTitle>
-                      <div className="text-4xl font-bold text-blue-400 my-4">
-                        <PackagePricingDisplay serviceName="private limited company" packageType={pkg.price as "BASIC" | "STANDARD" | "PREMIUM" } />
-                      </div>
-                      <p className="text-blue-100">One-time payment</p>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {pkg.features.map((feature, idx) => (
-                        <div key={idx} className="flex items-center space-x-3">
-                          <CheckCircle className="h-5 w-5 text-blue-400 flex-shrink-0" />
-                          <span className="text-blue-100 text-sm">{feature}</span>
-                        </div>
-                      ))}
-                      <Link href={`/dashboard/company-formation?service=${encodeURIComponent("Private Limited Company")}`} passHref>
-                        <Button
-                          className={`w-full mt-6 ${
-                            pkg.popular
-                              ? "bg-blue-400 text-blue-900 hover:bg-blue-300"
-                              : "bg-white/20 text-white hover:bg-white/30"
-                          } transition-all duration-300 hover:scale-105`}
-                        >
-                          Choose This Package
-                        </Button>
-                      </Link>
-                    </CardContent>
-                  </Card>
-                </FadeInSection>
-              ))}
             </div>
           </div>
         </section>

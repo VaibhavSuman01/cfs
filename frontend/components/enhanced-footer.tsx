@@ -434,9 +434,12 @@ export function EnhancedFooter() {
               <p className="text-gray-400 text-sm mb-2">
                 &copy; 2024 Com Financial Services. All rights reserved.
               </p>
-              <p className="text-gray-500 text-xs">
+              <p className="text-gray-500 text-xs mb-2">
                 Empowering businesses across India with trusted financial
                 solutions.
+              </p>
+              <p className="text-gray-500 text-xs">
+                * Prices vary based on company size, complexity, and industry standards
               </p>
             </div>
 

@@ -148,8 +148,8 @@ const PRICING_RAW: Record<string, ServicePricing> = {
     tooltip: "Prices may vary based on complexity and industry standards"
   },
   "public limited company": { 
-    basePrice: "₹15,999*", 
-    packages: { BASIC: "₹15,999*", STANDARD: "₹24,999*", PREMIUM: "₹30,999*" },
+    basePrice: "₹14,999*", 
+    packages: { BASIC: "₹14,999*", STANDARD: "₹24,999*", PREMIUM: "₹30,999*" },
     tooltip: "Prices may vary based on complexity and industry standards"
   },
   "private limited company": { 
