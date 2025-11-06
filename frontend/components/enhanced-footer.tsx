@@ -39,13 +39,22 @@ export function EnhancedFooter() {
       name: "Sole Proprietorship",
       href: "/other-registration/sole-proprietorship",
     },
-    { name: "MSME/Udyam Registration", href: "/other-registration/msme-udyam-registration" },
+    {
+      name: "MSME/Udyam Registration",
+      href: "/other-registration/msme-udyam-registration",
+    },
     { name: "EPFO Registration", href: "/other-registration/epfo" },
     { name: "ESIC Registration", href: "/other-registration/esic" },
     { name: "PT Tax Registration", href: "/other-registration/pt-tax" },
     { name: "IEC Registration", href: "/other-registration/iec-registration" },
-    { name: "Gumusta / Shop Registration", href: "/other-registration/gumusta-shop-registration" },
-    { name: "Fassai (Food) Licence", href: "/other-registration/fassai-food-license" },
+    {
+      name: "Gumusta / Shop Registration",
+      href: "/other-registration/gumusta-shop-registration",
+    },
+    {
+      name: "Fassai (Food) Licence",
+      href: "/other-registration/fassai-food-license",
+    },
     { name: "Industry Licence", href: "/other-registration/industry-license" },
     { name: "NGO Registration", href: "/other-registration/ngo-registration" },
     { name: "PAN Application", href: "/other-registration/pan-apply" },
@@ -89,8 +98,14 @@ export function EnhancedFooter() {
   const legalServices = [
     { name: "Trademark Registration", href: "/trademark-iso/trademark" },
     { name: "ISO 9001 Certification", href: "/trademark-iso/iso-9001" },
-    { name: "ISO 14001 Certification", href: "/trademark-iso/iso-14001-certification" },
-    { name: "Copyright Registration", href: "/trademark-iso/copyright-registration" },
+    {
+      name: "ISO 14001 Certification",
+      href: "/trademark-iso/iso-14001-certification",
+    },
+    {
+      name: "Copyright Registration",
+      href: "/trademark-iso/copyright-registration",
+    },
   ];
 
   const advisoryServices = [
@@ -116,8 +131,14 @@ export function EnhancedFooter() {
     },
     { name: "Startup Mentoring", href: "/advisory/startup-mentoring" },
     { name: "Tax Plan Analysis", href: "/advisory/tax-plan-analysis" },
-    { name: "Assistance for Fund Raising", href: "/advisory/assistance-for-fund-raising" },
-    { name: "Other Finance Related Services", href: "/advisory/other-finance-related-services" },
+    {
+      name: "Assistance for Fund Raising",
+      href: "/advisory/assistance-for-fund-raising",
+    },
+    {
+      name: "Other Finance Related Services",
+      href: "/advisory/other-finance-related-services",
+    },
   ];
 
   const toolsServices = [
@@ -310,9 +331,7 @@ export function EnhancedFooter() {
             {/* Reports */}
             <div className="space-y-6">
               <div className="space-y-1">
-                <h3 className="text-xl font-bold text-blue-300">
-                  Reports
-                </h3>
+                <h3 className="text-xl font-bold text-blue-300">Reports</h3>
                 <div className="w-12 h-1 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
               </div>
               <div className="space-y-3">
@@ -356,9 +375,7 @@ export function EnhancedFooter() {
             {/* ROC Returns */}
             <div className="space-y-6">
               <div className="space-y-1">
-                <h3 className="text-xl font-bold text-blue-300">
-                  ROC Returns
-                </h3>
+                <h3 className="text-xl font-bold text-blue-300">ROC Returns</h3>
                 <div className="w-12 h-1 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
               </div>
               <div className="space-y-3">
@@ -428,7 +445,7 @@ export function EnhancedFooter() {
         </div>
 
         {/* Bottom Section */}
-        <div className="mt-16 pt-8 border-t border-gray-700">
+        <div className="mt-8 pt-4 border-t border-gray-700">
           <div className="flex flex-col lg:flex-row justify-between items-center space-y-6 lg:space-y-0">
             <div className="text-center lg:text-left">
               <p className="text-gray-400 text-sm mb-2">
@@ -439,7 +456,8 @@ export function EnhancedFooter() {
                 solutions.
               </p>
               <p className="text-gray-500 text-xs">
-                * Prices vary based on company size, complexity, and industry standards
+                * Prices vary based on company size, complexity, and industry
+                standards
               </p>
             </div>
 
