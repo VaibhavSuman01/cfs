@@ -200,7 +200,9 @@ export default function LlpRegistrationPage() {
                   <CardTitle className="text-2xl font-bold text-blue-600">
                     Basic
                   </CardTitle>
-                  <div className="text-4xl font-bold text-gray-900">₹7,999</div>
+                  <div className="text-4xl font-bold text-gray-900">
+                    ₹7,999*
+                  </div>
                   <p className="text-sm text-gray-600">Starting Price</p>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -236,7 +238,9 @@ export default function LlpRegistrationPage() {
                   <CardTitle className="text-2xl font-bold text-blue-600">
                     Standard
                   </CardTitle>
-                  <div className="text-4xl font-bold text-gray-900">₹9,999</div>
+                  <div className="text-4xl font-bold text-gray-900">
+                    ₹9,999*
+                  </div>
                   <p className="text-sm text-gray-600">Most Popular</p>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -277,7 +281,7 @@ export default function LlpRegistrationPage() {
                     Premium
                   </CardTitle>
                   <div className="text-4xl font-bold text-gray-900">
-                    ₹14,999
+                    ₹14,999*
                   </div>
                   <p className="text-sm text-gray-600">Complete Solution</p>
                 </CardHeader>
