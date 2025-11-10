@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { EnhancedHeader } from '@/components/enhanced-header';
 import { EnhancedFooter } from "@/components/enhanced-footer";
+import { FadeInSection } from "@/components/fade-in-section";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,29 +37,35 @@ export default function HRACalculator() {
   const calculateHRA = () => {
     const { basicSalary, hraReceived, rentPaid, cityType, rentPaidTo } = formData;
     
-    // Calculate HRA exemption based on the three conditions
+    // Calculate HRA exemption based on the three conditions (as per Indian Income Tax Act)
     const condition1 = hraReceived; // Actual HRA received
-    const condition2 = rentPaid - (basicSalary * 0.1); // Rent paid minus 10% of basic salary
+    const condition2 = Math.max(0, rentPaid - (basicSalary * 0.1)); // Rent paid minus 10% of basic salary (must be >= 0)
     const condition3 = cityType === "metro" ? basicSalary * 0.5 : basicSalary * 0.4; // 50% of basic for metro, 40% for non-metro
     
     // HRA exemption is the minimum of the three conditions
-    const hraExemption = Math.min(condition1, Math.max(condition2, 0), condition3);
+    const hraExemption = Math.min(condition1, condition2, condition3);
     
-    // If rent is paid to relative, additional conditions apply
+    // If rent is paid to relative, additional scrutiny applies (IT Act provisions)
+    // Rent should be at fair market value, but for calculator purposes, we allow it
     let finalHraExemption = hraExemption;
     if (rentPaidTo === "relative") {
-      // If rent is paid to relative, it should be reasonable and not excessive
-      // For simplicity, we'll apply a 80% rule (can be adjusted based on actual rent)
-      finalHraExemption = Math.min(hraExemption, rentPaid * 0.8);
+      // IT Department may scrutinize if rent is excessive
+      // For calculation, we apply the exemption but note this in the display
+      finalHraExemption = hraExemption;
     }
     
-    const taxableHra = hraReceived - finalHraExemption;
+    const taxableHra = Math.max(0, hraReceived - finalHraExemption);
     
-    // Calculate tax saving (assuming 30% tax rate for simplicity)
-    const taxSaving = finalHraExemption * 0.3;
+    // Estimate tax saving (assuming average tax rate)
+    // This is an approximation - actual tax saving depends on tax slab
+    const estimatedTaxRate = basicSalary > 1500000 ? 0.30 : 
+                             basicSalary > 1200000 ? 0.20 :
+                             basicSalary > 900000 ? 0.15 :
+                             basicSalary > 600000 ? 0.10 : 0.05;
+    const taxSaving = finalHraExemption * estimatedTaxRate;
     
-    // Calculate effective rate
-    const effectiveRate = (finalHraExemption / hraReceived) * 100;
+    // Calculate effective exemption rate
+    const effectiveRate = hraReceived > 0 ? (finalHraExemption / hraReceived) * 100 : 0;
     
     setResults({
       basicSalary,
@@ -97,21 +104,19 @@ export default function HRACalculator() {
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50">
       <EnhancedHeader />
       
-      <main className="pt-20 pb-16">
-        <div className="container mx-auto px-4 py-8">
-          <div className="max-w-4xl mx-auto">
-            {/* Header */}
-            <div className="text-center mb-8">
-              <div className="flex items-center justify-center gap-3 mb-4">
-                <div className="p-3 bg-emerald-100 rounded-full">
-                  <Home className="w-8 h-8 text-emerald-600" />
-                </div>
-                <h1 className="text-4xl font-bold text-gray-900">HRA Calculator</h1>
+      <main className="pt-20">
+        <FadeInSection className="py-8">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              {/* Header */}
+              <div className="text-center mb-8">
+                <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                  HRA Calculator
+                </h1>
+                <p className="text-xl text-gray-600">
+                  Calculate your House Rent Allowance (HRA) exemption and maximize your tax savings
+                </p>
               </div>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                Calculate your House Rent Allowance (HRA) exemption and maximize your tax savings.
-              </p>
-            </div>
 
             <div className="grid lg:grid-cols-2 gap-8">
               {/* Input Form */}
@@ -356,8 +361,9 @@ export default function HRACalculator() {
                 </div>
               </CardContent>
             </Card>
+            </div>
           </div>
-        </div>
+        </FadeInSection>
       </main>
 
       <EnhancedFooter />

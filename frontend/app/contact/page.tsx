@@ -61,8 +61,10 @@ const SERVICE_OPTIONS: Record<string, string[]> = {
     "Business Strategy Consulting",
     "Financial Planning & Analysis",
     "HR & Organizational Development",
+    "Legal & Compliance Advisory",
     "Assistance for Fund Raising",
-    "Tax Plan & Analysis",
+    "Startup Mentoring",
+    "Tax Plan Analysis",
     "Other Finance Related Services",
     "Other",
   ],
@@ -97,23 +99,41 @@ export default function ContactPage() {
 
   useEffect(() => {
     const serviceParam = searchParams.get('service');
+    const subServiceParam = searchParams.get('subService');
+    
     if (serviceParam) {
-      // Try to find which service this sub-service belongs to
-      const entries = Object.entries(SERVICE_OPTIONS)
-      let matchedParent: string | null = null
-      for (const [parent, subs] of entries) {
-        if (subs.includes(serviceParam)) {
-          matchedParent = parent
-          break
+      // If service is "Advisory", set it directly
+      if (serviceParam === 'Advisory') {
+        setService('Advisory')
+        if (subServiceParam) {
+          setSubService(subServiceParam)
         }
-      }
-      if (matchedParent) {
-        setService(matchedParent)
-        setSubService(serviceParam)
       } else {
-        // If not found in predefined list, categorize under Other
-        setService('Other')
-        setSubService(serviceParam)
+        // Try to find which service category this belongs to
+        const entries = Object.entries(SERVICE_OPTIONS)
+        let matchedParent: string | null = null
+        for (const [parent, subs] of entries) {
+          if (subs.includes(serviceParam)) {
+            matchedParent = parent
+            break
+          }
+        }
+        if (matchedParent) {
+          setService(matchedParent)
+          setSubService(serviceParam)
+        } else {
+          // Check if it's a direct service category name
+          if (Object.keys(SERVICE_OPTIONS).includes(serviceParam)) {
+            setService(serviceParam)
+            if (subServiceParam) {
+              setSubService(subServiceParam)
+            }
+          } else {
+            // If not found in predefined list, set as service and subService
+            setService('Other')
+            setSubService(serviceParam)
+          }
+        }
       }
     }
   }, [searchParams]);

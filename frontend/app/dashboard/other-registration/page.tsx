@@ -31,7 +31,7 @@ const otherRegistrationSchema = z.object({
   state: z.string().min(1, "State is required"),
   pincode: z.string().min(6, "Pincode must be at least 6 digits"),
   registrationPurpose: z.string().optional(),
-  description: z.string().min(1, "Business detail/description is required"),
+  description: z.string().optional(),
 });
 
 type OtherRegistrationValues = z.infer<typeof otherRegistrationSchema>;
@@ -111,6 +111,10 @@ export default function OtherRegistrationPage() {
         }
       });
 
+      // Add service and subService fields for backend compatibility
+      formData.append("service", "Other Registration");
+      formData.append("subService", data.registrationType);
+
       // Append specific document files
       if (aadhaarFile) formData.append("aadhaarFile", aadhaarFile);
       if (panFile) formData.append("panFile", panFile);
@@ -131,17 +135,21 @@ export default function OtherRegistrationPage() {
         formData.append("documents", file);
       });
 
-      await api.post(API_PATHS.FORMS.OTHER_REGISTRATION, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      await api.post(API_PATHS.FORMS.OTHER_REGISTRATION, formData);
 
       toast.success("Registration application submitted successfully");
       router.push("/dashboard/other-registration");
     } catch (error) {
       console.error("Failed to submit registration form:", error);
-      toast.error("Failed to submit registration application. Please try again.");
+      
+      // Handle specific error cases
+      if (error.response?.status === 400 && error.response?.data?.message?.includes("already exists")) {
+        toast.error("Already submitted for this Year. You can only submit one form per service.");
+      } else if (error.response?.status === 409) {
+        toast.error("Already submitted for this Year. You can only submit one form per service.");
+      } else {
+        toast.error("Failed to submit registration application. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -278,6 +286,32 @@ export default function OtherRegistrationPage() {
                   />
                   <FormField
                     control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email *</FormLabel>
+                        <FormControl>
+                          <Input type="email" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone *</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
                     name="pan"
                     render={({ field }) => (
                       <FormItem>
@@ -297,32 +331,6 @@ export default function OtherRegistrationPage() {
                         <FormLabel>Aadhaar Number *</FormLabel>
                         <FormControl>
                           <Input {...field} placeholder="123456789012" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>3. Mobile No. (Text) *</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>4. Email (Text) *</FormLabel>
-                        <FormControl>
-                          <Input type="email" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -376,7 +384,7 @@ export default function OtherRegistrationPage() {
                     name="businessName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>9. Business Name (Text) *</FormLabel>
+                        <FormLabel>Business Name *</FormLabel>
                         <FormControl>
                           <Input {...field} placeholder="Enter business name" />
                         </FormControl>
@@ -465,50 +473,42 @@ export default function OtherRegistrationPage() {
                     )}
                   />
                 </div>
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>10. Business Detail/Descriptions *</FormLabel>
-                        <FormControl>
-                          <Textarea {...field} rows={4} placeholder="Provide detailed description of your business, its activities, and any other relevant information" />
-                        </FormControl>
-                        <FormMessage />
-                        <p className="text-xs text-muted-foreground">
-                          Please provide a comprehensive description of your business activities and details.
-                        </p>
-                      </FormItem>
-                    )}
-                  />
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Additional Information</FormLabel>
+                      <FormControl>
+                        <Textarea {...field} rows={3} placeholder="Any additional information about your registration" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
 
               {/* Document Upload */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Document Requirements</h3>
                 <div className="bg-blue-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-blue-900 mb-2">Required Documents (Upload as Jpeg/Jpg/Pdf/Png):</h4>
+                  <h4 className="font-medium text-blue-900 mb-2">Required Documents:</h4>
                   <ul className="text-sm text-blue-800 space-y-1">
-                    <li>1. Aadhaar Card</li>
-                    <li>2. PAN Card</li>
-                    <li>3. Mobile No. (Text) - Already provided above</li>
-                    <li>4. Email (Text) - Already provided above</li>
-                    <li>5. Bank Statement / Cancel Check</li>
-                    <li>6. GST (If available)</li>
-                    <li>7. Electricity Bill</li>
-                    <li>8. Rent Agreement</li>
-                    <li>9. Business Name (Text) - Already provided above</li>
-                    <li>10. Business Detail/Descriptions (Text Box) - Already provided above</li>
-                    <li>11. Any Other Documents (Excel, Zip, Pdf, Word)</li>
+                    <li>• Aadhaar Card (JPG/PNG/PDF)</li>
+                    <li>• PAN Card (JPG/PNG/PDF)</li>
+                    <li>• Bank Statement / Cancel Check (PDF)</li>
+                    <li>• GST Certificate (If available) (PDF)</li>
+                    <li>• Electricity Bill (PDF)</li>
+                    <li>• Rent Agreement (PDF)</li>
+                    <li>• Business Name (Text)</li>
+                    <li>• Business Detail/Descriptions (Text Box)</li>
+                    <li>• Any Other Documents (Excel, Zip, Pdf, Word)</li>
                   </ul>
-                  <p className="text-xs text-blue-600 mt-2 italic">
-                    Note: Required documents shall be subject to change from time to time in accordance with applicable laws, acts, rules, notifications, circulars, court judgments, and other provisions issued by the Government of India.
-                  </p>
                 </div>
 
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="aadhaar-file">1. Aadhaar Card (JPG/PNG/PDF) *</Label>
+                    <Label htmlFor="aadhaar-file">Aadhaar Card (JPG/PNG/PDF) *</Label>
                     <Input
                       id="aadhaar-file"
                       type="file"
@@ -524,7 +524,7 @@ export default function OtherRegistrationPage() {
                   </div>
 
                   <div>
-                    <Label htmlFor="pan-file">2. PAN Card (JPG/PNG/PDF) *</Label>
+                    <Label htmlFor="pan-file">PAN Card (JPG/PNG/PDF) *</Label>
                     <Input
                       id="pan-file"
                       type="file"
@@ -652,27 +652,11 @@ export default function OtherRegistrationPage() {
                   </div>
 
                   <div>
-                    <Label htmlFor="cancel-check-file">5. Bank Statement / Cancel Check (JPG/PNG/PDF) *</Label>
-                    <Input
-                      id="cancel-check-file"
-                      type="file"
-                      accept=".jpg,.jpeg,.png,.pdf"
-                      onChange={handleCancelCheckFileChange}
-                      className="mt-1"
-                    />
-                    {cancelCheckFile && (
-                      <p className="text-sm text-green-600 mt-1">
-                        ✓ {cancelCheckFile.name} selected
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <Label htmlFor="gst-file">6. GST (If available) (JPG/PNG/PDF)</Label>
+                    <Label htmlFor="gst-file">GST Certificate (If available) (PDF)</Label>
                     <Input
                       id="gst-file"
                       type="file"
-                      accept=".jpg,.jpeg,.png,.pdf"
+                      accept=".pdf"
                       onChange={handleGstFileChange}
                       className="mt-1"
                     />
@@ -681,17 +665,14 @@ export default function OtherRegistrationPage() {
                         ✓ {gstFile.name} selected
                       </p>
                     )}
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Optional: Upload only if GST certificate is available
-                    </p>
                   </div>
 
                   <div>
-                    <Label htmlFor="electricity-bill-file">7. Electricity Bill (JPG/PNG/PDF) *</Label>
+                    <Label htmlFor="electricity-bill-file">Electricity Bill (PDF)</Label>
                     <Input
                       id="electricity-bill-file"
                       type="file"
-                      accept=".jpg,.jpeg,.png,.pdf"
+                      accept=".pdf"
                       onChange={handleElectricityBillFileChange}
                       className="mt-1"
                     />
@@ -703,11 +684,11 @@ export default function OtherRegistrationPage() {
                   </div>
 
                   <div>
-                    <Label htmlFor="rent-agreement-file">8. Rent Agreement (JPG/PNG/PDF) *</Label>
+                    <Label htmlFor="rent-agreement-file">Rent Agreement (PDF)</Label>
                     <Input
                       id="rent-agreement-file"
                       type="file"
-                      accept=".jpg,.jpeg,.png,.pdf"
+                      accept=".pdf"
                       onChange={handleRentAgreementFileChange}
                       className="mt-1"
                     />
@@ -719,7 +700,23 @@ export default function OtherRegistrationPage() {
                   </div>
 
                   <div>
-                    <Label htmlFor="documents">11. Any Other Documents (Excel, Zip, Pdf, Word)</Label>
+                    <Label htmlFor="cancel-check-file">Bank Statement / Cancel Check (PDF)</Label>
+                    <Input
+                      id="cancel-check-file"
+                      type="file"
+                      accept=".pdf"
+                      onChange={handleCancelCheckFileChange}
+                      className="mt-1"
+                    />
+                    {cancelCheckFile && (
+                      <p className="text-sm text-green-600 mt-1">
+                        ✓ {cancelCheckFile.name} selected
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <Label htmlFor="documents">Any Other Documents (Excel, Zip, Pdf, Word)</Label>
                     <Input
                       id="documents"
                       type="file"

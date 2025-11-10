@@ -67,7 +67,7 @@ export default function DocumentDisplay({
           downloadUrl = `/api/forms/advisory/download/${docId}`;
           break;
         case 'CompanyForm':
-          downloadUrl = `/api/forms/company-information/download/${docId}`;
+          downloadUrl = `/api/forms/company-formation/download/${docId}`;
           break;
         case 'OtherRegistrationForm':
           downloadUrl = `/api/forms/other-registration/download/${docId}`;

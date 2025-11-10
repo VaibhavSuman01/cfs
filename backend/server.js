@@ -280,46 +280,82 @@ const syncAllIndexes = async () => {
   }
 };
 
-// Connect to MongoDB with optimized settings for serverless
-mongoose
-  .connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    maxPoolSize: 10, // Maintain up to 10 socket connections
-    serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
-    socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
-    bufferCommands: true, // Enable mongoose buffering for serverless environments
-    maxIdleTimeMS: 30000, // Close connections after 30 seconds of inactivity
-    family: 4, // Use IPv4, skip trying IPv6
-  })
-  .then(async () => {
-    logger.info("Connected to MongoDB", {
-      database: process.env.MONGODB_URI?.split("@")[1]?.split("/")[0],
-    });
-
-    // Sync all model indexes
+// Connect to MongoDB with optimized settings and retry logic
+const connectWithRetry = async (retries = 3, delay = 5000) => {
+  for (let i = 0; i < retries; i++) {
     try {
-      await syncAllIndexes();
-      logger.info("All model indexes synced successfully");
-    } catch (err) {
-      logger.error("Error syncing model indexes:", {
-        error: err.message,
-        stack: err.stack,
+      await mongoose.connect(process.env.MONGODB_URI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        maxPoolSize: 10, // Maintain up to 10 socket connections
+        serverSelectionTimeoutMS: 10000, // Increased timeout for DNS resolution
+        socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+        bufferCommands: true, // Enable mongoose buffering for serverless environments
+        maxIdleTimeMS: 30000, // Close connections after 30 seconds of inactivity
+        family: 4, // Use IPv4, skip trying IPv6
       });
-      // Continue server startup even if index syncing fails
-    }
 
-    // Start cleanup job for expired password reset tokens
-    startTokenCleanupJob();
-    logger.info("Password reset token cleanup job started");
-  })
-  .catch((err) => {
-    logger.error("MongoDB connection error:", {
-      error: err.message,
-      stack: err.stack,
-    });
-    process.exit(1);
-  });
+      logger.info("Connected to MongoDB", {
+        database: process.env.MONGODB_URI?.split("@")[1]?.split("/")[0] || "unknown",
+      });
+
+      // Sync all model indexes
+      try {
+        await syncAllIndexes();
+        logger.info("All model indexes synced successfully");
+      } catch (err) {
+        logger.error("Error syncing model indexes:", {
+          error: err.message,
+          stack: err.stack,
+        });
+        // Continue server startup even if index syncing fails
+      }
+
+      // Start cleanup job for expired password reset tokens
+      startTokenCleanupJob();
+      logger.info("Password reset token cleanup job started");
+      
+      return; // Success, exit retry loop
+    } catch (err) {
+      logger.error(`MongoDB connection attempt ${i + 1}/${retries} failed:`, {
+        error: err.message,
+        code: err.code,
+      });
+
+      // Provide helpful error messages
+      if (err.message.includes("querySrv ESERVFAIL") || err.message.includes("ESERVFAIL")) {
+        logger.error("DNS Resolution Error: Cannot resolve MongoDB Atlas SRV record.", {
+          suggestions: [
+            "1. Check your internet connection",
+            "2. Verify DNS server settings (try using 8.8.8.8 or 1.1.1.1)",
+            "3. Check if MongoDB Atlas cluster is active (not paused)",
+            "4. Verify MONGODB_URI in .env file is correct",
+            "5. Check firewall/proxy settings blocking DNS queries",
+            "6. Try: nslookup _mongodb._tcp.cluster0.mixicet.mongodb.net"
+          ]
+        });
+      }
+
+      if (i < retries - 1) {
+        logger.info(`Retrying MongoDB connection in ${delay / 1000} seconds...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      } else {
+        // Last attempt failed
+        logger.error("MongoDB connection failed after all retry attempts", {
+          error: err.message,
+          stack: err.stack,
+        });
+        logger.error("Server will continue but database operations will fail until connection is established.");
+        // Don't exit - let server start without DB (for development/debugging)
+        // Uncomment the line below if you want the server to exit on DB connection failure:
+        // process.exit(1);
+      }
+    }
+  }
+};
+
+// Start connection with retry
+connectWithRetry();
 
 // Basic route for testing
 app.get("/", (req, res) => {

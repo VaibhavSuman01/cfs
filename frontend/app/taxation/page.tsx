@@ -1,13 +1,36 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { EnhancedHeader } from "@/components/enhanced-header";
 import { EnhancedFooter } from "@/components/enhanced-footer";
-import { FadeInSection } from "@/components/fade-in-section"
-import { Calculator, FileText, TrendingUp, Shield, CheckCircle, ArrowRight, Clock, Users, Building } from "lucide-react"
+import { FadeInSection } from "@/components/fade-in-section";
+import {
+  Calculator,
+  FileText,
+  TrendingUp,
+  Shield,
+  CheckCircle,
+  ArrowRight,
+  Clock,
+  Users,
+  Building,
+} from "lucide-react";
 import Link from "next/link";
-import { PricingDisplay } from "@/components/ui/pricing-display"
+import { PricingDisplay } from "@/components/ui/pricing-display";
+import {
+  getServiceCardClasses,
+  getServiceBackgroundColor,
+  getServiceIconColor,
+  getServicePriceColor,
+  getServicePageHeroBackground,
+} from "@/lib/service-colors";
 
 export default function TaxationPage() {
   return (
@@ -15,13 +38,19 @@ export default function TaxationPage() {
       <EnhancedHeader />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-100 py-20">
+      <section
+        className={`relative overflow-hidden ${getServicePageHeroBackground(
+          "Taxation"
+        )} py-20`}
+      >
         <div className="container mx-auto px-4">
           <FadeInSection className="text-center space-y-8">
-            <h1 className="text-5xl font-bold text-gray-900">Taxation Services</h1>
+            <h1 className="text-5xl font-bold text-gray-900">
+              Taxation Services
+            </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Complete tax compliance solutions including GST registration, income tax filing, TDS returns, and tax
-              planning services.
+              Complete tax compliance solutions including GST registration,
+              income tax filing, TDS returns, and tax planning services.
             </p>
           </FadeInSection>
         </div>
@@ -32,8 +61,12 @@ export default function TaxationPage() {
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center space-y-4 mb-16">
-              <h2 className="text-4xl font-bold text-gray-900">Our Tax Services</h2>
-              <p className="text-xl text-gray-600">Comprehensive tax solutions for individuals and businesses</p>
+              <h2 className="text-4xl font-bold text-gray-900">
+                Our Tax Services
+              </h2>
+              <p className="text-xl text-gray-600">
+                Comprehensive tax solutions for individuals and businesses
+              </p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -42,22 +75,23 @@ export default function TaxationPage() {
                   icon: TrendingUp,
                   title: "GST Filing",
                   button: "gst-filing",
-                  description: "Registration and monthly/quarterly GST compliance (GSTR-1, GSTR-3B) with ITC support",
+                  description:
+                    "Monthly/quarterly GST compliance (GSTR-1, GSTR-3B) with ITC support",
                   features: [
-                    "GST registration & portal setup",
                     "GSTR-1 (outward supplies) filing",
                     "GSTR-3B summary return filing",
                     "E-invoice/e-way bill guidance",
                     "Input Tax Credit reconciliation",
                   ],
-                  priceKey: "gst registration",
+                  priceKey: "gst filing",
                   timeline: "3-7 days",
                 },
                 {
                   icon: FileText,
                   title: "Income Tax Filing",
                   button: "income-tax",
-                  description: "ITR preparation and e-filing (ITR-1 to ITR-7), refunds and compliance support",
+                  description:
+                    "ITR preparation and e-filing (ITR-1 to ITR-7), refunds and compliance support",
                   features: [
                     "Form 16/AIS/26AS-based return prep",
                     "ITR-1 to ITR-7 applicability guidance",
@@ -72,7 +106,8 @@ export default function TaxationPage() {
                   icon: Calculator,
                   title: "TDS Returns",
                   button: "tds-returns",
-                  description: "Quarterly TDS/TCS e-returns and TRACES compliance (24Q/26Q/27Q/27EQ)",
+                  description:
+                    "Quarterly TDS/TCS e-returns and TRACES compliance (24Q/26Q/27Q/27EQ)",
                   features: [
                     "Quarterly Form 24Q/26Q/27Q/27EQ",
                     "Challan (OIN) mapping & validation",
@@ -87,7 +122,8 @@ export default function TaxationPage() {
                   icon: Shield,
                   title: "Tax Planning",
                   button: "tax-planning",
-                  description: "Year-round planning covering 80C/80D deductions, HRA/LTA and capital gains",
+                  description:
+                    "Year-round planning covering 80C/80D deductions, HRA/LTA and capital gains",
                   features: [
                     "Section 80C/80D/80G optimization",
                     "HRA, LTA and perquisite planning",
@@ -102,7 +138,8 @@ export default function TaxationPage() {
                   icon: Building,
                   title: "Corporate Tax",
                   button: "corporate-tax-filing",
-                  description: "Corporate ITR, tax audit support, MAT/115BAA options and TP compliance",
+                  description:
+                    "Corporate ITR, tax audit support, MAT/115BAA options and TP compliance",
                   features: [
                     "Company ITR and schedules (ROI)",
                     "Tax audit (3CA/3CB-3CD) assistance",
@@ -117,7 +154,8 @@ export default function TaxationPage() {
                   icon: Users,
                   title: "Payroll Tax",
                   button: "payroll-tax",
-                  description: "End-to-end payroll compliance: TDS on salary, PF, ESI and PT",
+                  description:
+                    "End-to-end payroll compliance: TDS on salary, PF, ESI and PT",
                   features: [
                     "Monthly payroll and TDS (Form 24Q)",
                     "Form 16 generation and distribution",
@@ -130,24 +168,26 @@ export default function TaxationPage() {
                 },
                 {
                   icon: Calculator,
-                  title:"EPFO Filing",
-                  button:"epfo-filing",
-                  description:"EPF registration and monthly ECR filing with challan payment support",
-                  features:[
+                  title: "EPFO Filing",
+                  button: "epfo-filing",
+                  description:
+                    "EPF registration and monthly ECR filing with challan payment support",
+                  features: [
                     "EPF registration & code allotment",
                     "UAN/KYC onboarding for employees",
                     "Monthly ECR preparation & payment",
                     "Return filing & ledger reconciliation",
                     "Inspections and compliance advisory",
                   ],
-                  price:"As per request",
-                  timeline:"3-7 days"
+                  priceKey: "EPFO filing",
+                  timeline: "3-7 days",
                 },
                 {
                   icon: Shield,
                   title: "ESIC Filing",
                   button: "esic-filing",
-                  description: "ESIC registration, monthly contributions and return compliance",
+                  description:
+                    "ESIC registration, monthly contributions and return compliance",
                   features: [
                     "Employer code registration",
                     "IP (employee) registration & KYC",
@@ -155,14 +195,15 @@ export default function TaxationPage() {
                     "Half-yearly return compliance",
                     "Inspection/audit assistance",
                   ],
-                  price: "As per request",
+                  priceKey: "ESIC filing",
                   timeline: "3-7 days",
                 },
                 {
                   icon: FileText,
                   title: "PT-Tax Filing",
                   button: "pt-tax-filing",
-                  description: "Professional Tax registration and monthly/annual filing as per state rules",
+                  description:
+                    "Professional Tax registration and monthly/annual filing as per state rules",
                   features: [
                     "PT registration and enrollment",
                     "Slab-wise employee classification",
@@ -170,38 +211,45 @@ export default function TaxationPage() {
                     "State-specific compliance calendar",
                     "Notices and assessment support",
                   ],
-                  price: "As per request",
+                  priceKey: "PT tax filing",
                   timeline: "2-5 days",
                 },
               ].map((service, index) => (
                 <FadeInSection key={index} delay={index * 100}>
-                  <Card className="border-2 border-gray-200 hover:border-blue-300 hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group">
+                  <Card className={getServiceCardClasses("Taxation")}>
                     <CardHeader className="text-center">
-                      <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-blue-200 transition-colors">
-                        <service.icon className="h-8 w-8 text-blue-600 group-hover:scale-110 transition-transform" />
+                      <div className={getServiceBackgroundColor("Taxation")}>
+                        <service.icon
+                          className={getServiceIconColor("Taxation")}
+                        />
                       </div>
-                      <CardTitle className="text-xl text-gray-900">{service.title}</CardTitle>
+                      <CardTitle className="text-xl text-gray-900">
+                        {service.title}
+                      </CardTitle>
                       <div className="space-y-2">
-                        <div className="text-2xl font-bold text-blue-600">
-                          {service.priceKey ? (
-                            <PricingDisplay serviceName={service.priceKey} />
-                          ) : (
-                            service.price
-                          )}
+                        <div className={getServicePriceColor("Taxation")}>
+                          <PricingDisplay serviceName={service.priceKey} />
                         </div>
                         <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
                           <Clock className="h-4 w-4" />
                           <span>{service.timeline}</span>
                         </div>
                       </div>
-                      <CardDescription className="text-gray-600">{service.description}</CardDescription>
+                      <CardDescription className="text-gray-600">
+                        {service.description}
+                      </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="space-y-3">
                         {service.features.map((feature, idx) => (
-                          <div key={idx} className="flex items-center space-x-2">
+                          <div
+                            key={idx}
+                            className="flex items-center space-x-2"
+                          >
                             <CheckCircle className="h-4 w-4 text-blue-500" />
-                            <span className="text-sm text-gray-600">{feature}</span>
+                            <span className="text-sm text-gray-600">
+                              {feature}
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -214,7 +262,6 @@ export default function TaxationPage() {
                   </Card>
                   {/* view more from dropdown */}
                 </FadeInSection>
-
               ))}
             </div>
           </div>
@@ -226,15 +273,20 @@ export default function TaxationPage() {
         <section className="py-20 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="text-center space-y-4 mb-16">
-              <h2 className="text-4xl font-bold text-gray-900">Why GST Filing?</h2>
-              <p className="text-xl text-gray-600">Benefits of getting GST registered</p>
+              <h2 className="text-4xl font-bold text-gray-900">
+                Why GST Filing?
+              </h2>
+              <p className="text-xl text-gray-600">
+                Benefits of getting GST registered
+              </p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {[
                 {
                   title: "Legal Compliance",
-                  description: "Mandatory for businesses with turnover above ₹20 lakhs",
+                  description:
+                    "Mandatory for businesses with turnover above ₹20 lakhs",
                 },
                 {
                   title: "Input Tax Credit",
@@ -252,8 +304,12 @@ export default function TaxationPage() {
                 <FadeInSection key={index} delay={index * 100}>
                   <Card className="text-center hover:shadow-lg transition-shadow">
                     <CardContent className="p-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{benefit.title}</h3>
-                      <p className="text-gray-600 text-sm">{benefit.description}</p>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                        {benefit.title}
+                      </h3>
+                      <p className="text-gray-600 text-sm">
+                        {benefit.description}
+                      </p>
                     </CardContent>
                   </Card>
                 </FadeInSection>
@@ -268,7 +324,9 @@ export default function TaxationPage() {
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center space-y-4 mb-16">
-              <h2 className="text-4xl font-bold text-gray-900">Important Tax Dates</h2>
+              <h2 className="text-4xl font-bold text-gray-900">
+                Important Tax Dates
+              </h2>
               <p className="text-xl text-gray-600">Never miss a tax deadline</p>
             </div>
 
@@ -276,11 +334,18 @@ export default function TaxationPage() {
               {[
                 {
                   month: "April",
-                  deadlines: ["Advance Tax Q4 - 15th April", "TDS Return Q4 - 30th April"],
+                  deadlines: [
+                    "Advance Tax Q4 - 15th April",
+                    "TDS Return Q4 - 30th April",
+                  ],
                 },
                 {
                   month: "July",
-                  deadlines: ["ITR Filing - 31st July", "Advance Tax Q1 - 15th July", "TDS Return Q1 - 31st July"],
+                  deadlines: [
+                    "ITR Filing - 31st July",
+                    "Advance Tax Q1 - 15th July",
+                    "TDS Return Q1 - 31st July",
+                  ],
                 },
                 {
                   month: "September",
@@ -302,14 +367,21 @@ export default function TaxationPage() {
                 <FadeInSection key={index} delay={index * 100}>
                   <Card className="hover:shadow-lg transition-shadow">
                     <CardHeader>
-                      <CardTitle className="text-xl text-blue-600">{calendar.month}</CardTitle>
+                      <CardTitle className="text-xl text-blue-600">
+                        {calendar.month}
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
                         {calendar.deadlines.map((deadline, idx) => (
-                          <div key={idx} className="flex items-center space-x-2">
+                          <div
+                            key={idx}
+                            className="flex items-center space-x-2"
+                          >
                             <Clock className="h-4 w-4 text-blue-500" />
-                            <span className="text-sm text-gray-600">{deadline}</span>
+                            <span className="text-sm text-gray-600">
+                              {deadline}
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -329,11 +401,13 @@ export default function TaxationPage() {
             <div className="space-y-8">
               <h2 className="text-4xl font-bold">Need Tax Assistance?</h2>
               <p className="text-xl text-blue-100 max-w-2xl mx-auto">
-                Our tax experts are here to help you with all your tax compliance needs
+                Our tax experts are here to help you with all your tax
+                compliance needs
               </p>
               <div className="flex justify-center space-x-4">
-                <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg">Get Tax Help</Button>
-
+                <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg">
+                  Get Tax Help
+                </Button>
               </div>
             </div>
           </div>
@@ -341,5 +415,5 @@ export default function TaxationPage() {
       </FadeInSection>
       <EnhancedFooter />
     </div>
-  )
+  );
 }

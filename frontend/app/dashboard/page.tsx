@@ -42,6 +42,7 @@ import {
 import Link from "next/link";
 import api from "@/lib/api-client";
 import { EnhancedFooter } from "@/components/enhanced-footer";
+import { maskAadhaar } from "@/lib/utils";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -156,7 +157,12 @@ export default function UserDashboard() {
   const handleDownloadLatestReport = async (form: FormSubmission) => {
     try {
       const latest = (form.reports || []).slice().reverse().find(r => r.documentId);
-      if (!latest || !latest.documentId) return;
+      if (!latest || !latest.documentId) {
+        console.log('No report with documentId found for form:', form._id);
+        return;
+      }
+      
+      console.log('Attempting to download document:', latest.documentId, 'for form:', form._id);
       const defaultName = latest.type ? `report-${latest.type}.pdf` : `report-${latest.documentId}`;
       await api.downloadFile(`/api/forms/download/${latest.documentId}`, defaultName);
     } catch (e) {
@@ -232,7 +238,7 @@ export default function UserDashboard() {
   const getFormDetailUrl = (formType: string, formId: string) => {
     const typeMap: Record<string, string> = {
       'TaxForm': `/dashboard/forms/${formId}`,
-      'CompanyForm': `/dashboard/company-information/${formId}`,
+      'CompanyForm': `/dashboard/company-formation/${formId}`,
       'OtherRegistrationForm': `/dashboard/other-registration/${formId}`,
       'ROCForm': `/dashboard/roc-returns/${formId}`,
       'ReportsForm': `/dashboard/reports/${formId}`,
@@ -245,7 +251,7 @@ export default function UserDashboard() {
   const getFormEditUrl = (formType: string, formId: string) => {
     const typeMap: Record<string, string> = {
       'TaxForm': `/dashboard/forms/edit/${formId}`,
-      'CompanyForm': `/dashboard/company-information/${formId}/edit`,
+      'CompanyForm': `/dashboard/company-formation/${formId}/edit`,
       'OtherRegistrationForm': `/dashboard/other-registration/${formId}/edit`,
       'ROCForm': `/dashboard/roc-returns/${formId}/edit`,
       'ReportsForm': `/dashboard/reports/${formId}/edit`,
@@ -260,6 +266,7 @@ export default function UserDashboard() {
     
     // Map service names to more readable labels
     const serviceMap: Record<string, string> = {
+      'GST Registration': 'GST Registration',
       'GST Filing': 'GST Filing',
       'Income Tax Filing': 'Income Tax Filing',
       'TDS Returns': 'TDS Returns',
@@ -276,7 +283,6 @@ export default function UserDashboard() {
       'LLP Registration': 'LLP Registration',
       'Partnership Firm': 'Partnership Firm',
       'Sole Proprietorship': 'Sole Proprietorship',
-      'GST Registration': 'GST Registration',
       'MSME Registration': 'MSME Registration',
       'FSSAI Food License': 'FSSAI Food License',
       'Digital Signature': 'Digital Signature',
@@ -341,6 +347,7 @@ export default function UserDashboard() {
     {
       name: "Other Registration",
       items: [
+        "GST Registration",
         "LLP Registration",
         "Partnership Firm",
         "Proprietorship",
@@ -357,7 +364,6 @@ export default function UserDashboard() {
         "TAN Apply",
         "Start-up India Registration",
         "Digital Registration",
-        "GST Filing",
       ],
     },
     {
@@ -452,7 +458,7 @@ export default function UserDashboard() {
                     </p>
                     <p className="text-sm font-medium text-gray-800 flex items-center">
                       <Fingerprint className="mr-2 h-4 w-4 text-gray-400" />
-                      {user?.aadhaar || "Not provided"}
+                      {maskAadhaar(user?.aadhaar)}
                     </p>
                   </div>
                   <div className="space-y-1">
@@ -540,7 +546,7 @@ export default function UserDashboard() {
                                   ) : category.name === 'Company Information' ? (
                                     <Button variant="outline" size="sm" asChild>
                                       <Link
-                                        href={`/dashboard/company-information?service=${encodeURIComponent(service)}`}
+                                        href={`/dashboard/company-formation?service=${encodeURIComponent(service)}`}
                                       >
                                         Apply Now{" "}
                                         <ChevronRight className="ml-2 h-4 w-4" />

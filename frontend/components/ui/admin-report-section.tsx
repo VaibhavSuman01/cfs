@@ -54,7 +54,7 @@ export default function AdminReportSection({ reports, formId, formType }: AdminR
           downloadUrl = `/api/forms/advisory/download/${documentId}`;
           break;
         case 'CompanyForm':
-          downloadUrl = `/api/forms/company-information/download/${documentId}`;
+          downloadUrl = `/api/forms/company-formation/download/${documentId}`;
           break;
         case 'OtherRegistrationForm':
           downloadUrl = `/api/forms/other-registration/download/${documentId}`;

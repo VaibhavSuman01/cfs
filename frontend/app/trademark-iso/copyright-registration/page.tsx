@@ -1,12 +1,18 @@
 "use client";
 
-import { EnhancedHeader } from '@/components/enhanced-header';
-import { EnhancedFooter } from '@/components/enhanced-footer';
-import { FadeInSection } from '@/components/fade-in-section';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import Link from 'next/link';
+import { EnhancedHeader } from "@/components/enhanced-header";
+import { EnhancedFooter } from "@/components/enhanced-footer";
+import { FadeInSection } from "@/components/fade-in-section";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 import {
   FileText,
   CheckCircle,
@@ -14,12 +20,11 @@ import {
   Shield,
   Users,
   Copyright,
-  Zap
-} from 'lucide-react';
-import { PricingDisplay } from '@/components/ui/pricing-display';
+  Zap,
+} from "lucide-react";
+import { PricingDisplay } from "@/components/ui/pricing-display";
 
 export default function CopyrightRegistrationPage() {
-
   return (
     <div className="min-h-screen bg-white">
       <EnhancedHeader />
@@ -43,7 +48,11 @@ export default function CopyrightRegistrationPage() {
                   </span>
                 </h1>
                 <p className="text-xl text-gray-600 leading-relaxed">
-                  Copyright is a legal right that grants the creator of an original work exclusive rights for its use and distribution. Registering your copyright provides a public record of your ownership and is necessary before you can file a lawsuit for infringement.
+                  Copyright is a legal right that grants the creator of an
+                  original work exclusive rights for its use and distribution.
+                  Registering your copyright provides a public record of your
+                  ownership and is necessary before you can file a lawsuit for
+                  infringement.
                 </p>
 
                 <div className="grid sm:grid-cols-3 gap-4 pt-6">
@@ -54,23 +63,37 @@ export default function CopyrightRegistrationPage() {
                     <div className="text-sm text-gray-600">Starting Price</div>
                   </div>
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-                    <div className="text-2xl font-bold text-blue-600">3-6 Months</div>
+                    <div className="text-2xl font-bold text-blue-600">
+                      3-6 Months
+                    </div>
                     <div className="text-sm text-gray-600">Processing Time</div>
                   </div>
                   <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-                    <div className="text-2xl font-bold text-blue-600">Legal</div>
+                    <div className="text-2xl font-bold text-blue-600">
+                      Legal
+                    </div>
                     <div className="text-sm text-gray-600">Protection</div>
                   </div>
                 </div>
 
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                  <Link href={`/dashboard/trademark-iso?service=${encodeURIComponent('Copyright Registration')}`} passHref>
+                  <Link
+                    href={`/dashboard/trademark-iso?service=${encodeURIComponent(
+                      "Copyright Registration"
+                    )}`}
+                    passHref
+                  >
                     <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                       Register Copyright
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
-                  <Link href={`/dashboard/trademark-iso?service=${encodeURIComponent('Copyright Registration')}`} passHref>
+                  <Link
+                    href={`/dashboard/trademark-iso?service=${encodeURIComponent(
+                      "Copyright Registration"
+                    )}`}
+                    passHref
+                  >
                     <Button
                       variant="outline"
                       className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
@@ -84,7 +107,7 @@ export default function CopyrightRegistrationPage() {
             <FadeInSection className="hidden lg:block">
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-tr from-blue-100 to-transparent rounded-full -translate-x-10 -translate-y-10"></div>
-                <div className="relative rounded-lg shadow-2xl w-full h-80 bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
+                <div className="relative rounded-lg w-full h-80 flex items-center justify-center">
                   <Copyright className="h-32 w-32 text-blue-600" />
                 </div>
               </div>
@@ -98,7 +121,9 @@ export default function CopyrightRegistrationPage() {
         <section className="py-20 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-4xl mx-auto mb-16">
-              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">What is Copyright?</h2>
+              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">
+                What is Copyright?
+              </h2>
               <p className="text-lg text-gray-600">
                 A legal right that protects your original creative works
               </p>
@@ -107,17 +132,23 @@ export default function CopyrightRegistrationPage() {
               <Card className="text-center p-6 border-2 border-transparent hover:border-blue-200 hover:shadow-xl transition-all">
                 <FileText className="mx-auto h-12 w-12 text-blue-500 mb-4" />
                 <h3 className="text-xl font-semibold mb-2">Literary Works</h3>
-                <p className="text-gray-600">Books, articles, scripts, and other written content.</p>
+                <p className="text-gray-600">
+                  Books, articles, scripts, and other written content.
+                </p>
               </Card>
               <Card className="text-center p-6 border-2 border-transparent hover:border-blue-200 hover:shadow-xl transition-all">
                 <Shield className="mx-auto h-12 w-12 text-blue-500 mb-4" />
                 <h3 className="text-xl font-semibold mb-2">Artistic Works</h3>
-                <p className="text-gray-600">Paintings, drawings, photographs, and sculptures.</p>
+                <p className="text-gray-600">
+                  Paintings, drawings, photographs, and sculptures.
+                </p>
               </Card>
               <Card className="text-center p-6 border-2 border-transparent hover:border-blue-200 hover:shadow-xl transition-all">
                 <Users className="mx-auto h-12 w-12 text-blue-500 mb-4" />
                 <h3 className="text-xl font-semibold mb-2">Musical Works</h3>
-                <p className="text-gray-600">Compositions, lyrics, and musical arrangements.</p>
+                <p className="text-gray-600">
+                  Compositions, lyrics, and musical arrangements.
+                </p>
               </Card>
             </div>
           </div>
@@ -129,7 +160,9 @@ export default function CopyrightRegistrationPage() {
         <section className="py-20">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-4xl mx-auto mb-16">
-              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">Copyright Registration Process</h2>
+              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">
+                Copyright Registration Process
+              </h2>
               <p className="text-lg text-gray-600">
                 Our systematic approach to copyright registration
               </p>
@@ -138,24 +171,48 @@ export default function CopyrightRegistrationPage() {
               <div className="hidden md:block absolute top-1/2 left-0 w-full h-0.5"></div>
               <div className="grid md:grid-cols-4 gap-16 relative">
                 <div className="text-center space-y-4">
-                  <div className="relative inline-block"><div className="w-20 h-20 mx-auto bg-blue-500 text-white rounded-full flex items-center justify-center text-2xl font-bold">1</div></div>
+                  <div className="relative inline-block">
+                    <div className="w-20 h-20 mx-auto bg-blue-500 text-white rounded-full flex items-center justify-center text-2xl font-bold">
+                      1
+                    </div>
+                  </div>
                   <h3 className="text-xl font-semibold">Application Filing</h3>
-                  <p className="text-gray-600">Submit copyright application with required documents.</p>
+                  <p className="text-gray-600">
+                    Submit copyright application with required documents.
+                  </p>
                 </div>
                 <div className="text-center space-y-4">
-                  <div className="relative inline-block"><div className="w-20 h-20 mx-auto bg-blue-500 text-white rounded-full flex items-center justify-center text-2xl font-bold">2</div></div>
+                  <div className="relative inline-block">
+                    <div className="w-20 h-20 mx-auto bg-blue-500 text-white rounded-full flex items-center justify-center text-2xl font-bold">
+                      2
+                    </div>
+                  </div>
                   <h3 className="text-xl font-semibold">Examination</h3>
-                  <p className="text-gray-600">Copyright office examines the application for completeness.</p>
+                  <p className="text-gray-600">
+                    Copyright office examines the application for completeness.
+                  </p>
                 </div>
                 <div className="text-center space-y-4">
-                  <div className="relative inline-block"><div className="w-20 h-20 mx-auto bg-blue-500 text-white rounded-full flex items-center justify-center text-2xl font-bold">3</div></div>
+                  <div className="relative inline-block">
+                    <div className="w-20 h-20 mx-auto bg-blue-500 text-white rounded-full flex items-center justify-center text-2xl font-bold">
+                      3
+                    </div>
+                  </div>
                   <h3 className="text-xl font-semibold">Publication</h3>
-                  <p className="text-gray-600">Application is published for public notice period.</p>
+                  <p className="text-gray-600">
+                    Application is published for public notice period.
+                  </p>
                 </div>
                 <div className="text-center space-y-4">
-                  <div className="relative inline-block"><div className="w-20 h-20 mx-auto bg-blue-500 text-white rounded-full flex items-center justify-center text-2xl font-bold">4</div></div>
+                  <div className="relative inline-block">
+                    <div className="w-20 h-20 mx-auto bg-blue-500 text-white rounded-full flex items-center justify-center text-2xl font-bold">
+                      4
+                    </div>
+                  </div>
                   <h3 className="text-xl font-semibold">Registration</h3>
-                  <p className="text-gray-600">Copyright certificate is issued upon approval.</p>
+                  <p className="text-gray-600">
+                    Copyright certificate is issued upon approval.
+                  </p>
                 </div>
               </div>
             </div>
@@ -168,18 +225,32 @@ export default function CopyrightRegistrationPage() {
         <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
           <div className="container mx-auto px-4 text-center">
             <div className="max-w-4xl mx-auto space-y-8">
-              <h2 className="text-4xl lg:text-5xl font-bold">Ready to Protect Your Work?</h2>
+              <h2 className="text-4xl lg:text-5xl font-bold">
+                Ready to Protect Your Work?
+              </h2>
               <p className="text-xl text-blue-100 leading-relaxed">
-                Don't let others profit from your creativity. Register your copyright today and secure the legal protection your original works deserve.
+                Don't let others profit from your creativity. Register your
+                copyright today and secure the legal protection your original
+                works deserve.
               </p>
               <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <Link href={`/dashboard/trademark-iso?service=${encodeURIComponent('Copyright Registration')}`} passHref>
+                <Link
+                  href={`/dashboard/trademark-iso?service=${encodeURIComponent(
+                    "Copyright Registration"
+                  )}`}
+                  passHref
+                >
                   <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                     Start Registration
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
-                <Link href={`/dashboard/trademark-iso?service=${encodeURIComponent('Copyright Registration')}`} passHref>
+                <Link
+                  href={`/dashboard/trademark-iso?service=${encodeURIComponent(
+                    "Copyright Registration"
+                  )}`}
+                  passHref
+                >
                   <Button
                     variant="outline"
                     className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent"

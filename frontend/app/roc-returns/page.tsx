@@ -8,6 +8,7 @@ import { EnhancedHeader } from "@/components/enhanced-header";
 import { EnhancedFooter } from "@/components/enhanced-footer";
 import { FadeInSection } from "@/components/fade-in-section"
 import { PricingDisplay } from "@/components/ui/pricing-display"
+import { getServiceCardClasses, getServiceBackgroundColor, getServiceIconColor, getServicePriceColor, getServicePageHeroBackground } from "@/lib/service-colors"
 import {
   FileText,
   Calendar,
@@ -26,7 +27,7 @@ export default function ROCReturnsPage() {
       <EnhancedHeader />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-100 py-20">
+      <section className={`relative overflow-hidden ${getServicePageHeroBackground("ROC Returns")} py-20`}>
         <div className="container mx-auto px-4">
           <FadeInSection className="text-center space-y-8">
             <h1 className="text-5xl font-bold text-gray-900">ROC Returns & Company Management</h1>
@@ -113,59 +114,21 @@ export default function ROCReturnsPage() {
                   timeline: "10-15 days",
                   urgent: false,
                 },
-                {
-                  icon: AlertTriangle,
-                  title: "ROC Default Removal",
-                  description: "Remove company from ROC defaulter list and restore compliance",
-                  features: [
-                    "Default analysis",
-                    "Penalty calculation",
-                    "Form filing with additional fees",
-                    "Compliance restoration",
-                    "Status monitoring",
-                  ],
-                  priceKey: "roc default removal",
-                  timeline: "15-20 days",
-                  urgent: true,
-                },
-                {
-                  icon: Shield,
-                  title: "Company Strike Off",
-                  description: "Close dormant company through strike off process",
-                  features: [
-                    "STK-2 application",
-                    "Board resolution",
-                    "Compliance verification",
-                    "Publication in gazette",
-                    "Final closure certificate",
-                  ],
-                  priceKey: "company strike off",
-                  timeline: "60-90 days",
-                  urgent: false,
-                },
               ].map((service, index) => (
                 <FadeInSection key={index} delay={index * 100}>
-                  <Card
-                    className={`border-2 hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group ${
-                      service.urgent ? "border-blue-200 hover:border-blue-300" : "border-gray-200 hover:border-blue-300"
-                    }`}
-                  >
+                  <Card className={getServiceCardClasses('ROC Returns')}>
                     {service.urgent && (
-                      <div className="bg-blue-100 text-blue-800 text-xs font-medium px-3 py-1 rounded-b-lg text-center">
+                      <div className="bg-cyan-100 text-cyan-800 text-xs font-medium px-3 py-1 rounded-b-lg text-center">
                         Urgent Service
                       </div>
                     )}
                     <CardHeader className="text-center">
-                      <div
-                        className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform ${
-                          service.urgent ? "bg-blue-100" : "bg-blue-100"
-                        }`}
-                      >
-                        <service.icon className={`h-8 w-8 ${service.urgent ? "text-blue-600" : "text-blue-600"}`} />
+                      <div className={getServiceBackgroundColor('ROC Returns')}>
+                        <service.icon className={getServiceIconColor('ROC Returns')} />
                       </div>
                       <CardTitle className="text-xl text-gray-900">{service.title}</CardTitle>
                       <div className="space-y-2">
-                        <div className={`text-2xl font-bold ${service.urgent ? "text-blue-600" : "text-blue-600"}`}>
+                        <div className={getServicePriceColor('ROC Returns')}>
                           {service.priceKey ? (
                             <PricingDisplay serviceName={service.priceKey} />
                           ) : (

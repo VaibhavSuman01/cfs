@@ -38,12 +38,9 @@ const taxFormSchema = z.object({
   pranNumber: z.string().optional(),
   
   // GST Filing specific fields
-  gstFilingType: z.enum(['monthly', 'quarterly']).optional(),
   gstFilingMonth: z.string().optional(),
-  gstFilingQuarter: z.string().optional(),
   gstFilingYear: z.string().optional(),
   gstNumber: z.string().optional(),
-  selectedMonths: z.array(z.string()).optional(),
   
   // TDS Return specific fields
   tdsFilingMonth: z.string().optional(),
@@ -54,7 +51,6 @@ const taxFormSchema = z.object({
   incomeTaxUserId: z.string().optional(),
   incomeTaxPassword: z.string().optional(),
   panNumber: z.string().optional(),
-  incomeTaxPanNumber: z.string().regex(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, 'Invalid PAN format').optional(),
   
   // EPFO specific fields
   epfoUserId: z.string().optional(),
@@ -87,9 +83,6 @@ export default function NewFormPage() {
   const [tdsDataFile, setTdsDataFile] = useState<File | null>(null);
   const [wagesReportFile, setWagesReportFile] = useState<File | null>(null);
   const [salarySheetFile, setSalarySheetFile] = useState<File | null>(null);
-  
-  // GST Quarterly filing state
-  const [selectedMonths, setSelectedMonths] = useState<string[]>([]);
 
   // Month and year options
   const months = [
@@ -184,10 +177,11 @@ export default function NewFormPage() {
   const form = useForm<TaxFormValues>({
     resolver: zodResolver(taxFormSchema),
     defaultValues: {
-      fullName: user?.name || '',
-      email: user?.email || '',
-      phone: user?.mobile || '',
-      pan: user?.pan || '',
+      fullName: '',
+      email: '',
+      phone: '',
+      pan: '',
+      aadhaar: '',
       service: '',
       year: '',
       hasIncomeTaxLogin: false,
@@ -200,8 +194,28 @@ export default function NewFormPage() {
       homeLoanTotalInterest: '',
       hasPranNumber: false,
       pranNumber: '',
-      gstFilingType: 'monthly',
-      selectedMonths: [],
+      // GST Filing specific fields
+      gstFilingMonth: '',
+      gstFilingYear: '',
+      gstNumber: '',
+      // TDS Return specific fields
+      tdsFilingMonth: '',
+      tdsFilingYear: '',
+      tracesUserId: '',
+      tracesPassword: '',
+      tanNumber: '',
+      incomeTaxUserId: '',
+      incomeTaxPassword: '',
+      panNumber: '',
+      // EPFO specific fields
+      epfoUserId: '',
+      epfoPassword: '',
+      // ESIC specific fields
+      esicUserId: '',
+      esicPassword: '',
+      // PT-Tax specific fields
+      ptTaxUserId: '',
+      ptTaxPassword: '',
     },
   });
 
@@ -210,6 +224,16 @@ export default function NewFormPage() {
   const hasPranNumber = form.watch('hasPranNumber');
   const selectedService = form.watch('service');
   const gstFilingType = form.watch('gstFilingType');
+
+  // Populate form with user data when loaded
+  useEffect(() => {
+    if (user && !isLoading) {
+      form.setValue('fullName', user.name || '');
+      form.setValue('email', user.email || '');
+      form.setValue('phone', user.mobile || '');
+      form.setValue('pan', user.pan || '');
+    }
+  }, [user, isLoading, form]);
 
   // Preselect service from query param
   useEffect(() => {
@@ -298,6 +322,19 @@ export default function NewFormPage() {
       if (wagesReportFile) formData.append('wagesReportFile', wagesReportFile);
       if (salarySheetFile) formData.append('salarySheetFile', salarySheetFile);
 
+      // Append Aadhaar file if uploaded
+      if (aadhaarFile) {
+        formData.append('aadhaarFile', aadhaarFile);
+      }
+
+      // Append service-specific files
+      if (salesDataFile) formData.append('salesDataFile', salesDataFile);
+      if (purchaseDataFile) formData.append('purchaseDataFile', purchaseDataFile);
+      if (bankStatementFile) formData.append('bankStatementFile', bankStatementFile);
+      if (tdsDataFile) formData.append('tdsDataFile', tdsDataFile);
+      if (wagesReportFile) formData.append('wagesReportFile', wagesReportFile);
+      if (salarySheetFile) formData.append('salarySheetFile', salarySheetFile);
+
       // Append files with backend-compatible identifiers
       // Backend expects fileId_<index> and optional documentType_<fileId>
       let fileIndex = 0;
@@ -321,17 +358,21 @@ export default function NewFormPage() {
         }
       });
 
-      await api.post('/api/forms/tax', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      await api.post('/api/forms/tax', formData);
 
       toast.success('Tax form submitted successfully');
       router.push('/dashboard');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to submit tax form:', error);
-      toast.error('Failed to submit tax form. Please try again.');
+      
+      // Handle specific error cases
+      if (error.response?.status === 400 && error.response?.data?.message?.includes("already exists")) {
+        toast.error("Already submitted for this Year. You can only submit one form per service.");
+      } else if (error.response?.status === 409) {
+        toast.error("Already submitted for this Year. You can only submit one form per service.");
+      } else {
+        toast.error('Failed to submit tax form. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -517,203 +558,76 @@ export default function NewFormPage() {
               {selectedService === 'GST Filing' && (
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold">GST Filing Details</h3>
-                  
-                  {/* Filing Type Toggle */}
-                  <FormField
-                    control={form.control}
-                    name="gstFilingType"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Filing Type *</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value || 'monthly'}>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="gstFilingMonth"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Filing Month *</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select month" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {months.map((month) => (
+                                <SelectItem key={month.value} value={month.value}>
+                                  {month.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="gstFilingYear"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Filing Year *</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select year" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {years.map((year) => (
+                                <SelectItem key={year.value} value={year.value}>
+                                  {year.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="gstNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>GST Number</FormLabel>
                           <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select filing type" />
-                            </SelectTrigger>
+                            <Input {...field} placeholder="Enter GST number" />
                           </FormControl>
-                          <SelectContent>
-                            <SelectItem value="monthly">Monthly</SelectItem>
-                            <SelectItem value="quarterly">Quarterly</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Monthly Filing */}
-                  {gstFilingType === 'monthly' && (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="gstFilingMonth"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Filing Month *</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select month" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {months.map((month) => (
-                                  <SelectItem key={month.value} value={month.value}>
-                                    {month.label}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="gstFilingYear"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Filing Year *</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select year" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {years.map((year) => (
-                                  <SelectItem key={year.value} value={year.value}>
-                                    {year.label}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="gstNumber"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>GST Number</FormLabel>
-                            <FormControl>
-                              <Input {...field} placeholder="Enter GST number" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  )}
-
-                  {/* Quarterly Filing */}
-                  {gstFilingType === 'quarterly' && (
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <FormField
-                          control={form.control}
-                          name="gstFilingQuarter"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Quarter *</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select quarter" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="Q1">Q1 (Apr - Jun)</SelectItem>
-                                  <SelectItem value="Q2">Q2 (Jul - Sep)</SelectItem>
-                                  <SelectItem value="Q3">Q3 (Oct - Dec)</SelectItem>
-                                  <SelectItem value="Q4">Q4 (Jan - Mar)</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="gstFilingYear"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Filing Year *</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select year" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  {years.map((year) => (
-                                    <SelectItem key={year.value} value={year.value}>
-                                      {year.label}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label>Select Months for Quarterly Filing *</Label>
-                        <div className="grid grid-cols-3 md:grid-cols-4 gap-2 mt-2">
-                          {months.map((month) => (
-                            <div key={month.value} className="flex items-center space-x-2">
-                              <input
-                                type="checkbox"
-                                id={`month-${month.value}`}
-                                checked={selectedMonths.includes(month.value)}
-                                onChange={(e) => {
-                                  if (e.target.checked) {
-                                    setSelectedMonths([...selectedMonths, month.value]);
-                                  } else {
-                                    setSelectedMonths(selectedMonths.filter(m => m !== month.value));
-                                  }
-                                }}
-                                className="rounded border-gray-300"
-                              />
-                              <label htmlFor={`month-${month.value}`} className="text-sm cursor-pointer">
-                                {month.label}
-                              </label>
-                            </div>
-                          ))}
-                        </div>
-                        {selectedMonths.length === 0 && (
-                          <p className="text-sm text-destructive mt-1">Please select at least one month</p>
-                        )}
-                      </div>
-
-                      <FormField
-                        control={form.control}
-                        name="gstNumber"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>GST Number</FormLabel>
-                            <FormControl>
-                              <Input {...field} placeholder="Enter GST number" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  )}
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
               )}
 
               {selectedService === 'TDS Returns' && (
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold">TDS Return Details</h3>
-                  
-                  {/* Month and Year Selection */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <FormField
                       control={form.control}
                       name="tdsFilingMonth"
@@ -762,84 +676,12 @@ export default function NewFormPage() {
                         </FormItem>
                       )}
                     />
-                  </div>
-
-                  {/* TRACES Section */}
-                  <div className="space-y-4 border rounded-lg p-4">
-                    <h4 className="font-semibold text-base">1. TRACES</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="tracesUserId"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>a. User ID *</FormLabel>
-                            <FormControl>
-                              <Input {...field} placeholder="Enter TRACES User ID" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="tracesPassword"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>b. Password (Text format) *</FormLabel>
-                            <FormControl>
-                              <Input type="text" {...field} placeholder="Enter TRACES Password" />
-                            </FormControl>
-                            <FormMessage />
-                            <p className="text-xs text-muted-foreground">
-                              Password should be provided in text format
-                            </p>
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Income Tax (TAN Base) Section */}
-                  <div className="space-y-4 border rounded-lg p-4">
-                    <h4 className="font-semibold text-base">2. Income Tax (TAN Base)</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="incomeTaxUserId"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>a. User ID *</FormLabel>
-                            <FormControl>
-                              <Input {...field} placeholder="Enter Income Tax User ID" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="incomeTaxPassword"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>b. Password (Text format) *</FormLabel>
-                            <FormControl>
-                              <Input type="text" {...field} placeholder="Enter Income Tax Password" />
-                            </FormControl>
-                            <FormMessage />
-                            <p className="text-xs text-muted-foreground">
-                              Password should be provided in text format
-                            </p>
-                          </FormItem>
-                        )}
-                      />
-                    </div>
                     <FormField
                       control={form.control}
                       name="tanNumber"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>TAN Number *</FormLabel>
+                          <FormLabel>TAN Number</FormLabel>
                           <FormControl>
                             <Input {...field} placeholder="Enter TAN number" />
                           </FormControl>
@@ -848,31 +690,56 @@ export default function NewFormPage() {
                       )}
                     />
                   </div>
-
-                  {/* Income Tax (PAN No.) Section */}
-                  <div className="space-y-4 border rounded-lg p-4">
-                    <h4 className="font-semibold text-base">3. Income Tax (PAN No.)</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
-                      name="incomeTaxPanNumber"
+                      name="tracesUserId"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>PAN Number *</FormLabel>
+                          <FormLabel>TRACES User ID</FormLabel>
                           <FormControl>
-                            <Input 
-                              {...field} 
-                              placeholder="ABCDE1234F" 
-                              maxLength={10}
-                              onChange={(e) => {
-                                const value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-                                field.onChange(value);
-                              }}
-                            />
+                            <Input {...field} placeholder="Enter TRACES User ID" />
                           </FormControl>
                           <FormMessage />
-                          <p className="text-xs text-muted-foreground">
-                            Format: 5 letters + 4 digits + 1 letter (e.g., ABCDE1234F)
-                          </p>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="tracesPassword"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>TRACES Password</FormLabel>
+                          <FormControl>
+                            <Input type="text" {...field} placeholder="Enter TRACES Password" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="incomeTaxUserId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Income Tax User ID</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Enter Income Tax User ID" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="incomeTaxPassword"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Income Tax Password</FormLabel>
+                          <FormControl>
+                            <Input type="text" {...field} placeholder="Enter Income Tax Password" />
+                          </FormControl>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -1137,21 +1004,10 @@ export default function NewFormPage() {
               {selectedService === 'TDS Returns' && (
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold">TDS Return Documents</h3>
-                  <div className="bg-blue-50 p-4 rounded-lg mb-4">
-                    <h4 className="font-medium text-blue-900 mb-2">Required Documents:</h4>
-                    <ul className="text-sm text-blue-800 space-y-1">
-                      <li>1. TRACES - User ID & Password (Text format) - Already provided above</li>
-                      <li>2. Income Tax (TAN Base) - User ID & Password (Text format) - Already provided above</li>
-                      <li>3. Income Tax (PAN No.) - Already provided above</li>
-                      <li>4. TDS Data (Monthly) - Excel/Zip/Pdf/Word</li>
-                      <li>5. Any Other Documents - Excel/Zip/Pdf/Word</li>
-                    </ul>
-                  </div>
-                  
                   <div className="border-2 border-dashed border-blue-200 rounded-lg p-4 bg-blue-50">
                     <div className="flex items-center justify-between">
                       <div>
-                        <Label className="text-sm font-medium text-blue-800">4. TDS Data (Monthly) *</Label>
+                        <Label className="text-sm font-medium text-blue-800">TDS Data (Monthly)</Label>
                         <p className="text-xs text-blue-600 mt-1">
                           Upload TDS data in Excel/Zip/Pdf/Word format
                         </p>

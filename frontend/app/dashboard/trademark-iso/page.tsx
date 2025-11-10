@@ -70,9 +70,13 @@ export default function TrademarkISOPage() {
       // Append form data
       Object.entries(data).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
-          formData.append(key, value);
+          formData.append(key, String(value));
         }
       });
+
+      // Add service and subService fields
+      formData.append("service", "Trademark & ISO");
+      formData.append("subService", data.serviceType);
 
       // Append Aadhaar file if uploaded
       if (aadhaarFile) {
@@ -84,17 +88,21 @@ export default function TrademarkISOPage() {
         formData.append("documents", file);
       });
 
-      await api.post(API_PATHS.FORMS.TRADEMARK_ISO, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      await api.post(API_PATHS.FORMS.TRADEMARK_ISO, formData);
 
       toast.success("Trademark & ISO application submitted successfully");
       router.push("/dashboard/trademark-iso");
     } catch (error) {
       console.error("Failed to submit trademark form:", error);
-      toast.error("Failed to submit trademark application. Please try again.");
+      
+      // Handle specific error cases
+      if (error.response?.status === 400 && error.response?.data?.message?.includes("already exists")) {
+        toast.error("Already submitted for this Year. You can only submit one form per service.");
+      } else if (error.response?.status === 409) {
+        toast.error("Already submitted for this Year. You can only submit one form per service.");
+      } else {
+        toast.error("Failed to submit trademark application. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }

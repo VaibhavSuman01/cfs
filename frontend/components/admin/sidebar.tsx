@@ -44,6 +44,7 @@ const navigation = [
       
       // Other Registration
       { name: 'Other Registration', header: true },
+      { name: 'GST Registration', href: '/admin/services/gst-registration' },
       { name: 'LLP Registration', href: '/admin/services/llp' },
       { name: 'Partnership Firm', href: '/admin/services/partnership' },
       { name: 'Sole Proprietorship', href: '/admin/services/sole-proprietorship' },

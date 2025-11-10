@@ -40,17 +40,28 @@ export default function PPFCalculator() {
     let totalInterest = 0;
     const annualData = [];
     
+    // PPF interest is calculated monthly on the minimum balance between 5th and last day
+    // For calculator purposes, we'll use monthly compounding
+    // Interest is credited at the end of the financial year (March 31)
+    const monthlyRate = interestRate / (12 * 100);
     let balance = 0;
     
     for (let year = 1; year <= investmentPeriod; year++) {
-      // Add annual investment at the beginning of the year
+      // Add annual investment (typically done in one or more installments during the year)
+      // For calculation, we'll add it at the beginning of the year
+      const openingBalance = balance;
       balance += annualInvestment;
       totalInvested += annualInvestment;
       
-      // Calculate interest for the year
-      const interest = balance * (interestRate / 100);
-      balance += interest;
-      totalInterest += interest;
+      // Apply interest for the year (monthly compounding)
+      // PPF interest is calculated monthly but credited annually
+      for (let month = 1; month <= 12; month++) {
+        balance = balance * (1 + monthlyRate);
+      }
+      
+      // Calculate interest earned this year
+      const interestThisYear = balance - openingBalance - annualInvestment;
+      totalInterest = balance - totalInvested;
       
       annualData.push({
         year: year,

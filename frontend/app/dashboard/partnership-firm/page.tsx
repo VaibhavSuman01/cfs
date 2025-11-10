@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/providers/auth-provider";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -75,10 +75,10 @@ export default function PartnershipFirmPage() {
   const form = useForm<PartnershipFormValues>({
     resolver: zodResolver(partnershipFormSchema),
     defaultValues: {
-      fullName: "",
-      email: "",
-      phone: "",
-      pan: "",
+      fullName: user?.name || "",
+      email: user?.email || "",
+      phone: user?.mobile || "",
+      pan: user?.pan || "",
       businessName: "",
       businessAddress: "",
       city: "",
@@ -98,59 +98,6 @@ export default function PartnershipFirmPage() {
       selectedPackage: "Basic",
     },
   });
-
-  // Update form when user data is available
-  useEffect(() => {
-    if (user) {
-      const currentValues = form.getValues();
-      const formData: Partial<PartnershipFormValues> = {};
-      let hasChanges = false;
-      
-      // Pre-populate fields from user profile if they exist and are different
-      if (user.name && currentValues.fullName !== user.name) {
-        formData.fullName = user.name;
-        hasChanges = true;
-      }
-      if (user.email && currentValues.email !== user.email) {
-        formData.email = user.email;
-        hasChanges = true;
-      }
-      if (user.mobile && currentValues.phone !== user.mobile) {
-        formData.phone = user.mobile;
-        hasChanges = true;
-      }
-      if (user.pan && currentValues.pan !== user.pan) {
-        formData.pan = user.pan;
-        hasChanges = true;
-      }
-      
-      // Only update if there are actual changes
-      if (hasChanges) {
-        form.reset({
-          ...currentValues,
-          ...formData,
-        });
-      }
-    }
-  }, [user]);
-
-  // Determine which fields should be disabled (if they already exist in user profile)
-  const isFieldDisabled = (fieldName: keyof PartnershipFormValues) => {
-    if (!user) return false;
-    
-    switch (fieldName) {
-      case "fullName":
-        return !!user.name;
-      case "email":
-        return !!user.email;
-      case "phone":
-        return !!user.mobile;
-      case "pan":
-        return !!user.pan;
-      default:
-        return false;
-    }
-  };
 
   const addressProofType = form.watch("addressProofType");
 
@@ -179,9 +126,13 @@ export default function PartnershipFirmPage() {
       // Append form data
       Object.entries(data).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
-          formData.append(key, typeof value === 'boolean' ? value.toString() : value);
+          formData.append(key, String(value));
         }
       });
+
+      // Add service and subService fields
+      formData.append("service", "Other Registration");
+      formData.append("subService", "Partnership Firm Registration");
 
       // Append partners data
       formData.append("partners", JSON.stringify(partners));
@@ -218,17 +169,21 @@ export default function PartnershipFirmPage() {
         }
       });
 
-      await api.post(API_PATHS.FORMS.PARTNERSHIP_FIRM, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      await api.post(API_PATHS.FORMS.PARTNERSHIP_FIRM, formData);
 
       toast.success("Partnership firm registration application submitted successfully");
       router.push("/dashboard/partnership-firm");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to submit partnership firm form:", error);
-      toast.error("Failed to submit partnership firm application. Please try again.");
+      
+      // Handle specific error cases
+      if (error.response?.status === 400 && error.response?.data?.message?.includes("already exists")) {
+        toast.error("Already submitted for this Year. You can only submit one form per service.");
+      } else if (error.response?.status === 409) {
+        toast.error("Already submitted for this Year. You can only submit one form per service.");
+      } else {
+        toast.error("Failed to submit partnership firm application. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -295,16 +250,9 @@ export default function PartnershipFirmPage() {
                       <FormItem>
                         <FormLabel>Full Name *</FormLabel>
                         <FormControl>
-                          <Input 
-                            {...field} 
-                            disabled={isFieldDisabled("fullName")}
-                            className={isFieldDisabled("fullName") ? "bg-muted cursor-not-allowed" : ""}
-                          />
+                          <Input {...field} />
                         </FormControl>
                         <FormMessage />
-                        {isFieldDisabled("fullName") && (
-                          <p className="text-xs text-muted-foreground">This field is pre-filled from your profile</p>
-                        )}
                       </FormItem>
                     )}
                   />
@@ -315,17 +263,9 @@ export default function PartnershipFirmPage() {
                       <FormItem>
                         <FormLabel>Email *</FormLabel>
                         <FormControl>
-                          <Input 
-                            type="email" 
-                            {...field} 
-                            disabled={isFieldDisabled("email")}
-                            className={isFieldDisabled("email") ? "bg-muted cursor-not-allowed" : ""}
-                          />
+                          <Input type="email" {...field} />
                         </FormControl>
                         <FormMessage />
-                        {isFieldDisabled("email") && (
-                          <p className="text-xs text-muted-foreground">This field is pre-filled from your profile</p>
-                        )}
                       </FormItem>
                     )}
                   />
@@ -336,16 +276,9 @@ export default function PartnershipFirmPage() {
                       <FormItem>
                         <FormLabel>Phone *</FormLabel>
                         <FormControl>
-                          <Input 
-                            {...field} 
-                            disabled={isFieldDisabled("phone")}
-                            className={isFieldDisabled("phone") ? "bg-muted cursor-not-allowed" : ""}
-                          />
+                          <Input {...field} />
                         </FormControl>
                         <FormMessage />
-                        {isFieldDisabled("phone") && (
-                          <p className="text-xs text-muted-foreground">This field is pre-filled from your profile</p>
-                        )}
                       </FormItem>
                     )}
                   />
@@ -356,17 +289,9 @@ export default function PartnershipFirmPage() {
                       <FormItem>
                         <FormLabel>PAN *</FormLabel>
                         <FormControl>
-                          <Input 
-                            {...field} 
-                            placeholder="ABCDE1234F"
-                            disabled={isFieldDisabled("pan")}
-                            className={isFieldDisabled("pan") ? "bg-muted cursor-not-allowed" : ""}
-                          />
+                          <Input {...field} placeholder="ABCDE1234F" />
                         </FormControl>
                         <FormMessage />
-                        {isFieldDisabled("pan") && (
-                          <p className="text-xs text-muted-foreground">This field is pre-filled from your profile</p>
-                        )}
                       </FormItem>
                     )}
                   />
