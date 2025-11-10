@@ -77,7 +77,7 @@ export default function CompanyFormationDetailPage() {
     const documentId = getDocId(doc);
     if (!documentId) return;
     const filename = getDocTitle(doc);
-    const url = `/api/forms/company-formation/download/${documentId}`;
+    const url = `/api/forms/company-information/download/${documentId}`;
     await api.downloadFile(url, filename);
   };
 
@@ -122,14 +122,14 @@ export default function CompanyFormationDetailPage() {
             <ArrowLeft className="h-4 w-4 mr-2" /> Back
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Company Formation Details</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Company Information Details</h1>
             <p className="text-gray-600 mt-1">Track your company formation application progress and communications</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
           {getStatusBadge(form.status)}
           <Button 
-            onClick={() => router.push(`/dashboard/company-formation/${form._id}/edit`)}
+            onClick={() => router.push(`/dashboard/company-information/${form._id}/edit`)}
             className="bg-blue-600 hover:bg-blue-700"
           >
             Edit Form
@@ -145,7 +145,7 @@ export default function CompanyFormationDetailPage() {
             <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
               <CardTitle className="flex items-center gap-2 text-xl">
                 <Building className="h-6 w-6 text-blue-600" />
-                Company Formation Information
+                Company Information Information
               </CardTitle>
               <CardDescription>ID: {form._id}</CardDescription>
             </CardHeader>

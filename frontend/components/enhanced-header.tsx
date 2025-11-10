@@ -35,15 +35,15 @@ export function EnhancedHeader() {
 
   const navigation = [
     {
-      name: "Company Formation",
-      href: "/company-formation",
+      name: "Company Information",
+      href: "/company-information",
       dropdown: [
-        { name: "Private Limited Company", href: "/company-formation/private-limited" },
-        { name: "Public Limited Company", href: "/company-formation/public-limited" },
-        { name: "One Person Company", href: "/company-formation/one-person-company" },
-        { name: "Section 8 Company", href: "/company-formation/section-8" },
-        { name: "Nidhi Company", href: "/company-formation/nidhi-company" },
-        { name: "Producer Company", href: "/company-formation/producer-company" },
+        { name: "Private Limited Company", href: "/company-information/private-limited" },
+        { name: "Public Limited Company", href: "/company-information/public-limited" },
+        { name: "One Person Company", href: "/company-information/one-person-company" },
+        { name: "Section 8 Company", href: "/company-information/section-8" },
+        { name: "Nidhi Company", href: "/company-information/nidhi-company" },
+        { name: "Producer Company", href: "/company-information/producer-company" },
       ],
     },
     {

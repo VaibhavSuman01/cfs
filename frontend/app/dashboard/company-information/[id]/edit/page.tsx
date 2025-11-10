@@ -80,7 +80,7 @@ export default function CompanyFormationEditPage() {
       });
 
       toast.success("Form updated successfully");
-      router.push(`/dashboard/company-formation/${id}`);
+      router.push(`/dashboard/company-information/${id}`);
     } catch (e) {
       console.error("Failed to update form", e);
       toast.error("Update failed. Please try again.");
@@ -108,7 +108,7 @@ export default function CompanyFormationEditPage() {
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
               <Building className="h-8 w-8 text-blue-600" />
-              Edit Company Formation
+              Edit Company Information
             </h1>
             <p className="text-gray-600 mt-1">Update your company formation application details and upload additional documents</p>
           </div>
@@ -129,7 +129,7 @@ export default function CompanyFormationEditPage() {
           <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
             <CardTitle className="flex items-center gap-2 text-xl">
               <Edit3 className="h-6 w-6 text-blue-600" />
-              Update Company Formation Details
+              Update Company Information Details
             </CardTitle>
             <CardDescription>Modify your company formation information and add supporting documents</CardDescription>
           </CardHeader>

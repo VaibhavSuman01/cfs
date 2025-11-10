@@ -35,8 +35,8 @@ const navigation = [
     name: 'Services', 
     icon: FileSpreadsheet,
     submenu: [
-      // Company Formation
-      { name: 'Company Formation', header: true },
+      // Company Information
+      { name: 'Company Information', header: true },
       { name: 'Private Limited', href: '/admin/services/private-limited' },
       { name: 'Public Limited', href: '/admin/services/public-limited' },
       { name: 'One Person Company', href: '/admin/services/opc' },

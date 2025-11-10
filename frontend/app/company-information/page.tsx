@@ -20,13 +20,13 @@ export default function CompanyFormationPage() {
         <div className="container mx-auto px-4">
           <FadeInSection className="text-center space-y-8">
             <Badge className="bg-blue-100 text-blue-800">Most Popular Service</Badge>
-            <h1 className="text-5xl font-bold text-gray-900">Company Formation</h1>
+            <h1 className="text-5xl font-bold text-gray-900">Company Information</h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Start your Private Limited Company, Public Limited Company, or One Person Company with complete legal
               compliance and documentation.
             </p>
             <div className="flex justify-center space-x-4">
-              <Link href={`/dashboard/company-formation?service=${encodeURIComponent("Company Formation")}`} passHref>
+              <Link href={`/dashboard/company-information?service=${encodeURIComponent("Company Information")}`} passHref>
                 <Button className="bg-blue-600 hover:bg-blue-700 px-8 py-3">Start Registration</Button>
               </Link>
 
@@ -158,7 +158,7 @@ export default function CompanyFormationPage() {
                           </div>
                         ))}
                       </div>
-                      <Link href={`/company-formation/${company.slug}`} passHref>
+                      <Link href={`/company-information/${company.slug}`} passHref>
                         <Button
                           className={`w-full ${
                             company.popular ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-600 hover:bg-gray-700"
@@ -352,10 +352,10 @@ export default function CompanyFormationPage() {
                 Join thousands of entrepreneurs who have successfully registered their companies with us
               </p>
               <div className="flex justify-center space-x-4">
-                <Link href={`/dashboard/company-formation?service=${encodeURIComponent("Company Formation")}`} passHref>
+                <Link href={`/dashboard/company-information?service=${encodeURIComponent("Company Information")}`} passHref>
                   <Button className="bg-blue-600 hover:bg-blue-700 px-8 py-3 text-lg">Start Registration Now</Button>
                 </Link>
-                <Link href={`/dashboard/company-formation?service=${encodeURIComponent("Company Formation")}`} passHref>
+                <Link href={`/dashboard/company-information?service=${encodeURIComponent("Company Information")}`} passHref>
                   <Button variant="outline" className="px-8 py-3 text-lg bg-transparent">
                     Apply Now
                   </Button>

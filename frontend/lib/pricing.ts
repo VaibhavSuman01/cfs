@@ -48,8 +48,8 @@ const PRICING_RAW: Record<string, ServicePricing> = {
     tooltip: "Prices vary based on company size, complexity, and industry standards"
   },
   "gst registration": { 
-    basePrice: "₹2,999*", 
-    packages: { BASIC: "₹2,999*", STANDARD: "₹4,999*" },
+    basePrice: "₹2,499*", 
+    packages: { BASIC: "₹2,499*", STANDARD: "₹3,499*", PREMIUM: "₹4,999*" },
     tooltip: "Prices may vary based on complexity and industry standards"
   },
   "gst filing": { 
@@ -113,8 +113,8 @@ const PRICING_RAW: Record<string, ServicePricing> = {
     tooltip: "Prices may vary based on complexity and industry standards"
   },
   "llp registration": { 
-    basePrice: "₹9,999*", 
-    packages: { BASIC: "₹9,999*", STANDARD: "₹14,999*", PREMIUM: "₹24,999*" },
+    basePrice: "₹7,999*", 
+    packages: { BASIC: "₹7,999*", STANDARD: "₹9,999*", PREMIUM: "₹14,999*" },
     tooltip: "Prices may vary based on complexity and industry standards"
   },
   "partnership firm": { 
@@ -191,8 +191,9 @@ const PRICING_RAW: Record<string, ServicePricing> = {
     tooltip: "Prices vary based on license type, business size, and industry standards"
   },
   "iec registration": { 
-    basePrice: "As per request*",
-    tooltip: "Prices vary based on business type, export volume, and industry standards"
+    basePrice: "₹2,499*",
+    packages: { BASIC: "₹2,499*" },
+    tooltip: "Prices may vary based on complexity and industry standards"
   },
   "industry license": { 
     basePrice: "As per request*",

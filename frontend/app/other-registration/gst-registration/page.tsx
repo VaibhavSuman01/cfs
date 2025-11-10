@@ -139,7 +139,7 @@ export default function GstRegistrationPage() {
               <Card className="border-2 border-blue-200 hover:border-blue-400 hover:shadow-xl transition-all duration-300">
                 <CardHeader className="text-center pb-4">
                   <CardTitle className="text-2xl font-bold text-blue-600">Basic</CardTitle>
-                  <div className="text-4xl font-bold text-gray-900">₹1,999</div>
+                  <div className="text-4xl font-bold text-gray-900">₹2,499</div>
                   <p className="text-sm text-gray-600">Starting Price</p>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -157,7 +157,7 @@ export default function GstRegistrationPage() {
               <Card className="border-2 border-blue-400 hover:border-blue-600 hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 <CardHeader className="text-center pb-4">
                   <CardTitle className="text-2xl font-bold text-blue-600">Standard</CardTitle>
-                  <div className="text-4xl font-bold text-gray-900">₹2,999</div>
+                  <div className="text-4xl font-bold text-gray-900">₹3,499</div>
                   <p className="text-sm text-gray-600">Most Popular</p>
                 </CardHeader>
                 <CardContent className="space-y-4">

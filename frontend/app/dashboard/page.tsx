@@ -219,7 +219,7 @@ export default function UserDashboard() {
   const getFormTypeLabel = (formType: string) => {
     const typeMap: Record<string, string> = {
       'TaxForm': 'Tax Filing',
-      'CompanyForm': 'Company Formation',
+      'CompanyForm': 'Company Information',
       'OtherRegistrationForm': 'Other Registration',
       'ROCForm': 'ROC Returns',
       'ReportsForm': 'Reports',
@@ -232,7 +232,7 @@ export default function UserDashboard() {
   const getFormDetailUrl = (formType: string, formId: string) => {
     const typeMap: Record<string, string> = {
       'TaxForm': `/dashboard/forms/${formId}`,
-      'CompanyForm': `/dashboard/company-formation/${formId}`,
+      'CompanyForm': `/dashboard/company-information/${formId}`,
       'OtherRegistrationForm': `/dashboard/other-registration/${formId}`,
       'ROCForm': `/dashboard/roc-returns/${formId}`,
       'ReportsForm': `/dashboard/reports/${formId}`,
@@ -245,7 +245,7 @@ export default function UserDashboard() {
   const getFormEditUrl = (formType: string, formId: string) => {
     const typeMap: Record<string, string> = {
       'TaxForm': `/dashboard/forms/edit/${formId}`,
-      'CompanyForm': `/dashboard/company-formation/${formId}/edit`,
+      'CompanyForm': `/dashboard/company-information/${formId}/edit`,
       'OtherRegistrationForm': `/dashboard/other-registration/${formId}/edit`,
       'ROCForm': `/dashboard/roc-returns/${formId}/edit`,
       'ReportsForm': `/dashboard/reports/${formId}/edit`,
@@ -318,7 +318,7 @@ export default function UserDashboard() {
 
   const services = [
     {
-      name: "Company Formation",
+      name: "Company Information",
       items: [
         "Private Limited Company",
         "One Person Company (OPC)",
@@ -537,10 +537,10 @@ export default function UserDashboard() {
                                         <ChevronRight className="ml-2 h-4 w-4" />
                                       </Link>
                                     </Button>
-                                  ) : category.name === 'Company Formation' ? (
+                                  ) : category.name === 'Company Information' ? (
                                     <Button variant="outline" size="sm" asChild>
                                       <Link
-                                        href={`/dashboard/company-formation?service=${encodeURIComponent(service)}`}
+                                        href={`/dashboard/company-information?service=${encodeURIComponent(service)}`}
                                       >
                                         Apply Now{" "}
                                         <ChevronRight className="ml-2 h-4 w-4" />

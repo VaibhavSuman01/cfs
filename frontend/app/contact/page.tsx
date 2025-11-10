@@ -12,13 +12,13 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Phone, Mail, MapPin, Clock, MessageCircle, Send, Headphones, Loader2 } from "lucide-react"
+import { Phone, Mail, MapPin, Clock, Send, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import api from "@/lib/api-client"
 
 // Service -> Sub-services mapping (extend as needed)
 const SERVICE_OPTIONS: Record<string, string[]> = {
-  "Company Formation": [
+  "Company Information": [
     "Private Limited Company",
     "One Person Company",
     "Public Limited Company",
@@ -197,54 +197,12 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* Contact Information */}
-      <FadeInSection>
-        <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
-          <div className="container mx-auto px-4">
-            <div className="grid md:grid-cols-2 gap-8 mb-16 max-w-4xl mx-auto">
-              {[
-                {
-                  icon: Phone,
-                  title: "Call Us",
-                  info: "0612-4535604",
-                  subInfo: "Mon-Sat 10AM-7PM",
-                  action: "Call Now",
-                },
-                {
-                  icon: Mail,
-                  title: "Email Us",
-                  info: "info@comfinserv.co",
-                  subInfo: "We'll respond promptly",
-                  action: "Send Email",
-                },
-              ].map((contact, index) => (
-                <FadeInSection key={index} delay={index * 100}>
-                  <Card className="text-center border-2 border-blue-100 hover:border-blue-300 hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group">
-                    <CardContent className="p-8">
-                      <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                        <contact.icon className="h-8 w-8 text-white" />
-                      </div>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">{contact.title}</h3>
-                      <p className="text-lg text-blue-600 font-medium mb-1">{contact.info}</p>
-                      <p className="text-gray-600 text-sm mb-4">{contact.subInfo}</p>
-                      <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-2 rounded-full">
-                        {contact.action}
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </FadeInSection>
-              ))}
-            </div>
-          </div>
-        </section>
-      </FadeInSection>
-
-      {/* Contact Form & Office Info */}
+      {/* Contact Form & Contact Details */}
       <FadeInSection>
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4">
             <div className="grid lg:grid-cols-2 gap-16">
-              {/* Contact Form */}
+              {/* Contact Form - Left Side */}
               <div className="space-y-8">
                 <div>
                   <h2 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-blue-800 bg-clip-text text-transparent mb-4">
@@ -405,25 +363,58 @@ export default function ContactPage() {
                 )}
               </div>
 
-              {/* Office Information */}
+              {/* Contact Details - Right Side */}
               <div className="space-y-8">
                 <div>
                   <h2 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-blue-800 bg-clip-text text-transparent mb-4">
-                    Visit Our Office
+                    Contact Details
                   </h2>
                   <p className="text-gray-600">
-                    Meet our team in person at our office.
+                    Get in touch with us through any of these channels.
                   </p>
                 </div>
 
-                <Card className="border-2 border-blue-100 shadow-xl">
-                  <CardContent className="p-8">
-                    <div className="space-y-6">
+                <div className="space-y-6">
+                  {/* Call Us */}
+                  <Card className="border-2 border-blue-100 shadow-xl hover:shadow-2xl transition-all duration-300">
+                    <CardContent className="p-6">
                       <div className="flex items-start space-x-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                          <Phone className="h-6 w-6 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-900 mb-2">Call Us</h3>
+                          <p className="text-lg text-blue-600 font-medium mb-1">0612-4535604</p>
+                          <p className="text-gray-600 text-sm">Mon-Sat 10AM-7PM</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Email Us */}
+                  <Card className="border-2 border-blue-100 shadow-xl hover:shadow-2xl transition-all duration-300">
+                    <CardContent className="p-6">
+                      <div className="flex items-start space-x-4">
+                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                          <Mail className="h-6 w-6 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-900 mb-2">Email Us</h3>
+                          <p className="text-lg text-blue-600 font-medium mb-1">info@comfinserv.co</p>
+                          <p className="text-gray-600 text-sm">We'll respond promptly</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Office Address */}
+                  <Card className="border-2 border-blue-100 shadow-xl hover:shadow-2xl transition-all duration-300">
+                    <CardContent className="p-6">
+                      <div className="flex items-start space-x-4">
+                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                           <MapPin className="h-6 w-6 text-white" />
                         </div>
-                        <div>
+                        <div className="flex-1">
                           <h3 className="font-semibold text-gray-900 mb-2">Head Office</h3>
                           <p className="text-gray-600">
                             211, NP EXHIBITION ROAD
@@ -432,12 +423,17 @@ export default function ContactPage() {
                           </p>
                         </div>
                       </div>
+                    </CardContent>
+                  </Card>
 
+                  {/* Office Hours */}
+                  <Card className="border-2 border-blue-100 shadow-xl hover:shadow-2xl transition-all duration-300">
+                    <CardContent className="p-6">
                       <div className="flex items-start space-x-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                           <Clock className="h-6 w-6 text-white" />
                         </div>
-                        <div>
+                        <div className="flex-1">
                           <h3 className="font-semibold text-gray-900 mb-2">Office Hours</h3>
                           <p className="text-gray-600">
                             Monday - Saturday: 10:00 AM - 7:00 PM
@@ -446,70 +442,10 @@ export default function ContactPage() {
                           </p>
                         </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </div>
-        </section>
-      </FadeInSection>
-
-      {/* FAQ Section */}
-      <FadeInSection>
-        <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
-          <div className="container mx-auto px-4">
-            <div className="text-center space-y-6 mb-16">
-              <h2 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-blue-800 bg-clip-text text-transparent">
-                Frequently Asked Questions
-              </h2>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                Quick answers to common questions about our services
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-              {[
-                {
-                  question: "How long does company registration take?",
-                  answer:
-                    "Company registration typically takes 7-15 working days, depending on the type of company and document verification process.",
-                },
-                {
-                  question: "What documents are required for GST registration?",
-                  answer:
-                    "You'll need PAN card, Aadhaar card, business registration certificate, bank account details, and address proof of business premises.",
-                },
-                {
-                  question: "Do you provide post-registration support?",
-                  answer:
-                    "Yes, we provide comprehensive post-registration support including compliance management, annual filings, and ongoing advisory services.",
-                },
-                {
-                  question: "Are your services available pan-India?",
-                  answer:
-                    "Yes, we provide our services across all states and union territories of India through our network of local partners and digital platform.",
-                },
-                {
-                  question: "What is your refund policy?",
-                  answer:
-                    "We offer a full refund if we're unable to complete your registration due to reasons attributable to us. Terms and conditions apply.",
-                },
-                {
-                  question: "Can I track the status of my application?",
-                  answer:
-                    "Yes, you can track your application status in real-time through our client portal or by contacting our customer support team.",
-                },
-              ].map((faq, index) => (
-                <FadeInSection key={index} delay={index * 100}>
-                  <Card className="border-2 border-blue-100 hover:border-blue-300 hover:shadow-lg transition-all duration-300">
-                    <CardContent className="p-6">
-                      <h3 className="font-semibold text-gray-900 mb-3">{faq.question}</h3>
-                      <p className="text-gray-600 text-sm leading-relaxed">{faq.answer}</p>
                     </CardContent>
                   </Card>
-                </FadeInSection>
-              ))}
+                </div>
+              </div>
             </div>
           </div>
         </section>

@@ -62,7 +62,7 @@ interface FormData {
   createdAt: string;
   updatedAt: string;
   
-  // Company Formation specific fields
+  // Company Information specific fields
   companyName?: string;
   businessActivity?: string;
   proposedCapital?: string;
@@ -211,7 +211,7 @@ export default function FormDetailPage() {
   const getFormTypeLabel = (formType: string) => {
     const typeMap: Record<string, string> = {
       'TaxForm': 'Tax Filing',
-      'CompanyForm': 'Company Formation',
+      'CompanyForm': 'Company Information',
       'OtherRegistrationForm': 'Other Registration',
       'ROCForm': 'ROC Returns',
       'ReportsForm': 'Reports',
@@ -357,7 +357,7 @@ export default function FormDetailPage() {
                   )}
                 </div>
 
-                {/* Company Formation specific fields */}
+                {/* Company Information specific fields */}
                 {form.formType === 'CompanyForm' && (
                   <>
                     <Separator />

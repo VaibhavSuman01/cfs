@@ -86,7 +86,7 @@ export default function NidhiCompanyPage() {
         <FadeInSection>
           <Card className="max-w-4xl mx-auto">
             <CardContent className="space-y-6 text-center">
-              <Link href={`/dashboard/company-formation?service=${encodeURIComponent('Nidhi Company')}`} passHref>
+              <Link href={`/dashboard/company-information?service=${encodeURIComponent('Nidhi Company')}`} passHref>
                 <Button className="w-full">Book This Service</Button>
               </Link>
             </CardContent>

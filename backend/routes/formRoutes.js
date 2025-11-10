@@ -18,6 +18,7 @@ const ROCForm = require("../models/ROCForm");
 const ReportsForm = require("../models/ReportsForm");
 const TrademarkISOForm = require("../models/TrademarkISOForm");
 const AdvisoryForm = require("../models/AdvisoryForm");
+const PartnershipForm = require("../models/PartnershipForm");
 
 // @route   GET /api/forms/check-pan/:pan
 // @desc    Check if a PAN number already exists in the system
@@ -62,7 +63,7 @@ router.post(
     console.log("Processing tax form upload request");
     next();
   },
-  upload.array("documents", 10), // Allow up to 10 documents with a single field
+  upload.any(), // Use upload.any() to handle dynamic file fields (salesDataFile, purchaseDataFile, etc.)
   handleMulterError,
   async (req, res) => {
     try {
@@ -88,6 +89,22 @@ router.post(
         homeLoanTotalInterest,
         hasPranNumber,
         pranNumber,
+        // GST Filing specific fields
+        gstFilingType,
+        gstFilingMonth,
+        gstFilingQuarter,
+        gstFilingYear,
+        gstNumber,
+        selectedMonths,
+        // TDS Return specific fields
+        tdsFilingMonth,
+        tdsFilingYear,
+        tracesUserId,
+        tracesPassword,
+        tanNumber,
+        incomeTaxUserId,
+        incomeTaxPassword,
+        incomeTaxPanNumber,
       } = req.body;
 
       // Validate required fields
@@ -134,6 +151,26 @@ router.post(
         return res.status(400).json({ message: "PRAN number is required" });
       }
 
+      // Validate TDS Returns specific fields
+      if (service === 'TDS Returns') {
+        if (!tdsFilingMonth || !tdsFilingYear) {
+          return res.status(400).json({ message: "TDS filing month and year are required" });
+        }
+        if (!tracesUserId || !tracesPassword) {
+          return res.status(400).json({ message: "TRACES User ID and Password are required" });
+        }
+        if (!incomeTaxUserId || !incomeTaxPassword) {
+          return res.status(400).json({ message: "Income Tax (TAN Base) User ID and Password are required" });
+        }
+        if (!incomeTaxPanNumber) {
+          return res.status(400).json({ message: "Income Tax (PAN No.) is required" });
+        }
+        // Validate Income Tax PAN format
+        if (incomeTaxPanNumber && !panRegex.test(incomeTaxPanNumber)) {
+          return res.status(400).json({ message: "Invalid Income Tax PAN format" });
+        }
+      }
+
       // Process uploaded files
       const formData = {
         user: req.user._id, // Associate form with user
@@ -154,6 +191,22 @@ router.post(
         homeLoanTotalInterest: homeLoanTotalInterest || "",
         hasPranNumber: hasPranNumber === "true",
         pranNumber: pranNumber || "",
+        // GST Filing specific fields
+        gstFilingType: gstFilingType || undefined,
+        gstFilingMonth: gstFilingMonth || undefined,
+        gstFilingQuarter: gstFilingQuarter || undefined,
+        gstFilingYear: gstFilingYear || undefined,
+        gstNumber: gstNumber || undefined,
+        selectedMonths: selectedMonths ? (typeof selectedMonths === 'string' ? JSON.parse(selectedMonths) : selectedMonths) : undefined,
+        // TDS Return specific fields
+        tdsFilingMonth: tdsFilingMonth || undefined,
+        tdsFilingYear: tdsFilingYear || undefined,
+        tracesUserId: tracesUserId || undefined,
+        tracesPassword: tracesPassword || undefined,
+        tanNumber: tanNumber || undefined,
+        incomeTaxUserId: incomeTaxUserId || undefined,
+        incomeTaxPassword: incomeTaxPassword || undefined,
+        incomeTaxPanNumber: incomeTaxPanNumber ? incomeTaxPanNumber.toUpperCase() : undefined,
         status: "Pending",
         documents: [],
       };
@@ -164,44 +217,156 @@ router.post(
         if (key.startsWith("documentType_")) {
           const fileId = key.replace("documentType_", "");
           documentTypes[fileId] = req.body[key];
-          // Remove these fields from formData
-          delete formData[key];
         }
       });
 
-      // Process each file with its document type
+      // Process uploaded files - handle both dynamic field names and regular documents
       if (req.files && req.files.length > 0) {
         console.log(`Processing ${req.files.length} uploaded files`);
-
-        req.files.forEach((file, index) => {
-          const fileId = req.body[`fileId_${index}`] || `file_${index}`;
-          const docType = documentTypes[fileId] || "other";
-
-          console.log(`Processing file: ${docType}`, {
-            originalname: file.originalname,
-            mimetype: file.mimetype,
-            size: file.size,
-            extension: file.originalname.split(".").pop().toLowerCase(),
-          });
-
-          // Generate a unique filename
-          const fileName = generateUniqueFilename(file.originalname);
-
-          // Add to documents array with file data
-          formData.documents.push({
-            documentType: docType,
-            fileName: fileName,
-            originalName: file.originalname,
-            fileType: file.mimetype,
-            fileSize: file.size,
-            fileData: getFileData(file),
-            contentType: file.mimetype,
-            uploadedBy: 'user', // submissions here are always by the user
-          });
-
-          // Remove the fileId field
-          delete formData[`fileId_${index}`];
+        
+        const fileMap = {};
+        
+        // Group files by fieldname
+        req.files.forEach((file) => {
+          if (!fileMap[file.fieldname]) {
+            fileMap[file.fieldname] = [];
+          }
+          fileMap[file.fieldname].push(file);
         });
+
+        // Process GST-specific files
+        if (service === 'GST Filing') {
+          // Process Sales Data file
+          if (fileMap['salesDataFile']) {
+            fileMap['salesDataFile'].forEach((file) => {
+              formData.documents.push({
+                documentType: "Sales Data (Tally Data)",
+                fileName: generateUniqueFilename(file.originalname),
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+                uploadedBy: 'user',
+              });
+            });
+          }
+
+          // Process Purchase Data file
+          if (fileMap['purchaseDataFile']) {
+            fileMap['purchaseDataFile'].forEach((file) => {
+              formData.documents.push({
+                documentType: "Purchase Data (Tally Data)",
+                fileName: generateUniqueFilename(file.originalname),
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+                uploadedBy: 'user',
+              });
+            });
+          }
+
+          // Process Bank Statement file
+          if (fileMap['bankStatementFile']) {
+            fileMap['bankStatementFile'].forEach((file) => {
+              formData.documents.push({
+                documentType: "Bank Statement (Tally Data)",
+                fileName: generateUniqueFilename(file.originalname),
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+                uploadedBy: 'user',
+              });
+            });
+          }
+        }
+
+        // Process Aadhaar file
+        if (fileMap['aadhaarFile']) {
+          fileMap['aadhaarFile'].forEach((file) => {
+            formData.documents.push({
+              documentType: "Aadhaar Card",
+              fileName: generateUniqueFilename(file.originalname),
+              originalName: file.originalname,
+              fileType: file.mimetype,
+              fileSize: file.size,
+              fileData: getFileData(file),
+              contentType: file.mimetype,
+              uploadedBy: 'user',
+            });
+          });
+        }
+
+        // Process TDS Data file (for TDS Returns service)
+        if (service === 'TDS Returns' && fileMap['tdsDataFile']) {
+          fileMap['tdsDataFile'].forEach((file) => {
+            formData.documents.push({
+              documentType: "TDS Data (Monthly)",
+              fileName: generateUniqueFilename(file.originalname),
+              originalName: file.originalname,
+              fileType: file.mimetype,
+              fileSize: file.size,
+              fileData: getFileData(file),
+              contentType: file.mimetype,
+              uploadedBy: 'user',
+            });
+          });
+        }
+
+        // Process Wages Report file
+        if (fileMap['wagesReportFile']) {
+          fileMap['wagesReportFile'].forEach((file) => {
+            formData.documents.push({
+              documentType: "Wages Report / Calculation of monthly wages",
+              fileName: generateUniqueFilename(file.originalname),
+              originalName: file.originalname,
+              fileType: file.mimetype,
+              fileSize: file.size,
+              fileData: getFileData(file),
+              contentType: file.mimetype,
+              uploadedBy: 'user',
+            });
+          });
+        }
+
+        // Process Salary Sheet file
+        if (fileMap['salarySheetFile']) {
+          fileMap['salarySheetFile'].forEach((file) => {
+            formData.documents.push({
+              documentType: "Salary Sheet of all Employed",
+              fileName: generateUniqueFilename(file.originalname),
+              originalName: file.originalname,
+              fileType: file.mimetype,
+              fileSize: file.size,
+              fileData: getFileData(file),
+              contentType: file.mimetype,
+              uploadedBy: 'user',
+            });
+          });
+        }
+
+        // Process regular documents with documentType
+        if (fileMap['documents']) {
+          fileMap['documents'].forEach((file, index) => {
+            const fileId = req.body[`fileId_${index}`] || `file_${index}`;
+            const docType = documentTypes[fileId] || "Additional Document";
+
+            formData.documents.push({
+              documentType: docType,
+              fileName: generateUniqueFilename(file.originalname),
+              originalName: file.originalname,
+              fileType: file.mimetype,
+              fileSize: file.size,
+              fileData: getFileData(file),
+              contentType: file.mimetype,
+              uploadedBy: 'user',
+            });
+          });
+        }
       } else {
         console.log("No files were uploaded");
       }
@@ -1776,7 +1941,7 @@ router.put(
 router.post(
   "/company-formation",
   protect,
-  upload.array("documents", 10),
+  upload.any(),
   handleMulterError,
   async (req, res) => {
     try {
@@ -1792,13 +1957,21 @@ router.post(
         service,
         subService,
         companyName,
+        proposedName1,
+        proposedName2,
+        proposedNames,
         businessActivity,
+        businessDetails,
         proposedCapital,
         registeredOfficeAddress,
         city,
         state,
         pincode,
         directors,
+        addressProofType,
+        ownerName,
+        ownerPan,
+        ownerAadhaar,
         hasDigitalSignature,
         hasBankAccount,
         requiresGstRegistration,
@@ -1828,7 +2001,11 @@ router.post(
         selectedPackage,
       });
 
-      if (!fullName || !email || !phone || !pan || !service || !companyName || !businessActivity || !proposedCapital || !registeredOfficeAddress || !city || !state || !pincode) {
+      // Use proposedName1 if companyName is not provided (for backward compatibility)
+      const finalCompanyName = companyName || proposedName1;
+      const finalProposedNames = proposedNames ? (typeof proposedNames === 'string' ? JSON.parse(proposedNames) : proposedNames) : [proposedName1, proposedName2].filter(Boolean);
+      
+      if (!fullName || !email || !phone || !pan || !service || !finalCompanyName || !businessActivity || !businessDetails || !proposedCapital || !registeredOfficeAddress || !city || !state || !pincode || !addressProofType) {
         return res.status(400).json({ message: "All required fields must be provided" });
       }
 
@@ -1875,49 +2052,268 @@ router.post(
         pan: pan.toUpperCase(),
         service,
         subService: subService || service,
-        companyName,
+        companyName: finalCompanyName,
+        proposedNames: finalProposedNames,
         businessActivity,
+        businessDetails,
         proposedCapital,
         registeredOfficeAddress,
         city,
         state,
         pincode,
-        directors: parsedDirectors,
+        directors: parsedDirectors.map(dir => ({
+          name: dir.name,
+          email: dir.email,
+          phone: dir.phone,
+          pan: dir.pan ? dir.pan.toUpperCase() : undefined,
+          aadhaar: dir.aadhaar ? dir.aadhaar.replace(/\D/g, '') : undefined,
+          voterId: dir.voterId || undefined,
+          drivingLicense: dir.drivingLicense || undefined,
+          address: dir.address,
+        })),
+        addressProofType,
+        ownerName: ownerName || undefined,
+        ownerPan: ownerPan ? ownerPan.toUpperCase() : undefined,
+        ownerAadhaar: ownerAadhaar ? ownerAadhaar.replace(/\D/g, '') : undefined,
         hasDigitalSignature: hasDigitalSignature === 'true',
         hasBankAccount: hasBankAccount === 'true',
         requiresGstRegistration: requiresGstRegistration === 'true',
         requiresCompliance: requiresCompliance === 'true',
         selectedPackage: selectedPackage || "Basic",
+        documents: [],
       };
 
-      console.log("Final form data:", JSON.stringify(formData, null, 2));
-
+      // Process uploaded files
       if (req.files && req.files.length > 0) {
-        try {
-          formData.documents = req.files.map((file, index) => {
-            console.log(`Processing file ${index}:`, {
-              originalName: file.originalname,
-              mimetype: file.mimetype,
-              size: file.size,
-              hasBuffer: !!file.buffer
+        const documents = [];
+        const fileMap = {};
+
+        // Group files by fieldname
+        req.files.forEach((file) => {
+          if (!fileMap[file.fieldname]) {
+            fileMap[file.fieldname] = [];
+          }
+          fileMap[file.fieldname].push(file);
+        });
+
+        // Process director photos (directorPhoto_0, directorPhoto_1, etc.)
+        Object.keys(fileMap).forEach((fieldName) => {
+          if (fieldName.startsWith('directorPhoto_')) {
+            fileMap[fieldName].forEach((file) => {
+              const directorIndex = fieldName.split('_')[1] || '0';
+              documents.push({
+                documentType: `Director ${parseInt(directorIndex) + 1} Photo`,
+                fileName: generateUniqueFilename(file.originalname),
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+                uploadedBy: 'user',
+              });
             });
-            
-            return {
-              documentType: req.body[`documentType_${index}`] || "General Document",
-              fileName: file.filename || `file_${Date.now()}_${index}`,
+          }
+        });
+
+        // Process director signatures
+        Object.keys(fileMap).forEach((fieldName) => {
+          if (fieldName.startsWith('directorSignature_')) {
+            fileMap[fieldName].forEach((file) => {
+              const directorIndex = fieldName.split('_')[1] || '0';
+              documents.push({
+                documentType: `Director ${parseInt(directorIndex) + 1} Signature`,
+                fileName: generateUniqueFilename(file.originalname),
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+                uploadedBy: 'user',
+              });
+            });
+          }
+        });
+
+        // Process director Aadhaar cards
+        Object.keys(fileMap).forEach((fieldName) => {
+          if (fieldName.startsWith('directorAadhaar_')) {
+            fileMap[fieldName].forEach((file) => {
+              const directorIndex = fieldName.split('_')[1] || '0';
+              documents.push({
+                documentType: `Director ${parseInt(directorIndex) + 1} Aadhaar Card`,
+                fileName: generateUniqueFilename(file.originalname),
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+                uploadedBy: 'user',
+              });
+            });
+          }
+        });
+
+        // Process director PAN cards
+        Object.keys(fileMap).forEach((fieldName) => {
+          if (fieldName.startsWith('directorPan_')) {
+            fileMap[fieldName].forEach((file) => {
+              const directorIndex = fieldName.split('_')[1] || '0';
+              documents.push({
+                documentType: `Director ${parseInt(directorIndex) + 1} PAN Card`,
+                fileName: generateUniqueFilename(file.originalname),
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+                uploadedBy: 'user',
+              });
+            });
+          }
+        });
+
+        // Process director Voter IDs
+        Object.keys(fileMap).forEach((fieldName) => {
+          if (fieldName.startsWith('directorVoterId_')) {
+            fileMap[fieldName].forEach((file) => {
+              const directorIndex = fieldName.split('_')[1] || '0';
+              documents.push({
+                documentType: `Director ${parseInt(directorIndex) + 1} Voter ID`,
+                fileName: generateUniqueFilename(file.originalname),
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+                uploadedBy: 'user',
+              });
+            });
+          }
+        });
+
+        // Process director Driving Licenses
+        Object.keys(fileMap).forEach((fieldName) => {
+          if (fieldName.startsWith('directorDrivingLicense_')) {
+            fileMap[fieldName].forEach((file) => {
+              const directorIndex = fieldName.split('_')[1] || '0';
+              documents.push({
+                documentType: `Director ${parseInt(directorIndex) + 1} Driving License`,
+                fileName: generateUniqueFilename(file.originalname),
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+                uploadedBy: 'user',
+              });
+            });
+          }
+        });
+
+        // Process director Bank Statements
+        Object.keys(fileMap).forEach((fieldName) => {
+          if (fieldName.startsWith('directorBankStatement_')) {
+            fileMap[fieldName].forEach((file) => {
+              const directorIndex = fieldName.split('_')[1] || '0';
+              documents.push({
+                documentType: `Director ${parseInt(directorIndex) + 1} Bank Statement (Latest 3 Months)`,
+                fileName: generateUniqueFilename(file.originalname),
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+                uploadedBy: 'user',
+              });
+            });
+          }
+        });
+
+        // Process rent agreement
+        if (fileMap['rentAgreement']) {
+          fileMap['rentAgreement'].forEach((file) => {
+            documents.push({
+              documentType: "Rent Agreement",
+              fileName: generateUniqueFilename(file.originalname),
               originalName: file.originalname,
               fileType: file.mimetype,
               fileSize: file.size,
               fileData: getFileData(file),
               contentType: file.mimetype,
-            };
+              uploadedBy: 'user',
+            });
           });
-          console.log("Documents processed:", formData.documents.length);
-        } catch (fileError) {
-          console.error("Error processing files:", fileError);
-          return res.status(400).json({ message: "Error processing uploaded files" });
         }
+
+        // Process electricity bill
+        if (fileMap['electricityBill']) {
+          fileMap['electricityBill'].forEach((file) => {
+            documents.push({
+              documentType: "Electricity Bill",
+              fileName: generateUniqueFilename(file.originalname),
+              originalName: file.originalname,
+              fileType: file.mimetype,
+              fileSize: file.size,
+              fileData: getFileData(file),
+              contentType: file.mimetype,
+              uploadedBy: 'user',
+            });
+          });
+        }
+
+        // Process owner PAN/Aadhaar
+        if (fileMap['ownerPanAadhaar']) {
+          fileMap['ownerPanAadhaar'].forEach((file) => {
+            documents.push({
+              documentType: "Owner PAN/Aadhaar Card",
+              fileName: generateUniqueFilename(file.originalname),
+              originalName: file.originalname,
+              fileType: file.mimetype,
+              fileSize: file.size,
+              fileData: getFileData(file),
+              contentType: file.mimetype,
+              uploadedBy: 'user',
+            });
+          });
+        }
+
+        // Process municipal tax receipt
+        if (fileMap['municipalTaxReceipt']) {
+          fileMap['municipalTaxReceipt'].forEach((file) => {
+            documents.push({
+              documentType: "Municipal Tax Receipt",
+              fileName: generateUniqueFilename(file.originalname),
+              originalName: file.originalname,
+              fileType: file.mimetype,
+              fileSize: file.size,
+              fileData: getFileData(file),
+              contentType: file.mimetype,
+              uploadedBy: 'user',
+            });
+          });
+        }
+
+        // Process other documents
+        if (fileMap['documents']) {
+          fileMap['documents'].forEach((file) => {
+            documents.push({
+              documentType: "Additional Document",
+              fileName: generateUniqueFilename(file.originalname),
+              originalName: file.originalname,
+              fileType: file.mimetype,
+              fileSize: file.size,
+              fileData: getFileData(file),
+              contentType: file.mimetype,
+              uploadedBy: 'user',
+            });
+          });
+        }
+
+        formData.documents = documents;
+        console.log("Documents processed:", documents.length);
       }
+
+      console.log("Final form data:", JSON.stringify({ ...formData, documents: formData.documents.length }, null, 2));
 
       console.log("Creating CompanyForm instance...");
       const companyForm = new CompanyForm(formData);
@@ -1967,6 +2363,10 @@ router.post(
     { name: 'mouFile', maxCount: 1 },
     { name: 'bankAccountFile', maxCount: 1 },
     { name: 'businessRegistrationFile', maxCount: 1 },
+    { name: 'gstFile', maxCount: 1 },
+    { name: 'electricityBillFile', maxCount: 1 },
+    { name: 'rentAgreementFile', maxCount: 1 },
+    { name: 'cancelCheckFile', maxCount: 1 },
     { name: 'documents', maxCount: 10 }
   ]),
   handleMulterError,
@@ -2057,24 +2457,35 @@ router.post(
       // Handle file uploads
       const documents = [];
       
-      // Process specific document files
-      const fileFields = [
-        'aadhaarFile', 'panFile', 'addressProofFile', 'businessAddressProofFile',
-        'identityProofFile', 'partnershipDeedFile', 'mouFile', 'bankAccountFile',
-        'businessRegistrationFile'
-      ];
+      // Process specific document files with proper document types
+      const fileFieldMap = {
+        'aadhaarFile': 'Aadhaar Card',
+        'panFile': 'PAN Card',
+        'addressProofFile': 'Address Proof',
+        'businessAddressProofFile': 'Business Address Proof',
+        'identityProofFile': 'Identity Proof',
+        'partnershipDeedFile': 'Partnership Deed',
+        'mouFile': 'Memorandum of Understanding',
+        'bankAccountFile': 'Bank Account Details',
+        'businessRegistrationFile': 'Business Registration Certificate',
+        'gstFile': 'GST Certificate',
+        'electricityBillFile': 'Electricity Bill',
+        'rentAgreementFile': 'Rent Agreement',
+        'cancelCheckFile': 'Bank Statement / Cancel Check'
+      };
       
-      fileFields.forEach(fieldName => {
+      Object.keys(fileFieldMap).forEach(fieldName => {
         if (req.files[fieldName] && req.files[fieldName].length > 0) {
           const file = req.files[fieldName][0];
           documents.push({
-            documentType: fieldName.replace('File', ' Document'),
-            fileName: file.filename,
+            documentType: fileFieldMap[fieldName],
+            fileName: generateUniqueFilename(file.originalname),
             originalName: file.originalname,
             fileType: file.mimetype,
             fileSize: file.size,
             fileData: getFileData(file),
             contentType: file.mimetype,
+            uploadedBy: 'user',
           });
         }
       });
@@ -2084,12 +2495,13 @@ router.post(
         req.files['documents'].forEach((file, index) => {
           documents.push({
             documentType: req.body[`documentType_${index}`] || "Additional Document",
-            fileName: file.filename,
+            fileName: generateUniqueFilename(file.originalname),
             originalName: file.originalname,
             fileType: file.mimetype,
             fileSize: file.size,
             fileData: getFileData(file),
             contentType: file.mimetype,
+            uploadedBy: 'user',
           });
         });
       }
@@ -2109,6 +2521,348 @@ router.post(
       console.error("Error submitting other registration form:", error);
       res.status(500).json({
         message: "Server error while submitting other registration form",
+        error: error.message,
+      });
+    }
+  }
+);
+
+// @route   POST /api/forms/partnership-firm
+// @desc    Submit partnership firm registration form with documents
+// @access  Private
+router.post(
+  "/partnership-firm",
+  protect,
+  upload.any(),
+  handleMulterError,
+  async (req, res) => {
+    try {
+      console.log("Partnership firm form submission received");
+      console.log("Request body:", req.body);
+      console.log("Files received:", req.files ? Object.keys(req.files).length : "No files");
+      
+      const {
+        fullName,
+        email,
+        phone,
+        pan,
+        businessName,
+        businessAddress,
+        city,
+        state,
+        pincode,
+        businessDetails,
+        addressProofType,
+        ownerName,
+        ownerPan,
+        ownerAadhaar,
+        partnershipDeedDate,
+        partnershipDeedNotarized,
+        partnershipDeedStampDuty,
+        requiresGstRegistration,
+        requiresBankAccount,
+        requiresCompliance,
+        selectedPackage,
+        partners,
+        service = "Other Registration",
+        subService = "Partnership Firm",
+      } = req.body;
+
+      // Validate required fields
+      if (!fullName || !email || !phone || !pan || !businessName || !businessAddress || !city || !state || !pincode || !businessDetails || !addressProofType) {
+        return res.status(400).json({ message: "All required fields must be provided" });
+      }
+
+      // Validate PAN format
+      const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+      if (!panRegex.test(pan)) {
+        return res.status(400).json({ message: "Invalid PAN format" });
+      }
+
+      // Parse partners data
+      let parsedPartners = [];
+      try {
+        if (partners) {
+          parsedPartners = typeof partners === 'string' ? JSON.parse(partners) : partners;
+        }
+      } catch (parseError) {
+        console.error("Error parsing partners:", parseError);
+        return res.status(400).json({ message: "Invalid partners data format" });
+      }
+
+      // Validate partners data
+      if (!parsedPartners || parsedPartners.length === 0) {
+        return res.status(400).json({ message: "At least one partner is required" });
+      }
+
+      // Validate each partner
+      for (const partner of parsedPartners) {
+        if (!partner.name || !partner.email || !partner.phone || !partner.pan || !partner.aadhaar || !partner.address) {
+          return res.status(400).json({ message: "All partner fields are required" });
+        }
+        if (!panRegex.test(partner.pan)) {
+          return res.status(400).json({ message: `Invalid PAN format for partner: ${partner.name}` });
+        }
+        if (!/^\d{12}$/.test(partner.aadhaar)) {
+          return res.status(400).json({ message: `Invalid Aadhaar format for partner: ${partner.name}` });
+        }
+      }
+
+      // Build form data
+      const formData = {
+        user: req.user._id,
+        fullName,
+        email,
+        phone,
+        pan: pan.toUpperCase(),
+        service,
+        subService,
+        businessName,
+        businessAddress,
+        city,
+        state,
+        pincode,
+        businessDetails,
+        addressProofType,
+        partners: parsedPartners.map(partner => ({
+          name: partner.name,
+          email: partner.email,
+          phone: partner.phone,
+          pan: partner.pan.toUpperCase(),
+          aadhaar: partner.aadhaar.replace(/\D/g, ''),
+          address: partner.address,
+          isActive: true,
+        })),
+        partnershipDeedDate: partnershipDeedDate || undefined,
+        partnershipDeedNotarized: partnershipDeedNotarized === 'true' || partnershipDeedNotarized === true,
+        partnershipDeedStampDuty: partnershipDeedStampDuty || undefined,
+        ownerName: ownerName || undefined,
+        ownerPan: ownerPan ? ownerPan.toUpperCase() : undefined,
+        ownerAadhaar: ownerAadhaar ? ownerAadhaar.replace(/\D/g, '') : undefined,
+        requiresGstRegistration: requiresGstRegistration === 'true' || requiresGstRegistration === true,
+        requiresBankAccount: requiresBankAccount === 'true' || requiresBankAccount === true,
+        requiresCompliance: requiresCompliance === 'true' || requiresCompliance === true,
+        selectedPackage: selectedPackage || "Basic",
+        documents: [],
+        status: "Pending",
+      };
+
+      // Process uploaded files
+      if (req.files && req.files.length > 0) {
+        const documents = [];
+        const fileMap = {};
+
+        // Group files by fieldname
+        req.files.forEach((file) => {
+          if (!fileMap[file.fieldname]) {
+            fileMap[file.fieldname] = [];
+          }
+          fileMap[file.fieldname].push(file);
+        });
+
+        // Process partner photos (partnerPhoto_0, partnerPhoto_1, etc.)
+        Object.keys(fileMap).forEach((fieldName) => {
+          if (fieldName.startsWith('partnerPhoto_')) {
+            fileMap[fieldName].forEach((file, index) => {
+              const partnerIndex = fieldName.split('_')[1] || '0';
+              documents.push({
+                documentType: `Partner ${parseInt(partnerIndex) + 1} Photo`,
+                fileName: generateUniqueFilename(file.originalname),
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+                uploadedBy: 'user',
+              });
+            });
+          }
+        });
+
+        // Process partner signatures (partnerSignature_0, partnerSignature_1, etc.)
+        Object.keys(fileMap).forEach((fieldName) => {
+          if (fieldName.startsWith('partnerSignature_')) {
+            fileMap[fieldName].forEach((file, index) => {
+              const partnerIndex = fieldName.split('_')[1] || '0';
+              documents.push({
+                documentType: `Partner ${parseInt(partnerIndex) + 1} Signature`,
+                fileName: generateUniqueFilename(file.originalname),
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+                uploadedBy: 'user',
+              });
+            });
+          }
+        });
+
+        // Process partner Aadhaar cards (partnerAadhaar_0, partnerAadhaar_1, etc.)
+        Object.keys(fileMap).forEach((fieldName) => {
+          if (fieldName.startsWith('partnerAadhaar_')) {
+            fileMap[fieldName].forEach((file, index) => {
+              const partnerIndex = fieldName.split('_')[1] || '0';
+              documents.push({
+                documentType: `Partner ${parseInt(partnerIndex) + 1} Aadhaar Card`,
+                fileName: generateUniqueFilename(file.originalname),
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+                uploadedBy: 'user',
+              });
+            });
+          }
+        });
+
+        // Process partner PAN cards (partnerPan_0, partnerPan_1, etc.)
+        Object.keys(fileMap).forEach((fieldName) => {
+          if (fieldName.startsWith('partnerPan_')) {
+            fileMap[fieldName].forEach((file, index) => {
+              const partnerIndex = fieldName.split('_')[1] || '0';
+              documents.push({
+                documentType: `Partner ${parseInt(partnerIndex) + 1} PAN Card`,
+                fileName: generateUniqueFilename(file.originalname),
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+                uploadedBy: 'user',
+              });
+            });
+          }
+        });
+
+        // Process rent agreement
+        if (fileMap['rentAgreement']) {
+          fileMap['rentAgreement'].forEach((file) => {
+            documents.push({
+              documentType: "Rent Agreement",
+              fileName: generateUniqueFilename(file.originalname),
+              originalName: file.originalname,
+              fileType: file.mimetype,
+              fileSize: file.size,
+              fileData: getFileData(file),
+              contentType: file.mimetype,
+              uploadedBy: 'user',
+            });
+          });
+        }
+
+        // Process electricity bill
+        if (fileMap['electricityBill']) {
+          fileMap['electricityBill'].forEach((file) => {
+            documents.push({
+              documentType: "Electricity Bill",
+              fileName: generateUniqueFilename(file.originalname),
+              originalName: file.originalname,
+              fileType: file.mimetype,
+              fileSize: file.size,
+              fileData: getFileData(file),
+              contentType: file.mimetype,
+              uploadedBy: 'user',
+            });
+          });
+        }
+
+        // Process owner PAN/Aadhaar
+        if (fileMap['ownerPanAadhaar']) {
+          fileMap['ownerPanAadhaar'].forEach((file) => {
+            documents.push({
+              documentType: "Owner PAN/Aadhaar Card",
+              fileName: generateUniqueFilename(file.originalname),
+              originalName: file.originalname,
+              fileType: file.mimetype,
+              fileSize: file.size,
+              fileData: getFileData(file),
+              contentType: file.mimetype,
+              uploadedBy: 'user',
+            });
+          });
+        }
+
+        // Process municipal tax receipt
+        if (fileMap['municipalTaxReceipt']) {
+          fileMap['municipalTaxReceipt'].forEach((file) => {
+            documents.push({
+              documentType: "Municipal Tax Receipt",
+              fileName: generateUniqueFilename(file.originalname),
+              originalName: file.originalname,
+              fileType: file.mimetype,
+              fileSize: file.size,
+              fileData: getFileData(file),
+              contentType: file.mimetype,
+              uploadedBy: 'user',
+            });
+          });
+        }
+
+        // Process custom documents
+        Object.keys(fileMap).forEach((fieldName) => {
+          if (fieldName.startsWith('customDoc_')) {
+            fileMap[fieldName].forEach((file) => {
+              const docIndex = fieldName.split('_')[1];
+              const docTitle = req.body[`customDocTitle_${docIndex}`] || "Custom Document";
+              documents.push({
+                documentType: docTitle,
+                fileName: generateUniqueFilename(file.originalname),
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+                uploadedBy: 'user',
+              });
+            });
+          }
+        });
+
+        // Process other documents
+        if (fileMap['documents']) {
+          fileMap['documents'].forEach((file) => {
+            documents.push({
+              documentType: "Additional Document",
+              fileName: generateUniqueFilename(file.originalname),
+              originalName: file.originalname,
+              fileType: file.mimetype,
+              fileSize: file.size,
+              fileData: getFileData(file),
+              contentType: file.mimetype,
+              uploadedBy: 'user',
+            });
+          });
+        }
+
+        formData.documents = documents;
+      }
+
+      console.log("Final form data:", JSON.stringify({ ...formData, documents: formData.documents.length }, null, 2));
+
+      // Create partnership form
+      const partnershipForm = new PartnershipForm(formData);
+      await partnershipForm.save();
+
+      console.log("Partnership firm form saved successfully with ID:", partnershipForm._id);
+
+      res.status(201).json({
+        message: "Partnership firm registration form submitted successfully",
+        formId: partnershipForm._id,
+      });
+    } catch (error) {
+      console.error("Error submitting partnership firm form:", error);
+      
+      // Handle duplicate key error
+      if (error.code === 11000) {
+        return res.status(409).json({
+          message: "You have already submitted a partnership firm registration form. You can only submit one form per service.",
+        });
+      }
+      
+      res.status(500).json({
+        message: "Server error while submitting partnership firm form",
         error: error.message,
       });
     }

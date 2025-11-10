@@ -124,7 +124,7 @@ export default function HomePage() {
                 {
                   icon: Building2,
                   title: "Company Registration",
-                  href: "/company-formation",
+                  href: "/company-information",
                   description:
                     "Start your company with complete legal compliance",
                 },
