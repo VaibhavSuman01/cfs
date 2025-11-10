@@ -1,15 +1,18 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { 
   MessageSquare, 
-  Plus, 
   Home,
   Building2,
-  Users
+  Settings,
+  LogOut,
+  User,
+  MessageCircle,
 } from 'lucide-react';
+import { useAuth } from '@/providers/auth-provider';
 
 const navigation = [
   {
@@ -18,17 +21,28 @@ const navigation = [
     icon: Home,
   },
   {
-    name: 'Contact Form',
-    href: '/contact-form',
-    icon: Plus,
+    name: 'Chat Support',
+    href: '/chat',
+    icon: MessageCircle,
   },
 ];
 
 export function Navigation() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    router.push('/auth');
+  };
+
+  if (pathname === '/auth') {
+    return null;
+  }
 
   return (
-    <nav className="bg-white shadow-sm border-b">
+    <nav className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -37,8 +51,8 @@ export function Navigation() {
               <Building2 className="h-5 w-5 text-white" />
             </div>
             <div>
-              <span className="text-xl font-bold text-gray-900">Contact</span>
-              <span className="text-sm text-gray-500 ml-1">Management</span>
+              <span className="text-xl font-bold text-gray-900 dark:text-white">Support</span>
+              <span className="text-sm text-gray-500 dark:text-gray-400 ml-1">Team</span>
             </div>
           </Link>
 
@@ -50,10 +64,10 @@ export function Navigation() {
                 <Link key={item.name} href={item.href}>
                   <Button
                     variant={isActive ? 'default' : 'ghost'}
-                    className={`flex items-center space-x-2 ${
+                    className={`flex items-center space-x-2 dark:text-gray-300 ${
                       isActive 
                         ? 'bg-blue-600 text-white' 
-                        : 'text-gray-600 hover:text-gray-900'
+                        : 'text-gray-600 hover:text-gray-900 dark:hover:text-white'
                     }`}
                   >
                     <item.icon className="h-4 w-4" />
@@ -62,6 +76,23 @@ export function Navigation() {
                 </Link>
               );
             })}
+            
+            <Link href="/profile">
+              <Button variant="ghost" className="dark:text-gray-300">
+                <User className="h-4 w-4 mr-2" />
+                {user?.name}
+              </Button>
+            </Link>
+            
+            <Link href="/settings">
+              <Button variant="ghost" className="dark:text-gray-300">
+                <Settings className="h-4 w-4" />
+              </Button>
+            </Link>
+            
+            <Button variant="ghost" onClick={handleLogout} className="dark:text-gray-300">
+              <LogOut className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </div>
