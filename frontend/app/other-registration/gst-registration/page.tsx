@@ -180,7 +180,9 @@ export default function GstRegistrationPage() {
                   <CardTitle className="text-2xl font-bold text-blue-600">
                     Basic
                   </CardTitle>
-                  <div className="text-4xl font-bold text-gray-900">₹1,999</div>
+                  <div className="text-4xl font-bold text-gray-900">
+                    ₹2,499*
+                  </div>
                   <p className="text-sm text-gray-600">Starting Price</p>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -216,7 +218,9 @@ export default function GstRegistrationPage() {
                   <CardTitle className="text-2xl font-bold text-blue-600">
                     Standard
                   </CardTitle>
-                  <div className="text-4xl font-bold text-gray-900">₹2,999</div>
+                  <div className="text-4xl font-bold text-gray-900">
+                    ₹3,499*
+                  </div>
                   <p className="text-sm text-gray-600">Most Popular</p>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -256,7 +260,9 @@ export default function GstRegistrationPage() {
                   <CardTitle className="text-2xl font-bold text-blue-600">
                     Premium
                   </CardTitle>
-                  <div className="text-4xl font-bold text-gray-900">₹4,999</div>
+                  <div className="text-4xl font-bold text-gray-900">
+                    ₹4,999*
+                  </div>
                   <p className="text-sm text-gray-600">Complete Solution</p>
                 </CardHeader>
                 <CardContent className="space-y-4">

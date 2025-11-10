@@ -42,10 +42,10 @@
     "tooltip": "Prices vary based on company size, complexity, and industry standards"
   },
   "gst registration": {
-    "basePrice": "₹1,999*",
+    "basePrice": "₹2,499*",
     "packages": {
-      "BASIC": "₹1,999*",
-      "STANDARD": "₹2,999*",
+      "BASIC": "₹2,499*",
+      "STANDARD": "₹3,499*",
       "PREMIUM": "₹4,999*"
     },
     "tooltip": "Prices may vary based on complexity and industry standards"
@@ -273,9 +273,9 @@
     "tooltip": "Prices vary based on license type, business size, and industry standards"
   },
   "iec registration": {
-    "basePrice": "₹1,499*",
+    "basePrice": "₹2,499*",
     "packages": {
-      "BASIC": "₹1,499*"
+      "BASIC": "₹2,499*"
     },
     "tooltip": "Prices may vary based on complexity and industry standards"
   },

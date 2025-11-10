@@ -192,7 +192,7 @@ export default function PublicLimitedCompanyPage() {
                     Basic
                   </CardTitle>
                   <div className="text-4xl font-bold text-gray-900">
-                    ₹14,999
+                    ₹14,999*
                   </div>
                   <p className="text-sm text-gray-600">Starting Price</p>
                 </CardHeader>
@@ -229,7 +229,7 @@ export default function PublicLimitedCompanyPage() {
                     Standard
                   </CardTitle>
                   <div className="text-4xl font-bold text-gray-900">
-                    ₹24,999
+                    ₹24,999*
                   </div>
                   <p className="text-sm text-gray-600">Most Popular</p>
                 </CardHeader>
@@ -270,7 +270,7 @@ export default function PublicLimitedCompanyPage() {
                     Premium
                   </CardTitle>
                   <div className="text-4xl font-bold text-gray-900">
-                    ₹30,999
+                    ₹30,999*
                   </div>
                   <p className="text-sm text-gray-600">Complete Solution</p>
                 </CardHeader>
