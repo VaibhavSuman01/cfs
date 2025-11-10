@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Contact = require("../models/Contact");
-const { protect } = require("../middleware/auth");
+const { protect, admin } = require("../middleware/auth");
 const sendEmail = require("../utils/email");
 
 // @route   POST /api/support/contact
@@ -114,6 +114,237 @@ router.get("/block-details", protect, async (req, res) => {
     res.status(500).json({ 
       success: false, 
       message: "Failed to fetch block details" 
+    });
+  }
+});
+
+// @route   GET /api/support/contacts
+// @desc    Get all contact form submissions (for support team/admin)
+// @access  Private/Support or Admin
+router.get("/contacts", protect, async (req, res) => {
+  // Allow support team or admin
+  if (req.user.type !== "support" && req.user.role !== "admin") {
+    return res.status(403).json({
+      success: false,
+      message: "Access denied",
+    });
+  }
+  try {
+    const { page = 1, limit = 20, status, search } = req.query;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    // Build query
+    const query = {};
+    if (status === 'replied') {
+      query.replied = true;
+    } else if (status === 'pending') {
+      query.replied = false;
+    }
+
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+        { phone: { $regex: search, $options: 'i' } },
+        { service: { $regex: search, $options: 'i' } },
+        { message: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    const contacts = await Contact.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    const total = await Contact.countDocuments(query);
+
+    res.json({
+      success: true,
+      data: contacts,
+      pagination: {
+        total,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        pages: Math.ceil(total / parseInt(limit))
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching contacts:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Failed to fetch contacts" 
+    });
+  }
+});
+
+// @route   GET /api/support/contacts/:id
+// @desc    Get a specific contact by ID
+// @access  Private/Support or Admin
+router.get("/contacts/:id", protect, async (req, res) => {
+  if (req.user.type !== "support" && req.user.role !== "admin") {
+    return res.status(403).json({
+      success: false,
+      message: "Access denied",
+    });
+  }
+  try {
+    const contact = await Contact.findById(req.params.id);
+    
+    if (!contact) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Contact not found" 
+      });
+    }
+
+    res.json({
+      success: true,
+      data: contact
+    });
+  } catch (error) {
+    console.error("Error fetching contact:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Failed to fetch contact" 
+    });
+  }
+});
+
+// @route   PUT /api/support/contacts/:id/reply
+// @desc    Mark contact as replied and send email response
+// @access  Private/Admin
+router.put("/contacts/:id/reply", protect, admin, async (req, res) => {
+  try {
+    const { replyMessage } = req.body;
+    
+    if (!replyMessage || !replyMessage.trim()) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Reply message is required" 
+      });
+    }
+
+    const contact = await Contact.findById(req.params.id);
+    
+    if (!contact) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Contact not found" 
+      });
+    }
+
+    // Update contact as replied
+    contact.replied = true;
+    contact.repliedAt = new Date();
+    contact.repliedBy = req.user._id;
+    contact.replyMessage = replyMessage.trim();
+    await contact.save();
+
+    // Send email reply to user
+    try {
+      await sendEmail({
+        email: contact.email,
+        subject: `Re: ${contact.service} - Response from Com Financial Services`,
+        message: `
+Dear ${contact.name},
+
+Thank you for contacting Com Financial Services.
+
+${replyMessage}
+
+If you have any further questions, please don't hesitate to contact us.
+
+Best regards,
+Com Financial Services Support Team
+        `
+      });
+    } catch (emailError) {
+      console.error('Failed to send reply email:', emailError);
+      // Don't fail the request if email fails
+    }
+
+    res.json({
+      success: true,
+      message: "Reply sent successfully",
+      data: contact
+    });
+  } catch (error) {
+    console.error("Error replying to contact:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Failed to send reply" 
+    });
+  }
+});
+
+// @route   PUT /api/support/contacts/:id/mark-replied
+// @desc    Mark contact as replied without sending email
+// @access  Private/Support or Admin
+router.put("/contacts/:id/mark-replied", protect, async (req, res) => {
+  if (req.user.type !== "support" && req.user.role !== "admin") {
+    return res.status(403).json({
+      success: false,
+      message: "Access denied",
+    });
+  }
+  try {
+    const contact = await Contact.findById(req.params.id);
+    
+    if (!contact) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Contact not found" 
+      });
+    }
+
+    contact.replied = true;
+    contact.repliedAt = new Date();
+    contact.repliedBy = req.user._id;
+    await contact.save();
+
+    res.json({
+      success: true,
+      message: "Contact marked as replied",
+      data: contact
+    });
+  } catch (error) {
+    console.error("Error marking contact as replied:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Failed to update contact" 
+    });
+  }
+});
+
+// @route   DELETE /api/support/contacts/:id
+// @desc    Delete a contact submission
+// @access  Private/Support or Admin
+router.delete("/contacts/:id", protect, async (req, res) => {
+  if (req.user.type !== "support" && req.user.role !== "admin") {
+    return res.status(403).json({
+      success: false,
+      message: "Access denied",
+    });
+  }
+  try {
+    const contact = await Contact.findByIdAndDelete(req.params.id);
+    
+    if (!contact) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Contact not found" 
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Contact deleted successfully"
+    });
+  } catch (error) {
+    console.error("Error deleting contact:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Failed to delete contact" 
     });
   }
 });

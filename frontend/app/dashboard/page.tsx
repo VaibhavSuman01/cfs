@@ -38,6 +38,9 @@ import {
   Home,
   ChevronRight,
   Pencil,
+  MessageCircle,
+  HelpCircle,
+  Send,
 } from "lucide-react";
 import Link from "next/link";
 import api from "@/lib/api-client";
@@ -501,9 +504,10 @@ export default function UserDashboard() {
           {/* --- Right Column: Services & Forms --- */}
           <div className="lg:col-span-2">
             <Tabs defaultValue="services">
-              <TabsList className="grid w-full grid-cols-2 bg-blue-100/70 p-1">
+              <TabsList className="grid w-full grid-cols-3 bg-blue-100/70 p-1">
                 <TabsTrigger value="services">Our Services</TabsTrigger>
                 <TabsTrigger value="forms">My Forms</TabsTrigger>
+                <TabsTrigger value="support">Support</TabsTrigger>
               </TabsList>
 
               <TabsContent value="services" className="mt-4">
@@ -716,6 +720,120 @@ export default function UserDashboard() {
                         </Button>
                       </div>
                     )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="support" className="mt-4">
+                <Card className="shadow-sm">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <MessageCircle className="h-5 w-5 text-blue-600" />
+                      Support & Help
+                    </CardTitle>
+                    <CardDescription>
+                      Get help from our support team or contact us for assistance.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <Card className="border-2 border-blue-100 hover:border-blue-300 transition-colors">
+                        <CardContent className="p-6">
+                          <div className="flex items-start space-x-4">
+                            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                              <MessageCircle className="h-6 w-6 text-blue-600" />
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="font-semibold text-gray-900 mb-2">Chat Support</h3>
+                              <p className="text-sm text-gray-600 mb-4">
+                                Chat directly with our support team for real-time assistance.
+                              </p>
+                              <Button asChild className="w-full">
+                                <Link href="/dashboard/chat">
+                                  <MessageCircle className="mr-2 h-4 w-4" />
+                                  Start Chat
+                                </Link>
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="border-2 border-purple-100 hover:border-purple-300 transition-colors">
+                        <CardContent className="p-6">
+                          <div className="flex items-start space-x-4">
+                            <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                              <Send className="h-6 w-6 text-purple-600" />
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="font-semibold text-gray-900 mb-2">Contact Form</h3>
+                              <p className="text-sm text-gray-600 mb-4">
+                                Send a message via contact form. We'll get back to you within 24 hours.
+                              </p>
+                              <Button variant="outline" asChild className="w-full">
+                                <Link href="/contact">
+                                  <Send className="mr-2 h-4 w-4" />
+                                  Send Message
+                                </Link>
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="border-2 border-green-100 hover:border-green-300 transition-colors">
+                        <CardContent className="p-6">
+                          <div className="flex items-start space-x-4">
+                            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                              <Phone className="h-6 w-6 text-green-600" />
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="font-semibold text-gray-900 mb-2">Call Support</h3>
+                              <p className="text-sm text-gray-600 mb-4">
+                                Call us directly for immediate assistance during business hours.
+                              </p>
+                              <Button variant="outline" className="w-full" asChild>
+                                <a href="tel:0612-4535604">
+                                  <Phone className="mr-2 h-4 w-4" />
+                                  0612-4535604
+                                </a>
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    <Card className="border-2 border-purple-100">
+                      <CardContent className="p-6">
+                        <div className="flex items-start space-x-4">
+                          <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <HelpCircle className="h-6 w-6 text-purple-600" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-gray-900 mb-2">Frequently Asked Questions</h3>
+                            <p className="text-sm text-gray-600 mb-4">
+                              Find quick answers to common questions about our services.
+                            </p>
+                            <Button variant="outline" className="w-full" asChild>
+                              <Link href="/contact#faq">
+                                <HelpCircle className="mr-2 h-4 w-4" />
+                                View FAQ
+                              </Link>
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <h4 className="font-semibold text-blue-900 mb-2">Office Hours</h4>
+                      <p className="text-sm text-blue-700">
+                        Monday - Saturday: 10:00 AM - 7:00 PM
+                        <br />
+                        Sunday: Closed
+                      </p>
+                    </div>
                   </CardContent>
                 </Card>
               </TabsContent>

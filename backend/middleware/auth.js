@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const SupportTeam = require("../models/SupportTeam");
 
 // Middleware to protect routes
 const protect = async (req, res, next) => {
@@ -29,8 +30,14 @@ const protect = async (req, res, next) => {
         return res.status(401).json({ message: "Not authorized, token expired" });
       }
 
-      // Get user from token
-      req.user = await User.findById(decoded.user.id).select("-password");
+      // Check if it's a support team member or regular user
+      if (decoded.type === "support") {
+        req.user = await SupportTeam.findById(decoded.id).select("-password");
+        req.user.type = "support";
+      } else {
+        req.user = await User.findById(decoded.user?.id || decoded.id).select("-password");
+        req.user.type = "user";
+      }
 
       if (!req.user) {
         return res

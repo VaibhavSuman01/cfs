@@ -30,6 +30,16 @@ const ContactSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  repliedAt: {
+    type: Date,
+  },
+  repliedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  },
+  replyMessage: {
+    type: String,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
