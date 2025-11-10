@@ -228,7 +228,7 @@ export default function UserDashboard() {
   const getFormTypeLabel = (formType: string) => {
     const typeMap: Record<string, string> = {
       'TaxForm': 'Tax Filing',
-      'CompanyForm': 'Company Formation',
+      'CompanyForm': 'Company Information',
       'OtherRegistrationForm': 'Other Registration',
       'ROCForm': 'ROC Returns',
       'ReportsForm': 'Reports',
@@ -327,7 +327,7 @@ export default function UserDashboard() {
 
   const services = [
     {
-      name: "Company Formation",
+      name: "Company Information",
       items: [
         "Private Limited Company",
         "One Person Company (OPC)",
@@ -541,13 +541,13 @@ export default function UserDashboard() {
                                   {category.name === 'Taxation' ? (
                                     <Button variant="outline" size="sm" asChild>
                                       <Link
-                                        href={`/dashboard/new-form?service=${encodeURIComponent(service)}`}
+                                        href={`/dashboard/new-form=${encodeURIComponent(service)}`}
                                       >
                                         File Now{" "}
                                         <ChevronRight className="ml-2 h-4 w-4" />
                                       </Link>
                                     </Button>
-                                  ) : category.name === 'Company Formation' ? (
+                                  ) : category.name === 'Company Information' ? (
                                     <Button variant="outline" size="sm" asChild>
                                       <Link
                                         href={`/dashboard/company-formation?service=${encodeURIComponent(service)}`}

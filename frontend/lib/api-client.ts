@@ -62,7 +62,7 @@ export const API_PATHS = {
     // Generic service form endpoint
     SERVICE: createUrl("/api/forms/service"),
     // Specific form endpoints
-    COMPANY_FORMATION: createUrl("/api/forms/company-formation"),
+    COMPANY_FORMATION: createUrl("/api/forms/company-information"),
     OTHER_REGISTRATION: createUrl("/api/forms/other-registration"),
     PARTNERSHIP_FIRM: createUrl("/api/forms/partnership-firm"),
     ROC_RETURNS: createUrl("/api/forms/roc-returns"),
@@ -70,12 +70,12 @@ export const API_PATHS = {
     TRADEMARK_ISO: createUrl("/api/forms/trademark-iso"),
     ADVISORY: createUrl("/api/forms/advisory"),
 
-    // Company Formation - user CRUD and documents
-    COMPANY_FORMATION_USER_SUBMISSIONS: createUrl("/api/forms/company-formation/user-submissions"),
-    COMPANY_FORMATION_DETAIL: (id: string) => createUrl(`/api/forms/company-formation/${id}`),
-    COMPANY_FORMATION_UPDATE: (id: string) => createUrl(`/api/forms/company-formation/${id}`),
-    COMPANY_FORMATION_UPLOAD_DOC: (formId: string) => createUrl(`/api/forms/company-formation/document/${formId}`),
-    COMPANY_FORMATION_DOWNLOAD_DOC: (documentId: string) => createUrl(`/api/forms/company-formation/download/${documentId}`),
+    // Company Information - user CRUD and documents
+    COMPANY_FORMATION_USER_SUBMISSIONS: createUrl("/api/forms/company-information/user-submissions"),
+    COMPANY_FORMATION_DETAIL: (id: string) => createUrl(`/api/forms/company-information/${id}`),
+    COMPANY_FORMATION_UPDATE: (id: string) => createUrl(`/api/forms/company-information/${id}`),
+    COMPANY_FORMATION_UPLOAD_DOC: (formId: string) => createUrl(`/api/forms/company-information/document/${formId}`),
+    COMPANY_FORMATION_DOWNLOAD_DOC: (documentId: string) => createUrl(`/api/forms/company-information/download/${documentId}`),
 
     // Other Registration - user CRUD and documents
     OTHER_REGISTRATION_USER_SUBMISSIONS: createUrl("/api/forms/other-registration/user-submissions"),

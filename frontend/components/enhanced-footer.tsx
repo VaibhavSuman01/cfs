@@ -150,6 +150,15 @@ export function EnhancedFooter() {
     { name: "Salary Calculator", href: "/tools/salary-calculator" },
   ];
 
+  const toolsServices = [
+    { name: "Income Tax Calculator", href: "/tools/income-tax-calculator" },
+    { name: "EMI Calculator", href: "/tools/emi-calculator" },
+    { name: "GST Calculator", href: "/tools/gst-calculator" },
+    { name: "SIP Calculator", href: "/tools/sip-calculator" },
+    { name: "HSN Code Finder", href: "/tools/hsn-code-finder" },
+    { name: "Salary Calculator", href: "/tools/salary-calculator" },
+  ]
+
   const quickLinks = [
     { name: "About Us", href: "/about" },
     { name: "Contact Us", href: "/contact" },

@@ -223,6 +223,7 @@ export default function NewFormPage() {
   const hasHomeLoan = form.watch('hasHomeLoan');
   const hasPranNumber = form.watch('hasPranNumber');
   const selectedService = form.watch('service');
+  const gstFilingType = form.watch('gstFilingType');
 
   // Populate form with user data when loaded
   useEffect(() => {
@@ -247,12 +248,54 @@ export default function NewFormPage() {
     try {
       setIsSubmitting(true);
 
+      // Validate quarterly filing months
+      if (selectedService === 'GST Filing' && gstFilingType === 'quarterly' && selectedMonths.length === 0) {
+        toast.error('Please select at least one month for quarterly filing');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Validate TDS Returns required fields
+      if (selectedService === 'TDS Returns') {
+        if (!data.tdsFilingMonth || !data.tdsFilingYear) {
+          toast.error('Please select filing month and year for TDS Returns');
+          setIsSubmitting(false);
+          return;
+        }
+        if (!data.tracesUserId || !data.tracesPassword) {
+          toast.error('TRACES User ID and Password are required');
+          setIsSubmitting(false);
+          return;
+        }
+        if (!data.incomeTaxUserId || !data.incomeTaxPassword) {
+          toast.error('Income Tax (TAN Base) User ID and Password are required');
+          setIsSubmitting(false);
+          return;
+        }
+        if (!data.incomeTaxPanNumber) {
+          toast.error('Income Tax (PAN No.) is required');
+          setIsSubmitting(false);
+          return;
+        }
+        if (!tdsDataFile) {
+          toast.error('TDS Data (Monthly) file is required');
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       const formData = new FormData();
 
       // Append form data
       Object.entries(data).forEach(([key, value]) => {
         if (typeof value === 'boolean') {
           formData.append(key, String(value));
+        } else if (Array.isArray(value)) {
+          // Handle array values (like selectedMonths)
+          value.forEach((item, index) => {
+            formData.append(`${key}[${index}]`, item);
+          });
+          formData.append(key, JSON.stringify(value));
         } else if (value !== undefined && value !== null) {
           formData.append(key, value);
         } else {
@@ -260,6 +303,24 @@ export default function NewFormPage() {
           formData.append(key, '');
         }
       });
+      
+      // Append selected months for quarterly filing
+      if (selectedMonths.length > 0) {
+        formData.append('selectedMonths', JSON.stringify(selectedMonths));
+      }
+
+      // Append Aadhaar file if uploaded
+      if (aadhaarFile) {
+        formData.append('aadhaarFile', aadhaarFile);
+      }
+
+      // Append service-specific files
+      if (salesDataFile) formData.append('salesDataFile', salesDataFile);
+      if (purchaseDataFile) formData.append('purchaseDataFile', purchaseDataFile);
+      if (bankStatementFile) formData.append('bankStatementFile', bankStatementFile);
+      if (tdsDataFile) formData.append('tdsDataFile', tdsDataFile);
+      if (wagesReportFile) formData.append('wagesReportFile', wagesReportFile);
+      if (salarySheetFile) formData.append('salarySheetFile', salarySheetFile);
 
       // Append Aadhaar file if uploaded
       if (aadhaarFile) {
@@ -352,6 +413,11 @@ export default function NewFormPage() {
     );
   }
 
+  // Get service from query params for dynamic header
+  const serviceParam = searchParams.get('service');
+  const pageTitle = serviceParam ? `${serviceParam} Form` : "New Tax Form";
+  const cardTitle = serviceParam ? `${serviceParam} Submission Form` : "Submit a New Tax Form";
+
   return (
     <div className="container mx-auto p-6">
       <div className="flex items-center mb-6">
@@ -359,12 +425,12 @@ export default function NewFormPage() {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back
         </Button>
-        <h1 className="text-3xl font-bold">New Tax Form</h1>
+        <h1 className="text-3xl font-bold">{pageTitle}</h1>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Submit a New Tax Form</CardTitle>
+          <CardTitle>{cardTitle}</CardTitle>
           <CardDescription>Fill in the details for your tax filing</CardDescription>
         </CardHeader>
         <CardContent>
@@ -1129,13 +1195,16 @@ export default function NewFormPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="file-upload">Upload Supporting Documents</Label>
+                <Label htmlFor="file-upload">
+                  {selectedService === 'TDS Returns' ? '5. Any Other Documents (Excel, Zip, Pdf, Word)' : 'Upload Supporting Documents'}
+                </Label>
                 <div className="flex items-center">
                   <Input
                     id="file-upload"
                     type="file"
                     multiple
                     onChange={handleFileChange}
+                    accept={selectedService === 'TDS Returns' ? '.pdf,.doc,.docx,.xls,.xlsx,.zip' : undefined}
                     className="hidden"
                   />
                   <Button type="button" variant="outline" onClick={() => document.getElementById('file-upload')?.click()}>
@@ -1146,6 +1215,11 @@ export default function NewFormPage() {
                     {files.length} {files.length === 1 ? 'file' : 'files'} selected
                   </span>
                 </div>
+                {selectedService === 'TDS Returns' && (
+                  <p className="text-xs text-muted-foreground">
+                    Upload any additional documents in Excel, Zip, Pdf, or Word format
+                  </p>
+                )}
 
                 {files.length > 0 && (
                   <div className="mt-4 space-y-2">

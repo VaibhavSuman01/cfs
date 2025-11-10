@@ -32,6 +32,7 @@ import {
   Globe,
 } from "lucide-react";
 
+
 export default function OtherRegistrationPage() {
   return (
     <div className="min-h-screen bg-white">
@@ -138,7 +139,7 @@ export default function OtherRegistrationPage() {
                     "For Individuals & Organizations",
                     "e-Tendering & e-Filing",
                   ],
-                  price: "As per request",
+                    price: "As per request",
                   timeline: "1-2 days",
                 },
 

@@ -37,8 +37,8 @@ export function EnhancedHeader() {
 
   const navigation = [
     {
-      name: "Company Formation",
-      href: "/company-formation",
+      name: "Company Information",
+      href: "/company-information",
       dropdown: [
         {
           name: "Private Limited Company",
@@ -415,7 +415,7 @@ export function EnhancedHeader() {
 
             {/* Enhanced User section */}
             {isAuthenticated ? (
-              <div
+              <div 
                 className="relative group"
                 onMouseEnter={() => setDropdownOpen(true)}
                 onMouseLeave={() => setDropdownOpen(false)}

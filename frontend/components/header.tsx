@@ -9,7 +9,7 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   const navigation = [
-    { name: "Company Formation", href: "/company-formation" },
+    { name: "Company Information", href: "/company-information" },
     { name: "Other Registration", href: "/other-registration" },
     { name: "Taxation", href: "/taxation" },
     { name: "Trademark & ISO", href: "/trademark-iso" },
