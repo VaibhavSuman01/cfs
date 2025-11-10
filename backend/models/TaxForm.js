@@ -137,9 +137,12 @@ const taxFormSchema = new mongoose.Schema({
   pranNumber: { type: String },
   
   // GST Filing specific fields
-  gstFilingMonth: { type: String }, // Month for GST filing
+  gstFilingType: { type: String, enum: ['monthly', 'quarterly'] }, // Monthly or Quarterly filing
+  gstFilingMonth: { type: String }, // Month for GST filing (for monthly)
+  gstFilingQuarter: { type: String }, // Quarter for GST filing (for quarterly: Q1, Q2, Q3, Q4)
   gstFilingYear: { type: String }, // Year for GST filing
   gstNumber: { type: String },
+  selectedMonths: [{ type: String }], // Selected months for quarterly filing
   salesData: { type: String }, // Tally data for sales
   purchaseData: { type: String }, // Tally data for purchases
   bankStatement: { type: String }, // Bank statement data
@@ -150,9 +153,10 @@ const taxFormSchema = new mongoose.Schema({
   tracesUserId: { type: String }, // TRACES User ID
   tracesPassword: { type: String }, // TRACES Password (text format for admin visibility)
   tanNumber: { type: String }, // TAN number
-  incomeTaxUserId: { type: String }, // Income Tax User ID
-  incomeTaxPassword: { type: String }, // Income Tax Password (text format for admin visibility)
-  panNumber: { type: String }, // PAN number for TDS
+  incomeTaxUserId: { type: String }, // Income Tax (TAN Base) User ID
+  incomeTaxPassword: { type: String }, // Income Tax (TAN Base) Password (text format for admin visibility)
+  panNumber: { type: String }, // PAN number for TDS (legacy)
+  incomeTaxPanNumber: { type: String }, // Income Tax (PAN No.) - separate PAN field for TDS
   
   // EPFO specific fields
   epfoUserId: { type: String }, // EPFO User ID

@@ -22,6 +22,7 @@ const ROCForm = require("../models/ROCForm");
 const ReportsForm = require("../models/ReportsForm");
 const TrademarkISOForm = require("../models/TrademarkISOForm");
 const AdvisoryForm = require("../models/AdvisoryForm");
+const PartnershipForm = require("../models/PartnershipForm");
 
 // Apply auth middleware to all admin routes
 router.use(protect);
@@ -482,7 +483,8 @@ router.put("/forms/:id/status", validateObjectId(), async (req, res) => {
       { model: OtherRegistrationForm, name: 'OtherRegistrationForm' },
       { model: ReportsForm, name: 'ReportsForm' },
       { model: TrademarkISOForm, name: 'TrademarkISOForm' },
-      { model: AdvisoryForm, name: 'AdvisoryForm' }
+      { model: AdvisoryForm, name: 'AdvisoryForm' },
+      { model: PartnershipForm, name: 'PartnershipForm' }
     ];
 
     let form = null;
@@ -1165,8 +1167,13 @@ router.get("/forms/service", admin, async (req, res) => {
     
     if (service === 'Company Formation' || service.includes('Company')) {
       model = CompanyForm;
-    } else if (service === 'Other Registration' || service.includes('Registration')) {
-      model = OtherRegistrationForm;
+    } else if (service === 'Other Registration' || service.includes('Registration') || service === 'Partnership Firm' || service.includes('Partnership')) {
+      // Check if it's specifically Partnership Firm
+      if (service === 'Partnership Firm' || service.includes('Partnership')) {
+        model = PartnershipForm;
+      } else {
+        model = OtherRegistrationForm;
+      }
     } else if (service === 'ROC Returns' || service.includes('ROC')) {
       model = ROCForm;
     } else if (service === 'Reports' || service.includes('Report')) {
@@ -1445,8 +1452,6 @@ router.post("/send-weekly-report", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-
-
 
 // @route   POST /api/admin/forms/:formId/reports
 // @desc    Create an admin report with documents for a specific form
