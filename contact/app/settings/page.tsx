@@ -28,8 +28,9 @@ export default function SettingsPage() {
     try {
       await updateProfile({ name, phone });
       toast.success("Settings saved successfully!");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to save settings");
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to save settings";
+      toast.error(errorMessage);
     } finally {
       setIsSaving(false);
     }
@@ -184,8 +185,11 @@ export default function SettingsPage() {
                     } else {
                       toast.error(response.data.message || "Failed to change password");
                     }
-                  } catch (error: any) {
-                    toast.error(error.response?.data?.message || "Failed to change password");
+                  } catch (error) {
+                    const errorMessage = error && typeof error === 'object' && 'response' in error
+                      ? (error as { response?: { data?: { message?: string } } }).response?.data?.message || "Failed to change password"
+                      : "Failed to change password";
+                    toast.error(errorMessage);
                   } finally {
                     setIsChangingPassword(false);
                   }

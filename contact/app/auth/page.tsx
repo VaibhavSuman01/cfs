@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label";
 import { Building2, Mail, Lock, Loader2, AlertCircle, KeyRound } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/providers/auth-provider";
-import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -37,9 +36,10 @@ export default function LoginPage() {
       await login(email, password);
       toast.success("Login successful!");
       router.push("/");
-    } catch (err: any) {
-      setError(err.message || "Login failed");
-      toast.error(err.message || "Login failed");
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Login failed";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -69,7 +69,7 @@ export default function LoginPage() {
       } else {
         toast.error(data.message || "Failed to send OTP");
       }
-    } catch (error) {
+    } catch {
       toast.error("Failed to send OTP. Please try again.");
     } finally {
       setIsRequestingOTP(false);
@@ -100,7 +100,7 @@ export default function LoginPage() {
       } else {
         toast.error(data.message || "Invalid OTP");
       }
-    } catch (error) {
+    } catch {
       toast.error("Failed to verify OTP. Please try again.");
     } finally {
       setIsVerifyingOTP(false);
@@ -150,7 +150,7 @@ export default function LoginPage() {
       } else {
         toast.error(data.message || "Failed to reset password");
       }
-    } catch (error) {
+    } catch {
       toast.error("Failed to reset password. Please try again.");
     } finally {
       setIsResettingPassword(false);

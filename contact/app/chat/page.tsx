@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -12,10 +11,7 @@ import {
   User,
   Loader2,
   Search,
-  Users,
   Clock,
-  CheckCircle,
-  XCircle,
 } from "lucide-react";
 import {
   Select,
@@ -63,21 +59,7 @@ export default function ChatPage() {
     }
   }, [user, authLoading, router]);
 
-  useEffect(() => {
-    if (user) {
-      fetchChats();
-      const interval = setInterval(fetchChats, 5000); // Refresh every 5 seconds
-      return () => clearInterval(interval);
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (selectedChat) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [selectedChat]);
-
-  const fetchChats = async () => {
+  const fetchChats = useCallback(async () => {
     try {
       const response = await api.get("/api/support-team/chats");
       setChats(response.data.data || []);
@@ -94,7 +76,21 @@ export default function ChatPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [selectedChat]);
+
+  useEffect(() => {
+    if (user) {
+      fetchChats();
+      const interval = setInterval(fetchChats, 5000); // Refresh every 5 seconds
+      return () => clearInterval(interval);
+    }
+  }, [user, fetchChats]);
+
+  useEffect(() => {
+    if (selectedChat) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [selectedChat]);
 
   const handleSendMessage = async () => {
     if (!message.trim() || !selectedChat) return;
@@ -106,8 +102,11 @@ export default function ChatPage() {
       });
       setMessage("");
       await fetchChats();
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to send message");
+    } catch (error) {
+      const errorMessage = error && typeof error === 'object' && 'response' in error
+        ? (error as { response?: { data?: { message?: string } } }).response?.data?.message || "Failed to send message"
+        : "Failed to send message";
+      toast.error(errorMessage);
     } finally {
       setIsSending(false);
     }
@@ -238,11 +237,11 @@ export default function ChatPage() {
                         );
                         await fetchChats();
                         toast.success("Chat status updated");
-                      } catch (error: any) {
-                        toast.error(
-                          error.response?.data?.message ||
-                            "Failed to update status"
-                        );
+                      } catch (error) {
+                        const errorMessage = error && typeof error === 'object' && 'response' in error
+                          ? (error as { response?: { data?: { message?: string } } }).response?.data?.message || "Failed to update status"
+                          : "Failed to update status";
+                        toast.error(errorMessage);
                       }
                     }}
                   >

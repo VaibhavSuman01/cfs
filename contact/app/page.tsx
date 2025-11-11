@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/auth-provider';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -29,7 +29,6 @@ import {
   Calendar, 
   Search, 
   Filter,
-  Users,
   Clock,
   CheckCircle,
   AlertCircle,
@@ -75,11 +74,7 @@ export default function SupportTeamDashboard() {
   const [isReplying, setIsReplying] = useState(false);
   const [isReplyDialogOpen, setIsReplyDialogOpen] = useState(false);
 
-  useEffect(() => {
-    fetchContacts();
-  }, [currentPage, statusFilter, searchQuery]);
-
-  const fetchContacts = async () => {
+  const fetchContacts = useCallback(async () => {
     try {
       setIsLoading(true);
       const params = new URLSearchParams({
@@ -96,20 +91,24 @@ export default function SupportTeamDashboard() {
       const response = await api.get(`/api/support/contacts?${params.toString()}`);
       setContacts(response.data.data || []);
       setTotalPages(response.data.pagination?.pages || 1);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to fetch contacts:', error);
       toast.error('Failed to load contact messages');
       // Fallback to admin endpoint if support endpoint doesn't work
       try {
         const fallbackResponse = await api.get('/api/admin/contacts');
         setContacts(fallbackResponse.data.contacts || []);
-      } catch (fallbackError) {
-        console.error('Fallback also failed:', fallbackError);
+      } catch {
+        console.error('Fallback also failed');
       }
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentPage, statusFilter, searchQuery]);
+
+  useEffect(() => {
+    fetchContacts();
+  }, [fetchContacts]);
 
   const handleReply = async () => {
     if (!selectedContact || !replyMessage.trim()) {
@@ -131,9 +130,12 @@ export default function SupportTeamDashboard() {
       setIsReplyDialogOpen(false);
       setSelectedContact(null);
       fetchContacts();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Failed to send email:', error);
-      toast.error(error.response?.data?.message || 'Failed to send email');
+      const errorMessage = error && typeof error === 'object' && 'response' in error
+        ? (error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to send email'
+        : 'Failed to send email';
+      toast.error(errorMessage);
     } finally {
       setIsReplying(false);
     }
@@ -144,7 +146,7 @@ export default function SupportTeamDashboard() {
       await api.put(`/api/support/contacts/${contactId}/mark-replied`);
       toast.success('Marked as replied');
       fetchContacts();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Failed to mark as replied:', error);
       toast.error('Failed to update status');
     }
@@ -159,7 +161,7 @@ export default function SupportTeamDashboard() {
       await api.delete(`/api/support/contacts/${contactId}`);
       toast.success('Contact deleted');
       fetchContacts();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Failed to delete contact:', error);
       toast.error('Failed to delete contact');
     }
