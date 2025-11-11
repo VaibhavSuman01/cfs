@@ -55,13 +55,13 @@ interface Director {
 const COMPANY_TYPE_NAMES: Record<string, string> = {
   "Private Limited Company": "Private Limited Company",
   "Public Limited Company": "Public Limited Company",
-  "One Person Company": "One Person Company",
+  "One Person Company (OPC)": "One Person Company (OPC)",
   "Section 8 Company": "Section 8 Company",
   "Nidhi Company": "Nidhi Company",
   "Producer Company": "Producer Company",
   "private-limited": "Private Limited Company",
   "public-limited": "Public Limited Company",
-  "one-person-company": "One Person Company",
+  "one-person-company-opc": "One Person Company (OPC)",
   "section-8": "Section 8 Company",
   "nidhi-company": "Nidhi Company",
   "producer-company": "Producer Company",
@@ -95,7 +95,7 @@ export default function CompanyFormationPage() {
   
   // Get company type from URL
   const serviceParam = searchParams?.get("service") || "";
-  const companyTypeName = COMPANY_TYPE_NAMES[serviceParam] || "Company Formation";
+  const companyTypeName = COMPANY_TYPE_NAMES[serviceParam] || "Company Information";
   const companyTypeValue = serviceParam.toLowerCase().replace(/\s+/g, "-") || "";
 
   const form = useForm<CompanyFormValues>({
@@ -266,7 +266,7 @@ export default function CompanyFormationPage() {
       formData.append("directors", JSON.stringify(directors));
 
       // Append service and subService
-      formData.append("service", "Company Formation");
+      formData.append("service", "Company Information");
       formData.append("subService", companyTypeName);
 
       // Append director documents

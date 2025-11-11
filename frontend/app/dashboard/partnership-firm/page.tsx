@@ -18,27 +18,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 const partnershipFormSchema = z.object({
-  fullName: z.string().min(1, "Full name is required"),
-  email: z.string().email("Invalid email address"),
-  phone: z.string().min(10, "Phone number must be at least 10 digits"),
-  pan: z.string().regex(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "Invalid PAN format"),
-  businessName: z.string().min(1, "Business name is required"),
-  businessAddress: z.string().min(1, "Business address is required"),
-  city: z.string().min(1, "City is required"),
-  state: z.string().min(1, "State is required"),
-  pincode: z.string().min(6, "Pincode must be at least 6 digits"),
+  businessName: z.string().min(1, "Business/Enterprises name is required"),
   businessDetails: z.string().min(1, "Business details are required"),
   addressProofType: z.enum(["rent", "owned"], { required_error: "Please select address proof type" }),
-  ownerName: z.string().optional(),
-  ownerPan: z.string().optional(),
-  ownerAadhaar: z.string().optional(),
-  partnershipDeedDate: z.string().optional(),
-  partnershipDeedNotarized: z.boolean().optional(),
-  partnershipDeedStampDuty: z.string().optional(),
-  requiresGstRegistration: z.boolean().optional(),
-  requiresBankAccount: z.boolean().optional(),
-  requiresCompliance: z.boolean().optional(),
-  selectedPackage: z.enum(["Basic", "Standard", "Premium"]).optional(),
 });
 
 type PartnershipFormValues = z.infer<typeof partnershipFormSchema>;
@@ -49,7 +31,10 @@ interface Partner {
   phone: string;
   pan: string;
   aadhaar: string;
-  address: string;
+  photo: File | null;
+  signature: File | null;
+  aadhaarCard: File | null;
+  panCard: File | null;
 }
 
 export default function PartnershipFirmPage() {
@@ -57,16 +42,9 @@ export default function PartnershipFirmPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [partners, setPartners] = useState<Partner[]>([
-    { name: "", email: "", phone: "", pan: "", aadhaar: "", address: "" }
+    { name: "", email: "", phone: "", pan: "", aadhaar: "", photo: null, signature: null, aadhaarCard: null, panCard: null }
   ]);
   const [files, setFiles] = useState<File[]>([]);
-  const [customDocs, setCustomDocs] = useState<Array<{ title: string; file: File | null }>>([]);
-
-  // Document upload states
-  const [partnerPhotos, setPartnerPhotos] = useState<File[]>([]);
-  const [partnerSignatures, setPartnerSignatures] = useState<File[]>([]);
-  const [partnerAadhaarCards, setPartnerAadhaarCards] = useState<File[]>([]);
-  const [partnerPanCards, setPartnerPanCards] = useState<File[]>([]);
   const [rentAgreement, setRentAgreement] = useState<File | null>(null);
   const [electricityBill, setElectricityBill] = useState<File | null>(null);
   const [ownerPanAadhaar, setOwnerPanAadhaar] = useState<File | null>(null);
@@ -75,34 +53,16 @@ export default function PartnershipFirmPage() {
   const form = useForm<PartnershipFormValues>({
     resolver: zodResolver(partnershipFormSchema),
     defaultValues: {
-      fullName: user?.name || "",
-      email: user?.email || "",
-      phone: user?.mobile || "",
-      pan: user?.pan || "",
       businessName: "",
-      businessAddress: "",
-      city: "",
-      state: "",
-      pincode: "",
       businessDetails: "",
       addressProofType: "owned",
-      ownerName: "",
-      ownerPan: "",
-      ownerAadhaar: "",
-      partnershipDeedDate: "",
-      partnershipDeedNotarized: false,
-      partnershipDeedStampDuty: "",
-      requiresGstRegistration: false,
-      requiresBankAccount: false,
-      requiresCompliance: false,
-      selectedPackage: "Basic",
     },
   });
 
   const addressProofType = form.watch("addressProofType");
 
   const addPartner = () => {
-    setPartners([...partners, { name: "", email: "", phone: "", pan: "", aadhaar: "", address: "" }]);
+    setPartners([...partners, { name: "", email: "", phone: "", pan: "", aadhaar: "", photo: null, signature: null, aadhaarCard: null, panCard: null }]);
   };
 
   const removePartner = (index: number) => {
@@ -111,9 +71,9 @@ export default function PartnershipFirmPage() {
     }
   };
 
-  const updatePartner = (index: number, field: keyof Partner, value: string) => {
+  const updatePartner = (index: number, field: keyof Partner, value: string | File | null) => {
     const updatedPartners = [...partners];
-    updatedPartners[index][field] = value;
+    (updatedPartners[index] as any)[field] = value;
     setPartners(updatedPartners);
   };
 
@@ -134,21 +94,17 @@ export default function PartnershipFirmPage() {
       formData.append("service", "Other Registration");
       formData.append("subService", "Partnership Firm Registration");
 
-      // Append partners data
-      formData.append("partners", JSON.stringify(partners));
-
-      // Append document files
-      partnerPhotos.forEach((file, index) => {
-        formData.append(`partnerPhoto_${index}`, file);
-      });
-      partnerSignatures.forEach((file, index) => {
-        formData.append(`partnerSignature_${index}`, file);
-      });
-      partnerAadhaarCards.forEach((file, index) => {
-        formData.append(`partnerAadhaar_${index}`, file);
-      });
-      partnerPanCards.forEach((file, index) => {
-        formData.append(`partnerPan_${index}`, file);
+      // Append partners data with their documents
+      partners.forEach((partner, index) => {
+        formData.append(`partner_${index}_name`, partner.name);
+        formData.append(`partner_${index}_email`, partner.email);
+        formData.append(`partner_${index}_phone`, partner.phone);
+        formData.append(`partner_${index}_pan`, partner.pan);
+        formData.append(`partner_${index}_aadhaar`, partner.aadhaar);
+        if (partner.photo) formData.append(`partner_${index}_photo`, partner.photo);
+        if (partner.signature) formData.append(`partner_${index}_signature`, partner.signature);
+        if (partner.aadhaarCard) formData.append(`partner_${index}_aadhaarCard`, partner.aadhaarCard);
+        if (partner.panCard) formData.append(`partner_${index}_panCard`, partner.panCard);
       });
 
       if (rentAgreement) formData.append("rentAgreement", rentAgreement);
@@ -161,13 +117,6 @@ export default function PartnershipFirmPage() {
         formData.append("documents", file);
       });
 
-      // Append custom documents
-      customDocs.forEach((entry, index) => {
-        if (entry.file) {
-          formData.append(`customDoc_${index}`, entry.file);
-          formData.append(`customDocTitle_${index}`, entry.title);
-        }
-      });
 
       await api.post(API_PATHS.FORMS.PARTNERSHIP_FIRM, formData);
 
@@ -194,22 +143,6 @@ export default function PartnershipFirmPage() {
       const fileArray = Array.from(e.target.files);
       setFiles(fileArray);
     }
-  };
-
-  const addCustomDoc = () => {
-    setCustomDocs([...customDocs, { title: "", file: null }]);
-  };
-
-  const updateCustomDocTitle = (idx: number, title: string) => {
-    setCustomDocs(prev => prev.map((c, i) => i === idx ? { ...c, title } : c));
-  };
-
-  const updateCustomDocFile = (idx: number, file: File | null) => {
-    setCustomDocs(prev => prev.map((c, i) => i === idx ? { ...c, file } : c));
-  };
-
-  const removeCustomDoc = (idx: number) => {
-    setCustomDocs(prev => prev.filter((_, i) => i !== idx));
   };
 
   if (isLoading) {
@@ -239,130 +172,17 @@ export default function PartnershipFirmPage() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              {/* Personal Information */}
+              {/* Business Information */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Primary Applicant Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="fullName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Full Name *</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email *</FormLabel>
-                        <FormControl>
-                          <Input type="email" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone *</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="pan"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>PAN *</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="ABCDE1234F" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-
-              {/* Business Details */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Business Details</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="businessName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Business/Enterprise Name *</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Enter business name" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="city"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>City *</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Enter city" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="state"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>State *</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Enter state" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="pincode"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Pincode *</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Enter pincode" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                <h3 className="text-lg font-semibold">Business Information</h3>
                 <FormField
                   control={form.control}
-                  name="businessAddress"
+                  name="businessName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Business/Enterprise Address *</FormLabel>
+                      <FormLabel>2. Business/Enterprises Name *</FormLabel>
                       <FormControl>
-                        <Textarea {...field} rows={3} placeholder="Enter complete business address" />
+                        <Input {...field} placeholder="Enter business/enterprises name" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -373,9 +193,9 @@ export default function PartnershipFirmPage() {
                   name="businessDetails"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Business Details *</FormLabel>
+                      <FormLabel>4. Business Details *</FormLabel>
                       <FormControl>
-                        <Textarea {...field} rows={3} placeholder="Describe your business activities" />
+                        <Textarea {...field} rows={4} placeholder="Describe your business details and activities" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -383,10 +203,10 @@ export default function PartnershipFirmPage() {
                 />
               </div>
 
-              {/* Partners Information */}
+              {/* Partners KYC */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">Partners Information</h3>
+                  <h3 className="text-lg font-semibold">1. Partners KYC (Upload as JPG/JPEG/PDF/PNG)</h3>
                   <Button type="button" variant="outline" onClick={addPartner}>
                     <Plus className="h-4 w-4 mr-2" /> Add Partner
                   </Button>
@@ -406,66 +226,92 @@ export default function PartnershipFirmPage() {
                         </Button>
                       )}
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label>Name *</Label>
-                        <Input
-                          value={partner.name}
-                          onChange={(e) => updatePartner(index, "name", e.target.value)}
-                          placeholder="Partner name"
-                        />
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label>e. Mobile No. *</Label>
+                          <Input
+                            value={partner.phone}
+                            onChange={(e) => updatePartner(index, "phone", e.target.value)}
+                            placeholder="Enter mobile number"
+                          />
+                        </div>
+                        <div>
+                          <Label>f. Email *</Label>
+                          <Input
+                            type="email"
+                            value={partner.email}
+                            onChange={(e) => updatePartner(index, "email", e.target.value)}
+                            placeholder="Enter email"
+                          />
+                        </div>
                       </div>
-                      <div>
-                        <Label>Email *</Label>
-                        <Input
-                          type="email"
-                          value={partner.email}
-                          onChange={(e) => updatePartner(index, "email", e.target.value)}
-                          placeholder="Partner email"
-                        />
-                      </div>
-                      <div>
-                        <Label>Phone *</Label>
-                        <Input
-                          value={partner.phone}
-                          onChange={(e) => updatePartner(index, "phone", e.target.value)}
-                          placeholder="Partner phone"
-                        />
-                      </div>
-                      <div>
-                        <Label>PAN *</Label>
-                        <Input
-                          value={partner.pan}
-                          onChange={(e) => updatePartner(index, "pan", e.target.value.toUpperCase())}
-                          placeholder="ABCDE1234F"
-                        />
-                      </div>
-                      <div>
-                        <Label>Aadhaar *</Label>
-                        <Input
-                          value={partner.aadhaar}
-                          onChange={(e) => updatePartner(index, "aadhaar", e.target.value.replace(/\D/g, ""))}
-                          placeholder="123456789012"
-                          maxLength={12}
-                        />
-                      </div>
-                      <div>
-                        <Label>Address *</Label>
-                        <Textarea
-                          value={partner.address}
-                          onChange={(e) => updatePartner(index, "address", e.target.value)}
-                          placeholder="Partner address"
-                          rows={2}
-                        />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label>a. Photo (JPG/JPEG/PDF/PNG) *</Label>
+                          <Input
+                            type="file"
+                            accept=".jpg,.jpeg,.png,.pdf"
+                            onChange={(e) => updatePartner(index, "photo", e.target.files?.[0] || null)}
+                            className="mt-1"
+                          />
+                          {partner.photo && (
+                            <p className="text-sm text-green-600 mt-1">
+                              ✓ {partner.photo.name} selected
+                            </p>
+                          )}
+                        </div>
+                        <div>
+                          <Label>b. Signature (JPG/JPEG/PDF/PNG) *</Label>
+                          <Input
+                            type="file"
+                            accept=".jpg,.jpeg,.png,.pdf"
+                            onChange={(e) => updatePartner(index, "signature", e.target.files?.[0] || null)}
+                            className="mt-1"
+                          />
+                          {partner.signature && (
+                            <p className="text-sm text-green-600 mt-1">
+                              ✓ {partner.signature.name} selected
+                            </p>
+                          )}
+                        </div>
+                        <div>
+                          <Label>c. Aadhaar Card (JPG/JPEG/PDF/PNG) *</Label>
+                          <Input
+                            type="file"
+                            accept=".jpg,.jpeg,.png,.pdf"
+                            onChange={(e) => updatePartner(index, "aadhaarCard", e.target.files?.[0] || null)}
+                            className="mt-1"
+                          />
+                          {partner.aadhaarCard && (
+                            <p className="text-sm text-green-600 mt-1">
+                              ✓ {partner.aadhaarCard.name} selected
+                            </p>
+                          )}
+                        </div>
+                        <div>
+                          <Label>d. PAN Card (JPG/JPEG/PDF/PNG) *</Label>
+                          <Input
+                            type="file"
+                            accept=".jpg,.jpeg,.png,.pdf"
+                            onChange={(e) => updatePartner(index, "panCard", e.target.files?.[0] || null)}
+                            className="mt-1"
+                          />
+                          {partner.panCard && (
+                            <p className="text-sm text-green-600 mt-1">
+                              ✓ {partner.panCard.name} selected
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </Card>
                 ))}
               </div>
 
-              {/* Address Proof */}
+              {/* Business/Enterprises Address */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Business Address Proof</h3>
+                <h3 className="text-lg font-semibold">3. Business/Enterprises Address (Upload as JPG/JPEG/PDF/PNG)</h3>
                 <FormField
                   control={form.control}
                   name="addressProofType"
@@ -487,177 +333,29 @@ export default function PartnershipFirmPage() {
                     </FormItem>
                   )}
                 />
-                {addressProofType === "rent" && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="ownerName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Property Owner Name</FormLabel>
-                          <FormControl>
-                            <Input {...field} placeholder="Owner name" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="ownerPan"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Owner PAN</FormLabel>
-                          <FormControl>
-                            <Input {...field} placeholder="ABCDE1234F" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="ownerAadhaar"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Owner Aadhaar</FormLabel>
-                          <FormControl>
-                            <Input {...field} placeholder="123456789012" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                )}
               </div>
 
-              {/* Partnership Deed Details */}
+              {/* Business/Enterprises Address Documents */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Partnership Deed Details</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="partnershipDeedDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Partnership Deed Date</FormLabel>
-                        <FormControl>
-                          <Input type="date" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="partnershipDeedStampDuty"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Stamp Duty Amount</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Enter stamp duty amount" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-
-              {/* Document Upload */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Document Requirements</h3>
                 <div className="bg-blue-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-blue-900 mb-2">Required Documents:</h4>
+                  <h4 className="font-medium text-blue-900 mb-2">Documents For Registration of Partnership Firm:</h4>
                   <ul className="text-sm text-blue-800 space-y-1">
-                    <li>• Partners KYC (Photo, Signature, Aadhaar Card, PAN Card)</li>
-                    <li>• Business Address Proof (Rent Agreement, Electricity Bill)</li>
-                    <li>• Owner's PAN/Aadhaar (if rented property)</li>
-                    <li>• Municipal Tax Receipt</li>
-                    <li>• Partnership Deed</li>
-                    <li>• Any Other Documents (Excel, Zip, Pdf, Word)</li>
+                    <li>1. Partners KYC (Upload as JPG/JPEG/PDF/PNG)</li>
+                    <li className="ml-4">a. Photo, b. Signature, c. Aadhaar Card, d. PAN Card, e. Mobile No., f. Email</li>
+                    <li>2. Business/Enterprises Name (Text)</li>
+                    <li>3. Business/Enterprises Address (Upload as JPG/JPEG/PDF/PNG)</li>
+                    <li className="ml-4">a. Rent Agreement, b. Electricity Bill, c. Owner Pan/Aadhaar (if rented), d. Municipal Tax Receipt</li>
+                    <li>4. Business Details (Text Box)</li>
+                    <li>5. Any Other Documents (Excel, Zip, Pdf, Word)</li>
                   </ul>
                 </div>
 
-                {/* Partners Documents */}
                 <div className="space-y-4">
-                  <h4 className="font-medium">Partners KYC Documents</h4>
-                  
                   <div>
-                    <Label>Partner Photos (JPG/PNG)</Label>
+                    <Label>a. Rent Agreement (JPG/JPEG/PDF/PNG) *</Label>
                     <Input
                       type="file"
-                      multiple
-                      accept=".jpg,.jpeg,.png"
-                      onChange={(e) => setPartnerPhotos(Array.from(e.target.files || []))}
-                      className="mt-1"
-                    />
-                    {partnerPhotos.length > 0 && (
-                      <p className="text-sm text-green-600 mt-1">
-                        ✓ {partnerPhotos.length} photo(s) selected
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <Label>Partner Signatures (JPG/PNG)</Label>
-                    <Input
-                      type="file"
-                      multiple
-                      accept=".jpg,.jpeg,.png"
-                      onChange={(e) => setPartnerSignatures(Array.from(e.target.files || []))}
-                      className="mt-1"
-                    />
-                    {partnerSignatures.length > 0 && (
-                      <p className="text-sm text-green-600 mt-1">
-                        ✓ {partnerSignatures.length} signature(s) selected
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <Label>Aadhaar Cards (JPG/PNG/PDF)</Label>
-                    <Input
-                      type="file"
-                      multiple
                       accept=".jpg,.jpeg,.png,.pdf"
-                      onChange={(e) => setPartnerAadhaarCards(Array.from(e.target.files || []))}
-                      className="mt-1"
-                    />
-                    {partnerAadhaarCards.length > 0 && (
-                      <p className="text-sm text-green-600 mt-1">
-                        ✓ {partnerAadhaarCards.length} Aadhaar card(s) selected
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <Label>PAN Cards (JPG/PNG/PDF)</Label>
-                    <Input
-                      type="file"
-                      multiple
-                      accept=".jpg,.jpeg,.png,.pdf"
-                      onChange={(e) => setPartnerPanCards(Array.from(e.target.files || []))}
-                      className="mt-1"
-                    />
-                    {partnerPanCards.length > 0 && (
-                      <p className="text-sm text-green-600 mt-1">
-                        ✓ {partnerPanCards.length} PAN card(s) selected
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Business Address Proof Documents */}
-                <div className="space-y-4">
-                  <h4 className="font-medium">Business Address Proof Documents</h4>
-                  
-                  <div>
-                    <Label>Rent Agreement (PDF)</Label>
-                    <Input
-                      type="file"
-                      accept=".pdf"
                       onChange={(e) => setRentAgreement(e.target.files?.[0] || null)}
                       className="mt-1"
                     />
@@ -669,10 +367,10 @@ export default function PartnershipFirmPage() {
                   </div>
 
                   <div>
-                    <Label>Electricity Bill (PDF)</Label>
+                    <Label>b. Electricity Bill (JPG/JPEG/PDF/PNG) *</Label>
                     <Input
                       type="file"
-                      accept=".pdf"
+                      accept=".jpg,.jpeg,.png,.pdf"
                       onChange={(e) => setElectricityBill(e.target.files?.[0] || null)}
                       className="mt-1"
                     />
@@ -685,10 +383,10 @@ export default function PartnershipFirmPage() {
 
                   {addressProofType === "rent" && (
                     <div>
-                      <Label>Owner's PAN/Aadhaar (PDF)</Label>
+                      <Label>c. Owner Pan/Aadhaar Card (if rented) (JPG/JPEG/PDF/PNG) *</Label>
                       <Input
                         type="file"
-                        accept=".pdf"
+                        accept=".jpg,.jpeg,.png,.pdf"
                         onChange={(e) => setOwnerPanAadhaar(e.target.files?.[0] || null)}
                         className="mt-1"
                       />
@@ -701,10 +399,10 @@ export default function PartnershipFirmPage() {
                   )}
 
                   <div>
-                    <Label>Municipal Tax Receipt (PDF)</Label>
+                    <Label>d. Municipal Tax Receipt of property (JPG/JPEG/PDF/PNG) *</Label>
                     <Input
                       type="file"
-                      accept=".pdf"
+                      accept=".jpg,.jpeg,.png,.pdf"
                       onChange={(e) => setMunicipalTaxReceipt(e.target.files?.[0] || null)}
                       className="mt-1"
                     />
@@ -715,61 +413,30 @@ export default function PartnershipFirmPage() {
                     )}
                   </div>
                 </div>
+              </div>
 
-                {/* Additional Documents */}
-                <div className="space-y-4">
-                  <h4 className="font-medium">Additional Documents</h4>
-                  
-                  <div>
-                    <Label>Any Other Documents (Excel, Zip, Pdf, Word)</Label>
-                    <Input
-                      type="file"
-                      multiple
-                      accept=".pdf,.doc,.docx,.xls,.xlsx,.zip"
-                      onChange={handleFileChange}
-                      className="mt-1"
-                    />
-                    {files.length > 0 && (
-                      <div className="mt-2 space-y-1">
-                        {files.map((file, index) => (
-                          <div key={index} className="flex items-center text-sm text-green-600">
-                            <FileText className="h-4 w-4 mr-2" />
-                            ✓ {file.name}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Custom Documents */}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label>Add Custom Documents</Label>
-                      <Button type="button" variant="outline" size="sm" onClick={addCustomDoc}>
-                        <Plus className="h-4 w-4 mr-1" /> Add
-                      </Button>
+              {/* Any Other Documents */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">5. Any Other Documents (Excel, Zip, Pdf, Word)</h3>
+                <div>
+                  <Label>Any Other Documents</Label>
+                  <Input
+                    type="file"
+                    multiple
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.zip"
+                    onChange={handleFileChange}
+                    className="mt-1"
+                  />
+                  {files.length > 0 && (
+                    <div className="mt-2 space-y-1">
+                      {files.map((file, index) => (
+                        <div key={index} className="flex items-center text-sm text-green-600">
+                          <FileText className="h-4 w-4 mr-2" />
+                          ✓ {file.name}
+                        </div>
+                      ))}
                     </div>
-                    {customDocs.length > 0 && (
-                      <div className="space-y-3">
-                        {customDocs.map((cd, idx) => (
-                          <div key={idx} className="grid grid-cols-1 md:grid-cols-3 gap-2 items-center">
-                            <Input
-                              placeholder="Document Title"
-                              value={cd.title}
-                              onChange={(e) => updateCustomDocTitle(idx, e.target.value)}
-                            />
-                            <Input
-                              type="file"
-                              onChange={(e) => updateCustomDocFile(idx, e.target.files?.[0] || null)}
-                            />
-                            <Button type="button" variant="ghost" onClick={() => removeCustomDoc(idx)}>
-                              <Trash2 className="h-4 w-4 mr-1" /> Remove
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  )}
                 </div>
               </div>
 

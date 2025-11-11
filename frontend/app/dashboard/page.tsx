@@ -241,7 +241,7 @@ export default function UserDashboard() {
   const getFormDetailUrl = (formType: string, formId: string) => {
     const typeMap: Record<string, string> = {
       'TaxForm': `/dashboard/forms/${formId}`,
-      'CompanyForm': `/dashboard/company-formation/${formId}`,
+      'CompanyForm': `/dashboard/company-information/${formId}`,
       'OtherRegistrationForm': `/dashboard/other-registration/${formId}`,
       'ROCForm': `/dashboard/roc-returns/${formId}`,
       'ReportsForm': `/dashboard/reports/${formId}`,
@@ -254,7 +254,7 @@ export default function UserDashboard() {
   const getFormEditUrl = (formType: string, formId: string) => {
     const typeMap: Record<string, string> = {
       'TaxForm': `/dashboard/forms/edit/${formId}`,
-      'CompanyForm': `/dashboard/company-formation/${formId}/edit`,
+      'CompanyForm': `/dashboard/company-information/${formId}/edit`,
       'OtherRegistrationForm': `/dashboard/other-registration/${formId}/edit`,
       'ROCForm': `/dashboard/roc-returns/${formId}/edit`,
       'ReportsForm': `/dashboard/reports/${formId}/edit`,
@@ -541,7 +541,7 @@ export default function UserDashboard() {
                                   {category.name === 'Taxation' ? (
                                     <Button variant="outline" size="sm" asChild>
                                       <Link
-                                        href={`/dashboard/new-form=${encodeURIComponent(service)}`}
+                                        href={`/dashboard/new-form?service=${encodeURIComponent(service)}`}
                                       >
                                         File Now{" "}
                                         <ChevronRight className="ml-2 h-4 w-4" />
@@ -550,7 +550,7 @@ export default function UserDashboard() {
                                   ) : category.name === 'Company Information' ? (
                                     <Button variant="outline" size="sm" asChild>
                                       <Link
-                                        href={`/dashboard/company-formation?service=${encodeURIComponent(service)}`}
+                                        href={`/dashboard/company-information?service=${encodeURIComponent(service)}`}
                                       >
                                         Apply Now{" "}
                                         <ChevronRight className="ml-2 h-4 w-4" />

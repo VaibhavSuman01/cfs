@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/providers/auth-provider";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -38,6 +38,7 @@ type ROCReturnsValues = z.infer<typeof rocReturnsSchema>;
 export default function ROCReturnsPage() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [aadhaarFile, setAadhaarFile] = useState<File | null>(null);
@@ -49,6 +50,19 @@ export default function ROCReturnsPage() {
   const [shareTransferDeedFile, setShareTransferDeedFile] = useState<File | null>(null);
   const [previousReturnsFile, setPreviousReturnsFile] = useState<File | null>(null);
   const [dscFile, setDscFile] = useState<File | null>(null);
+
+  // Map service names from dashboard to return type values
+  const serviceToReturnType: Record<string, string> = {
+    "Annual Filing": "annual-filing",
+    "Board Resolutions": "board-resolutions",
+    "Director Changes": "director-changes",
+    "Share Transfer": "share-transfer",
+  };
+
+  // Get service from URL
+  const serviceParam = searchParams?.get("service") || "";
+  const returnTypeFromUrl = serviceParam ? (serviceToReturnType[serviceParam] || "") : "";
+  const isServiceFromUrl = !!serviceParam;
 
   const form = useForm<ROCReturnsValues>({
     resolver: zodResolver(rocReturnsSchema),
@@ -68,6 +82,13 @@ export default function ROCReturnsPage() {
       description: "",
     },
   });
+
+  // Set return type from URL
+  useEffect(() => {
+    if (returnTypeFromUrl) {
+      form.setValue("returnType", returnTypeFromUrl);
+    }
+  }, [returnTypeFromUrl, form]);
 
   const onSubmit = async (data: ROCReturnsValues) => {
     try {
@@ -254,9 +275,14 @@ export default function ROCReturnsPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Return Type *</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select 
+                          onValueChange={field.onChange} 
+                          defaultValue={field.value}
+                          value={field.value}
+                          disabled={isServiceFromUrl}
+                        >
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className={isServiceFromUrl ? "bg-muted cursor-not-allowed" : ""}>
                               <SelectValue placeholder="Select return type" />
                             </SelectTrigger>
                           </FormControl>
@@ -272,6 +298,9 @@ export default function ROCReturnsPage() {
                           </SelectContent>
                         </Select>
                         <FormMessage />
+                        {isServiceFromUrl && (
+                          <p className="text-xs text-muted-foreground">This field is pre-selected based on the service you chose</p>
+                        )}
                       </FormItem>
                     )}
                   />

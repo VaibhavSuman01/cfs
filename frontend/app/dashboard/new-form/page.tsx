@@ -223,7 +223,6 @@ export default function NewFormPage() {
   const hasHomeLoan = form.watch('hasHomeLoan');
   const hasPranNumber = form.watch('hasPranNumber');
   const selectedService = form.watch('service');
-  const gstFilingType = form.watch('gstFilingType');
 
   // Populate form with user data when loaded
   useEffect(() => {
@@ -235,25 +234,28 @@ export default function NewFormPage() {
     }
   }, [user, isLoading, form]);
 
+  // Get service from URL
+  const serviceParam = searchParams?.get('service') || '';
+  const isServiceFromUrl = !!serviceParam;
+
   // Preselect service from query param
   useEffect(() => {
-    const qpService = searchParams.get('service');
-    if (qpService) {
-      form.setValue('service', qpService);
+    if (serviceParam) {
+      form.setValue('service', serviceParam);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, [searchParams, serviceParam]);
 
   const onSubmit = async (data: TaxFormValues) => {
     try {
       setIsSubmitting(true);
 
-      // Validate quarterly filing months
-      if (selectedService === 'GST Filing' && gstFilingType === 'quarterly' && selectedMonths.length === 0) {
-        toast.error('Please select at least one month for quarterly filing');
-        setIsSubmitting(false);
-        return;
-      }
+      // Validate quarterly filing months (if needed in future)
+        if (selectedService === 'GST Filing' && data.gstFilingMonth === 'quarterly' && data.gstFilingYear === 'quarterly') {
+          toast.error('Please select at least one month for quarterly filing');
+          setIsSubmitting(false);
+          return;
+        }
 
       // Validate TDS Returns required fields
       if (selectedService === 'TDS Returns') {
@@ -272,7 +274,7 @@ export default function NewFormPage() {
           setIsSubmitting(false);
           return;
         }
-        if (!data.incomeTaxPanNumber) {
+        if (!data.panNumber) {
           toast.error('Income Tax (PAN No.) is required');
           setIsSubmitting(false);
           return;
@@ -304,10 +306,10 @@ export default function NewFormPage() {
         }
       });
       
-      // Append selected months for quarterly filing
-      if (selectedMonths.length > 0) {
-        formData.append('selectedMonths', JSON.stringify(selectedMonths));
-      }
+      // Append selected months for quarterly filing (if needed in future)
+      // if (selectedMonths.length > 0) {
+      //   formData.append('selectedMonths', JSON.stringify(selectedMonths));
+      // }
 
       // Append Aadhaar file if uploaded
       if (aadhaarFile) {
@@ -414,7 +416,6 @@ export default function NewFormPage() {
   }
 
   // Get service from query params for dynamic header
-  const serviceParam = searchParams.get('service');
   const pageTitle = serviceParam ? `${serviceParam} Form` : "New Tax Form";
   const cardTitle = serviceParam ? `${serviceParam} Submission Form` : "Submit a New Tax Form";
 
@@ -488,34 +489,42 @@ export default function NewFormPage() {
                     </FormItem>
                   )} 
                 />
-                <FormField
-                  control={form.control}
-                  name="service"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Service</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a service" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="GST Filing">GST Filing</SelectItem>
-                          <SelectItem value="Income Tax Filing">Income Tax Filing</SelectItem>
-                          <SelectItem value="TDS Returns">TDS Returns</SelectItem>
-                          <SelectItem value="Tax Planning">Tax Planning</SelectItem>
-                          <SelectItem value="EPFO Filing">EPFO Filing</SelectItem>
-                          <SelectItem value="ESIC Filing">ESIC Filing</SelectItem>
-                          <SelectItem value="PT-Tax Filing">PT-Tax Filing</SelectItem>
-                          <SelectItem value="Corporate Tax Filing">Corporate Tax Filing</SelectItem>
-                          <SelectItem value="Payroll Tax">Payroll Tax</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    control={form.control}
+                    name="service"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Service</FormLabel>
+                        <Select 
+                          onValueChange={field.onChange} 
+                          defaultValue={field.value}
+                          value={field.value}
+                          disabled={isServiceFromUrl}
+                        >
+                          <FormControl>
+                            <SelectTrigger className={isServiceFromUrl ? "bg-muted cursor-not-allowed" : ""}>
+                              <SelectValue placeholder="Select a service" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="GST Filing">GST Filing</SelectItem>
+                            <SelectItem value="Income Tax Filing">Income Tax Filing</SelectItem>
+                            <SelectItem value="TDS Returns">TDS Returns</SelectItem>
+                            <SelectItem value="Tax Planning">Tax Planning</SelectItem>
+                            <SelectItem value="EPFO Filing">EPFO Filing</SelectItem>
+                            <SelectItem value="ESIC Filing">ESIC Filing</SelectItem>
+                            <SelectItem value="PT-Tax Filing">PT-Tax Filing</SelectItem>
+                            <SelectItem value="Corporate Tax Filing">Corporate Tax Filing</SelectItem>
+                            <SelectItem value="Payroll Tax">Payroll Tax</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                        {isServiceFromUrl && (
+                          <p className="text-xs text-muted-foreground">This field is pre-selected based on the service you chose</p>
+                        )}
+                      </FormItem>
+                    )}
+                  />
                 <FormField
                   control={form.control}
                   name="year"

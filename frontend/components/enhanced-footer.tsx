@@ -16,19 +16,19 @@ export function EnhancedFooter() {
   const companyServices = [
     {
       name: "Private Limited Company",
-      href: "/company-formation/private-limited",
+      href: "/company-information/private-limited",
     },
     {
       name: "Public Limited Company",
-      href: "/company-formation/public-limited",
+      href: "/company-information/public-limited",
     },
     {
       name: "One Person Company",
-      href: "/company-formation/one-person-company",
+      href: "/company-information/one-person-company",
     },
-    { name: "Section 8 Company", href: "/company-formation/section-8" },
-    { name: "Nidhi Company", href: "/company-formation/nidhi-company" },
-    { name: "Producer Company", href: "/company-formation/producer-company" },
+    { name: "Section 8 Company", href: "/company-information/section-8" },
+    { name: "Nidhi Company", href: "/company-information/nidhi-company" },
+    { name: "Producer Company", href: "/company-information/producer-company" },
   ];
 
   const otherServices = [
@@ -168,65 +168,271 @@ export function EnhancedFooter() {
         ></div>
       </div>
 
-      <div className="container mx-auto px-4 py-20 relative z-10">
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-8 lg:gap-12">
-          {/* Company Info - Takes 2 columns on large screens */}
-          <div className="lg:col-span-2 space-y-8">
-            <div className="space-y-6">
-              <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <Building2 className="h-8 w-8 text-white" />
+      <div className="container mx-auto px-4 py-8 relative z-10">
+        {/* Main Content - Two Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+          {/* Company Information */}
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <h3 className="text-lg font-bold text-blue-300 tracking-tight">
+                Company Information
+              </h3>
+              <div className="w-12 h-0.5 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
+            </div>
+            <div className="flex flex-wrap gap-x-3 gap-y-2">
+              {companyServices.map((service, index) => (
+                <div key={service.name} className="flex items-center">
+                  <Link
+                    href={service.href}
+                    className="text-gray-400 hover:text-blue-300 transition-all duration-300 hover:translate-x-1 text-sm group whitespace-nowrap relative"
+                  >
+                    <span className="group-hover:text-blue-300 relative">
+                      {service.name}
+                    </span>
+                  </Link>
+                  {index < companyServices.length - 1 && (
+                    <span className="mx-2 text-gray-600">•</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Other Registration */}
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <h3 className="text-lg font-bold text-blue-300 tracking-tight">
+                Other Registration
+              </h3>
+              <div className="w-12 h-0.5 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
+            </div>
+            <div className="flex flex-wrap gap-x-3 gap-y-2">
+              {otherServices.map((service, index) => (
+                <div key={service.name} className="flex items-center">
+                  <Link
+                    href={service.href}
+                    className="text-gray-400 hover:text-blue-300 transition-all duration-300 hover:translate-x-1 text-sm group whitespace-nowrap relative"
+                  >
+                    <span className="group-hover:text-blue-300 relative">
+                      {service.name}
+                    </span>
+                  </Link>
+                  {index < otherServices.length - 1 && (
+                    <span className="mx-2 text-gray-600">•</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Taxation */}
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <h3 className="text-lg font-bold text-blue-300 tracking-tight">Taxation</h3>
+              <div className="w-12 h-0.5 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
+            </div>
+            <div className="flex flex-wrap gap-x-3 gap-y-2">
+              {taxationServices.map((service, index) => (
+                <div key={service.name} className="flex items-center">
+                  <Link
+                    href={service.href}
+                    className="text-gray-400 hover:text-blue-300 transition-all duration-300 hover:translate-x-1 text-sm group whitespace-nowrap relative"
+                  >
+                    <span className="group-hover:text-blue-300 relative">
+                      {service.name}
+                    </span>
+                  </Link>
+                  {index < taxationServices.length - 1 && (
+                    <span className="mx-2 text-gray-600">•</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Reports */}
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <h3 className="text-lg font-bold text-blue-300 tracking-tight">Reports</h3>
+              <div className="w-12 h-0.5 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
+            </div>
+            <div className="flex flex-wrap gap-x-3 gap-y-2">
+              {reportsServices.map((service, index) => (
+                <div key={service.name} className="flex items-center">
+                  <Link
+                    href={service.href}
+                    className="text-gray-400 hover:text-blue-300 transition-all duration-300 hover:translate-x-1 text-sm group whitespace-nowrap relative"
+                  >
+                    <span className="group-hover:text-blue-300 relative">
+                      {service.name}
+                    </span>
+                  </Link>
+                  {index < reportsServices.length - 1 && (
+                    <span className="mx-2 text-gray-600">•</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Trademark & ISO */}
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <h3 className="text-lg font-bold text-blue-300 tracking-tight">
+                Trademark & ISO
+              </h3>
+              <div className="w-12 h-0.5 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
+            </div>
+            <div className="flex flex-wrap gap-x-3 gap-y-2">
+              {legalServices.map((service, index) => (
+                <div key={service.name} className="flex items-center">
+                  <Link
+                    href={service.href}
+                    className="text-gray-400 hover:text-blue-300 transition-all duration-300 hover:translate-x-1 text-sm group whitespace-nowrap relative"
+                  >
+                    <span className="group-hover:text-blue-300 relative">
+                      {service.name}
+                    </span>
+                  </Link>
+                  {index < legalServices.length - 1 && (
+                    <span className="mx-2 text-gray-600">•</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* ROC Returns */}
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <h3 className="text-lg font-bold text-blue-300 tracking-tight">ROC Returns</h3>
+              <div className="w-12 h-0.5 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
+            </div>
+            <div className="flex flex-wrap gap-x-3 gap-y-2">
+              {rocReturnsServices.map((service, index) => (
+                <div key={service.name} className="flex items-center">
+                  <Link
+                    href={service.href}
+                    className="text-gray-400 hover:text-blue-300 transition-all duration-300 hover:translate-x-1 text-sm group whitespace-nowrap relative"
+                  >
+                    <span className="group-hover:text-blue-300 relative">
+                      {service.name}
+                    </span>
+                  </Link>
+                  {index < rocReturnsServices.length - 1 && (
+                    <span className="mx-2 text-gray-600">•</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Left Column - Services */}
+          <div className="space-y-5">
+
+            {/* Advisory Services */}
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <h3 className="text-lg font-bold text-blue-300 tracking-tight">
+                  Advisory Services
+                </h3>
+                <div className="w-12 h-0.5 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
+              </div>
+              <div className="flex flex-wrap gap-x-3 gap-y-2">
+                {advisoryServices.map((service, index) => (
+                  <div key={service.name} className="flex items-center">
+                    <Link
+                      href={service.href}
+                      className="text-gray-400 hover:text-blue-300 transition-all duration-300 hover:translate-x-1 text-sm group whitespace-nowrap relative"
+                    >
+                      <span className="group-hover:text-blue-300 relative">
+                        {service.name}
+                      </span>
+                    </Link>
+                    {index < advisoryServices.length - 1 && (
+                      <span className="mx-2 text-gray-600">•</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Tools & Calculators */}
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <h3 className="text-lg font-bold text-blue-300 tracking-tight">
+                  Tools & Calculators
+                </h3>
+                <div className="w-12 h-0.5 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
+              </div>
+              <div className="flex flex-wrap gap-x-3 gap-y-2">
+                {toolsServices.map((service, index) => (
+                  <div key={service.name} className="flex items-center">
+                    <Link
+                      href={service.href}
+                      className="text-gray-400 hover:text-blue-300 transition-all duration-300 hover:translate-x-1 text-sm group whitespace-nowrap relative"
+                    >
+                      <span className="group-hover:text-blue-300 relative">
+                        {service.name}
+                      </span>
+                    </Link>
+                    {index < toolsServices.length - 1 && (
+                      <span className="mx-2 text-gray-600">•</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column - Company Info */}
+          <div className="space-y-4">
+            <div className="space-y-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center shadow-lg">
+                  <Building2 className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-blue-300 to-blue-200 bg-clip-text text-transparent">
+                  <h2 className="text-xl font-bold bg-gradient-to-r from-blue-400 via-blue-300 to-blue-200 bg-clip-text text-transparent">
                     Com Financial Services
                   </h2>
-                  <p className="text-blue-300 font-medium">
+                  <p className="text-blue-300 font-medium text-sm">
                     Your Trusted Business Partner
                   </p>
                 </div>
               </div>
 
-              <p className="text-gray-300 leading-relaxed text-lg max-w-md">
+              <p className="text-gray-300 leading-relaxed text-sm max-w-md">
                 Empowering businesses with comprehensive legal, financial, and
                 compliance solutions. Your success is our commitment.
               </p>
-            </div>
-
-            {/* Contact Information */}
-            <div className="space-y-4">
-              <h4 className="text-xl font-semibold text-blue-300 mb-4">
+              <h4 className="text-lg font-semibold text-blue-300 mb-3">
                 Get in Touch
               </h4>
-              <div className="space-y-4">
-                <div className="flex items-start space-x-4 group">
-                  <div className="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center group-hover:bg-blue-600/30 transition-colors">
-                    <Phone className="h-5 w-5 text-blue-400" />
+              <div className="flex flex-wrap gap-4 md:gap-6">
+                <a href="tel:06124535604" className="flex items-start space-x-3 group cursor-pointer">
+                  <div className="w-8 h-8 bg-blue-600/20 rounded-lg flex items-center justify-center group-hover:bg-blue-600/30 group-hover:scale-110 transition-all duration-300">
+                    <Phone className="h-4 w-4 text-blue-400 group-hover:text-blue-300" />
                   </div>
                   <div>
-                    <p className="text-gray-300 font-medium">Phone</p>
-                    <p className="text-gray-400">0612-4535604</p>
+                    <p className="text-gray-300 font-medium text-sm group-hover:text-blue-300 transition-colors">Phone</p>
+                    <p className="text-gray-400 text-xs group-hover:text-blue-200 transition-colors">0612-4535604</p>
                   </div>
-                </div>
+                </a>
 
-                <div className="flex items-start space-x-4 group">
-                  <div className="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center group-hover:bg-blue-600/30 transition-colors">
-                    <Mail className="h-5 w-5 text-blue-400" />
+                <a href="mailto:info@comfinserv.co" className="flex items-start space-x-3 group cursor-pointer">
+                  <div className="w-8 h-8 bg-blue-600/20 rounded-lg flex items-center justify-center group-hover:bg-blue-600/30 group-hover:scale-110 transition-all duration-300">
+                    <Mail className="h-4 w-4 text-blue-400 group-hover:text-blue-300" />
                   </div>
                   <div>
-                    <p className="text-gray-300 font-medium">Email</p>
-                    <p className="text-gray-400">info@comfinserv.co</p>
+                    <p className="text-gray-300 font-medium text-sm group-hover:text-blue-300 transition-colors">Email</p>
+                    <p className="text-gray-400 text-xs group-hover:text-blue-200 transition-colors">info@comfinserv.co</p>
                   </div>
-                </div>
+                </a>
 
-                <div className="flex items-start space-x-4 group">
-                  <div className="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center group-hover:bg-blue-600/30 transition-colors">
-                    <MapPin className="h-5 w-5 text-blue-400" />
+                <div className="flex items-start space-x-3 group">
+                  <div className="w-8 h-8 bg-blue-600/20 rounded-lg flex items-center justify-center group-hover:bg-blue-600/30 group-hover:scale-110 transition-all duration-300">
+                    <MapPin className="h-4 w-4 text-blue-400 group-hover:text-blue-300" />
                   </div>
                   <div>
-                    <p className="text-gray-300 font-medium">Address</p>
-                    <p className="text-gray-400">
+                    <p className="text-gray-300 font-medium text-sm group-hover:text-blue-300 transition-colors">Address</p>
+                    <p className="text-gray-400 text-xs group-hover:text-blue-200 transition-colors">
                       211, NP Exhibition Road
                       <br />
                       Patna, Bihar-800001
@@ -235,223 +441,17 @@ export function EnhancedFooter() {
                 </div>
               </div>
             </div>
-
-            {/* Social Media */}
-            <div className="space-y-4">
-              <h4 className="text-xl font-semibold text-blue-300">Follow Us</h4>
-              <div className="flex space-x-3">
-                {[
-                  { icon: Facebook, href: "#", label: "Facebook" },
-                  { icon: Twitter, href: "#", label: "Twitter" },
-                  { icon: Linkedin, href: "#", label: "LinkedIn" },
-                  { icon: Instagram, href: "#", label: "Instagram" },
-                ].map((social) => (
-                  <a
-                    key={social.label}
-                    href={social.href}
-                    className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center hover:from-blue-500 hover:to-blue-600 transition-all duration-300 hover:scale-110 hover:shadow-lg"
-                    aria-label={social.label}
-                  >
-                    <social.icon className="h-5 w-5" />
-                  </a>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Services Grid - 6 columns on large screens */}
-          <div className="lg:col-span-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
-            {/* Company Formation */}
-            <div className="space-y-6">
-              <div className="space-y-1">
-                <h3 className="text-xl font-bold text-blue-300">
-                  Company Formation
-                </h3>
-                <div className="w-12 h-1 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
-              </div>
-              <div className="space-y-3">
-                {companyServices.map((service) => (
-                  <Link
-                    key={service.name}
-                    href={service.href}
-                    className="block text-gray-400 hover:text-blue-300 transition-all duration-300 hover:translate-x-1 text-sm group"
-                  >
-                    <span className="group-hover:text-blue-300">
-                      {service.name}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            {/* Other Registration */}
-            <div className="space-y-6">
-              <div className="space-y-1">
-                <h3 className="text-xl font-bold text-blue-300">
-                  Other Registration
-                </h3>
-                <div className="w-12 h-1 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
-              </div>
-              <div className="space-y-3">
-                {otherServices.map((service) => (
-                  <Link
-                    key={service.name}
-                    href={service.href}
-                    className="block text-gray-400 hover:text-blue-300 transition-all duration-300 hover:translate-x-1 text-sm group"
-                  >
-                    <span className="group-hover:text-blue-300">
-                      {service.name}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            {/* Taxation */}
-            <div className="space-y-6">
-              <div className="space-y-1">
-                <h3 className="text-xl font-bold text-blue-300">Taxation</h3>
-                <div className="w-12 h-1 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
-              </div>
-              <div className="space-y-3">
-                {taxationServices.map((service) => (
-                  <Link
-                    key={service.name}
-                    href={service.href}
-                    className="block text-gray-400 hover:text-blue-300 transition-all duration-300 hover:translate-x-1 text-sm group"
-                  >
-                    <span className="group-hover:text-blue-300">
-                      {service.name}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            {/* Reports */}
-            <div className="space-y-6">
-              <div className="space-y-1">
-                <h3 className="text-xl font-bold text-blue-300">Reports</h3>
-                <div className="w-12 h-1 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
-              </div>
-              <div className="space-y-3">
-                {reportsServices.map((service) => (
-                  <Link
-                    key={service.name}
-                    href={service.href}
-                    className="block text-gray-400 hover:text-blue-300 transition-all duration-300 hover:translate-x-1 text-sm group"
-                  >
-                    <span className="group-hover:text-blue-300">
-                      {service.name}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            {/* Trademark & ISO */}
-            <div className="space-y-6">
-              <div className="space-y-1">
-                <h3 className="text-xl font-bold text-blue-300">
-                  Trademark & ISO
-                </h3>
-                <div className="w-12 h-1 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
-              </div>
-              <div className="space-y-3">
-                {legalServices.map((service) => (
-                  <Link
-                    key={service.name}
-                    href={service.href}
-                    className="block text-gray-400 hover:text-blue-300 transition-all duration-300 hover:translate-x-1 text-sm group"
-                  >
-                    <span className="group-hover:text-blue-300">
-                      {service.name}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            {/* ROC Returns */}
-            <div className="space-y-6">
-              <div className="space-y-1">
-                <h3 className="text-xl font-bold text-blue-300">ROC Returns</h3>
-                <div className="w-12 h-1 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
-              </div>
-              <div className="space-y-3">
-                {rocReturnsServices.map((service) => (
-                  <Link
-                    key={service.name}
-                    href={service.href}
-                    className="block text-gray-400 hover:text-blue-300 transition-all duration-300 hover:translate-x-1 text-sm group"
-                  >
-                    <span className="group-hover:text-blue-300">
-                      {service.name}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Advisory Services - Full Width Section */}
-        <div className="mt-16 pt-8 border-t border-gray-700">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="space-y-6">
-              <div className="space-y-1">
-                <h3 className="text-xl font-bold text-blue-300">
-                  Advisory Services
-                </h3>
-                <div className="w-12 h-1 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {advisoryServices.map((service) => (
-                  <Link
-                    key={service.name}
-                    href={service.href}
-                    className="block text-gray-400 hover:text-blue-300 transition-all duration-300 hover:translate-x-1 text-sm group"
-                  >
-                    <span className="group-hover:text-blue-300">
-                      {service.name}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            <div className="space-y-6">
-              <div className="space-y-1">
-                <h3 className="text-xl font-bold text-blue-300">
-                  Tools & Calculators
-                </h3>
-                <div className="w-12 h-1 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {toolsServices.map((service) => (
-                  <Link
-                    key={service.name}
-                    href={service.href}
-                    className="block text-gray-400 hover:text-blue-300 transition-all duration-300 hover:translate-x-1 text-sm group"
-                  >
-                    <span className="group-hover:text-blue-300">
-                      {service.name}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
 
         {/* Bottom Section */}
-        <div className="mt-8 pt-4 border-t border-gray-700">
-          <div className="flex flex-col lg:flex-row justify-between items-center space-y-6 lg:space-y-0">
+        <div className="mt-8 pt-4 border-t border-gray-700/50">
+          <div className="flex flex-col lg:flex-row justify-between items-center space-y-4 lg:space-y-0">
             <div className="text-center lg:text-left">
-              <p className="text-gray-400 text-sm mb-2">
+              <p className="text-gray-400 text-xs mb-1">
                 &copy; 2024 Com Financial Services. All rights reserved.
               </p>
-              <p className="text-gray-500 text-xs mb-2">
+              <p className="text-gray-500 text-xs mb-1">
                 Empowering businesses across India with trusted financial
                 solutions.
               </p>
@@ -478,16 +478,10 @@ export function EnhancedFooter() {
                 Privacy Policy
               </Link>
               <Link
-                href="/terms-of-service"
+                href="/terms-and-conditions"
                 className="text-gray-400 hover:text-blue-300 transition-colors duration-300 hover:scale-105"
               >
-                Terms of Service
-              </Link>
-              <Link
-                href="/refund-policy"
-                className="text-gray-400 hover:text-blue-300 transition-colors duration-300 hover:scale-105"
-              >
-                Refund Policy
+                Terms and Conditions
               </Link>
             </div>
           </div>

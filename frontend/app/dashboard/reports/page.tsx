@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/providers/auth-provider";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -36,9 +36,23 @@ type ReportsFormValues = z.infer<typeof reportsFormSchema>;
 export default function ReportsPage() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [aadhaarFile, setAadhaarFile] = useState<File | null>(null);
+
+  // Map service names from dashboard to report type values
+  const serviceToReportType: Record<string, string> = {
+    "Project Reports": "project-reports",
+    "CMA Reports": "cma-reports",
+    "DSCR Reports": "dscr-reports",
+    "Bank Reconciliation": "bank-reconciliation",
+  };
+
+  // Get service from URL
+  const serviceParam = searchParams?.get("service") || "";
+  const reportTypeFromUrl = serviceParam ? (serviceToReportType[serviceParam] || "") : "";
+  const isServiceFromUrl = !!serviceParam;
 
   const form = useForm<ReportsFormValues>({
     resolver: zodResolver(reportsFormSchema),
@@ -56,6 +70,13 @@ export default function ReportsPage() {
       businessType: "",
     },
   });
+
+  // Set report type from URL
+  useEffect(() => {
+    if (reportTypeFromUrl) {
+      form.setValue("reportType", reportTypeFromUrl);
+    }
+  }, [reportTypeFromUrl, form]);
 
   const onSubmit = async (data: ReportsFormValues) => {
     try {
@@ -233,9 +254,14 @@ export default function ReportsPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Report Type *</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select 
+                          onValueChange={field.onChange} 
+                          defaultValue={field.value}
+                          value={field.value}
+                          disabled={isServiceFromUrl}
+                        >
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className={isServiceFromUrl ? "bg-muted cursor-not-allowed" : ""}>
                               <SelectValue placeholder="Select report type" />
                             </SelectTrigger>
                           </FormControl>
@@ -248,6 +274,9 @@ export default function ReportsPage() {
                           </SelectContent>
                         </Select>
                         <FormMessage />
+                        {isServiceFromUrl && (
+                          <p className="text-xs text-muted-foreground">This field is pre-selected based on the service you chose</p>
+                        )}
                       </FormItem>
                     )}
                   />

@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/providers/auth-provider";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2, Upload, ArrowLeft, FileText } from "lucide-react";
 import { toast } from "sonner";
 import api, { API_PATHS } from "@/lib/api-client";
+import { AxiosError } from "axios";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -38,9 +39,23 @@ type TrademarkFormValues = z.infer<typeof trademarkFormSchema>;
 export default function TrademarkISOPage() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [aadhaarFile, setAadhaarFile] = useState<File | null>(null);
+
+  // Map service names from dashboard to service type values
+  const serviceToServiceType: Record<string, string> = {
+    "Trademark Registration": "trademark-registration",
+    "ISO 9001 Certification": "iso-9001",
+    "ISO 14001 Certification": "iso-14001",
+    "Copyright Registration": "copyright-registration",
+  };
+
+  // Get service from URL
+  const serviceParam = searchParams?.get("service") || "";
+  const serviceTypeFromUrl = serviceParam ? (serviceToServiceType[serviceParam] || "") : "";
+  const isServiceFromUrl = !!serviceParam;
 
   const form = useForm<TrademarkFormValues>({
     resolver: zodResolver(trademarkFormSchema),
@@ -60,6 +75,13 @@ export default function TrademarkISOPage() {
       businessAddress: "",
     },
   });
+
+  // Set service type from URL
+  useEffect(() => {
+    if (serviceTypeFromUrl) {
+      form.setValue("serviceType", serviceTypeFromUrl);
+    }
+  }, [serviceTypeFromUrl, form]);
 
   const onSubmit = async (data: TrademarkFormValues) => {
     try {
@@ -96,10 +118,14 @@ export default function TrademarkISOPage() {
       console.error("Failed to submit trademark form:", error);
       
       // Handle specific error cases
-      if (error.response?.status === 400 && error.response?.data?.message?.includes("already exists")) {
-        toast.error("Already submitted for this Year. You can only submit one form per service.");
-      } else if (error.response?.status === 409) {
-        toast.error("Already submitted for this Year. You can only submit one form per service.");
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 400 && error.response?.data?.message?.includes("already exists")) {
+          toast.error("Already submitted for this Year. You can only submit one form per service.");
+        } else if (error.response?.status === 409) {
+          toast.error("Already submitted for this Year. You can only submit one form per service.");
+        } else {
+          toast.error("Failed to submit trademark application. Please try again.");
+        }
       } else {
         toast.error("Failed to submit trademark application. Please try again.");
       }
@@ -230,9 +256,14 @@ export default function TrademarkISOPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Service Type *</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select 
+                          onValueChange={field.onChange} 
+                          defaultValue={field.value}
+                          value={field.value}
+                          disabled={isServiceFromUrl}
+                        >
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className={isServiceFromUrl ? "bg-muted cursor-not-allowed" : ""}>
                               <SelectValue placeholder="Select service type" />
                             </SelectTrigger>
                           </FormControl>
@@ -248,6 +279,9 @@ export default function TrademarkISOPage() {
                           </SelectContent>
                         </Select>
                         <FormMessage />
+                        {isServiceFromUrl && (
+                          <p className="text-xs text-muted-foreground">This field is pre-selected based on the service you chose</p>
+                        )}
                       </FormItem>
                     )}
                   />
