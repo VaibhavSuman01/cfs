@@ -128,6 +128,7 @@ app.use(
       "http://localhost:3001",
       process.env.FRONTEND_URL,
       process.env.FRONTEND_URL_ALT,
+      process.env.CONTACT_URL,
     ].filter(Boolean),
 
     credentials: true,
