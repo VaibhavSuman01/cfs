@@ -93,7 +93,7 @@ export default function PrivateLimitedCompanyPage() {
 
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                   <Link
-                    href={`/dashboard/company-formation?service=${encodeURIComponent(
+                    href={`/dashboard/company-information?service=${encodeURIComponent(
                       "Private Limited Company"
                     )}`}
                     passHref
@@ -339,7 +339,7 @@ export default function PrivateLimitedCompanyPage() {
                         </div>
                       ))}
                       <Link
-                        href={`/dashboard/company-formation?service=${encodeURIComponent(
+                        href={`/dashboard/company-information?service=${encodeURIComponent(
                           "Private Limited Company"
                         )}`}
                         passHref
@@ -789,7 +789,7 @@ export default function PrivateLimitedCompanyPage() {
               </p>
               <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
                 <Link
-                  href={`/dashboard/company-formation?service=${encodeURIComponent(
+                  href={`/dashboard/company-information?service=${encodeURIComponent(
                     "Private Limited Company"
                   )}`}
                   passHref

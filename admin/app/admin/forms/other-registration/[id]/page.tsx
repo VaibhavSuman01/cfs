@@ -127,7 +127,12 @@ export default function OtherRegistrationDetailPage() {
       // Fetch from service-forms endpoint and filter for this specific form
       const response = await api.get(`${API_PATHS.ADMIN.SERVICE_FORMS}`)
       const forms = response.data.forms
-      const targetForm = forms.find((f: any) => f._id === formId && f.formType === 'OtherRegistrationForm')
+      // Support both OtherRegistrationForm and PartnershipForm (Partnership Firm sub-service)
+      const targetForm = forms.find((f: any) => 
+        f._id === formId && 
+        (f.formType === 'OtherRegistrationForm' || 
+         (f.formType === 'PartnershipForm' && f.subService === 'Partnership Firm'))
+      )
       
       if (targetForm) {
         setForm(targetForm)

@@ -87,7 +87,7 @@ export default function Section8CompanyPage() {
 
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                   <Link
-                    href={`/dashboard/company-formation?service=${encodeURIComponent(
+                    href={`/dashboard/company-information?service=${encodeURIComponent(
                       "Section 8 Company"
                     )}`}
                     passHref
@@ -98,7 +98,7 @@ export default function Section8CompanyPage() {
                     </Button>
                   </Link>
                   <Link
-                    href={`/dashboard/company-formation?service=${encodeURIComponent(
+                    href={`/dashboard/company-information?service=${encodeURIComponent(
                       "Section 8 Company"
                     )}`}
                     passHref
@@ -220,7 +220,7 @@ export default function Section8CompanyPage() {
                     </li>
                   </ul>
                   <Link
-                    href={`/dashboard/company-formation?service=${encodeURIComponent(
+                    href={`/dashboard/company-information?service=${encodeURIComponent(
                       "Section 8 Company"
                     )}`}
                     passHref
@@ -262,7 +262,7 @@ export default function Section8CompanyPage() {
                     </li>
                   </ul>
                   <Link
-                    href={`/dashboard/company-formation?service=${encodeURIComponent(
+                    href={`/dashboard/company-information?service=${encodeURIComponent(
                       "Section 8 Company"
                     )}`}
                     passHref
@@ -304,7 +304,7 @@ export default function Section8CompanyPage() {
                     </li>
                   </ul>
                   <Link
-                    href={`/dashboard/company-formation?service=${encodeURIComponent(
+                    href={`/dashboard/company-information?service=${encodeURIComponent(
                       "Section 8 Company"
                     )}`}
                     passHref
@@ -583,7 +583,7 @@ export default function Section8CompanyPage() {
               </p>
               <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
                 <Link
-                  href={`/dashboard/company-formation?service=${encodeURIComponent(
+                  href={`/dashboard/company-information?service=${encodeURIComponent(
                     "Section 8 Company"
                   )}`}
                   passHref
@@ -594,7 +594,7 @@ export default function Section8CompanyPage() {
                   </Button>
                 </Link>
                 <Link
-                  href={`/dashboard/company-formation?service=${encodeURIComponent(
+                  href={`/dashboard/company-information?service=${encodeURIComponent(
                     "Section 8 Company"
                   )}`}
                   passHref

@@ -17,13 +17,9 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { PersonalInformationDropdown } from '@/components/ui/personal-information-dropdown';
 
 const taxFormSchema = z.object({
-  fullName: z.string().min(1, 'Full name is required'),
-  email: z.string().email('Invalid email address'),
-  phone: z.string().min(10, 'Phone number must be at least 10 digits'),
-  pan: z.string().regex(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, 'Invalid PAN format'),
-  aadhaar: z.string().regex(/^\d{12}$/, 'Aadhaar must be exactly 12 digits').optional(),
   service: z.string().min(1, 'Please select a service'),
   year: z.string().min(4, 'Please select a financial year'),
   hasIncomeTaxLogin: z.boolean().optional(),
@@ -38,7 +34,9 @@ const taxFormSchema = z.object({
   pranNumber: z.string().optional(),
   
   // GST Filing specific fields
+  gstFilingType: z.enum(['monthly', 'quarterly']).optional(),
   gstFilingMonth: z.string().optional(),
+  gstFilingQuarter: z.string().optional(),
   gstFilingYear: z.string().optional(),
   gstNumber: z.string().optional(),
   
@@ -51,6 +49,7 @@ const taxFormSchema = z.object({
   incomeTaxUserId: z.string().optional(),
   incomeTaxPassword: z.string().optional(),
   panNumber: z.string().optional(),
+  incomeTaxPanNumber: z.string().optional(),
   
   // EPFO specific fields
   epfoUserId: z.string().optional(),
@@ -174,15 +173,13 @@ export default function NewFormPage() {
     ],
   }), []);
 
+  // Get service from URL (before form initialization)
+  const serviceParam = searchParams?.get('service') || '';
+
   const form = useForm<TaxFormValues>({
     resolver: zodResolver(taxFormSchema),
     defaultValues: {
-      fullName: '',
-      email: '',
-      phone: '',
-      pan: '',
-      aadhaar: '',
-      service: '',
+      service: serviceParam || '',
       year: '',
       hasIncomeTaxLogin: false,
       incomeTaxLoginId: '',
@@ -195,7 +192,9 @@ export default function NewFormPage() {
       hasPranNumber: false,
       pranNumber: '',
       // GST Filing specific fields
+      gstFilingType: undefined,
       gstFilingMonth: '',
+      gstFilingQuarter: '',
       gstFilingYear: '',
       gstNumber: '',
       // TDS Return specific fields
@@ -207,6 +206,7 @@ export default function NewFormPage() {
       incomeTaxUserId: '',
       incomeTaxPassword: '',
       panNumber: '',
+      incomeTaxPanNumber: '',
       // EPFO specific fields
       epfoUserId: '',
       epfoPassword: '',
@@ -223,25 +223,24 @@ export default function NewFormPage() {
   const hasHomeLoan = form.watch('hasHomeLoan');
   const hasPranNumber = form.watch('hasPranNumber');
   const selectedService = form.watch('service');
-
-  // Populate form with user data when loaded
-  useEffect(() => {
-    if (user && !isLoading) {
-      form.setValue('fullName', user.name || '');
-      form.setValue('email', user.email || '');
-      form.setValue('phone', user.mobile || '');
-      form.setValue('pan', user.pan || '');
-    }
-  }, [user, isLoading, form]);
-
-  // Get service from URL
-  const serviceParam = searchParams?.get('service') || '';
+  const gstFilingType = form.watch('gstFilingType');
   const isServiceFromUrl = !!serviceParam;
 
-  // Preselect service from query param
+  // Clear month/quarter when filing type changes
+  useEffect(() => {
+    if (gstFilingType === 'monthly') {
+      form.setValue('gstFilingQuarter', '');
+    } else if (gstFilingType === 'quarterly') {
+      form.setValue('gstFilingMonth', '');
+    }
+  }, [gstFilingType, form]);
+
+  // Preselect service from query param (update if URL changes)
   useEffect(() => {
     if (serviceParam) {
-      form.setValue('service', serviceParam);
+      // Map service name to dropdown value (they should match, but handle any variations)
+      const serviceValue = serviceParam;
+      form.setValue('service', serviceValue);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, serviceParam]);
@@ -250,12 +249,29 @@ export default function NewFormPage() {
     try {
       setIsSubmitting(true);
 
-      // Validate quarterly filing months (if needed in future)
-        if (selectedService === 'GST Filing' && data.gstFilingMonth === 'quarterly' && data.gstFilingYear === 'quarterly') {
-          toast.error('Please select at least one month for quarterly filing');
+      // Validate GST Filing required fields
+      if (selectedService === 'GST Filing') {
+        if (!data.gstFilingType) {
+          toast.error('Please select filing type (Monthly or Quarterly)');
           setIsSubmitting(false);
           return;
         }
+        if (data.gstFilingType === 'monthly' && !data.gstFilingMonth) {
+          toast.error('Please select filing month for monthly GST filing');
+          setIsSubmitting(false);
+          return;
+        }
+        if (data.gstFilingType === 'quarterly' && !data.gstFilingQuarter) {
+          toast.error('Please select filing quarter for quarterly GST filing');
+          setIsSubmitting(false);
+          return;
+        }
+        if (!data.gstFilingYear) {
+          toast.error('Please select filing year');
+          setIsSubmitting(false);
+          return;
+        }
+      }
 
       // Validate TDS Returns required fields
       if (selectedService === 'TDS Returns') {
@@ -274,7 +290,7 @@ export default function NewFormPage() {
           setIsSubmitting(false);
           return;
         }
-        if (!data.panNumber) {
+        if (!data.incomeTaxPanNumber) {
           toast.error('Income Tax (PAN No.) is required');
           setIsSubmitting(false);
           return;
@@ -305,24 +321,22 @@ export default function NewFormPage() {
           formData.append(key, '');
         }
       });
+
+      // Append user profile data (non-editable fields)
+      if (user) {
+        formData.append("fullName", user.name || "");
+        formData.append("email", user.email || "");
+        formData.append("phone", user.mobile || "");
+        formData.append("pan", user.pan || "");
+        if (user.aadhaar) {
+          formData.append("aadhaar", user.aadhaar);
+        }
+      }
       
       // Append selected months for quarterly filing (if needed in future)
       // if (selectedMonths.length > 0) {
       //   formData.append('selectedMonths', JSON.stringify(selectedMonths));
       // }
-
-      // Append Aadhaar file if uploaded
-      if (aadhaarFile) {
-        formData.append('aadhaarFile', aadhaarFile);
-      }
-
-      // Append service-specific files
-      if (salesDataFile) formData.append('salesDataFile', salesDataFile);
-      if (purchaseDataFile) formData.append('purchaseDataFile', purchaseDataFile);
-      if (bankStatementFile) formData.append('bankStatementFile', bankStatementFile);
-      if (tdsDataFile) formData.append('tdsDataFile', tdsDataFile);
-      if (wagesReportFile) formData.append('wagesReportFile', wagesReportFile);
-      if (salarySheetFile) formData.append('salarySheetFile', salarySheetFile);
 
       // Append Aadhaar file if uploaded
       if (aadhaarFile) {
@@ -416,8 +430,8 @@ export default function NewFormPage() {
   }
 
   // Get service from query params for dynamic header
-  const pageTitle = serviceParam ? `${serviceParam} Form` : "New Tax Form";
-  const cardTitle = serviceParam ? `${serviceParam} Submission Form` : "Submit a New Tax Form";
+  const pageTitle = selectedService || serviceParam || "Taxation";
+  const cardTitle = selectedService ? `${selectedService} Form` : (serviceParam ? `${serviceParam} Form` : "Taxation Form");
 
   return (
     <div className="container mx-auto p-6">
@@ -437,58 +451,10 @@ export default function NewFormPage() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {/* Personal Information */}
+              <PersonalInformationDropdown />
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField control={form.control} name="fullName" render={({ field }) => (<FormItem><FormLabel>Full Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-                <FormField control={form.control} name="email" render={({ field }) => (<FormItem><FormLabel>Email</FormLabel><FormControl><Input {...field} type="email" /></FormControl><FormMessage /></FormItem>)} />
-                <FormField control={form.control} name="phone" render={({ field }) => (<FormItem><FormLabel>Phone</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-                <FormField 
-                  control={form.control} 
-                  name="pan" 
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>PAN Number *</FormLabel>
-                      <FormControl>
-                        <Input 
-                          {...field} 
-                          placeholder="AAAAA0000A" 
-                          maxLength={10}
-                          onChange={(e) => {
-                            const value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-                            field.onChange(value);
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                      <p className="text-xs text-muted-foreground">
-                        Format: 5 letters + 4 digits + 1 letter (e.g., ABCDE1234F)
-                      </p>
-                    </FormItem>
-                  )} 
-                />
-                <FormField 
-                  control={form.control} 
-                  name="aadhaar" 
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Aadhaar Number (Optional)</FormLabel>
-                      <FormControl>
-                        <Input 
-                          {...field} 
-                          placeholder="123456789012" 
-                          maxLength={12}
-                          onChange={(e) => {
-                            const value = e.target.value.replace(/\D/g, '');
-                            field.onChange(value);
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                      <p className="text-xs text-muted-foreground">
-                        12-digit unique identification number
-                      </p>
-                    </FormItem>
-                  )} 
-                />
                   <FormField
                     control={form.control}
                     name="service"
@@ -499,10 +465,9 @@ export default function NewFormPage() {
                           onValueChange={field.onChange} 
                           defaultValue={field.value}
                           value={field.value}
-                          disabled={isServiceFromUrl}
                         >
                           <FormControl>
-                            <SelectTrigger className={isServiceFromUrl ? "bg-muted cursor-not-allowed" : ""}>
+                            <SelectTrigger>
                               <SelectValue placeholder="Select a service" />
                             </SelectTrigger>
                           </FormControl>
@@ -519,9 +484,6 @@ export default function NewFormPage() {
                           </SelectContent>
                         </Select>
                         <FormMessage />
-                        {isServiceFromUrl && (
-                          <p className="text-xs text-muted-foreground">This field is pre-selected based on the service you chose</p>
-                        )}
                       </FormItem>
                     )}
                   />
@@ -567,38 +529,86 @@ export default function NewFormPage() {
               {selectedService === 'GST Filing' && (
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold">GST Filing Details</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
-                      name="gstFilingMonth"
+                      name="gstFilingType"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Filing Month *</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormLabel>Filing Type *</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger>
-                                <SelectValue placeholder="Select month" />
+                                <SelectValue placeholder="Select filing type" />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {months.map((month) => (
-                                <SelectItem key={month.value} value={month.value}>
-                                  {month.label}
-                                </SelectItem>
-                              ))}
+                              <SelectItem value="monthly">Monthly</SelectItem>
+                              <SelectItem value="quarterly">Quarterly</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
+                    {gstFilingType === 'monthly' && (
+                      <FormField
+                        control={form.control}
+                        name="gstFilingMonth"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Filing Month *</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select month" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {months.map((month) => (
+                                  <SelectItem key={month.value} value={month.value}>
+                                    {month.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                    {gstFilingType === 'quarterly' && (
+                      <FormField
+                        control={form.control}
+                        name="gstFilingQuarter"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Filing Quarter *</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select quarter" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="Q1">Q1 (April - June)</SelectItem>
+                                <SelectItem value="Q2">Q2 (July - September)</SelectItem>
+                                <SelectItem value="Q3">Q3 (October - December)</SelectItem>
+                                <SelectItem value="Q4">Q4 (January - March)</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
                     <FormField
                       control={form.control}
                       name="gstFilingYear"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Filing Year *</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue placeholder="Select year" />
@@ -747,6 +757,27 @@ export default function NewFormPage() {
                           <FormLabel>Income Tax Password</FormLabel>
                           <FormControl>
                             <Input type="text" {...field} placeholder="Enter Income Tax Password" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="incomeTaxPanNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Income Tax (PAN No.) *</FormLabel>
+                          <FormControl>
+                            <Input 
+                              {...field} 
+                              placeholder="ABCDE1234F" 
+                              maxLength={10}
+                              onChange={(e) => {
+                                const value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                                field.onChange(value);
+                              }}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1184,7 +1215,7 @@ export default function NewFormPage() {
                     <input
                       id="aadhaar-upload"
                       type="file"
-                      accept=".pdf"
+                      accept=".pdf,.jpg,.jpeg,.png"
                       onChange={(e) => setAadhaarFile(e.target.files?.[0] || null)}
                       className="hidden"
                     />

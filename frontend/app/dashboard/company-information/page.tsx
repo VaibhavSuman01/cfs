@@ -16,12 +16,9 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { PersonalInformationDropdown } from "@/components/ui/personal-information-dropdown";
 
 const companyFormSchema = z.object({
-  fullName: z.string().min(1, "Full name is required"),
-  email: z.string().email("Invalid email address"),
-  phone: z.string().min(10, "Phone number must be at least 10 digits"),
-  pan: z.string().regex(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "Invalid PAN format"),
   companyType: z.string().min(1, "Company type is required"),
   proposedName1: z.string().min(1, "First proposed company name is required"),
   proposedName2: z.string().min(1, "Second proposed company name is required"),
@@ -101,10 +98,6 @@ export default function CompanyFormationPage() {
   const form = useForm<CompanyFormValues>({
     resolver: zodResolver(companyFormSchema),
     defaultValues: {
-      fullName: "",
-      email: "",
-      phone: "",
-      pan: "",
       companyType: companyTypeValue || "",
       proposedName1: "",
       proposedName2: "",
@@ -122,62 +115,12 @@ export default function CompanyFormationPage() {
     },
   });
 
-  // Update form when user data is available
-  useEffect(() => {
-    if (user) {
-      const currentValues = form.getValues();
-      const formData: Partial<CompanyFormValues> = {};
-      let hasChanges = false;
-      
-      if (user.name && currentValues.fullName !== user.name) {
-        formData.fullName = user.name;
-        hasChanges = true;
-      }
-      if (user.email && currentValues.email !== user.email) {
-        formData.email = user.email;
-        hasChanges = true;
-      }
-      if (user.mobile && currentValues.phone !== user.mobile) {
-        formData.phone = user.mobile;
-        hasChanges = true;
-      }
-      if (user.pan && currentValues.pan !== user.pan) {
-        formData.pan = user.pan;
-        hasChanges = true;
-      }
-      
-      if (hasChanges) {
-        form.reset({
-          ...currentValues,
-          ...formData,
-        });
-      }
-    }
-  }, [user]);
-
   // Set company type from URL
   useEffect(() => {
     if (companyTypeValue) {
       form.setValue("companyType", companyTypeValue);
     }
   }, [companyTypeValue, form]);
-
-  const isFieldDisabled = (fieldName: keyof CompanyFormValues) => {
-    if (!user) return false;
-    
-    switch (fieldName) {
-      case "fullName":
-        return !!user.name;
-      case "email":
-        return !!user.email;
-      case "phone":
-        return !!user.mobile;
-      case "pan":
-        return !!user.pan;
-      default:
-        return false;
-    }
-  };
 
   const addDirector = () => {
     setDirectors([...directors, { name: "", email: "", phone: "", pan: "", aadhaar: "", voterId: "", drivingLicense: "", address: "", bankStatement: null }]);
@@ -254,49 +197,74 @@ export default function CompanyFormationPage() {
 
       const formData = new FormData();
 
-      // Append form data
-      Object.entries(data).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          const formValue = typeof value === 'boolean' ? String(value) : (typeof value === 'string' ? value : String(value));
-          formData.append(key, formValue);
-        }
-      });
-
-      // Append directors data
-      formData.append("directors", JSON.stringify(directors));
+      // Append user profile data (non-editable fields)
+      if (user) {
+        formData.append("fullName", user.name || "");
+        formData.append("email", user.email || "");
+        formData.append("phone", user.mobile || "");
+        formData.append("pan", user.pan || "");
+      }
 
       // Append service and subService
       formData.append("service", "Company Information");
       formData.append("subService", companyTypeName);
 
+      // Append company information fields (matching backend expectations)
+      formData.append("companyName", data.proposedName1);
+      formData.append("proposedName1", data.proposedName1);
+      formData.append("proposedName2", data.proposedName2);
+      formData.append("proposedNames", JSON.stringify([data.proposedName1, data.proposedName2]));
+      
+      // Append business details
+      formData.append("businessActivity", data.businessActivity);
+      formData.append("businessDetails", data.businessDetails);
+      formData.append("proposedCapital", data.proposedCapital);
+      
+      // Append company address
+      formData.append("registeredOfficeAddress", data.registeredOfficeAddress);
+      formData.append("city", data.city);
+      formData.append("state", data.state);
+      formData.append("pincode", data.pincode);
+      formData.append("addressProofType", data.addressProofType);
+      
+      // Append owner information (if rented)
+      if (data.addressProofType === "rent") {
+        if (data.ownerName) formData.append("ownerName", data.ownerName);
+        if (data.ownerPan) formData.append("ownerPan", data.ownerPan);
+        if (data.ownerAadhaar) formData.append("ownerAadhaar", data.ownerAadhaar);
+      }
+
+      // Append directors data
+      formData.append("directors", JSON.stringify(directors));
+
       // Append director documents
       directors.forEach((director, dirIndex) => {
-        if (directorPhotos[dirIndex]) {
+        if (directorPhotos[dirIndex] && directorPhotos[dirIndex].length > 0) {
           directorPhotos[dirIndex].forEach((file) => {
             formData.append(`directorPhoto_${dirIndex}`, file);
           });
         }
-        if (directorSignatures[dirIndex]) {
+        if (directorSignatures[dirIndex] && directorSignatures[dirIndex].length > 0) {
           directorSignatures[dirIndex].forEach((file) => {
             formData.append(`directorSignature_${dirIndex}`, file);
           });
         }
-        if (directorAadhaarCards[dirIndex]) {
+        if (directorAadhaarCards[dirIndex] && directorAadhaarCards[dirIndex].length > 0) {
           directorAadhaarCards[dirIndex].forEach((file) => {
             formData.append(`directorAadhaar_${dirIndex}`, file);
           });
         }
-        if (directorPanCards[dirIndex]) {
+        if (directorPanCards[dirIndex] && directorPanCards[dirIndex].length > 0) {
           directorPanCards[dirIndex].forEach((file) => {
             formData.append(`directorPan_${dirIndex}`, file);
           });
         }
-        if (directorVoterIds[dirIndex]) {
+        if (directorVoterIds[dirIndex] && directorVoterIds[dirIndex].length > 0) {
           directorVoterIds[dirIndex].forEach((file) => {
             formData.append(`directorVoterId_${dirIndex}`, file);
           });
         }
-        if (directorDrivingLicenses[dirIndex]) {
+        if (directorDrivingLicenses[dirIndex] && directorDrivingLicenses[dirIndex].length > 0) {
           directorDrivingLicenses[dirIndex].forEach((file) => {
             formData.append(`directorDrivingLicense_${dirIndex}`, file);
           });
@@ -317,10 +285,6 @@ export default function CompanyFormationPage() {
         formData.append("documents", file);
       });
 
-      // Map form fields to backend expected fields
-      formData.append("companyName", data.proposedName1); // Use first proposed name as primary
-      formData.append("proposedNames", JSON.stringify([data.proposedName1, data.proposedName2]));
-
       await api.post(API_PATHS.FORMS.COMPANY_FORMATION, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -328,10 +292,20 @@ export default function CompanyFormationPage() {
       });
 
       toast.success(`${companyTypeName} registration application submitted successfully`);
-      router.push("/dashboard/company-information");
-    } catch (error) {
-      console.error("Failed to submit company formation form:", error);
-      toast.error("Failed to submit company formation application. Please try again.");
+      router.push("/dashboard");
+    } catch (error: any) {
+      console.error("Failed to submit Company Information form:", error);
+     
+      // Handle specific error cases
+      if (error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else if (error.response?.status === 400) {
+        toast.error("A Company Information form for this service already exists. You can only submit one form per service.");
+      } else if (error.response?.status === 409) {
+        toast.error("A Company Information form for this service already exists. You can only submit one form per service.");
+      } else {
+        toast.error("Failed to submit Company Information application. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -351,111 +325,25 @@ export default function CompanyFormationPage() {
         <Button variant="ghost" onClick={() => router.back()} className="mr-4">
           <ArrowLeft className="h-4 w-4 mr-2" /> Back
         </Button>
-        <h1 className="text-2xl font-bold">{companyTypeName} Registration</h1>
+        <h1 className="text-2xl font-bold">{companyTypeName}</h1>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>{companyTypeName} Registration Form</CardTitle>
+          <CardTitle>{companyTypeName} Form</CardTitle>
           <CardDescription>
-            Submit your {companyTypeName.toLowerCase()} registration application with all required details and documents.
+            Submit your {companyTypeName.toLowerCase()} application with all required details and documents.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              {/* Primary Applicant Information */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Primary Applicant Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="fullName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Full Name *</FormLabel>
-                        <FormControl>
-                          <Input 
-                            {...field} 
-                            disabled={isFieldDisabled("fullName")}
-                            className={isFieldDisabled("fullName") ? "bg-muted cursor-not-allowed" : ""}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                        {isFieldDisabled("fullName") && (
-                          <p className="text-xs text-muted-foreground">This field is pre-filled from your profile</p>
-                        )}
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email *</FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="email" 
-                            {...field} 
-                            disabled={isFieldDisabled("email")}
-                            className={isFieldDisabled("email") ? "bg-muted cursor-not-allowed" : ""}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                        {isFieldDisabled("email") && (
-                          <p className="text-xs text-muted-foreground">This field is pre-filled from your profile</p>
-                        )}
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone *</FormLabel>
-                        <FormControl>
-                          <Input 
-                            {...field} 
-                            disabled={isFieldDisabled("phone")}
-                            className={isFieldDisabled("phone") ? "bg-muted cursor-not-allowed" : ""}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                        {isFieldDisabled("phone") && (
-                          <p className="text-xs text-muted-foreground">This field is pre-filled from your profile</p>
-                        )}
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="pan"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>PAN *</FormLabel>
-                        <FormControl>
-                          <Input 
-                            {...field} 
-                            placeholder="ABCDE1234F"
-                            disabled={isFieldDisabled("pan")}
-                            className={isFieldDisabled("pan") ? "bg-muted cursor-not-allowed" : ""}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                        {isFieldDisabled("pan") && (
-                          <p className="text-xs text-muted-foreground">This field is pre-filled from your profile</p>
-                        )}
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
+              {/* Personal Information */}
+              <PersonalInformationDropdown />
 
-              {/* Company Proposed Names */}
+              {/* 2. Company Proposed Names */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Company Proposed Names</h3>
+                <h3 className="text-lg font-semibold">2. Company Proposed Name (2 proposed name of Company required, any one of them will be approved)</h3>
                 <div className="bg-blue-50 p-4 rounded-lg mb-4">
                   <p className="text-sm text-blue-800">
                     Please provide 2 proposed names for your company. Any one of them will be approved.
@@ -491,10 +379,10 @@ export default function CompanyFormationPage() {
                 </div>
               </div>
 
-              {/* Directors Information */}
+              {/* 1. Directors KYC */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">Directors Information</h3>
+                  <h3 className="text-lg font-semibold">1. Directors KYC (Upload as Jpeg/Jpg/Pdf/Png)</h3>
                   <Button type="button" variant="outline" onClick={addDirector}>
                     <Plus className="h-4 w-4 mr-2" /> Add Director
                   </Button>
@@ -524,7 +412,7 @@ export default function CompanyFormationPage() {
                         />
                       </div>
                       <div>
-                        <Label>Email *</Label>
+                        <Label>g. Email (Text) *</Label>
                         <Input
                           type="email"
                           value={director.email}
@@ -533,7 +421,7 @@ export default function CompanyFormationPage() {
                         />
                       </div>
                       <div>
-                        <Label>Phone *</Label>
+                        <Label>f. Mobile No. (Text) *</Label>
                         <Input
                           value={director.phone}
                           onChange={(e) => updateDirector(index, "phone", e.target.value)}
@@ -589,11 +477,11 @@ export default function CompanyFormationPage() {
                       <h5 className="font-medium text-sm">Director {index + 1} KYC Documents</h5>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
-                          <Label>Photo (JPG/PNG)</Label>
+                          <Label>a. Photo (Jpeg/Jpg/Pdf/Png)</Label>
                           <Input
                             type="file"
                             multiple
-                            accept=".jpg,.jpeg,.png"
+                            accept=".jpg,.jpeg,.png,.pdf"
                             onChange={(e) => updateDirectorFiles(index, "photo", Array.from(e.target.files || []))}
                             className="mt-1"
                           />
@@ -604,11 +492,11 @@ export default function CompanyFormationPage() {
                           )}
                         </div>
                         <div>
-                          <Label>Signature (JPG/PNG)</Label>
+                          <Label>b. Signature (Jpeg/Jpg/Pdf/Png)</Label>
                           <Input
                             type="file"
                             multiple
-                            accept=".jpg,.jpeg,.png"
+                            accept=".jpg,.jpeg,.png,.pdf"
                             onChange={(e) => updateDirectorFiles(index, "signature", Array.from(e.target.files || []))}
                             className="mt-1"
                           />
@@ -619,7 +507,7 @@ export default function CompanyFormationPage() {
                           )}
                         </div>
                         <div>
-                          <Label>Aadhaar Card (JPG/PNG/PDF)</Label>
+                          <Label>c. Aadhar Card (Jpeg/Jpg/Pdf/Png)</Label>
                           <Input
                             type="file"
                             multiple
@@ -634,7 +522,7 @@ export default function CompanyFormationPage() {
                           )}
                         </div>
                         <div>
-                          <Label>PAN Card (JPG/PNG/PDF)</Label>
+                          <Label>d. Pan Card (Jpeg/Jpg/Pdf/Png)</Label>
                           <Input
                             type="file"
                             multiple
@@ -649,7 +537,7 @@ export default function CompanyFormationPage() {
                           )}
                         </div>
                         <div>
-                          <Label>Voter ID (JPG/PNG/PDF)</Label>
+                          <Label>e. Voter ID (Jpeg/Jpg/Pdf/Png)</Label>
                           <Input
                             type="file"
                             multiple
@@ -664,7 +552,7 @@ export default function CompanyFormationPage() {
                           )}
                         </div>
                         <div>
-                          <Label>Driving License (JPG/PNG/PDF)</Label>
+                          <Label>e. Driving Licence (Jpeg/Jpg/Pdf/Png)</Label>
                           <Input
                             type="file"
                             multiple
@@ -679,7 +567,7 @@ export default function CompanyFormationPage() {
                           )}
                         </div>
                         <div>
-                          <Label>Bank Statement (Latest 3 Months) (PDF)</Label>
+                          <Label>h. Bank Statement (latest 3 Months) (Pdf)</Label>
                           <Input
                             type="file"
                             accept=".pdf"
@@ -698,9 +586,9 @@ export default function CompanyFormationPage() {
                 ))}
               </div>
 
-              {/* Company Address */}
+              {/* 3. Company Address */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Company Address</h3>
+                <h3 className="text-lg font-semibold">3. Company Address (Upload as Jpeg/Jpg/Pdf/Png)</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -825,10 +713,10 @@ export default function CompanyFormationPage() {
 
               {/* Company Address Documents */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Company Address Proof Documents</h3>
+                <h5 className="font-medium text-sm">Company Address Proof Documents</h5>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label>Rent Agreement (JPG/PNG/PDF)</Label>
+                    <Label>a. Rent Agreement (Jpeg/Jpg/Pdf/Png)</Label>
                     <Input
                       type="file"
                       accept=".jpg,.jpeg,.png,.pdf"
@@ -842,7 +730,7 @@ export default function CompanyFormationPage() {
                     )}
                   </div>
                   <div>
-                    <Label>Electricity Bill (JPG/PNG/PDF)</Label>
+                    <Label>b. Electricity Bill (Jpeg/Jpg/Pdf/Png)</Label>
                     <Input
                       type="file"
                       accept=".jpg,.jpeg,.png,.pdf"
@@ -857,7 +745,7 @@ export default function CompanyFormationPage() {
                   </div>
                   {addressProofType === "rent" && (
                     <div>
-                      <Label>Owner PAN/Aadhaar Card (JPG/PNG/PDF)</Label>
+                      <Label>c. Owner Pan/Aadhar card (if rented) (Jpeg/Jpg/Pdf/Png)</Label>
                       <Input
                         type="file"
                         accept=".jpg,.jpeg,.png,.pdf"
@@ -872,7 +760,7 @@ export default function CompanyFormationPage() {
                     </div>
                   )}
                   <div>
-                    <Label>Municipal Tax Receipt (JPG/PNG/PDF)</Label>
+                    <Label>d. Municipal Tax Receipt of property (Jpeg/Jpg/Pdf/Png)</Label>
                     <Input
                       type="file"
                       accept=".jpg,.jpeg,.png,.pdf"
@@ -888,9 +776,9 @@ export default function CompanyFormationPage() {
                 </div>
               </div>
 
-              {/* Business Details */}
+              {/* 4. Business Details */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Business Details</h3>
+                <h3 className="text-lg font-semibold">4. Business Detail (Text Box)</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -934,20 +822,20 @@ export default function CompanyFormationPage() {
                 />
               </div>
 
-              {/* Other Documents */}
+              {/* 5. Any Other Documents */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Any Other Documents</h3>
+                <h3 className="text-lg font-semibold">5. Any Other Documents (Excel, Zip, Pdf, Word)</h3>
                 <div className="bg-blue-50 p-4 rounded-lg mb-4">
                   <p className="text-sm text-blue-800">
-                    Upload any additional documents (Excel, Zip, Pdf, Word)
+                    Upload any additional documents (Excel, Zip, PDF, Word)
                   </p>
                 </div>
                 <div>
-                  <Label>Additional Documents (Excel, Zip, Pdf, Word)</Label>
+                  <Label>Additional Documents (Excel, Zip, PDF, Word)</Label>
                   <Input
                     type="file"
                     multiple
-                    accept=".pdf,.doc,.docx,.xls,.xlsx,.zip"
+                    accept=".xls,.xlsx,.zip,.pdf,.doc,.docx"
                     onChange={(e) => setOtherDocuments(Array.from(e.target.files || []))}
                     className="mt-1"
                   />

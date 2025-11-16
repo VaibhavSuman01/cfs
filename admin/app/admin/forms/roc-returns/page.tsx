@@ -86,7 +86,7 @@ export default function ROCReturnsPage() {
   const [status, setStatus] = useState(searchParams.get('status') || '');
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
-  const [service, setService] = useState(searchParams.get('service') || '');
+  const [subService, setSubService] = useState(searchParams.get('subService') || '');
 
   const fetchROCForms = useCallback(async () => {
     setLoading(true);
@@ -95,13 +95,23 @@ export default function ROCReturnsPage() {
       params.append('page', String(page));
       if (status) params.append('status', status);
       if (searchTerm) params.append('search', searchTerm);
-      if (service) params.append('service', service);
+      // Send service filter to backend (ROC Returns)
+      params.append('service', 'ROC Returns');
 
       // Use the service-forms endpoint to get all forms
       const response = await api.get(`${API_PATHS.ADMIN.SERVICE_FORMS}?${params.toString()}`);
       
       // Filter to only show ROCForm type forms
-      const rocForms = response.data.forms.filter((form: any) => form.formType === 'ROCForm');
+      let rocForms = response.data.forms.filter((form: any) => form.formType === 'ROCForm');
+      
+      // Filter by subService if selected
+      if (subService && subService !== 'all') {
+        rocForms = rocForms.filter((form: any) => {
+          const formSubService = form.subService?.toLowerCase() || '';
+          const filterSubService = subService.toLowerCase();
+          return formSubService === filterSubService || form.subService === subService;
+        });
+      }
       
       setForms(rocForms);
       setPagination({
@@ -120,7 +130,7 @@ export default function ROCReturnsPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, status, searchTerm, service, toast]);
+  }, [page, status, searchTerm, subService, toast]);
 
   useEffect(() => {
     fetchROCForms();
@@ -129,12 +139,12 @@ export default function ROCReturnsPage() {
   // Sync state from URL when query params change
   useEffect(() => {
     const urlStatus = searchParams.get('status') || '';
-    const urlService = searchParams.get('service') || '';
+    const urlSubService = searchParams.get('subService') || '';
     const urlSearch = searchParams.get('search') || '';
     const urlPage = Number(searchParams.get('page')) || 1;
 
     if (urlStatus !== status) setStatus(urlStatus);
-    if (urlService !== service) setService(urlService);
+    if (urlSubService !== subService) setSubService(urlSubService);
     if (urlSearch !== searchTerm) setSearchTerm(urlSearch);
     if (urlPage !== page) setPage(urlPage);
   }, [searchParams]);
@@ -143,7 +153,7 @@ export default function ROCReturnsPage() {
     const params = new URLSearchParams();
     if (status) params.set('status', status);
     if (searchTerm) params.set('search', searchTerm);
-    if (service) params.set('service', service);
+    if (subService) params.set('subService', subService);
     params.set('page', String(page));
 
     const next = `${pathname}?${params.toString()}`;
@@ -151,15 +161,15 @@ export default function ROCReturnsPage() {
     if (next !== current) {
       router.push(next);
     }
-  }, [status, searchTerm, service, page, pathname, router, searchParams]);
+  }, [status, searchTerm, subService, page, pathname, router, searchParams]);
 
   const handleStatusChange = (newStatus: string) => {
     setStatus(newStatus === 'all' ? '' : newStatus);
     setPage(1);
   };
 
-  const handleServiceChange = (newService: string) => {
-    setService(newService === 'all' ? '' : newService);
+  const handleSubServiceChange = (newSubService: string) => {
+    setSubService(newSubService === 'all' ? '' : newSubService);
     setPage(1);
   };
 
@@ -223,13 +233,13 @@ export default function ROCReturnsPage() {
                 </Select>
               </div>
               <div className="w-full md:w-1/4">
-                <Select onValueChange={handleServiceChange} value={service || 'all'}>
+                <Select onValueChange={handleSubServiceChange} value={subService || 'all'}>
                   <SelectTrigger>
                     <Filter className="mr-2 h-4 w-4" />
-                    <SelectValue placeholder="Filter by service" />
+                    <SelectValue placeholder="Filter by return type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Services</SelectItem>
+                    <SelectItem value="all">All Return Types</SelectItem>
                     <SelectItem value="Annual Returns">Annual Returns</SelectItem>
                     <SelectItem value="Event Based Returns">Event Based Returns</SelectItem>
                     <SelectItem value="Compliance Returns">Compliance Returns</SelectItem>

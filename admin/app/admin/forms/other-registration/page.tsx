@@ -23,7 +23,7 @@ interface OtherRegistrationForm {
   email: string
   phone: string
   pan: string
-  service?: string
+  subService?: string
   businessName?: string
   businessType?: string
   businessAddress?: string
@@ -86,7 +86,7 @@ export default function OtherRegistrationPage() {
   const [status, setStatus] = useState(searchParams.get('status') || '');
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
-  const [service, setService] = useState(searchParams.get('service') || '');
+  const [subService, setSubService] = useState(searchParams.get('subService') || '');
 
   const fetchOtherRegistrationForms = useCallback(async () => {
     setLoading(true);
@@ -95,13 +95,41 @@ export default function OtherRegistrationPage() {
       params.append('page', String(page));
       if (status) params.append('status', status);
       if (searchTerm) params.append('search', searchTerm);
-      if (service) params.append('service', service);
+      // Send service filter to backend (Other Registration)
+      params.append('service', 'Other Registration');
 
       // Use the service-forms endpoint to get all forms
       const response = await api.get(`${API_PATHS.ADMIN.SERVICE_FORMS}?${params.toString()}`);
       
-      // Filter to only show OtherRegistrationForm type forms
-      const otherRegistrationForms = response.data.forms.filter((form: any) => form.formType === 'OtherRegistrationForm');
+      // Filter to show OtherRegistrationForm and PartnershipForm (Partnership Firm sub-service)
+      // PartnershipForm has service: "Other Registration" and subService: "partnership-firm"
+      let otherRegistrationForms = response.data.forms.filter((form: any) => {
+        // Show OtherRegistrationForm forms
+        if (form.formType === 'OtherRegistrationForm') {
+          return true;
+        }
+        // Show PartnershipForm forms that belong to Other Registration service
+        if (form.formType === 'PartnershipForm') {
+          return form.service === 'Other Registration' || form.subService === 'partnership-firm' || form.subService === 'Partnership Firm';
+        }
+        return false;
+      });
+      
+      // Filter by subService if selected
+      if (subService && subService !== 'all') {
+        otherRegistrationForms = otherRegistrationForms.filter((form: any) => {
+          // Normalize subService values for comparison
+          const formSubService = form.subService?.toLowerCase() || '';
+          const filterSubService = subService.toLowerCase();
+          
+          // Handle partnership-firm variations
+          if (filterSubService === 'partnership firm' || filterSubService === 'partnership-firm') {
+            return formSubService === 'partnership firm' || formSubService === 'partnership-firm';
+          }
+          
+          return formSubService === filterSubService || form.subService === subService;
+        });
+      }
       
       setForms(otherRegistrationForms);
       setPagination({
@@ -120,7 +148,7 @@ export default function OtherRegistrationPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, status, searchTerm, service, toast]);
+  }, [page, status, searchTerm, subService, toast]);
 
   useEffect(() => {
     fetchOtherRegistrationForms();
@@ -129,12 +157,12 @@ export default function OtherRegistrationPage() {
   // Sync state from URL when query params change
   useEffect(() => {
     const urlStatus = searchParams.get('status') || '';
-    const urlService = searchParams.get('service') || '';
+    const urlSubService = searchParams.get('subService') || '';
     const urlSearch = searchParams.get('search') || '';
     const urlPage = Number(searchParams.get('page')) || 1;
 
     if (urlStatus !== status) setStatus(urlStatus);
-    if (urlService !== service) setService(urlService);
+    if (urlSubService !== subService) setSubService(urlSubService);
     if (urlSearch !== searchTerm) setSearchTerm(urlSearch);
     if (urlPage !== page) setPage(urlPage);
   }, [searchParams]);
@@ -143,7 +171,7 @@ export default function OtherRegistrationPage() {
     const params = new URLSearchParams();
     if (status) params.set('status', status);
     if (searchTerm) params.set('search', searchTerm);
-    if (service) params.set('service', service);
+    if (subService) params.set('subService', subService);
     params.set('page', String(page));
 
     const next = `${pathname}?${params.toString()}`;
@@ -151,15 +179,15 @@ export default function OtherRegistrationPage() {
     if (next !== current) {
       router.push(next);
     }
-  }, [status, searchTerm, service, page, pathname, router, searchParams]);
+  }, [status, searchTerm, subService, page, pathname, router, searchParams]);
 
   const handleStatusChange = (newStatus: string) => {
     setStatus(newStatus === 'all' ? '' : newStatus);
     setPage(1);
   };
 
-  const handleServiceChange = (newService: string) => {
-    setService(newService === 'all' ? '' : newService);
+  const handleSubServiceChange = (newSubService: string) => {
+    setSubService(newSubService === 'all' ? '' : newSubService);
     setPage(1);
   };
 
@@ -224,21 +252,21 @@ export default function OtherRegistrationPage() {
                 </Select>
               </div>
               <div className="w-full md:w-1/4">
-                <Select onValueChange={handleServiceChange} value={service || 'all'}>
+                <Select onValueChange={handleSubServiceChange} value={subService || 'all'}>
                   <SelectTrigger>
                     <Filter className="mr-2 h-4 w-4" />
-                    <SelectValue placeholder="Filter by service" />
+                    <SelectValue placeholder="Filter by registration type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Services</SelectItem>
-                    <SelectItem value="LLP Registration">LLP Registration</SelectItem>
-                    <SelectItem value="Partnership Firm">Partnership Firm</SelectItem>
-                    <SelectItem value="Sole Proprietorship">Sole Proprietorship</SelectItem>
-                    <SelectItem value="GST Registration">GST Registration</SelectItem>
-                    <SelectItem value="MSME Registration">MSME Registration</SelectItem>
-                    <SelectItem value="FSSAI Food License">FSSAI Food License</SelectItem>
-                    <SelectItem value="Digital Signature">Digital Signature</SelectItem>
-                    <SelectItem value="EPFO Registration">EPFO Registration</SelectItem>
+                    <SelectItem value="all">All Registration Types</SelectItem>
+                    <SelectItem value="llp-registration">LLP Registration</SelectItem>
+                    <SelectItem value="partnership-firm">Partnership Firm</SelectItem>
+                    <SelectItem value="sole-proprietorship">Sole Proprietorship</SelectItem>
+                    <SelectItem value="gst-registration">GST Registration</SelectItem>
+                    <SelectItem value="msme-registration">MSME Registration</SelectItem>
+                    <SelectItem value="fssai-food-license">FSSAI Food License</SelectItem>
+                    <SelectItem value="digital-signature">Digital Signature</SelectItem>
+                    <SelectItem value="epfo-registration">EPFO Registration</SelectItem>
                     <SelectItem value="ESIC Registration">ESIC Registration</SelectItem>
                     <SelectItem value="IEC Registration">IEC Registration</SelectItem>
                     <SelectItem value="NGO Registration">NGO Registration</SelectItem>
@@ -279,7 +307,7 @@ export default function OtherRegistrationPage() {
                     <TableRow key={form._id}>
                       <TableCell className="font-medium">{form.fullName}</TableCell>
                       <TableCell>{form.businessName || '-'}</TableCell>
-                      <TableCell>{form.service || '-'}</TableCell>
+                      <TableCell>{form.subService || '-'}</TableCell>
                       <TableCell>{form.city && form.state ? `${form.city}, ${form.state}` : '-'}</TableCell>
                       <TableCell>
                         <StatusBadge status={form.status} />

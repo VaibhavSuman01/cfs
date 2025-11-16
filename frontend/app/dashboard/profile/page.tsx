@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Loader2, Save, User, Camera } from "lucide-react";
+import { Loader2, Save, User, Camera, Edit } from "lucide-react";
 import { toast } from "sonner";
 import api, { API_PATHS } from "@/lib/api-client";
 import { getAvatarUrl } from "@/lib/avatar-utils";
@@ -431,12 +431,25 @@ export default function ProfilePage() {
               </div>
             </div>
           </CardContent>
-          <CardFooter className="flex justify-center">
+          <CardFooter className="flex justify-center gap-4">
             <Button
               variant="outline"
               onClick={() => (window.location.href = "/dashboard")}
             >
               Back to Dashboard
+            </Button>
+            <Button
+              onClick={() => {
+                // Scroll to form or focus on first editable field
+                const firstInput = document.querySelector('input:not([disabled])') as HTMLInputElement;
+                if (firstInput) {
+                  firstInput.focus();
+                  firstInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+              }}
+            >
+              <Edit className="mr-2 h-4 w-4" />
+              Edit Personal Details
             </Button>
           </CardFooter>
         </Card>

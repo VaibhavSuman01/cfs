@@ -99,7 +99,7 @@ const taxFormSchema = new mongoose.Schema({
   state: { type: String },
   pincode: { type: String },
   
-  // Company Formation specific fields
+  // Company Information specific fields
   companyName: { type: String },
   proposedNames: [{ type: String }],
   authorizedCapital: { type: String },
@@ -185,10 +185,21 @@ const taxFormSchema = new mongoose.Schema({
   editHistory: [editHistorySchema],
 }, { timestamps: true });
 
-// Enforce one submission per user+subService+year combination
-// Using sparse index to handle cases where year might be null/undefined
+// Index for efficient queries (not unique to allow multiple submissions for GST/TDS)
+// GST Filing allows quarterly submissions (user + subService + year + quarter)
+// TDS Returns allows monthly submissions (user + subService + year + month)
 taxFormSchema.index({ user: 1, subService: 1, year: 1 }, { 
-  unique: true,
+  sparse: true
+});
+
+// Additional indexes for GST and TDS specific queries
+taxFormSchema.index({ user: 1, subService: 1, year: 1, gstFilingQuarter: 1 }, { 
+  sparse: true
+});
+taxFormSchema.index({ user: 1, subService: 1, year: 1, gstFilingMonth: 1 }, { 
+  sparse: true
+});
+taxFormSchema.index({ user: 1, subService: 1, year: 1, tdsFilingMonth: 1 }, { 
   sparse: true
 });
 

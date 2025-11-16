@@ -11,7 +11,7 @@ export function getServiceCardClasses(serviceCategory: string): string {
       return `${baseClasses} border-cyan-200 hover:border-cyan-300`;
     case 'Reports':
       return `${baseClasses} border-yellow-200 hover:border-yellow-300`;
-    case 'Company Formation':
+    case 'Company Information':
       return `${baseClasses} border-blue-200 hover:border-blue-300`;
     case 'Trademark & ISO':
       return `${baseClasses} border-indigo-200 hover:border-indigo-300`;
@@ -32,7 +32,7 @@ export function getServiceBackgroundColor(serviceCategory: string): string {
       return "mx-auto w-16 h-16 bg-cyan-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-cyan-200 transition-colors";
     case 'Reports':
       return "mx-auto w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-yellow-200 transition-colors";
-    case 'Company Formation':
+    case 'Company Information':
       return "mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-blue-200 transition-colors";
     case 'Trademark & ISO':
       return "mx-auto w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-indigo-200 transition-colors";
@@ -53,7 +53,7 @@ export function getServiceIconColor(serviceCategory: string): string {
       return "h-8 w-8 text-cyan-600 group-hover:scale-110 transition-transform";
     case 'Reports':
       return "h-8 w-8 text-yellow-600 group-hover:scale-110 transition-transform";
-    case 'Company Formation':
+    case 'Company Information':
       return "h-8 w-8 text-blue-600 group-hover:scale-110 transition-transform";
     case 'Trademark & ISO':
       return "h-8 w-8 text-indigo-600 group-hover:scale-110 transition-transform";
@@ -74,7 +74,7 @@ export function getServicePriceColor(serviceCategory: string): string {
       return "text-2xl font-bold text-cyan-600";
     case 'Reports':
       return "text-2xl font-bold text-yellow-600";
-    case 'Company Formation':
+    case 'Company Information':
       return "text-2xl font-bold text-blue-600";
     case 'Trademark & ISO':
       return "text-2xl font-bold text-indigo-600";
@@ -95,7 +95,7 @@ export function getServicePageHeroBackground(serviceCategory: string): string {
       return "bg-gradient-to-br from-cyan-50 via-white to-cyan-100";
     case 'Reports':
       return "bg-gradient-to-br from-yellow-50 via-white to-yellow-100";
-    case 'Company Formation':
+    case 'Company Information':
       return "bg-gradient-to-br from-blue-50 via-white to-blue-100";
     case 'Trademark & ISO':
       return "bg-gradient-to-br from-indigo-50 via-white to-indigo-100";

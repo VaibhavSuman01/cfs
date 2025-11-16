@@ -33,46 +33,7 @@ export default function ProfilePage() {
     }
   };
 
-  const handleChangePassword = async () => {
-    if (!currentPassword || !newPassword || !confirmPassword) {
-      toast.error("Please fill in all password fields");
-      return;
-    }
 
-    if (newPassword !== confirmPassword) {
-      toast.error("New passwords do not match");
-      return;
-    }
-
-    if (newPassword.length < 6) {
-      toast.error("Password must be at least 6 characters");
-      return;
-    }
-
-    setIsChangingPassword(true);
-    try {
-      const response = await api.put("/api/support-team/change-password", {
-        currentPassword,
-        newPassword,
-      });
-      
-      if (response.data.success) {
-        toast.success("Password changed successfully!");
-        setCurrentPassword("");
-        setNewPassword("");
-        setConfirmPassword("");
-      } else {
-        toast.error(response.data.message || "Failed to change password");
-      }
-    } catch (error) {
-      const errorMessage = error && typeof error === 'object' && 'response' in error
-        ? (error as { response?: { data?: { message?: string } } }).response?.data?.message || "Failed to change password"
-        : "Failed to change password";
-      toast.error(errorMessage);
-    } finally {
-      setIsChangingPassword(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8">
@@ -149,63 +110,6 @@ export default function ProfilePage() {
             </CardContent>
           </Card>
 
-          {/* Change Password */}
-          <Card className="dark:bg-gray-800 dark:border-gray-700">
-            <CardHeader>
-              <CardTitle className="dark:text-white flex items-center gap-2">
-                <Lock className="h-5 w-5" />
-                Change Password
-              </CardTitle>
-              <CardDescription className="dark:text-gray-400">
-                Update your password to keep your account secure
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="currentPassword" className="dark:text-gray-300">Current Password</Label>
-                <Input
-                  id="currentPassword"
-                  type="password"
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  className="dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="newPassword" className="dark:text-gray-300">New Password</Label>
-                <Input
-                  id="newPassword"
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  className="dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="dark:text-gray-300">Confirm New Password</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                />
-              </div>
-              <Button onClick={handleChangePassword} disabled={isChangingPassword}>
-                {isChangingPassword ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Changing...
-                  </>
-                ) : (
-                  <>
-                    <Lock className="mr-2 h-4 w-4" />
-                    Change Password
-                  </>
-                )}
-              </Button>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>

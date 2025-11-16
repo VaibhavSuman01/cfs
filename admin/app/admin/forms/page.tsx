@@ -168,7 +168,7 @@ export default function FormsPage() {
     // Navigate to the appropriate edit page based on form type
     const formType = form.formType?.toLowerCase();
     if (formType === 'companyform') {
-      window.open(`/admin/forms/company-formation/${form._id}`, '_blank');
+      window.open(`/admin/forms/company-information/${form._id}`, '_blank');
     } else if (formType === 'otherregistrationform') {
       window.open(`/admin/forms/other-registration/${form._id}`, '_blank');
     } else if (formType === 'rocform') {
@@ -257,7 +257,7 @@ export default function FormsPage() {
   const getFormTypeLabel = (formType: string) => {
     const typeMap: Record<string, string> = {
       'TaxForm': 'Tax Filing',
-      'CompanyForm': 'Company Formation',
+      'CompanyForm': 'Company Information',
       'OtherRegistrationForm': 'Other Registration',
       'ROCForm': 'ROC Returns',
       'ReportsForm': 'Reports',
@@ -319,7 +319,7 @@ export default function FormsPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Services</SelectItem>
-                <SelectItem value="Company Formation">Company Formation</SelectItem>
+                <SelectItem value="Company Information">Company Information</SelectItem>
                 <SelectItem value="Other Registration">Other Registration</SelectItem>
                 <SelectItem value="ROC Returns">ROC Returns</SelectItem>
                 <SelectItem value="Reports">Reports</SelectItem>

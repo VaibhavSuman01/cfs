@@ -17,18 +17,16 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { PersonalInformationDropdown } from "@/components/ui/personal-information-dropdown";
 
 const trademarkFormSchema = z.object({
-  fullName: z.string().min(1, "Full name is required"),
-  email: z.string().email("Invalid email address"),
-  phone: z.string().min(10, "Phone number must be at least 10 digits"),
-  pan: z.string().regex(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "Invalid PAN format"),
-  aadhaar: z.string().regex(/^\d{12}$/, "Aadhaar must be exactly 12 digits").optional(),
   serviceType: z.string().min(1, "Service type is required"),
   trademarkName: z.string().min(1, "Trademark name is required"),
   trademarkClass: z.string().min(1, "Trademark class is required"),
   applicantName: z.string().min(1, "Applicant name is required"),
   applicationType: z.string().min(1, "Application type is required"),
+  businessName: z.string().min(1, "Business name is required"),
+  businessType: z.string().min(1, "Business type is required"),
   description: z.string().optional(),
   priorityDate: z.string().optional(),
   businessAddress: z.string().optional(),
@@ -50,6 +48,9 @@ export default function TrademarkISOPage() {
     "ISO 9001 Certification": "iso-9001",
     "ISO 14001 Certification": "iso-14001",
     "Copyright Registration": "copyright-registration",
+    // Handle variations
+    "ISO 9001": "iso-9001",
+    "ISO 14001": "iso-14001",
   };
 
   // Get service from URL
@@ -60,28 +61,27 @@ export default function TrademarkISOPage() {
   const form = useForm<TrademarkFormValues>({
     resolver: zodResolver(trademarkFormSchema),
     defaultValues: {
-      fullName: user?.name || "",
-      email: user?.email || "",
-      phone: user?.mobile || "",
-      pan: user?.pan || "",
-      aadhaar: user?.aadhaar || "",
-      serviceType: "",
+      serviceType: serviceTypeFromUrl || "",
       trademarkName: "",
       trademarkClass: "",
       applicantName: "",
       applicationType: "",
+      businessName: "",
+      businessType: "",
       description: "",
       priorityDate: "",
       businessAddress: "",
     },
   });
 
-  // Set service type from URL
+  // Set service type from URL (update if URL changes)
   useEffect(() => {
     if (serviceTypeFromUrl) {
       form.setValue("serviceType", serviceTypeFromUrl);
     }
   }, [serviceTypeFromUrl, form]);
+
+  const serviceType = form.watch("serviceType");
 
   const onSubmit = async (data: TrademarkFormValues) => {
     try {
@@ -95,6 +95,17 @@ export default function TrademarkISOPage() {
           formData.append(key, String(value));
         }
       });
+
+      // Append user profile data (non-editable fields)
+      if (user) {
+        formData.append("fullName", user.name || "");
+        formData.append("email", user.email || "");
+        formData.append("phone", user.mobile || "");
+        formData.append("pan", user.pan || "");
+        if (user.aadhaar) {
+          formData.append("aadhaar", user.aadhaar);
+        }
+      }
 
       // Add service and subService fields
       formData.append("service", "Trademark & ISO");
@@ -113,7 +124,7 @@ export default function TrademarkISOPage() {
       await api.post(API_PATHS.FORMS.TRADEMARK_ISO, formData);
 
       toast.success("Trademark & ISO application submitted successfully");
-      router.push("/dashboard/trademark-iso");
+      router.push("/dashboard");
     } catch (error) {
       console.error("Failed to submit trademark form:", error);
       
@@ -161,12 +172,16 @@ export default function TrademarkISOPage() {
         <Button variant="ghost" onClick={() => router.back()} className="mr-4">
           <ArrowLeft className="h-4 w-4 mr-2" /> Back
         </Button>
-        <h1 className="text-2xl font-bold">Trademark & ISO Application</h1>
+        <h1 className="text-2xl font-bold">
+          {serviceType ? (serviceType === "trademark-registration" ? "Trademark Registration" : serviceType === "iso-9001" ? "ISO 9001 Certification" : serviceType === "iso-14001" ? "ISO 14001 Certification" : serviceType === "copyright-registration" ? "Copyright Registration" : serviceParam || "Trademark & ISO") : (serviceParam || "Trademark & ISO")}
+        </h1>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Trademark & ISO Application Form</CardTitle>
+          <CardTitle>
+            {serviceType ? (serviceType === "trademark-registration" ? "Trademark Registration" : serviceType === "iso-9001" ? "ISO 9001 Certification" : serviceType === "iso-14001" ? "ISO 14001 Certification" : serviceType === "copyright-registration" ? "Copyright Registration" : serviceParam || "Trademark & ISO") : (serviceParam || "Trademark & ISO")} Form
+          </CardTitle>
           <CardDescription>
             Submit your trademark and ISO application with all required details and documents.
           </CardDescription>
@@ -175,76 +190,7 @@ export default function TrademarkISOPage() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               {/* Personal Information */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Personal Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="fullName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Full Name *</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email *</FormLabel>
-                        <FormControl>
-                          <Input type="email" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone *</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="pan"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>PAN *</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="ABCDE1234F" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="aadhaar"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Aadhaar Number</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="123456789012" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
+              <PersonalInformationDropdown />
 
               {/* Service Details */}
               <div className="space-y-4">
@@ -260,10 +206,9 @@ export default function TrademarkISOPage() {
                           onValueChange={field.onChange} 
                           defaultValue={field.value}
                           value={field.value}
-                          disabled={isServiceFromUrl}
                         >
                           <FormControl>
-                            <SelectTrigger className={isServiceFromUrl ? "bg-muted cursor-not-allowed" : ""}>
+                            <SelectTrigger>
                               <SelectValue placeholder="Select service type" />
                             </SelectTrigger>
                           </FormControl>
@@ -272,16 +217,10 @@ export default function TrademarkISOPage() {
                             <SelectItem value="iso-9001">ISO 9001 Certification</SelectItem>
                             <SelectItem value="iso-14001">ISO 14001 Certification</SelectItem>
                             <SelectItem value="copyright-registration">Copyright Registration</SelectItem>
-                            <SelectItem value="patent-filing">Patent Filing</SelectItem>
-                            <SelectItem value="design-registration">Design Registration</SelectItem>
-                            <SelectItem value="geographical-indication">Geographical Indication</SelectItem>
                             <SelectItem value="other">Other</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
-                        {isServiceFromUrl && (
-                          <p className="text-xs text-muted-foreground">This field is pre-selected based on the service you chose</p>
-                        )}
                       </FormItem>
                     )}
                   />
@@ -402,6 +341,45 @@ export default function TrademarkISOPage() {
                   />
                   <FormField
                     control={form.control}
+                    name="businessName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Business Name *</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Enter business name" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="businessType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Business Type *</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select business type" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="Proprietorship">Proprietorship</SelectItem>
+                            <SelectItem value="Partnership">Partnership</SelectItem>
+                            <SelectItem value="Company">Company</SelectItem>
+                            <SelectItem value="LLP">LLP</SelectItem>
+                            <SelectItem value="Individual">Individual</SelectItem>
+                            <SelectItem value="Trust">Trust</SelectItem>
+                            <SelectItem value="Society">Society</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
                     name="priorityDate"
                     render={({ field }) => (
                       <FormItem>
@@ -445,20 +423,7 @@ export default function TrademarkISOPage() {
               {/* Document Upload */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Document Requirements</h3>
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-blue-900 mb-2">Required Documents:</h4>
-                  <ul className="text-sm text-blue-800 space-y-1">
-                    <li>• Aadhaar Card (PDF)</li>
-                    <li>• PAN Card (PDF)</li>
-                    <li>• Trademark logo/design (if applicable)</li>
-                    <li>• Business registration documents</li>
-                    <li>• Power of Attorney (if applicable)</li>
-                    <li>• User Affidavit (if applicable)</li>
-                    <li>• Form 48 (if applicable)</li>
-                    <li>• Any supporting documents related to your application</li>
-                  </ul>
-                </div>
-
+              
                 <div className="space-y-4">
                   <div>
                     <Label htmlFor="aadhaar-file">Aadhaar Card (PDF)</Label>
@@ -482,7 +447,7 @@ export default function TrademarkISOPage() {
                       id="documents"
                       type="file"
                       multiple
-                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                      accept=".pdf,.jpg,.jpeg,.png"
                       onChange={handleFileChange}
                       className="mt-1"
                     />

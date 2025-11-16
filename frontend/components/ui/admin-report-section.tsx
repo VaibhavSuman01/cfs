@@ -54,7 +54,7 @@ export default function AdminReportSection({ reports, formId, formType }: AdminR
           downloadUrl = `/api/forms/advisory/download/${documentId}`;
           break;
         case 'CompanyForm':
-          downloadUrl = `/api/forms/company-formation/download/${documentId}`;
+          downloadUrl = `/api/forms/company-information/download/${documentId}`;
           break;
         case 'OtherRegistrationForm':
           downloadUrl = `/api/forms/other-registration/download/${documentId}`;
@@ -72,19 +72,34 @@ export default function AdminReportSection({ reports, formId, formType }: AdminR
           downloadUrl = `/api/forms/download/${documentId}`;
       }
 
+      // Get original filename from report documents if available
+      let originalFilename = `admin_report_${documentId}`;
+      if (report.documents && Array.isArray(report.documents) && report.documents.length > 0) {
+        const doc = report.documents[0];
+        if (typeof doc === 'object' && doc.originalName) {
+          originalFilename = doc.originalName;
+        } else if (typeof doc === 'object' && doc.fileName) {
+          originalFilename = doc.fileName;
+        }
+      }
+
       const response = await api.get(downloadUrl, { responseType: 'blob' });
+      
+      // Extract filename from Content-Disposition header if available
+      let filename = originalFilename;
+      const contentDisposition = response.headers['content-disposition'];
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+        if (filenameMatch && filenameMatch[1]) {
+          filename = filenameMatch[1];
+        }
+      }
       
       const blob = new Blob([response.data]);
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      
-      // Generate filename
-      const reportDate = report.sentAt || report.createdAt;
-      const dateStr = reportDate ? new Date(reportDate).toISOString().split('T')[0] : 'unknown';
-      const fileName = `admin_report_${dateStr}_${documentId}`;
-      
-      link.setAttribute('download', fileName);
+      link.setAttribute('download', filename);
       document.body.appendChild(link);
       link.click();
       link.remove();

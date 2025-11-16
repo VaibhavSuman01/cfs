@@ -24,6 +24,7 @@ interface CompanyForm {
   phone: string
   pan: string
   service?: string
+  subService?: string
   companyName?: string
   businessActivity?: string
   proposedCapital?: string
@@ -83,7 +84,7 @@ export default function CompanyFormationPage() {
   const [status, setStatus] = useState(searchParams.get('status') || '');
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
-  const [service, setService] = useState(searchParams.get('service') || '');
+  const [subService, setSubService] = useState(searchParams.get('subService') || '');
 
   const fetchCompanyForms = useCallback(async () => {
     setLoading(true);
@@ -92,13 +93,19 @@ export default function CompanyFormationPage() {
       params.append('page', String(page));
       if (status) params.append('status', status);
       if (searchTerm) params.append('search', searchTerm);
-      if (service) params.append('service', service);
+      // Send service filter to backend (Company Information)
+      params.append('service', 'Company Information');
 
       // Use the service-forms endpoint to get all forms
       const response = await api.get(`${API_PATHS.ADMIN.SERVICE_FORMS}?${params.toString()}`);
       
       // Filter to only show CompanyForm type forms
-      const companyForms = response.data.forms.filter((form: any) => form.formType === 'CompanyForm');
+      let companyForms = response.data.forms.filter((form: any) => form.formType === 'CompanyForm');
+      
+      // Filter by subService if selected
+      if (subService && subService !== 'all') {
+        companyForms = companyForms.filter((form: any) => form.subService === subService);
+      }
       
       setForms(companyForms);
       setPagination({
@@ -111,13 +118,13 @@ export default function CompanyFormationPage() {
       console.error('Failed to fetch company forms:', error);
       toast({
         title: 'Error',
-        description: 'Failed to load company formation forms.',
+        description: 'Failed to load Company Information forms.',
         variant: 'destructive',
       });
     } finally {
       setLoading(false);
     }
-  }, [page, status, searchTerm, service, toast]);
+  }, [page, status, searchTerm, subService, toast]);
 
   useEffect(() => {
     fetchCompanyForms();
@@ -126,12 +133,12 @@ export default function CompanyFormationPage() {
   // Sync state from URL when query params change
   useEffect(() => {
     const urlStatus = searchParams.get('status') || '';
-    const urlService = searchParams.get('service') || '';
+    const urlSubService = searchParams.get('subService') || '';
     const urlSearch = searchParams.get('search') || '';
     const urlPage = Number(searchParams.get('page')) || 1;
 
     if (urlStatus !== status) setStatus(urlStatus);
-    if (urlService !== service) setService(urlService);
+    if (urlSubService !== subService) setSubService(urlSubService);
     if (urlSearch !== searchTerm) setSearchTerm(urlSearch);
     if (urlPage !== page) setPage(urlPage);
   }, [searchParams]);
@@ -140,7 +147,7 @@ export default function CompanyFormationPage() {
     const params = new URLSearchParams();
     if (status) params.set('status', status);
     if (searchTerm) params.set('search', searchTerm);
-    if (service) params.set('service', service);
+    if (subService) params.set('subService', subService);
     params.set('page', String(page));
 
     const next = `${pathname}?${params.toString()}`;
@@ -148,15 +155,15 @@ export default function CompanyFormationPage() {
     if (next !== current) {
       router.push(next);
     }
-  }, [status, searchTerm, service, page, pathname, router, searchParams]);
+  }, [status, searchTerm, subService, page, pathname, router, searchParams]);
 
   const handleStatusChange = (newStatus: string) => {
     setStatus(newStatus === 'all' ? '' : newStatus);
     setPage(1);
   };
 
-  const handleServiceChange = (newService: string) => {
-    setService(newService === 'all' ? '' : newService);
+  const handleSubServiceChange = (newSubService: string) => {
+    setSubService(newSubService === 'all' ? '' : newSubService);
     setPage(1);
   };
 
@@ -189,8 +196,8 @@ export default function CompanyFormationPage() {
       >
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-white">Company Formation Forms</h1>
-            <p className="text-muted-foreground text-white">Manage and review all company formation applications.</p>
+            <h1 className="text-3xl font-bold text-white">Company Information Forms</h1>
+            <p className="text-muted-foreground text-white">Manage and review all Company Information applications.</p>
           </div>
         </div>
 
@@ -221,19 +228,19 @@ export default function CompanyFormationPage() {
                 </Select>
               </div>
               <div className="w-full md:w-1/4">
-                <Select onValueChange={handleServiceChange} value={service || 'all'}>
+                <Select onValueChange={handleSubServiceChange} value={subService || 'all'}>
                   <SelectTrigger>
                     <Filter className="mr-2 h-4 w-4" />
-                    <SelectValue placeholder="Filter by service" />
+                    <SelectValue placeholder="Filter by company type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Services</SelectItem>
+                    <SelectItem value="all">All Company Types</SelectItem>
                     <SelectItem value="Private Limited Company">Private Limited Company</SelectItem>
-                    <SelectItem value="One Person Company">One Person Company</SelectItem>
+                    <SelectItem value="One Person Company (OPC)">One Person Company (OPC)</SelectItem>
                     <SelectItem value="Public Limited Company">Public Limited Company</SelectItem>
                     <SelectItem value="Section 8 Company">Section 8 Company</SelectItem>
                     <SelectItem value="Nidhi Company">Nidhi Company</SelectItem>
-                    <SelectItem value="Partnership Firm">Partnership Firm</SelectItem>
+                    <SelectItem value="Producer Company">Producer Company</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -264,7 +271,7 @@ export default function CompanyFormationPage() {
                     <TableRow key={form._id}>
                       <TableCell className="font-medium">{form.fullName}</TableCell>
                       <TableCell>{form.companyName || '-'}</TableCell>
-                      <TableCell>{form.service || '-'}</TableCell>
+                      <TableCell>{form.subService || form.service || '-'}</TableCell>
                       <TableCell>
                         <StatusBadge status={form.status} />
                       </TableCell>
@@ -281,7 +288,7 @@ export default function CompanyFormationPage() {
                         <Button 
                           variant="outline" 
                           size="sm"
-                          onClick={() => router.push(`/admin/forms/company-formation/${form._id}`)}
+                          onClick={() => router.push(`/admin/forms/company-information/${form._id}`)}
                         >
                           <FileText className="mr-2 h-4 w-4" />
                           View

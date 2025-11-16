@@ -5,12 +5,12 @@ import { Building2, Phone, Mail, MapPin, Facebook, Twitter, Linkedin, Instagram 
 
 export function EnhancedFooter() {
   const companyServices = [
-    { name: "Private Limited Company", href: "/company-formation/private-limited" },
-    { name: "Public Limited Company", href: "/company-formation/public-limited" },
-    { name: "One Person Company", href: "/company-formation/one-person-company" },
-    { name: "Section 8 Company", href: "/company-formation/section-8" },
-    { name: "Nidhi Company", href: "/company-formation/nidhi-company" },
-    { name: "Producer Company", href: "/company-formation/producer-company" },
+    { name: "Private Limited Company", href: "/company-information/private-limited" },
+    { name: "Public Limited Company", href: "/company-information/public-limited" },
+    { name: "One Person Company", href: "/company-information/one-person-company" },
+    { name: "Section 8 Company", href: "/company-information/section-8" },
+    { name: "Nidhi Company", href: "/company-information/nidhi-company" },
+    { name: "Producer Company", href: "/company-information/producer-company" },
   ]
 
   const otherServices = [
@@ -139,7 +139,7 @@ export function EnhancedFooter() {
 
           {/* Company Services */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-blue-300">Company Formation</h3>
+            <h3 className="text-lg font-semibold text-blue-300">Company Information</h3>
             <div className="space-y-2">
               {companyServices.map((service) => (
                 <Link

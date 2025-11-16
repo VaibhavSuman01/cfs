@@ -16,13 +16,9 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { PersonalInformationDropdown } from "@/components/ui/personal-information-dropdown";
 
 const rocReturnsSchema = z.object({
-  fullName: z.string().min(1, "Full name is required"),
-  email: z.string().email("Invalid email address"),
-  phone: z.string().min(10, "Phone number must be at least 10 digits"),
-  pan: z.string().regex(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "Invalid PAN format"),
-  aadhaar: z.string().regex(/^\d{12}$/, "Aadhaar must be exactly 12 digits").optional(),
   returnType: z.string().min(1, "Return type is required"),
   companyName: z.string().min(1, "Company name is required"),
   cinNumber: z.string().min(1, "CIN number is required"),
@@ -67,12 +63,7 @@ export default function ROCReturnsPage() {
   const form = useForm<ROCReturnsValues>({
     resolver: zodResolver(rocReturnsSchema),
     defaultValues: {
-      fullName: user?.name || "",
-      email: user?.email || "",
-      phone: user?.mobile || "",
-      pan: user?.pan || "",
-      aadhaar: user?.aadhaar || "",
-      returnType: "",
+      returnType: returnTypeFromUrl || "",
       companyName: "",
       cinNumber: "",
       companyType: "",
@@ -83,12 +74,14 @@ export default function ROCReturnsPage() {
     },
   });
 
-  // Set return type from URL
+  // Set return type from URL (update if URL changes)
   useEffect(() => {
     if (returnTypeFromUrl) {
       form.setValue("returnType", returnTypeFromUrl);
     }
   }, [returnTypeFromUrl, form]);
+
+  const returnType = form.watch("returnType");
 
   const onSubmit = async (data: ROCReturnsValues) => {
     try {
@@ -96,13 +89,15 @@ export default function ROCReturnsPage() {
 
       const formData = new FormData();
 
-      // Append personal information fields
-      formData.append("fullName", data.fullName);
-      formData.append("email", data.email);
-      formData.append("phone", data.phone);
-      formData.append("pan", data.pan);
-      if (data.aadhaar) {
-        formData.append("aadhaar", data.aadhaar);
+      // Append user profile data (non-editable fields)
+      if (user) {
+        formData.append("fullName", user.name || "");
+        formData.append("email", user.email || "");
+        formData.append("phone", user.mobile || "");
+        formData.append("pan", user.pan || "");
+        if (user.aadhaar) {
+          formData.append("aadhaar", user.aadhaar);
+        }
       }
 
       // Add service and subService fields for backend compatibility
@@ -136,7 +131,7 @@ export default function ROCReturnsPage() {
       await api.post(API_PATHS.FORMS.ROC_RETURNS, formData);
 
       toast.success("ROC returns application submitted successfully");
-      router.push("/dashboard/roc-returns");
+      router.push("/dashboard");
     } catch (error: any) {
       console.error("Failed to submit ROC returns form:", error);
       
@@ -180,12 +175,16 @@ export default function ROCReturnsPage() {
         <Button variant="ghost" onClick={() => router.back()} className="mr-4">
           <ArrowLeft className="h-4 w-4 mr-2" /> Back
         </Button>
-        <h1 className="text-2xl font-bold">ROC Returns Application</h1>
+        <h1 className="text-2xl font-bold">
+          {returnType ? (returnType === "annual-filing" ? "Annual Filing" : returnType === "board-resolutions" ? "Board Resolutions" : returnType === "director-changes" ? "Director Changes" : returnType === "share-transfer" ? "Share Transfer" : serviceParam || "ROC Returns") : (serviceParam || "ROC Returns")}
+        </h1>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>ROC Returns Form</CardTitle>
+          <CardTitle>
+            {returnType ? (returnType === "annual-filing" ? "Annual Filing" : returnType === "board-resolutions" ? "Board Resolutions" : returnType === "director-changes" ? "Director Changes" : returnType === "share-transfer" ? "Share Transfer" : serviceParam || "ROC Returns") : (serviceParam || "ROC Returns")} Form
+          </CardTitle>
           <CardDescription>
             Submit your ROC returns application with all required details and documents.
           </CardDescription>
@@ -194,76 +193,7 @@ export default function ROCReturnsPage() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               {/* Personal Information */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Personal Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="fullName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Full Name *</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email *</FormLabel>
-                        <FormControl>
-                          <Input type="email" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone *</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="pan"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>PAN *</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="ABCDE1234F" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="aadhaar"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Aadhaar Number</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="123456789012" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
+              <PersonalInformationDropdown />
 
               {/* ROC Returns Details */}
               <div className="space-y-4">
@@ -279,10 +209,9 @@ export default function ROCReturnsPage() {
                           onValueChange={field.onChange} 
                           defaultValue={field.value}
                           value={field.value}
-                          disabled={isServiceFromUrl}
                         >
                           <FormControl>
-                            <SelectTrigger className={isServiceFromUrl ? "bg-muted cursor-not-allowed" : ""}>
+                            <SelectTrigger>
                               <SelectValue placeholder="Select return type" />
                             </SelectTrigger>
                           </FormControl>
@@ -291,16 +220,9 @@ export default function ROCReturnsPage() {
                             <SelectItem value="board-resolutions">Board Resolutions</SelectItem>
                             <SelectItem value="director-changes">Director Changes</SelectItem>
                             <SelectItem value="share-transfer">Share Transfer</SelectItem>
-                            <SelectItem value="audit-report">Audit Report Filing</SelectItem>
-                            <SelectItem value="balance-sheet">Balance Sheet Filing</SelectItem>
-                            <SelectItem value="profit-loss">Profit & Loss Account</SelectItem>
-                            <SelectItem value="annual-return">Annual Return (MGT-7)</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
-                        {isServiceFromUrl && (
-                          <p className="text-xs text-muted-foreground">This field is pre-selected based on the service you chose</p>
-                        )}
                       </FormItem>
                     )}
                   />
@@ -462,7 +384,7 @@ export default function ROCReturnsPage() {
                       id="documents"
                       type="file"
                       multiple
-                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                      accept=".pdf,.jpg,.jpeg,.png"
                       onChange={handleFileChange}
                       className="mt-1"
                     />

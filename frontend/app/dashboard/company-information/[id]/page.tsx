@@ -62,7 +62,7 @@ export default function CompanyFormationDetailPage() {
         const res = await api.get(API_PATHS.FORMS.COMPANY_FORMATION_DETAIL(id));
         setForm(res.data?.data || res.data);
       } catch (e) {
-        console.error("Failed to fetch company formation detail", e);
+        console.error("Failed to fetch Company Information detail", e);
       } finally {
         setLoading(false);
       }
@@ -123,7 +123,7 @@ export default function CompanyFormationDetailPage() {
           </Button>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Company Information Details</h1>
-            <p className="text-gray-600 mt-1">Track your company formation application progress and communications</p>
+            <p className="text-gray-600 mt-1">Track your Company Information application progress and communications</p>
           </div>
         </div>
         <div className="flex items-center gap-3">

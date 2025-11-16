@@ -42,21 +42,21 @@ export function EnhancedHeader() {
       dropdown: [
         {
           name: "Private Limited Company",
-          href: "/company-formation/private-limited",
+          href: "/company-information/private-limited",
         },
         {
           name: "Public Limited Company",
-          href: "/company-formation/public-limited",
+          href: "/company-information/public-limited",
         },
         {
           name: "One Person Company",
-          href: "/company-formation/one-person-company",
+          href: "/company-information/one-person-company",
         },
-        { name: "Section 8 Company", href: "/company-formation/section-8" },
-        { name: "Nidhi Company", href: "/company-formation/nidhi-company" },
+        { name: "Section 8 Company", href: "/company-information/section-8" },
+        { name: "Nidhi Company", href: "/company-information/nidhi-company" },
         {
           name: "Producer Company",
-          href: "/company-formation/producer-company",
+          href: "/company-information/producer-company",
         },
       ],
     },

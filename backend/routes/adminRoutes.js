@@ -117,7 +117,7 @@ router.delete("/service-forms/:id/reports/:reportId", async (req, res) => {
 
     // Determine model based on service
     let model;
-    if (service === 'Company Formation' || (service || '').includes('Company')) {
+    if (service === 'Company Information' || (service || '').includes('Company')) {
       model = CompanyForm;
     } else if (service === 'Other Registration' || (service || '').includes('Registration')) {
       model = OtherRegistrationForm;
@@ -202,6 +202,7 @@ router.get("/forms/:id/documents/:documentId", protect, async (req, res) => {
       { model: CompanyForm, name: 'CompanyForm' },
       { model: ROCForm, name: 'ROCForm' },
       { model: OtherRegistrationForm, name: 'OtherRegistrationForm' },
+      { model: PartnershipForm, name: 'PartnershipForm' },
       { model: ReportsForm, name: 'ReportsForm' },
       { model: TrademarkISOForm, name: 'TrademarkISOForm' },
       { model: AdvisoryForm, name: 'AdvisoryForm' }
@@ -415,22 +416,22 @@ router.post("/forms/:id/send-report", validateObjectId(), upload.single('reportF
 
     await form.save();
 
-    // Send an email to the user
-    try {
-      const emailSubject = `A new report has been sent to you: ${reportType}`;
-      const emailMessage = `Hello ${form.fullName},\n\nA new report of type '${reportType}' has been sent to you by the admin.\n\nMessage from admin: ${message}\n\nYou can view and download the report from your dashboard.\n\nThank you,\nCom Finserv Team`;
+    // // Send an email to the user
+    // try {
+    //   const emailSubject = `A new report has been sent to you: ${reportType}`;
+    //   const emailMessage = `Hello ${form.fullName},\n\nA new report of type '${reportType}' has been sent to you by the admin.\n\nMessage from admin: ${message}\n\nYou can view and download the report from your dashboard.\n\nThank you,\nCom Finserv Team`;
 
-      await sendEmail({
-        email: userEmail,
-        subject: emailSubject,
-        message: emailMessage,
-      });
+    //   await sendEmail({
+    //     email: userEmail,
+    //     subject: emailSubject,
+    //     message: emailMessage,
+    //   });
 
-      console.log(`Report email sent to ${userEmail}`);
-    } catch (emailError) {
-      console.error(`Failed to send report email to ${userEmail}:`, emailError);
-      // Don't block the response for email failure, just log it
-    }
+    //   console.log(`Report email sent to ${userEmail}`);
+    // } catch (emailError) {
+    //   console.error(`Failed to send report email to ${userEmail}:`, emailError);
+    //   // Don't block the response for email failure, just log it
+    // }
     
     res.json({ success: true, message: "Report sent successfully" });
   } catch (error) {
@@ -703,6 +704,100 @@ router.get("/users", async (req, res) => {
   } catch (error) {
     console.error("Get users error:", error);
     res.status(500).json({ message: "Server error" });
+  }
+});
+
+// @route   GET /api/admin/users/download
+// @desc    Download all registered users as Excel file
+// @access  Private/Admin
+router.get("/users/download", async (req, res) => {
+  try {
+    const { search, startDate, endDate } = req.query;
+
+    let filter = { role: "user" };
+
+    if (search) {
+      const searchRegex = { $regex: search, $options: "i" };
+      filter.$or = [
+        { name: searchRegex },
+        { email: searchRegex },
+        { mobile: searchRegex },
+        { fatherName: searchRegex },
+        { pan: searchRegex },
+        { aadhaar: searchRegex },
+        { address: searchRegex },
+      ];
+    }
+
+    if (startDate || endDate) {
+      filter.createdAt = {};
+      if (startDate) filter.createdAt.$gte = new Date(startDate);
+      if (endDate) filter.createdAt.$lte = new Date(endDate);
+    }
+
+    const users = await User.find(filter)
+      .select("name fatherName mobile email address pan aadhaar dob createdAt")
+      .sort({ createdAt: -1 });
+
+    // Create a new Excel workbook and worksheet
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Registered Users");
+
+    // Define columns
+    worksheet.columns = [
+      { header: "Name", key: "name", width: 20 },
+      { header: "Father's Name", key: "fatherName", width: 20 },
+      { header: "Mobile", key: "mobile", width: 15 },
+      { header: "Email", key: "email", width: 25 },
+      { header: "Address", key: "address", width: 30 },
+      { header: "PAN", key: "pan", width: 15 },
+      { header: "Aadhaar Number", key: "aadhaar", width: 18 },
+      { header: "Date of Birth", key: "dob", width: 15 },
+      { header: "Registered On", key: "createdAt", width: 15 }
+    ];
+
+    // Style the header row
+    worksheet.getRow(1).font = { bold: true };
+    worksheet.getRow(1).fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFE0E0E0' }
+    };
+
+    // Add rows
+    users.forEach(user => {
+      worksheet.addRow({
+        name: user.name || "N/A",
+        fatherName: user.fatherName || "N/A",
+        mobile: user.mobile || "N/A",
+        email: user.email || "N/A",
+        address: user.address || "N/A",
+        pan: user.pan || "N/A",
+        aadhaar: user.aadhaar || "N/A",
+        dob: user.dob ? new Date(user.dob).toLocaleDateString() : "N/A",
+        createdAt: new Date(user.createdAt).toLocaleDateString()
+      });
+    });
+
+    // Generate buffer instead of writing directly to response
+    const buffer = await workbook.xlsx.writeBuffer();
+    
+    // Set response headers
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=registered_users_${new Date().toISOString().split('T')[0]}.xlsx`
+    );
+    res.setHeader("Content-Length", buffer.length);
+
+    // Send the buffer
+    res.send(buffer);
+  } catch (error) {
+    console.error("Download users error:", error);
+    res.status(500).json({ message: "Server error generating Excel file" });
   }
 });
 
@@ -1066,7 +1161,15 @@ router.get("/service-forms", async (req, res) => {
     // Build filter object
     const filter = {};
 
-    if (service && service !== 'all') filter.service = service;
+    // Handle service filter - Partnership Firm is a sub-service under Other Registration
+    if (service && service !== 'all') {
+      if (service === 'Partnership Firm') {
+        // For Partnership Firm, filter by subService in PartnershipForm
+        filter.subService = service;
+      } else {
+        filter.service = service;
+      }
+    }
     if (status && status !== 'all') filter.status = status;
 
     // Unified search across common fields
@@ -1088,12 +1191,28 @@ router.get("/service-forms", async (req, res) => {
       if (endDate) filter.createdAt.$lte = new Date(endDate);
     }
 
+    // Build separate filters for PartnershipForm when filtering by Partnership Firm
+    const partnershipFilter = { ...filter };
+    const otherRegistrationFilter = { ...filter };
+    
+    // If filtering by Partnership Firm, apply subService filter only to PartnershipForm
+    // and exclude it from OtherRegistrationForm
+    if (service === 'Partnership Firm') {
+      // PartnershipForm: filter by subService
+      partnershipFilter.subService = 'Partnership Firm';
+      // Remove subService from otherRegistrationFilter if it was set
+      delete partnershipFilter.service;
+      // OtherRegistrationForm: exclude Partnership Firm sub-service
+      otherRegistrationFilter.subService = { $ne: 'Partnership Firm' };
+    }
+
     // Fetch forms from ALL models
-    const [taxForms, companyForms, rocForms, otherRegistrationForms, reportsForms, trademarkISOForms, advisoryForms] = await Promise.all([
+    const [taxForms, companyForms, rocForms, otherRegistrationForms, partnershipForms, reportsForms, trademarkISOForms, advisoryForms] = await Promise.all([
       TaxForm.find(filter).select("-documents.fileData").populate('user', 'name email mobile pan').sort({ createdAt: -1 }),
       CompanyForm.find(filter).select("-documents.fileData").populate('user', 'name email mobile pan').sort({ createdAt: -1 }),
       ROCForm.find(filter).select("-documents.fileData").populate('user', 'name email mobile pan').sort({ createdAt: -1 }),
-      OtherRegistrationForm.find(filter).select("-documents.fileData").populate('user', 'name email mobile pan').sort({ createdAt: -1 }),
+      OtherRegistrationForm.find(otherRegistrationFilter).select("-documents.fileData").populate('user', 'name email mobile pan').sort({ createdAt: -1 }),
+      PartnershipForm.find(partnershipFilter).select("-documents.fileData").populate('user', 'name email mobile pan').sort({ createdAt: -1 }),
       ReportsForm.find(filter).select("-documents.fileData").populate('user', 'name email mobile pan').sort({ createdAt: -1 }),
       TrademarkISOForm.find(filter).select("-documents.fileData").populate('user', 'name email mobile pan').sort({ createdAt: -1 }),
       AdvisoryForm.find(filter).select("-documents.fileData").populate('user', 'name email mobile pan').sort({ createdAt: -1 })
@@ -1105,6 +1224,7 @@ router.get("/service-forms", async (req, res) => {
       ...companyForms.map(form => ({ ...form.toObject(), formType: 'CompanyForm' })),
       ...rocForms.map(form => ({ ...form.toObject(), formType: 'ROCForm' })),
       ...otherRegistrationForms.map(form => ({ ...form.toObject(), formType: 'OtherRegistrationForm' })),
+      ...partnershipForms.map(form => ({ ...form.toObject(), formType: 'PartnershipForm' })),
       ...reportsForms.map(form => ({ ...form.toObject(), formType: 'ReportsForm' })),
       ...trademarkISOForms.map(form => ({ ...form.toObject(), formType: 'TrademarkISOForm' })),
       ...advisoryForms.map(form => ({ ...form.toObject(), formType: 'AdvisoryForm' }))
@@ -1165,7 +1285,7 @@ router.get("/forms/service", admin, async (req, res) => {
     let forms = [];
     let model;
     
-    if (service === 'Company Formation' || service.includes('Company')) {
+    if (service === 'Company Information' || service.includes('Company')) {
       model = CompanyForm;
     } else if (service === 'Other Registration' || service.includes('Registration') || service === 'Partnership Firm' || service.includes('Partnership')) {
       // Check if it's specifically Partnership Firm

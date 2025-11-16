@@ -78,7 +78,7 @@ router.post(
     try {
       console.log("Tax form submission received");
       console.log("Request body:", req.body);
-      console.log("Files received:", req.files ? req.files.length : "No files");
+      console.log("Files received:", req.files ? Object.keys(req.files).length + " field(s)" : "No files");
 
       const {
         fullName,
@@ -181,6 +181,14 @@ router.post(
       }
 
       // Process uploaded files
+      // For GST Filing, use gstFilingYear if provided, otherwise use year
+      // For TDS Returns, use tdsFilingYear if provided, otherwise use year
+      const finalYear = (service === 'GST Filing' && gstFilingYear) 
+        ? gstFilingYear 
+        : (service === 'TDS Returns' && tdsFilingYear) 
+          ? tdsFilingYear 
+          : year;
+      
       const formData = {
         user: req.user._id, // Associate form with user
         fullName,
@@ -189,7 +197,7 @@ router.post(
         pan,
         service,
         subService: subService || service,
-        year,
+        year: finalYear,
         hasIncomeTaxLogin: hasIncomeTaxLogin === "true",
         incomeTaxLoginId: incomeTaxLoginId || "",
         incomeTaxLoginPassword: incomeTaxLoginPassword || "",
@@ -297,6 +305,106 @@ router.post(
         console.log("No files were uploaded");
       }
 
+      // Check for duplicate submissions (custom validation for GST Filing and TDS Returns)
+      // GST Filing and TDS Returns allow multiple submissions per year (quarterly/monthly)
+      let duplicateCheck = {};
+      
+      if (service === 'GST Filing') {
+        // For GST Filing, check based on filing type (monthly or quarterly)
+        // GST Filing allows multiple submissions per year (quarterly/monthly)
+        const gstYear = gstFilingYear || year;
+        
+        if (gstFilingType === 'quarterly' && gstFilingQuarter && gstYear) {
+          // Quarterly filing: check for duplicate quarter
+          duplicateCheck = {
+            user: req.user._id,
+            subService: subService || service,
+            year: gstYear,
+            gstFilingQuarter: gstFilingQuarter
+          };
+        } else if ((gstFilingType === 'monthly' || gstFilingMonth) && gstYear) {
+          // Monthly filing: check for duplicate month
+          // If gstFilingType is not provided but gstFilingMonth is, treat as monthly
+          duplicateCheck = {
+            user: req.user._id,
+            subService: subService || service,
+            year: gstYear,
+            gstFilingMonth: gstFilingMonth
+          };
+        } else if (gstYear) {
+          // Fallback to year-based check if filing type/month/quarter not specified
+          // This allows only one submission per year if no month/quarter specified
+          duplicateCheck = {
+            user: req.user._id,
+            subService: subService || service,
+            year: gstYear
+          };
+        }
+      } else if (service === 'TDS Returns') {
+        // For TDS Returns, check based on month
+        const tdsYear = tdsFilingYear || year;
+        
+        if (tdsFilingMonth && tdsYear) {
+          duplicateCheck = {
+            user: req.user._id,
+            subService: subService || service,
+            year: tdsYear,
+            tdsFilingMonth: tdsFilingMonth
+          };
+        } else if (tdsYear) {
+          duplicateCheck = {
+            user: req.user._id,
+            subService: subService || service,
+            year: tdsYear
+          };
+        }
+      } else {
+        // For other services, check based on user + subService + year
+        if (year) {
+          duplicateCheck = {
+            user: req.user._id,
+            subService: subService || service,
+            year: year
+          };
+        }
+      }
+
+      // Check if duplicate exists (only if duplicateCheck is not empty)
+      if (Object.keys(duplicateCheck).length > 0) {
+        const existingForm = await TaxForm.findOne(duplicateCheck);
+        if (existingForm) {
+          let duplicateMessage = '';
+          if (service === 'GST Filing') {
+            const gstYear = gstFilingYear || year || finalYear;
+            if (gstFilingType === 'quarterly' && gstFilingQuarter) {
+              duplicateMessage = `You have already submitted a GST Filing form for Quarter ${gstFilingQuarter} of ${gstYear}.`;
+            } else if ((gstFilingType === 'monthly' || gstFilingMonth) && gstFilingMonth) {
+              // Treat as monthly if gstFilingMonth is provided (even if gstFilingType is not set)
+              const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+              const monthName = monthNames[parseInt(gstFilingMonth) - 1] || gstFilingMonth;
+              duplicateMessage = `You have already submitted a GST Filing form for ${monthName} ${gstYear}.`;
+            } else {
+              duplicateMessage = `You have already submitted a form for GST Filing for the year ${gstYear}.`;
+            }
+          } else if (service === 'TDS Returns') {
+            const tdsYear = tdsFilingYear || year || finalYear;
+            if (tdsFilingMonth) {
+              const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+              const monthName = monthNames[parseInt(tdsFilingMonth) - 1] || tdsFilingMonth;
+              duplicateMessage = `You have already submitted a TDS Returns form for ${monthName} ${tdsYear}.`;
+            } else {
+              duplicateMessage = `You have already submitted a TDS Returns form for the year ${tdsYear}.`;
+            }
+          } else {
+            duplicateMessage = `You have already submitted a form for this sub-service (${subService || service}) for the year ${finalYear || year}. You can only submit one form per sub-service each year.`;
+          }
+          
+          return res.status(409).json({
+            message: duplicateMessage,
+          });
+        }
+      }
+
       // Create new tax form submission
       const taxForm = new TaxForm(formData);
 
@@ -316,7 +424,7 @@ router.post(
         formId: taxForm._id,
       });
     } catch (error) {
-      // Handle duplicate key error for the compound index (user, subService, year)
+      // Handle duplicate key error (should not happen with custom validation, but keep as fallback)
       if (error.code === 11000) {
         return res.status(409).json({
           message: `You have already submitted a form for this sub-service (${req.body?.subService || req.body?.service || "selected"}) for the year ${req.body?.year || "the selected year"}. You can only submit one form per sub-service each year.`,
@@ -710,7 +818,11 @@ router.put("/other-registration/:id", protect, upload.fields([
     { name: 'partnershipDeedFile', maxCount: 1 },
     { name: 'mouFile', maxCount: 1 },
     { name: 'bankAccountFile', maxCount: 1 },
-    { name: 'businessRegistrationFile', maxCount: 1 }
+    { name: 'businessRegistrationFile', maxCount: 1 },
+    { name: 'cancelCheckFile', maxCount: 1 },
+    { name: 'gstFile', maxCount: 1 },
+    { name: 'electricityBillFile', maxCount: 1 },
+    { name: 'rentAgreementFile', maxCount: 1 }
   ]), handleMulterError, async (req, res) => {
   try {
     const { id } = req.params;
@@ -836,10 +948,10 @@ router.put("/other-registration/:id", protect, upload.fields([
   }
 });
 
-// @route   GET /api/forms/company-formation/user-submissions
-// @desc    Get all company formation submissions for the logged-in user
+// @route   GET /api/forms/company-information/user-submissions
+// @desc    Get all Company Information submissions for the logged-in user
 // @access  Private
-router.get("/company-formation/user-submissions", protect, async (req, res) => {
+router.get("/company-information/user-submissions", protect, async (req, res) => {
   try {
     const submissions = await CompanyForm.find({ user: req.user._id })
       .sort({ createdAt: -1 })
@@ -847,15 +959,15 @@ router.get("/company-formation/user-submissions", protect, async (req, res) => {
 
     res.json({ data: submissions });
   } catch (error) {
-    console.error("Error fetching company formation submissions:", error);
+    console.error("Error fetching Company Information submissions:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
 
-// @route   GET /api/forms/company-formation/:id
-// @desc    Get a specific company formation submission for the logged-in user
+// @route   GET /api/forms/company-information/:id
+// @desc    Get a specific Company Information submission for the logged-in user
 // @access  Private
-router.get("/company-formation/:id", protect, async (req, res) => {
+router.get("/company-information/:id", protect, async (req, res) => {
   try {
     const id = req.params.id;
     if (!isValidObjectId(id)) {
@@ -882,15 +994,15 @@ router.get("/company-formation/:id", protect, async (req, res) => {
 
     res.json({ data: processed });
   } catch (error) {
-    console.error("Error fetching company formation submission details:", error);
+    console.error("Error fetching Company Information submission details:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
 
-// @route   GET /api/forms/company-formation/download/:documentId
-// @desc    Download a document from a company formation submission
+// @route   GET /api/forms/company-information/download/:documentId
+// @desc    Download a document from a Company Information submission
 // @access  Private
-router.get("/company-formation/download/:documentId", protect, async (req, res) => {
+router.get("/company-information/download/:documentId", protect, async (req, res) => {
   try {
     const documentId = req.params.documentId;
     if (!isValidObjectId(documentId)) {
@@ -919,23 +1031,23 @@ router.get("/company-formation/download/:documentId", protect, async (req, res) 
     });
     res.send(document.fileData);
   } catch (error) {
-    console.error("Error downloading company formation document:", error);
+    console.error("Error downloading Company Information document:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
 
-// @route   DELETE /api/forms/company-formation/document/:documentId
-// @desc    Delete a document from a company formation submission (disabled for users)
+// @route   DELETE /api/forms/company-information/document/:documentId
+// @desc    Delete a document from a Company Information submission (disabled for users)
 // @access  Private
-router.delete("/company-formation/document/:documentId", protect, async (req, res) => {
+router.delete("/company-information/document/:documentId", protect, async (req, res) => {
   return res.status(403).json({ message: "Document deletion by users is disabled. Please contact admin." });
 });
 
-// @route   POST /api/forms/company-formation/document/:formId
-// @desc    Upload a new document to an existing company formation submission
+// @route   POST /api/forms/company-information/document/:formId
+// @desc    Upload a new document to an existing Company Information submission
 // @access  Private
 router.post(
-  "/company-formation/document/:formId",
+  "/company-information/document/:formId",
   protect,
   upload.single("document"),
   handleMulterError,
@@ -950,7 +1062,7 @@ router.post(
 
       const form = await CompanyForm.findById(formId);
       if (!form) {
-        return res.status(404).json({ message: "Company formation form not found" });
+        return res.status(404).json({ message: "Company Information form not found" });
       }
 
       const ownsByUser = form.user && form.user.equals(req.user._id);
@@ -998,17 +1110,17 @@ router.post(
 
       res.status(201).json({ success: true, message: "Document uploaded successfully", document: responseDocument });
     } catch (error) {
-      console.error("Error uploading company formation document:", error);
+      console.error("Error uploading Company Information document:", error);
       res.status(500).json({ message: "Server error" });
     }
   }
 );
 
-// @route   PUT /api/forms/company-formation/:id
-// @desc    Update a company formation submission and optionally add new documents
+// @route   PUT /api/forms/company-information/:id
+// @desc    Update a Company Information submission and optionally add new documents
 // @access  Private
 router.put(
-  "/company-formation/:id",
+  "/company-information/:id",
   protect,
   upload.fields([
     { name: 'documents', maxCount: 10 },
@@ -1031,7 +1143,7 @@ router.put(
 
       const form = await CompanyForm.findById(id);
       if (!form) {
-        return res.status(404).json({ message: "Company formation form not found" });
+        return res.status(404).json({ message: "Company Information form not found" });
       }
 
       const ownsByUser = form.user && form.user.equals(req.user._id);
@@ -1164,14 +1276,14 @@ router.put(
         });
       }
 
-      res.status(200).json({ message: "Company formation form updated successfully", data: updated });
+      res.status(200).json({ message: "Company Information form updated successfully", data: updated });
     } catch (error) {
-      console.error("Error updating company formation form:", error);
+      console.error("Error updating Company Information form:", error);
       if (error.name === "ValidationError") {
         const validationErrors = Object.values(error.errors).map((err) => err.message);
         return res.status(400).json({ message: "Validation failed", errors: validationErrors });
       }
-      res.status(500).json({ message: "Server error while updating company formation form", error: error.message });
+      res.status(500).json({ message: "Server error while updating Company Information form", error: error.message });
     }
   }
 );
@@ -2108,27 +2220,49 @@ router.put(
   }
 );
 
-// @route   POST /api/forms/company-formation
-// @desc    Submit company formation form with documents
+// @route   POST /api/forms/company-information
+// @desc    Submit Company Information form with documents
 // @access  Private
 router.post(
-  "/company-formation",
+  "/company-information",
   protect,
-  upload.fields([
-    { name: 'documents', maxCount: 10 },
-    { name: 'aadhaarFile', maxCount: 1 },
-    { name: 'panFile', maxCount: 1 },
-    { name: 'addressProofFile', maxCount: 1 },
-    { name: 'directorPhotosFile', maxCount: 1 },
-    { name: 'moaFile', maxCount: 1 },
-    { name: 'aoaFile', maxCount: 1 },
-    { name: 'dinFile', maxCount: 1 },
-    { name: 'dscFile', maxCount: 1 }
-  ]),
+  (() => {
+    const fields = [
+      { name: 'documents', maxCount: 10 },
+      { name: 'aadhaarFile', maxCount: 1 },
+      { name: 'panFile', maxCount: 1 },
+      { name: 'addressProofFile', maxCount: 1 },
+      { name: 'directorPhotosFile', maxCount: 1 },
+      { name: 'moaFile', maxCount: 1 },
+      { name: 'aoaFile', maxCount: 1 },
+      { name: 'dinFile', maxCount: 1 },
+      { name: 'dscFile', maxCount: 1 },
+      // Company address documents
+      { name: 'rentAgreement', maxCount: 1 },
+      { name: 'electricityBill', maxCount: 1 },
+      { name: 'ownerPanAadhaar', maxCount: 1 },
+      { name: 'municipalTaxReceipt', maxCount: 1 }
+    ];
+    
+    // Director documents (support up to 10 directors, indexed 0-9)
+    for (let i = 0; i < 10; i++) {
+      fields.push(
+        { name: `directorPhoto_${i}`, maxCount: 10 },
+        { name: `directorSignature_${i}`, maxCount: 10 },
+        { name: `directorAadhaar_${i}`, maxCount: 10 },
+        { name: `directorPan_${i}`, maxCount: 10 },
+        { name: `directorVoterId_${i}`, maxCount: 10 },
+        { name: `directorDrivingLicense_${i}`, maxCount: 10 },
+        { name: `directorBankStatement_${i}`, maxCount: 1 }
+      );
+    }
+    
+    return upload.fields(fields);
+  })(),
   handleMulterError,
   async (req, res) => {
     try {
-      console.log("Company formation form submission received");
+      console.log("Company Information form submission received");
       console.log("Request body:", req.body);
       console.log("Files received:", req.files ? req.files.length : "No files");
       
@@ -2155,11 +2289,6 @@ router.post(
         ownerName,
         ownerPan,
         ownerAadhaar,
-        hasDigitalSignature,
-        hasBankAccount,
-        requiresGstRegistration,
-        requiresCompliance,
-        selectedPackage,
       } = req.body;
 
       console.log("Parsed form data:", {
@@ -2177,11 +2306,6 @@ router.post(
         state,
         pincode,
         directors,
-        hasDigitalSignature,
-        hasBankAccount,
-        requiresGstRegistration,
-        requiresCompliance,
-        selectedPackage,
       });
 
       // Use proposedName1 if companyName is not provided (for backward compatibility)
@@ -2258,11 +2382,6 @@ router.post(
         ownerName: ownerName || undefined,
         ownerPan: ownerPan ? ownerPan.toUpperCase() : undefined,
         ownerAadhaar: ownerAadhaar ? ownerAadhaar.replace(/\D/g, '') : undefined,
-        hasDigitalSignature: hasDigitalSignature === 'true',
-        hasBankAccount: hasBankAccount === 'true',
-        requiresGstRegistration: requiresGstRegistration === 'true',
-        requiresCompliance: requiresCompliance === 'true',
-        selectedPackage: selectedPackage || "Basic",
         documents: [],
       };
 
@@ -2273,6 +2392,9 @@ router.post(
       
       if (req.files) {
         try {
+          // Create fileMap for easier access
+          const fileMap = req.files;
+
           // Process specific document types
           const fileFields = [
             { field: 'aadhaarFile', type: 'Aadhaar Card' },
@@ -2287,57 +2409,153 @@ router.post(
 
           // Process specific document files
           fileFields.forEach(({ field, type }) => {
-            if (req.files[field] && req.files[field].length > 0) {
-              const file = req.files[field][0];
+            if (fileMap[field] && fileMap[field].length > 0) {
+              const file = fileMap[field][0];
               console.log(`Processing ${field}:`, {
-              originalName: file.originalname,
-              mimetype: file.mimetype,
-                size: file.size
-              });
-              
-              formData.documents.push({
-                documentType: type,
-                fileName: file.filename || `file_${Date.now()}_${field}`,
-                originalName: file.originalname,
-                fileType: file.mimetype,
-                fileSize: file.size,
-                fileData: getFileData(file),
-                contentType: file.mimetype,
-              });
-            }
-          });
-
-          // Process general documents
-          if (req.files['documents'] && req.files['documents'].length > 0) {
-            req.files['documents'].forEach((file, index) => {
-              console.log(`Processing general document ${index}:`, {
                 originalName: file.originalname,
                 mimetype: file.mimetype,
                 size: file.size
               });
               
               formData.documents.push({
-                documentType: req.body[`documentType_${index}`] || "Additional Document",
-              fileName: file.filename || `file_${Date.now()}_${index}`,
+                documentType: type,
+                fileName: file.filename || generateUniqueFilename(file.originalname),
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+                uploadedBy: 'user',
+              });
+            }
+          });
+
+          // Process director documents (indexed fields)
+          for (let i = 0; i < 10; i++) {
+            // Director Photos
+            if (fileMap[`directorPhoto_${i}`] && fileMap[`directorPhoto_${i}`].length > 0) {
+              fileMap[`directorPhoto_${i}`].forEach((file) => {
+                formData.documents.push({
+                  documentType: `Director ${i + 1} Photo`,
+                  fileName: generateUniqueFilename(file.originalname),
+                  originalName: file.originalname,
+                  fileType: file.mimetype,
+                  fileSize: file.size,
+                  fileData: getFileData(file),
+                  contentType: file.mimetype,
+                  uploadedBy: 'user',
+                });
+              });
+            }
+            // Director Signatures
+            if (fileMap[`directorSignature_${i}`] && fileMap[`directorSignature_${i}`].length > 0) {
+              fileMap[`directorSignature_${i}`].forEach((file) => {
+                formData.documents.push({
+                  documentType: `Director ${i + 1} Signature`,
+                  fileName: generateUniqueFilename(file.originalname),
+                  originalName: file.originalname,
+                  fileType: file.mimetype,
+                  fileSize: file.size,
+                  fileData: getFileData(file),
+                  contentType: file.mimetype,
+                  uploadedBy: 'user',
+                });
+              });
+            }
+            // Director Aadhaar Cards
+            if (fileMap[`directorAadhaar_${i}`] && fileMap[`directorAadhaar_${i}`].length > 0) {
+              fileMap[`directorAadhaar_${i}`].forEach((file) => {
+                formData.documents.push({
+                  documentType: `Director ${i + 1} Aadhaar Card`,
+                  fileName: generateUniqueFilename(file.originalname),
+                  originalName: file.originalname,
+                  fileType: file.mimetype,
+                  fileSize: file.size,
+                  fileData: getFileData(file),
+                  contentType: file.mimetype,
+                  uploadedBy: 'user',
+                });
+              });
+            }
+            // Director PAN Cards
+            if (fileMap[`directorPan_${i}`] && fileMap[`directorPan_${i}`].length > 0) {
+              fileMap[`directorPan_${i}`].forEach((file) => {
+                formData.documents.push({
+                  documentType: `Director ${i + 1} PAN Card`,
+                  fileName: generateUniqueFilename(file.originalname),
+                  originalName: file.originalname,
+                  fileType: file.mimetype,
+                  fileSize: file.size,
+                  fileData: getFileData(file),
+                  contentType: file.mimetype,
+                  uploadedBy: 'user',
+                });
+              });
+            }
+            // Director Voter IDs
+            if (fileMap[`directorVoterId_${i}`] && fileMap[`directorVoterId_${i}`].length > 0) {
+              fileMap[`directorVoterId_${i}`].forEach((file) => {
+                formData.documents.push({
+                  documentType: `Director ${i + 1} Voter ID`,
+                  fileName: generateUniqueFilename(file.originalname),
+                  originalName: file.originalname,
+                  fileType: file.mimetype,
+                  fileSize: file.size,
+                  fileData: getFileData(file),
+                  contentType: file.mimetype,
+                  uploadedBy: 'user',
+                });
+              });
+            }
+            // Director Driving Licenses
+            if (fileMap[`directorDrivingLicense_${i}`] && fileMap[`directorDrivingLicense_${i}`].length > 0) {
+              fileMap[`directorDrivingLicense_${i}`].forEach((file) => {
+                formData.documents.push({
+                  documentType: `Director ${i + 1} Driving License`,
+                  fileName: generateUniqueFilename(file.originalname),
+                  originalName: file.originalname,
+                  fileType: file.mimetype,
+                  fileSize: file.size,
+                  fileData: getFileData(file),
+                  contentType: file.mimetype,
+                  uploadedBy: 'user',
+                });
+              });
+            }
+            // Director Bank Statements
+            if (fileMap[`directorBankStatement_${i}`] && fileMap[`directorBankStatement_${i}`].length > 0) {
+              const file = fileMap[`directorBankStatement_${i}`][0];
+              formData.documents.push({
+                documentType: `Director ${i + 1} Bank Statement`,
+                fileName: generateUniqueFilename(file.originalname),
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+                uploadedBy: 'user',
+              });
+            }
+          }
+
+          // Process company address documents
+          if (fileMap['rentAgreement'] && fileMap['rentAgreement'].length > 0) {
+            const file = fileMap['rentAgreement'][0];
+            formData.documents.push({
+              documentType: "Rent Agreement",
+              fileName: generateUniqueFilename(file.originalname),
               originalName: file.originalname,
               fileType: file.mimetype,
               fileSize: file.size,
               fileData: getFileData(file),
               contentType: file.mimetype,
-          });
+              uploadedBy: 'user',
             });
           }
 
-          console.log("Documents processed:", formData.documents.length);
-        } catch (fileError) {
-          console.error("Error processing files:", fileError);
-          return res.status(400).json({ message: "Error processing uploaded files" });
-        }
-
-        // Process electricity bill
-        if (fileMap['electricityBill']) {
-          fileMap['electricityBill'].forEach((file) => {
-            documents.push({
+          if (fileMap['electricityBill'] && fileMap['electricityBill'].length > 0) {
+            const file = fileMap['electricityBill'][0];
+            formData.documents.push({
               documentType: "Electricity Bill",
               fileName: generateUniqueFilename(file.originalname),
               originalName: file.originalname,
@@ -2347,13 +2565,11 @@ router.post(
               contentType: file.mimetype,
               uploadedBy: 'user',
             });
-          });
-        }
+          }
 
-        // Process owner PAN/Aadhaar
-        if (fileMap['ownerPanAadhaar']) {
-          fileMap['ownerPanAadhaar'].forEach((file) => {
-            documents.push({
+          if (fileMap['ownerPanAadhaar'] && fileMap['ownerPanAadhaar'].length > 0) {
+            const file = fileMap['ownerPanAadhaar'][0];
+            formData.documents.push({
               documentType: "Owner PAN/Aadhaar Card",
               fileName: generateUniqueFilename(file.originalname),
               originalName: file.originalname,
@@ -2363,13 +2579,11 @@ router.post(
               contentType: file.mimetype,
               uploadedBy: 'user',
             });
-          });
-        }
+          }
 
-        // Process municipal tax receipt
-        if (fileMap['municipalTaxReceipt']) {
-          fileMap['municipalTaxReceipt'].forEach((file) => {
-            documents.push({
+          if (fileMap['municipalTaxReceipt'] && fileMap['municipalTaxReceipt'].length > 0) {
+            const file = fileMap['municipalTaxReceipt'][0];
+            formData.documents.push({
               documentType: "Municipal Tax Receipt",
               fileName: generateUniqueFilename(file.originalname),
               originalName: file.originalname,
@@ -2379,27 +2593,35 @@ router.post(
               contentType: file.mimetype,
               uploadedBy: 'user',
             });
-          });
-        }
+          }
 
-        // Process other documents
-        if (fileMap['documents']) {
-          fileMap['documents'].forEach((file) => {
-            documents.push({
-              documentType: "Additional Document",
-              fileName: generateUniqueFilename(file.originalname),
-              originalName: file.originalname,
-              fileType: file.mimetype,
-              fileSize: file.size,
-              fileData: getFileData(file),
-              contentType: file.mimetype,
-              uploadedBy: 'user',
+          // Process general documents
+          if (fileMap['documents'] && fileMap['documents'].length > 0) {
+            fileMap['documents'].forEach((file, index) => {
+              console.log(`Processing general document ${index}:`, {
+                originalName: file.originalname,
+                mimetype: file.mimetype,
+                size: file.size
+              });
+              
+              formData.documents.push({
+                documentType: req.body[`documentType_${index}`] || "Additional Document",
+                fileName: generateUniqueFilename(file.originalname),
+                originalName: file.originalname,
+                fileType: file.mimetype,
+                fileSize: file.size,
+                fileData: getFileData(file),
+                contentType: file.mimetype,
+                uploadedBy: 'user',
+              });
             });
-          });
-        }
+          }
 
-        formData.documents = documents;
-        console.log("Documents processed:", documents.length);
+          console.log("Documents processed:", formData.documents.length);
+        } catch (fileError) {
+          console.error("Error processing files:", fileError);
+          return res.status(400).json({ message: "Error processing uploaded files" });
+        }
       }
 
       console.log("Final form data:", JSON.stringify({ ...formData, documents: formData.documents.length }, null, 2));
@@ -2415,21 +2637,21 @@ router.post(
         console.error("Error saving CompanyForm:", saveError);
         if (saveError.code === 11000) {
           return res.status(400).json({ 
-            message: "A company formation form for this service already exists. You can only submit one form per service." 
+            message: "A Company Information form for this service already exists. You can only submit one form per service." 
           });
         }
         throw saveError; // Re-throw to be caught by outer catch block
       }
 
       res.status(201).json({
-        message: "Company formation form submitted successfully",
+        message: "Company Information form submitted successfully",
         formId: companyForm._id,
       });
     } catch (error) {
-      console.error("Error submitting company formation form:", error);
+      console.error("Error submitting Company Information form:", error);
       console.error("Error stack:", error.stack);
       res.status(500).json({
-        message: "Server error while submitting company formation form",
+        message: "Server error while submitting Company Information form",
         error: error.message,
       });
     }
@@ -2452,11 +2674,19 @@ router.post(
     { name: 'mouFile', maxCount: 1 },
     { name: 'bankAccountFile', maxCount: 1 },
     { name: 'businessRegistrationFile', maxCount: 1 },
-    { name: 'documents', maxCount: 10 }
+    { name: 'documents', maxCount: 10 },
+    { name: 'cancelCheckFile', maxCount: 1 },
+    { name: 'gstFile', maxCount: 1 },
+    { name: 'electricityBillFile', maxCount: 1 },
+    { name: 'rentAgreementFile', maxCount: 1 }
   ]),
   handleMulterError,
   async (req, res) => {
     try {
+      console.log("Other registration form submission received (first route)");
+      console.log("Request body keys:", Object.keys(req.body || {}));
+      console.log("Request body:", JSON.stringify(req.body, null, 2));
+      console.log("Files received:", req.files ? Object.keys(req.files) : "No files");
       
       const {
         fullName,
@@ -2473,6 +2703,7 @@ router.post(
         pincode,
         registrationPurpose,
         description,
+        businessDetails,
         // Legacy fields for backward compatibility
         service,
         subService,
@@ -2493,46 +2724,90 @@ router.post(
       } = req.body;
 
       // Map frontend fields to backend expectations
-      const mappedService = registrationType || service;
-      const mappedBusinessType = businessActivity || businessType;
+      const mappedService = service || "Other Registration";
+      const mappedSubService = subService || registrationType;
+      const mappedBusinessType = businessType || businessActivity || 'Individual';
       const mappedApplicantAadhaar = aadhaar || applicantAadhaar;
+      const mappedBusinessAddress = businessAddress || businessDetails || 'Not Provided';
       
-      if (!fullName || !email || !phone || !pan || !mappedService || !businessName || !mappedBusinessType || !businessAddress) {
-        return res.status(400).json({ message: "All required fields must be provided" });
+      // Log parsed fields for debugging
+      console.log("Parsed form data:", {
+        fullName: fullName || 'MISSING',
+        email: email || 'MISSING',
+        phone: phone || 'MISSING',
+        pan: pan || 'MISSING',
+        service: mappedService || 'MISSING',
+        subService: mappedSubService || 'MISSING',
+        registrationType: registrationType || 'MISSING',
+        businessName: businessName || 'MISSING',
+        businessType: mappedBusinessType || 'MISSING',
+        businessAddress: mappedBusinessAddress || 'MISSING',
+        businessDetails: businessDetails || 'MISSING',
+      });
+
+      // Validate core required fields (frontend sends these)
+      const missingFields = [];
+      if (!email) missingFields.push('email');
+      if (!mappedService) missingFields.push('service');
+      if (!businessName) missingFields.push('businessName');
+      if (!registrationType && !mappedSubService) missingFields.push('registrationType or subService');
+      
+      if (missingFields.length > 0) {
+        console.error("Missing required fields:", missingFields);
+        console.error("Full request body:", req.body);
+        return res.status(400).json({ 
+          message: `Missing required fields: ${missingFields.join(', ')}` 
+        });
       }
 
-      const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
-      if (!panRegex.test(pan)) {
-        return res.status(400).json({ message: "Invalid PAN format" });
+      // Handle optional fields with defaults
+      const finalFullName = fullName || req.user?.name || 'Not Provided';
+      const finalPhone = phone || req.user?.mobile || 'Not Provided';
+      const finalPan = pan || req.user?.pan || 'NOTPR0000N'; // Valid PAN format placeholder
+      const finalCity = city || 'Not Provided';
+      const finalState = state || 'Not Provided';
+      const finalPincode = pincode || '000000';
+
+      // Validate PAN only if provided (skip validation for placeholder)
+      if (finalPan && finalPan.trim() !== '' && finalPan !== 'NOTPR0000N') {
+        const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+        if (!panRegex.test(finalPan)) {
+          return res.status(400).json({ message: "Invalid PAN format" });
+        }
       }
 
       const formData = {
         user: req.user._id,
-        fullName,
+        fullName: finalFullName,
         email,
-        phone,
-        pan: pan.toUpperCase(),
-        aadhaar: mappedApplicantAadhaar,
+        phone: finalPhone,
+        pan: finalPan.toUpperCase(),
+        aadhaar: mappedApplicantAadhaar || undefined,
         service: mappedService,
-        subService: subService || mappedService,
+        subService: mappedSubService,
         businessName,
         businessType: mappedBusinessType,
-        businessAddress,
-        city,
-        state,
-        pincode,
-        registrationPurpose,
-        description,
+        businessAddress: mappedBusinessAddress,
+        city: finalCity,
+        state: finalState,
+        pincode: finalPincode,
+        registrationType: registrationType || mappedSubService,
+        registrationPurpose: registrationPurpose || undefined,
+        description: description || businessDetails || "",
         // Legacy fields for backward compatibility
         turnover: turnover || "",
         employeeCount: employeeCount || "",
         businessCategory: businessCategory || "",
         foodBusinessType: foodBusinessType || "",
         importExportCode: importExportCode || "",
-        applicantName: applicantName || fullName,
-        applicantPan: applicantPan ? applicantPan.toUpperCase() : pan.toUpperCase(),
-        applicantAadhaar: mappedApplicantAadhaar,
-        applicantAddress: applicantAddress || businessAddress,
+        applicantName: applicantName || finalFullName,
+        applicantPan: applicantPan ? applicantPan.toUpperCase() : finalPan.toUpperCase(),
+        applicantAadhaar: mappedApplicantAadhaar && mappedApplicantAadhaar.trim() !== '' 
+          ? mappedApplicantAadhaar.replace(/\D/g, '') 
+          : (req.user?.aadhaar ? req.user.aadhaar.replace(/\D/g, '') : '000000000000'), // 12 digit placeholder
+        applicantAddress: (applicantAddress && applicantAddress.trim() !== '') 
+          ? applicantAddress.trim() 
+          : mappedBusinessAddress,
         requiresDigitalSignature: requiresDigitalSignature === 'true',
         requiresBankAccount: requiresBankAccount === 'true',
         requiresCompliance: requiresCompliance === 'true',
@@ -2544,22 +2819,38 @@ router.post(
       
       // Process specific document files
       const fileFields = [
-        'aadhaarFile', 'panFile', 'addressProofFile', 'businessAddressProofFile',
-        'identityProofFile', 'partnershipDeedFile', 'mouFile', 'bankAccountFile',
-        'businessRegistrationFile'
+        { field: 'aadhaarFile', type: 'Aadhaar Card' },
+        { field: 'panFile', type: 'PAN Card' },
+        { field: 'addressProofFile', type: 'Address Proof' },
+        { field: 'businessAddressProofFile', type: 'Business Address Proof' },
+        { field: 'identityProofFile', type: 'Identity Proof' },
+        { field: 'partnershipDeedFile', type: 'Partnership Deed' },
+        { field: 'mouFile', type: 'MOU' },
+        { field: 'bankAccountFile', type: 'Bank Account' },
+        { field: 'businessRegistrationFile', type: 'Business Registration' },
+        { field: 'cancelCheckFile', type: 'Cancel Check / Bank Statement' },
+        { field: 'gstFile', type: 'GST Certificate' },
+        { field: 'electricityBillFile', type: 'Electricity Bill' },
+        { field: 'rentAgreementFile', type: 'Rent Agreement' }
       ];
       
-      fileFields.forEach(fieldName => {
-        if (req.files[fieldName] && req.files[fieldName].length > 0) {
-          const file = req.files[fieldName][0];
+      fileFields.forEach(({ field, type }) => {
+        if (req.files[field] && req.files[field].length > 0) {
+          const file = req.files[field][0];
+          console.log(`Processing ${field}:`, {
+            originalName: file.originalname,
+            mimetype: file.mimetype,
+            size: file.size
+          });
           documents.push({
-            documentType: fieldName.replace('File', ' Document'),
-            fileName: file.filename,
+            documentType: type,
+            fileName: generateUniqueFilename(file.originalname),
             originalName: file.originalname,
             fileType: file.mimetype,
             fileSize: file.size,
             fileData: getFileData(file),
             contentType: file.mimetype,
+            uploadedBy: 'user',
           });
         }
       });
@@ -2567,24 +2858,48 @@ router.post(
       // Process additional documents
       if (req.files['documents'] && req.files['documents'].length > 0) {
         req.files['documents'].forEach((file, index) => {
+          console.log(`Processing general document ${index}:`, {
+            originalName: file.originalname,
+            mimetype: file.mimetype,
+            size: file.size
+          });
           documents.push({
             documentType: req.body[`documentType_${index}`] || "Additional Document",
-            fileName: file.filename,
+            fileName: generateUniqueFilename(file.originalname),
             originalName: file.originalname,
             fileType: file.mimetype,
             fileSize: file.size,
             fileData: getFileData(file),
             contentType: file.mimetype,
+            uploadedBy: 'user',
           });
         });
       }
+      
+      console.log("Documents processed:", documents.length);
       
       if (documents.length > 0) {
         formData.documents = documents;
       }
 
+      console.log("Final form data:", JSON.stringify({ ...formData, documents: formData.documents?.length || 0 }, null, 2));
+      console.log("Creating OtherRegistrationForm instance...");
+      
       const otherRegistrationForm = new OtherRegistrationForm(formData);
-      await otherRegistrationForm.save();
+      console.log("OtherRegistrationForm instance created, saving...");
+      
+      try {
+        await otherRegistrationForm.save();
+        console.log("OtherRegistrationForm saved successfully with ID:", otherRegistrationForm._id);
+      } catch (saveError) {
+        console.error("Error saving OtherRegistrationForm:", saveError);
+        if (saveError.code === 11000) {
+          return res.status(400).json({ 
+            message: "A form for this service already exists. You can only submit one form per service." 
+          });
+        }
+        throw saveError;
+      }
 
       res.status(201).json({
         message: "Other registration form submitted successfully",
@@ -3330,6 +3645,9 @@ router.post(
   handleMulterError,
   async (req, res) => {
     try {
+      console.log("Trademark & ISO form submission received");
+      console.log("Request body:", req.body);
+      console.log("Files received:", req.files ? Object.keys(req.files).length : "No files");
       
       const {
         fullName,
@@ -3338,114 +3656,188 @@ router.post(
         pan,
         service,
         subService,
+        serviceType,
+        trademarkName,
+        trademarkClass,
+        applicantName,
+        applicationType,
+        businessName,
+        businessType,
+        description,
+        priorityDate,
+        businessAddress,
+        aadhaar,
+      } = req.body;
+
+      // Log parsed fields for debugging
+      console.log("Parsed form data:", {
+        fullName,
+        email,
+        phone,
+        pan,
+        service,
+        subService,
+        serviceType,
+        trademarkName,
+        trademarkClass,
+        applicantName,
+        applicationType,
         businessName,
         businessType,
         businessAddress,
-        trademarkName,
-        trademarkClass,
-        trademarkDescription,
-        firstUseDate,
-        isoStandard,
-        scopeOfCertification,
-        numberOfEmployees,
-        industrySector,
-        workTitle,
-        workType,
-        creationDate,
-        authorName,
-        requiresSearch,
-        requiresObjectionHandling,
-        requiresRenewal,
-        requiresCompliance,
-        selectedPackage,
-      } = req.body;
+      });
 
-      if (!fullName || !email || !phone || !pan || !service || !businessName || !businessType || !businessAddress) {
-        return res.status(400).json({ message: "All required fields must be provided" });
+      // Determine subService - use serviceType if subService is not provided
+      const finalSubService = subService || serviceType;
+      
+      // Validate required fields with detailed error message
+      const missingFields = [];
+      if (!fullName) missingFields.push('fullName');
+      if (!email) missingFields.push('email');
+      if (!service) missingFields.push('service');
+      if (!finalSubService) missingFields.push('subService or serviceType');
+      if (!trademarkName) missingFields.push('trademarkName');
+      if (!trademarkClass) missingFields.push('trademarkClass');
+      if (!applicantName) missingFields.push('applicantName');
+      if (!applicationType) missingFields.push('applicationType');
+
+      if (missingFields.length > 0) {
+        console.error("Missing required fields:", missingFields);
+        return res.status(400).json({ 
+          message: `Missing required fields: ${missingFields.join(', ')}` 
+        });
       }
 
-      const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
-      if (!panRegex.test(pan)) {
-        return res.status(400).json({ message: "Invalid PAN format" });
+      // Validate PAN only if provided (it might be empty from user profile)
+      // Skip validation for placeholder values
+      if (pan && pan.trim() !== '' && pan.trim() !== 'NOTPR0000N') {
+        const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+        if (!panRegex.test(pan)) {
+          return res.status(400).json({ message: "Invalid PAN format" });
+        }
       }
+
+      // Map frontend fields to schema fields
+      // Use businessName and businessType if provided, otherwise fallback to applicantName/applicationType
+      // Ensure we always have values for required schema fields
+      const finalBusinessName = (businessName && businessName.trim() !== '') 
+        ? businessName.trim() 
+        : ((applicantName && applicantName.trim() !== '') 
+          ? applicantName.trim() 
+          : (fullName && fullName.trim() !== '' ? fullName.trim() : 'Not Provided'));
+      const finalBusinessType = (businessType && businessType.trim() !== '') 
+        ? businessType.trim() 
+        : ((applicationType && applicationType.trim() !== '') 
+          ? applicationType.trim() 
+          : 'Individual');
+      const finalBusinessAddress = (businessAddress && businessAddress.trim() !== '') 
+        ? businessAddress.trim() 
+        : 'Not Provided';
+      
+      console.log("Mapped business fields:", { businessName: finalBusinessName, businessType: finalBusinessType, finalBusinessAddress });
+      
+      // Handle phone and pan - schema requires them but they might be empty from user profile
+      // Use defaults if not provided
+      // Note: PAN must match format AAAAA0000A for schema validation
+      const finalPhone = phone && phone.trim() !== '' ? phone : 'Not Provided';
+      const finalPan = pan && pan.trim() !== '' ? pan.toUpperCase() : 'NOTPR0000N'; // Valid format placeholder
 
       const formData = {
         user: req.user._id,
         fullName,
         email,
-        phone,
-        pan: pan.toUpperCase(),
+        phone: finalPhone,
+        pan: finalPan,
         service,
-        subService: subService || service,
-        businessName,
-        businessType,
-        businessAddress,
+        subService: finalSubService,
+        serviceType: serviceType || finalSubService,
+        // Business Details (required by schema) - MUST be included
+        businessName: finalBusinessName,
+        businessType: finalBusinessType,
+        businessAddress: finalBusinessAddress,
+        // Trademark fields
         trademarkName,
         trademarkClass,
-        trademarkDescription,
-        firstUseDate,
-        isoStandard,
-        scopeOfCertification,
-        numberOfEmployees,
-        industrySector,
-        workTitle,
-        workType,
-        creationDate,
-        authorName,
-        requiresSearch: requiresSearch === 'true',
-        requiresObjectionHandling: requiresObjectionHandling === 'true',
-        requiresRenewal: requiresRenewal === 'true',
-        requiresCompliance: requiresCompliance === 'true',
-        selectedPackage: selectedPackage || "Basic",
+        trademarkDescription: description || undefined,
+        firstUseDate: priorityDate || undefined,
+        // Additional fields
+        applicantName,
+        applicationType,
+        aadhaar: aadhaar || undefined,
+        documents: [],
       };
 
-      // Process uploaded files from different field names
+      // Process uploaded files
       if (req.files) {
         try {
           formData.documents = [];
           
-          // Process specific document types
-          const fileFields = [
-            { field: 'aadhaarFile', type: 'Aadhaar Card' }
-          ];
+          // Create fileMap for easier access
+          const fileMap = req.files;
 
-          // Process specific document files
-          fileFields.forEach(({ field, type }) => {
-            if (req.files[field] && req.files[field].length > 0) {
-              const file = req.files[field][0];
+          // Process Aadhaar file
+          if (fileMap['aadhaarFile'] && fileMap['aadhaarFile'].length > 0) {
+            const file = fileMap['aadhaarFile'][0];
+            console.log(`Processing aadhaarFile:`, {
+              originalName: file.originalname,
+              mimetype: file.mimetype,
+              size: file.size
+            });
+            
+            formData.documents.push({
+              documentType: 'Aadhaar Card',
+              fileName: generateUniqueFilename(file.originalname),
+              originalName: file.originalname,
+              fileType: file.mimetype,
+              fileSize: file.size,
+              fileData: getFileData(file),
+              contentType: file.mimetype,
+              uploadedBy: 'user',
+            });
+          }
+
+          // Process general documents
+          if (fileMap['documents'] && fileMap['documents'].length > 0) {
+            fileMap['documents'].forEach((file, index) => {
+              console.log(`Processing document ${index}:`, {
+                originalName: file.originalname,
+                mimetype: file.mimetype,
+                size: file.size
+              });
+              
               formData.documents.push({
-                documentType: type,
-                fileName: file.filename || `file_${Date.now()}_${field}`,
+                documentType: req.body[`documentType_${index}`] || "Additional Document",
+                fileName: generateUniqueFilename(file.originalname),
                 originalName: file.originalname,
                 fileType: file.mimetype,
                 fileSize: file.size,
                 fileData: getFileData(file),
                 contentType: file.mimetype,
-              });
-            }
-          });
-
-          // Process general documents
-          if (req.files['documents'] && req.files['documents'].length > 0) {
-            req.files['documents'].forEach((file, index) => {
-              formData.documents.push({
-          documentType: req.body[`documentType_${index}`] || "General Document",
-                fileName: file.filename || `file_${Date.now()}_${index}`,
-          originalName: file.originalname,
-          fileType: file.mimetype,
-          fileSize: file.size,
-          fileData: getFileData(file),
-          contentType: file.mimetype,
+                uploadedBy: 'user',
               });
             });
           }
+
+          console.log("Documents processed:", formData.documents.length);
         } catch (fileError) {
           console.error("Error processing files:", fileError);
           return res.status(400).json({ message: "Error processing uploaded files" });
         }
       }
 
+      console.log("Final form data:", JSON.stringify({ ...formData, documents: formData.documents.length }, null, 2));
+      
+      // Verify required fields are present before creating model
+      console.log("Required fields check:", {
+        businessName: formData.businessName,
+        businessType: formData.businessType,
+        businessAddress: formData.businessAddress,
+        phone: formData.phone,
+        pan: formData.pan
+      });
+
       const trademarkISOForm = new TrademarkISOForm(formData);
+      console.log("Model created, attempting save...");
       await trademarkISOForm.save();
 
       res.status(201).json({
@@ -3638,14 +4030,19 @@ router.post(
     { name: 'addressProofFile', maxCount: 1 },
     { name: 'businessProofFile', maxCount: 1 },
     { name: 'partnershipDeedFile', maxCount: 1 },
-    { name: 'llpAgreementFile', maxCount: 1 }
+    { name: 'llpAgreementFile', maxCount: 1 },
+    { name: 'cancelCheckFile', maxCount: 1 },
+    { name: 'gstFile', maxCount: 1 },
+    { name: 'electricityBillFile', maxCount: 1 },
+    { name: 'rentAgreementFile', maxCount: 1 }
   ]),
   handleMulterError,
   async (req, res) => {
     try {
       console.log("Other registration form submission received");
-      console.log("Request body:", req.body);
-      console.log("Files received:", req.files ? Object.keys(req.files).length : "No files");
+      console.log("Request body keys:", Object.keys(req.body || {}));
+      console.log("Request body:", JSON.stringify(req.body, null, 2));
+      console.log("Files received:", req.files ? Object.keys(req.files) : "No files");
       
       const {
         fullName,
@@ -3682,12 +4079,48 @@ router.post(
         description,
       } = req.body;
 
-      // Validate required fields
-      if (!fullName || !email || !phone || !pan || !service || !businessName || !businessType || !businessAddress || !city || !state || !pincode || !registrationType) {
+      // Log parsed fields for debugging
+      console.log("Parsed form data:", {
+        fullName: fullName || 'MISSING',
+        email: email || 'MISSING',
+        phone: phone || 'MISSING',
+        pan: pan || 'MISSING',
+        service: service || 'MISSING',
+        subService: subService || 'MISSING',
+        registrationType: registrationType || 'MISSING',
+        businessName: businessName || 'MISSING',
+        businessType: businessType || 'MISSING',
+        businessAddress: businessAddress || 'MISSING',
+        city: city || 'MISSING',
+        state: state || 'MISSING',
+        pincode: pincode || 'MISSING',
+        businessDetails: req.body.businessDetails || 'MISSING',
+      });
+
+      // Validate core required fields (frontend sends these)
+      const missingFields = [];
+      if (!email) missingFields.push('email');
+      if (!service) missingFields.push('service');
+      if (!businessName) missingFields.push('businessName');
+      if (!registrationType) missingFields.push('registrationType');
+      
+      if (missingFields.length > 0) {
+        console.error("Missing required fields:", missingFields);
+        console.error("Full request body:", req.body);
         return res.status(400).json({ 
-          message: "Missing required fields. Please fill in all mandatory fields." 
+          message: `Missing required fields: ${missingFields.join(', ')}` 
         });
       }
+
+      // Handle optional fields with defaults
+      const finalFullName = fullName || req.user?.name || 'Not Provided';
+      const finalPhone = phone || req.user?.mobile || 'Not Provided';
+      const finalPan = pan || req.user?.pan || 'NOTPR0000N'; // Valid PAN format placeholder
+      const finalBusinessType = businessType || 'Individual';
+      const finalBusinessAddress = businessAddress || req.body.businessDetails || 'Not Provided';
+      const finalCity = city || 'Not Provided';
+      const finalState = state || 'Not Provided';
+      const finalPincode = pincode || '000000';
 
       // Parse partners safely if provided
       let parsedPartners = [];
@@ -3700,23 +4133,44 @@ router.post(
         }
       }
 
+      // Validate PAN only if provided (skip validation for placeholder)
+      if (finalPan && finalPan.trim() !== '' && finalPan !== 'NOTPR0000N') {
+        const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+        if (!panRegex.test(finalPan)) {
+          return res.status(400).json({ message: "Invalid PAN format" });
+        }
+      }
+
+      // Handle applicant fields - required by schema
+      const finalApplicantAadhaar = (req.body.aadhaar && req.body.aadhaar.trim() !== '') 
+        ? req.body.aadhaar.replace(/\D/g, '') 
+        : (req.user?.aadhaar ? req.user.aadhaar.replace(/\D/g, '') : '000000000000'); // 12 digit placeholder
+      const finalApplicantAddress = (req.body.applicantAddress && req.body.applicantAddress.trim() !== '') 
+        ? req.body.applicantAddress.trim() 
+        : finalBusinessAddress;
+
       const formData = {
         user: req.user._id,
-        fullName,
+        fullName: finalFullName,
         email,
-        phone,
-        pan: pan.toUpperCase(),
+        phone: finalPhone,
+        pan: finalPan.toUpperCase(),
         service,
         subService: subService || registrationType,
         businessName,
-        businessType,
-        businessAddress,
-        city,
-        state,
-        pincode,
+        businessType: finalBusinessType,
+        businessAddress: finalBusinessAddress,
+        city: finalCity,
+        state: finalState,
+        pincode: finalPincode,
         registrationType,
-        businessActivity: businessActivity || "",
+        businessActivity: businessActivity || req.body.businessDetails || "",
         partners: parsedPartners,
+        // Applicant fields (required by schema)
+        applicantName: finalFullName,
+        applicantPan: finalPan.toUpperCase(),
+        applicantAadhaar: finalApplicantAadhaar,
+        applicantAddress: finalApplicantAddress,
         authorizedCapital: authorizedCapital || "",
         paidUpCapital: paidUpCapital || "",
         numberOfPartners: numberOfPartners || "",
@@ -3733,7 +4187,7 @@ router.post(
         hasDigitalSignature: hasDigitalSignature === 'true',
         requiresCompliance: requiresCompliance === 'true',
         selectedPackage: selectedPackage || "Basic",
-        description: description || "",
+        description: description || req.body.businessDetails || "",
         status: "Pending",
         documents: [],
       };
@@ -3748,7 +4202,11 @@ router.post(
             { field: 'addressProofFile', type: 'Address Proof' },
             { field: 'businessProofFile', type: 'Business Proof' },
             { field: 'partnershipDeedFile', type: 'Partnership Deed' },
-            { field: 'llpAgreementFile', type: 'LLP Agreement' }
+            { field: 'llpAgreementFile', type: 'LLP Agreement' },
+            { field: 'cancelCheckFile', type: 'Cancel Check / Bank Statement' },
+            { field: 'gstFile', type: 'GST Certificate' },
+            { field: 'electricityBillFile', type: 'Electricity Bill' },
+            { field: 'rentAgreementFile', type: 'Rent Agreement' }
           ];
 
           // Process specific document files
@@ -3763,12 +4221,13 @@ router.post(
               
               formData.documents.push({
                 documentType: type,
-                fileName: file.filename || `file_${Date.now()}_${field}`,
+                fileName: generateUniqueFilename(file.originalname),
                 originalName: file.originalname,
                 fileType: file.mimetype,
                 fileSize: file.size,
                 fileData: getFileData(file),
                 contentType: file.mimetype,
+                uploadedBy: 'user',
               });
             }
           });
@@ -3784,12 +4243,13 @@ router.post(
               
               formData.documents.push({
                 documentType: req.body[`documentType_${index}`] || "Additional Document",
-                fileName: file.filename || `file_${Date.now()}_${index}`,
+                fileName: generateUniqueFilename(file.originalname),
                 originalName: file.originalname,
                 fileType: file.mimetype,
                 fileSize: file.size,
                 fileData: getFileData(file),
                 contentType: file.mimetype,
+                uploadedBy: 'user',
               });
             });
           }
@@ -4043,7 +4503,7 @@ router.post(
         city,
         state,
         pincode,
-        // Company formation specific fields
+        // Company Information specific fields
         companyName,
         proposedNames,
         authorizedCapital,
@@ -4121,7 +4581,7 @@ router.post(
         console.log('Selected TaxForm model for tax service');
       } else if (serviceLower.includes('company') || serviceLower.includes('formation')) {
         Model = CompanyForm;
-        console.log('Selected CompanyForm model for company formation service');
+        console.log('Selected CompanyForm model for Company Information service');
       } else if (serviceLower.includes('roc') || serviceLower.includes('returns')) {
         Model = ROCForm;
         console.log('Selected ROCForm model for ROC returns service');

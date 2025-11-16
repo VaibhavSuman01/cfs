@@ -125,11 +125,11 @@ export default function CompanyFormDetailPage() {
           if (foundForm) {
             setForm(foundForm);
           } else {
-            toast({ title: 'Error', description: 'Company formation form not found.', variant: 'destructive' });
+            toast({ title: 'Error', description: 'Company Information form not found.', variant: 'destructive' });
           }
         } catch (error) {
-          console.error('Failed to fetch company formation form:', error);
-          toast({ title: 'Error', description: 'Failed to load company formation form details.', variant: 'destructive' });
+          console.error('Failed to fetch Company Information form:', error);
+          toast({ title: 'Error', description: 'Failed to load Company Information form details.', variant: 'destructive' });
         } finally {
           setLoading(false);
         }
@@ -259,7 +259,7 @@ export default function CompanyFormDetailPage() {
         <div className="text-center py-12">
           <FileText className="mx-auto h-16 w-16 text-gray-300" />
           <h3 className="mt-4 text-lg font-medium">Form not found</h3>
-          <p className="mt-2 text-sm text-gray-500">The company formation form you're looking for doesn't exist.</p>
+          <p className="mt-2 text-sm text-gray-500">The Company Information form you're looking for doesn't exist.</p>
         </div>
       </div>
     );
@@ -277,8 +277,8 @@ export default function CompanyFormDetailPage() {
             <ArrowLeft className="h-4 w-4 mr-2" /> Back
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-white">Company Formation Form</h1>
-            <p className="text-muted-foreground text-white">Review and manage company formation application</p>
+            <h1 className="text-3xl font-bold text-white">Company Information Form</h1>
+            <p className="text-muted-foreground text-white">Review and manage Company Information application</p>
           </div>
         </div>
 

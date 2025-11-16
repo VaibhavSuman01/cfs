@@ -16,13 +16,9 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { PersonalInformationDropdown } from "@/components/ui/personal-information-dropdown";
 
 const reportsFormSchema = z.object({
-  fullName: z.string().min(1, "Full name is required"),
-  email: z.string().email("Invalid email address"),
-  phone: z.string().min(10, "Phone number must be at least 10 digits"),
-  pan: z.string().regex(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "Invalid PAN format"),
-  aadhaar: z.string().regex(/^\d{12}$/, "Aadhaar must be exactly 12 digits").optional(),
   reportType: z.string().min(1, "Report type is required"),
   subject: z.string().min(1, "Subject is required"),
   description: z.string().min(1, "Description is required"),
@@ -57,12 +53,7 @@ export default function ReportsPage() {
   const form = useForm<ReportsFormValues>({
     resolver: zodResolver(reportsFormSchema),
     defaultValues: {
-      fullName: user?.name || "",
-      email: user?.email || "",
-      phone: user?.mobile || "",
-      pan: user?.pan || "",
-      aadhaar: user?.aadhaar || "",
-      reportType: "",
+      reportType: reportTypeFromUrl || "",
       subject: "",
       description: "",
       dueDate: "",
@@ -71,12 +62,14 @@ export default function ReportsPage() {
     },
   });
 
-  // Set report type from URL
+  // Set report type from URL (update if URL changes)
   useEffect(() => {
     if (reportTypeFromUrl) {
       form.setValue("reportType", reportTypeFromUrl);
     }
   }, [reportTypeFromUrl, form]);
+
+  const reportType = form.watch("reportType");
 
   const onSubmit = async (data: ReportsFormValues) => {
     try {
@@ -90,6 +83,17 @@ export default function ReportsPage() {
           formData.append(key, value);
         }
       });
+
+      // Append user profile data (non-editable fields)
+      if (user) {
+        formData.append("fullName", user.name || "");
+        formData.append("email", user.email || "");
+        formData.append("phone", user.mobile || "");
+        formData.append("pan", user.pan || "");
+        if (user.aadhaar) {
+          formData.append("aadhaar", user.aadhaar);
+        }
+      }
 
       // Add service and subService fields for backend compatibility
       formData.append("service", "Reports");
@@ -115,7 +119,7 @@ export default function ReportsPage() {
       await api.post(API_PATHS.FORMS.REPORTS, formData);
 
       toast.success("Report request submitted successfully");
-      router.push("/dashboard/reports");
+      router.push("/dashboard");
     } catch (error: any) {
       console.error("Failed to submit reports form:", error);
       
@@ -159,12 +163,16 @@ export default function ReportsPage() {
         <Button variant="ghost" onClick={() => router.back()} className="mr-4">
           <ArrowLeft className="h-4 w-4 mr-2" /> Back
         </Button>
-        <h1 className="text-2xl font-bold">Reports Application</h1>
+        <h1 className="text-2xl font-bold">
+          {reportType ? (reportType === "project-reports" ? "Project Reports" : reportType === "cma-reports" ? "CMA Reports" : reportType === "dscr-reports" ? "DSCR Reports" : reportType === "bank-reconciliation" ? "Bank Reconciliation" : serviceParam || "Reports") : (serviceParam || "Reports")}
+        </h1>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Reports Form</CardTitle>
+          <CardTitle>
+            {reportType ? (reportType === "project-reports" ? "Project Reports" : reportType === "cma-reports" ? "CMA Reports" : reportType === "dscr-reports" ? "DSCR Reports" : reportType === "bank-reconciliation" ? "Bank Reconciliation" : serviceParam || "Reports") : (serviceParam || "Reports")} Form
+          </CardTitle>
           <CardDescription>
             Submit your report request with all required details and documents.
           </CardDescription>
@@ -173,76 +181,7 @@ export default function ReportsPage() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               {/* Personal Information */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Personal Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="fullName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Full Name *</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email *</FormLabel>
-                        <FormControl>
-                          <Input type="email" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone *</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="pan"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>PAN *</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="ABCDE1234F" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="aadhaar"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Aadhaar Number</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="123456789012" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
+              <PersonalInformationDropdown />
 
               {/* Report Details */}
               <div className="space-y-4">
@@ -258,10 +197,9 @@ export default function ReportsPage() {
                           onValueChange={field.onChange} 
                           defaultValue={field.value}
                           value={field.value}
-                          disabled={isServiceFromUrl}
                         >
                           <FormControl>
-                            <SelectTrigger className={isServiceFromUrl ? "bg-muted cursor-not-allowed" : ""}>
+                            <SelectTrigger>
                               <SelectValue placeholder="Select report type" />
                             </SelectTrigger>
                           </FormControl>
@@ -274,9 +212,6 @@ export default function ReportsPage() {
                           </SelectContent>
                         </Select>
                         <FormMessage />
-                        {isServiceFromUrl && (
-                          <p className="text-xs text-muted-foreground">This field is pre-selected based on the service you chose</p>
-                        )}
                       </FormItem>
                     )}
                   />
@@ -403,7 +338,7 @@ export default function ReportsPage() {
                       id="documents"
                       type="file"
                       multiple
-                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                      accept=".pdf,.jpg,.jpeg,.png"
                       onChange={handleFileChange}
                       className="mt-1"
                     />

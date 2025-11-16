@@ -40,7 +40,7 @@ The project follows a multi-tier architecture with separate frontend application
 ### Database Models
 - **User**: User accounts with role-based access
 - **TaxForm**: Tax filing submissions (GST, ITR, TDS, etc.)
-- **CompanyForm**: Company formation requests
+- **CompanyForm**: Company Information requests
 - **OtherRegistrationForm**: Business registrations (LLP, Partnership, etc.)
 - **ROCForm**: ROC compliance filings
 - **ReportsForm**: Financial reports (Project, CMA, DSCR)
@@ -51,7 +51,7 @@ The project follows a multi-tier architecture with separate frontend application
 
 ## Core Services
 
-### 1. Company Formation
+### 1. Company Information
 - Private Limited Company
 - One Person Company (OPC)
 - Public Limited Company
@@ -158,7 +158,7 @@ The project follows a multi-tier architecture with separate frontend application
 
 ### Form Routes (`/api/forms`)
 - `POST /tax` - Submit tax form
-- `POST /company` - Submit company formation form
+- `POST /company` - Submit Company Information form
 - `POST /other-registration` - Submit other registration form
 - `POST /roc` - Submit ROC form
 - `POST /reports` - Submit reports form
@@ -337,7 +337,7 @@ The project includes TestSprite test configurations in the `testsprite_tests/` d
 
 ### Service Categories
 The platform organizes services into logical categories:
-1. **Company Formation** - Business entity creation
+1. **Company Information** - Business entity creation
 2. **Taxation** - Tax compliance and filing
 3. **Other Registration** - Various business registrations
 4. **Reports** - Financial analysis and reporting

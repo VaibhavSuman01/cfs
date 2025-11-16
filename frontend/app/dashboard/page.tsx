@@ -166,8 +166,42 @@ export default function UserDashboard() {
       }
       
       console.log('Attempting to download document:', latest.documentId, 'for form:', form._id);
-      const defaultName = latest.type ? `report-${latest.type}.pdf` : `report-${latest.documentId}`;
-      await api.downloadFile(`/api/forms/download/${latest.documentId}`, defaultName);
+      
+      // Get original filename from report if available
+      let originalFilename = latest.type ? `report-${latest.type}` : `report-${latest.documentId}`;
+      
+      // Download file using fetch to access response headers
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${API_BASE_URL}/api/forms/download/${latest.documentId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Download failed: ${response.status} ${response.statusText}`);
+      }
+
+      // Extract filename from Content-Disposition header, fallback to originalFilename
+      const contentDisposition = response.headers.get('Content-Disposition');
+      let filename = originalFilename;
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+        if (filenameMatch && filenameMatch[1]) {
+          filename = filenameMatch[1];
+        }
+      }
+
+      // Get the blob and download
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      window.URL.revokeObjectURL(downloadUrl);
+      document.body.removeChild(link);
     } catch (e) {
       console.error('Failed to download report', e);
     }
@@ -240,28 +274,26 @@ export default function UserDashboard() {
 
   const getFormDetailUrl = (formType: string, formId: string) => {
     const typeMap: Record<string, string> = {
-      'TaxForm': `/dashboard/forms/${formId}`,
+      'TaxForm': `/dashboard/taxation/${formId}`,
       'CompanyForm': `/dashboard/company-information/${formId}`,
       'OtherRegistrationForm': `/dashboard/other-registration/${formId}`,
       'ROCForm': `/dashboard/roc-returns/${formId}`,
       'ReportsForm': `/dashboard/reports/${formId}`,
       'TrademarkISOForm': `/dashboard/trademark-iso/${formId}`,
-      'AdvisoryForm': `/dashboard/advisory/${formId}`
     };
-    return typeMap[formType] || `/dashboard/forms/${formId}`;
+    return typeMap[formType] || `/dashboard/taxation/${formId}`;
   };
 
   const getFormEditUrl = (formType: string, formId: string) => {
     const typeMap: Record<string, string> = {
-      'TaxForm': `/dashboard/forms/edit/${formId}`,
+      'TaxForm': `/dashboard/taxation/edit/${formId}`,
       'CompanyForm': `/dashboard/company-information/${formId}/edit`,
       'OtherRegistrationForm': `/dashboard/other-registration/${formId}/edit`,
       'ROCForm': `/dashboard/roc-returns/${formId}/edit`,
       'ReportsForm': `/dashboard/reports/${formId}/edit`,
       'TrademarkISOForm': `/dashboard/trademark-iso/${formId}/edit`,
-      'AdvisoryForm': `/dashboard/advisory/${formId}/edit`
     };
-    return typeMap[formType] || `/dashboard/forms/edit/${formId}`;
+    return typeMap[formType] || `/dashboard/taxation/edit/${formId}`;
   };
 
   const getServiceLabel = (service: string) => {
@@ -323,6 +355,76 @@ export default function UserDashboard() {
     };
     
     return serviceMap[service] || service;
+  };
+
+  const getSubServiceLabel = (subService: string) => {
+    if (!subService) return '';
+    
+    // Map subService values (often in kebab-case) to readable labels
+    const subServiceMap: Record<string, string> = {
+      'gst-filing': 'GST Filing',
+      'income-tax-filing': 'Income Tax Filing',
+      'tds-returns': 'TDS Returns',
+      'tax-planning': 'Tax Planning',
+      'epfo-filing': 'EPFO Filing',
+      'esic-filing': 'ESIC Filing',
+      'pt-tax-filing': 'PT-Tax Filing',
+      'corporate-tax-filing': 'Corporate Tax Filing',
+      'private-limited': 'Private Limited Company',
+      'one-person-company-opc': 'One Person Company (OPC)',
+      'public-limited': 'Public Limited Company',
+      'section-8': 'Section 8 Company',
+      'nidhi-company': 'Nidhi Company',
+      'producer-company': 'Producer Company',
+      'llp-registration': 'LLP Registration',
+      'partnership-firm': 'Partnership Firm',
+      'sole-proprietorship': 'Sole Proprietorship',
+      'gst-registration': 'GST Registration',
+      'msme-registration': 'MSME Registration',
+      'fssai-food-license': 'FSSAI Food License',
+      'digital-signature': 'Digital Signature',
+      'epfo-registration': 'EPFO Registration',
+      'esic-registration': 'ESIC Registration',
+      'iec-registration': 'IEC Registration',
+      'ngo-registration': 'NGO Registration',
+      'startup-india-registration': 'Startup India Registration',
+      'professional-tax': 'Professional Tax',
+      'trade-license': 'Trade License',
+      'psara-license': 'PSARA License',
+      'industry-license': 'Industry License',
+      'annual-filing': 'Annual Filing',
+      'board-resolutions': 'Board Resolutions',
+      'director-changes': 'Director Changes',
+      'share-transfer': 'Share Transfer',
+      'bank-reconciliation': 'Bank Reconciliation',
+      'cma-reports': 'CMA Reports',
+      'dscr-reports': 'DSCR Reports',
+      'project-reports': 'Project Reports',
+      'trademark-registration': 'Trademark Registration',
+      'iso-9001': 'ISO 9001',
+      'iso-14001': 'ISO 14001',
+      'copyright-registration': 'Copyright Registration',
+      'business-strategy-consulting': 'Business Strategy Consulting',
+      'financial-planning-analysis': 'Financial Planning & Analysis',
+      'digital-transformation': 'Digital Transformation',
+      'hr-organizational-development': 'HR & Organizational Development',
+      'legal-compliance-advisory': 'Legal Compliance Advisory',
+      'startup-mentoring': 'Startup Mentoring',
+      'tax-planning-analysis': 'Tax Planning & Analysis',
+      'assistance-fund-raising': 'Assistance for Fund Raising',
+      'other-finance-related-services': 'Other Finance Related Services'
+    };
+    
+    // If it's already in readable format, return as is
+    if (subServiceMap[subService.toLowerCase()]) {
+      return subServiceMap[subService.toLowerCase()];
+    }
+    
+    // Otherwise, format it nicely (convert kebab-case to Title Case)
+    return subService
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   };
 
   const services = [
@@ -541,7 +643,7 @@ export default function UserDashboard() {
                                   {category.name === 'Taxation' ? (
                                     <Button variant="outline" size="sm" asChild>
                                       <Link
-                                        href={`/dashboard/new-form?service=${encodeURIComponent(service)}`}
+                                        href={`/dashboard/taxation?service=${encodeURIComponent(service)}`}
                                       >
                                         File Now{" "}
                                         <ChevronRight className="ml-2 h-4 w-4" />
@@ -592,16 +694,7 @@ export default function UserDashboard() {
                                         <ChevronRight className="ml-2 h-4 w-4" />
                                       </Link>
                                     </Button>
-                                  ) : category.name === 'Advisory' ? (
-                                    <Button variant="outline" size="sm" asChild>
-                                      <Link
-                                        href={`/dashboard/advisory?service=${encodeURIComponent(service)}`}
-                                      >
-                                        Apply Now{" "}
-                                        <ChevronRight className="ml-2 h-4 w-4" />
-                                      </Link>
-                                    </Button>
-                                  ) : (
+                                  ) :  (
                                     <Button variant="outline" size="sm" asChild>
                                       <Link
                                         href={`/contact?service=${encodeURIComponent(
@@ -647,7 +740,40 @@ export default function UserDashboard() {
                             <div className="mb-4 flex items-center justify-between">
                                 <div>
                                     <div className="font-bold text-gray-800 flex items-center gap-2">
-                                      {getFormTypeLabel(form.formType)} - {getServiceLabel(form.service || 'Service')}{form.year ? ` - FY ${form.year}` : ''}
+                                      {(() => {
+                                        const formTypeLabel = getFormTypeLabel(form.formType);
+                                        const serviceLabel = form.service ? getServiceLabel(form.service) : '';
+                                        const subServiceLabel = form.subService ? getSubServiceLabel(form.subService) : '';
+                                        
+                                        // If FormType and Service are the same, show only Service - SubService
+                                        // Otherwise show FormType - Service - SubService
+                                        if (formTypeLabel === serviceLabel && serviceLabel) {
+                                          return (
+                                            <>
+                                              {serviceLabel}
+                                              {subServiceLabel && subServiceLabel !== serviceLabel && (
+                                                <> - {subServiceLabel}</>
+                                              )}
+                                            </>
+                                          );
+                                        } else {
+                                          return (
+                                            <>
+                                              {formTypeLabel}
+                                              {serviceLabel && (
+                                                <>
+                                                  {' - '}
+                                                  {serviceLabel}
+                                                  {subServiceLabel && subServiceLabel !== serviceLabel && (
+                                                    <> - {subServiceLabel}</>
+                                                  )}
+                                                </>
+                                              )}
+                                            </>
+                                          );
+                                        }
+                                      })()}
+                                      {form.year && ` - FY ${form.year}`}
                                       {form.reports && form.reports.length > 0 && (
                                         <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                           {form.reports.length} Report{form.reports.length > 1 ? 's' : ''}

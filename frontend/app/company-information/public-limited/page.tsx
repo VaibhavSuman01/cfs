@@ -83,7 +83,7 @@ export default function PublicLimitedCompanyPage() {
 
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                   <Link
-                    href={`/dashboard/company-formation?service=${encodeURIComponent(
+                    href={`/dashboard/company-information?service=${encodeURIComponent(
                       "Public Limited Company"
                     )}`}
                     passHref
@@ -94,7 +94,7 @@ export default function PublicLimitedCompanyPage() {
                     </Button>
                   </Link>
                   <Link
-                    href={`/dashboard/company-formation?service=${encodeURIComponent(
+                    href={`/dashboard/company-information?service=${encodeURIComponent(
                       "Public Limited Company"
                     )}`}
                     passHref
@@ -214,7 +214,7 @@ export default function PublicLimitedCompanyPage() {
                   <Button
                     onClick={() =>
                       (window.location.href =
-                        "/dashboard/company-formation?service=Public+Limited+Company")
+                        "/dashboard/company-information?service=Public+Limited+Company")
                     }
                     className="w-full bg-blue-600 hover:bg-blue-700"
                   >
@@ -255,7 +255,7 @@ export default function PublicLimitedCompanyPage() {
                   <Button
                     onClick={() =>
                       (window.location.href =
-                        "/dashboard/company-formation?service=Public+Limited+Company")
+                        "/dashboard/company-information?service=Public+Limited+Company")
                     }
                     className="w-full bg-blue-600 hover:bg-blue-700"
                   >
@@ -296,7 +296,7 @@ export default function PublicLimitedCompanyPage() {
                   <Button
                     onClick={() =>
                       (window.location.href =
-                        "/dashboard/company-formation?service=Public+Limited+Company")
+                        "/dashboard/company-information?service=Public+Limited+Company")
                     }
                     className="w-full bg-blue-600 hover:bg-blue-700"
                   >
@@ -581,7 +581,7 @@ export default function PublicLimitedCompanyPage() {
               </p>
               <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
                 <Link
-                  href={`/dashboard/company-formation?service=${encodeURIComponent(
+                  href={`/dashboard/company-information?service=${encodeURIComponent(
                     "Public Limited Company"
                   )}`}
                   passHref
@@ -592,7 +592,7 @@ export default function PublicLimitedCompanyPage() {
                   </Button>
                 </Link>
                 <Link
-                  href={`/dashboard/company-formation?service=${encodeURIComponent(
+                  href={`/dashboard/company-information?service=${encodeURIComponent(
                     "Public Limited Company"
                   )}`}
                   passHref

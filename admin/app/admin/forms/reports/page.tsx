@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useState, useEffect, useCallback } from 'react'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -17,7 +17,9 @@ import {
   FileText,
   BarChart3,
   Calculator,
-  TrendingUp
+  TrendingUp,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react'
 import { toast } from 'sonner'
 import api, { API_PATHS } from '@/lib/api-client'
@@ -44,48 +46,115 @@ interface ReportsForm {
   }
 }
 
+interface Pagination {
+  total: number
+  page: number
+  limit: number
+  pages: number
+}
+
 export default function ReportsPage() {
+  const router = useRouter()
+  const pathname = usePathname()
   const searchParams = useSearchParams()
   const [forms, setForms] = useState<ReportsForm[]>([])
+  const [pagination, setPagination] = useState<Pagination | null>(null)
   const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [statusFilter, setStatusFilter] = useState('all')
-  const [serviceFilter, setServiceFilter] = useState('all')
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '')
+  const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || 'all')
+  const [subServiceFilter, setSubServiceFilter] = useState(searchParams.get('subService') || 'all')
+  const [page, setPage] = useState(Number(searchParams.get('page')) || 1)
 
-  const service = searchParams.get('service')
-  const status = searchParams.get('status')
-
-  useEffect(() => {
-    if (service) setServiceFilter(service)
-    if (status) setStatusFilter(status)
-    if (!service) setServiceFilter('all')
-    if (!status) setStatusFilter('all')
-    fetchForms()
-  }, [service, status])
-
-  const fetchForms = async () => {
+  const fetchForms = useCallback(async () => {
     try {
       setLoading(true)
-      const response = await api.get(API_PATHS.ADMIN.SERVICE_FORMS, {
-        params: {
-          status: statusFilter !== 'all' ? statusFilter : undefined,
-          search: searchTerm || undefined,
-        }
-      })
+      const params = new URLSearchParams()
+      params.append('page', String(page))
+      if (statusFilter !== 'all') params.append('status', statusFilter)
+      if (searchTerm) params.append('search', searchTerm)
+      // Send service filter to backend (Reports)
+      params.append('service', 'Reports')
+
+      const response = await api.get(`${API_PATHS.ADMIN.SERVICE_FORMS}?${params.toString()}`)
+      
       // Filter to only show ReportsForm type forms
-      const reportsForms = response.data.forms.filter((form: any) => form.formType === 'ReportsForm');
+      let reportsForms = response.data.forms.filter((form: any) => form.formType === 'ReportsForm')
+      
+      // Filter by subService if selected
+      if (subServiceFilter && subServiceFilter !== 'all') {
+        reportsForms = reportsForms.filter((form: any) => {
+          const formSubService = form.subService?.toLowerCase() || ''
+          const filterSubService = subServiceFilter.toLowerCase()
+          return formSubService === filterSubService || form.subService === subServiceFilter
+        })
+      }
+      
       setForms(reportsForms || [])
+      setPagination({
+        total: reportsForms.length,
+        page: page,
+        limit: 10,
+        pages: Math.ceil(reportsForms.length / 10)
+      })
     } catch (error) {
       console.error('Error fetching forms:', error)
       toast.error('Failed to load forms. Please try again.')
     } finally {
       setLoading(false)
     }
-  }
+  }, [page, statusFilter, searchTerm, subServiceFilter])
 
   useEffect(() => {
     fetchForms()
-  }, [searchTerm, statusFilter, serviceFilter])
+  }, [fetchForms])
+
+  // Sync state from URL when query params change
+  useEffect(() => {
+    const urlStatus = searchParams.get('status') || 'all'
+    const urlSubService = searchParams.get('subService') || 'all'
+    const urlSearch = searchParams.get('search') || ''
+    const urlPage = Number(searchParams.get('page')) || 1
+
+    if (urlStatus !== statusFilter) setStatusFilter(urlStatus)
+    if (urlSubService !== subServiceFilter) setSubServiceFilter(urlSubService)
+    if (urlSearch !== searchTerm) setSearchTerm(urlSearch)
+    if (urlPage !== page) setPage(urlPage)
+  }, [searchParams])
+
+  useEffect(() => {
+    const params = new URLSearchParams()
+    if (statusFilter !== 'all') params.set('status', statusFilter)
+    if (searchTerm) params.set('search', searchTerm)
+    if (subServiceFilter !== 'all') params.set('subService', subServiceFilter)
+    params.set('page', String(page))
+
+    const next = `${pathname}?${params.toString()}`
+    const current = `${pathname}?${searchParams.toString()}`
+    if (next !== current) {
+      router.push(next)
+    }
+  }, [statusFilter, searchTerm, subServiceFilter, page, pathname, router, searchParams])
+
+  const handleStatusChange = (newStatus: string) => {
+    setStatusFilter(newStatus)
+    setPage(1)
+  }
+
+  const handleSubServiceChange = (newSubService: string) => {
+    setSubServiceFilter(newSubService)
+    setPage(1)
+  }
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value)
+    setPage(1)
+  }
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage > 0 && newPage <= (pagination?.pages || 1)) {
+      setPage(newPage)
+    }
+  }
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -100,14 +169,10 @@ export default function ReportsPage() {
     }
   }
 
-  const filteredForms = forms.filter(form => {
-    const matchesSearch = form.companyName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         form.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         form.email.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = statusFilter === 'all' || form.status === statusFilter
-    const matchesService = serviceFilter === 'all' || form.service === serviceFilter
-    return matchesSearch && matchesStatus && matchesService
-  })
+  // Forms are already filtered in fetchForms, so we just need to paginate
+  const startIndex = (page - 1) * 10
+  const endIndex = startIndex + 10
+  const paginatedForms = forms.slice(startIndex, endIndex)
 
   const exportData = () => {
     // TODO: Implement export functionality
@@ -207,23 +272,23 @@ export default function ReportsPage() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Service</label>
-              <Select value={serviceFilter} onValueChange={setServiceFilter}>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Report Type</label>
+              <Select value={subServiceFilter} onValueChange={handleSubServiceChange}>
                 <SelectTrigger>
-                  <SelectValue placeholder="All Services" />
+                  <SelectValue placeholder="All Report Types" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Services</SelectItem>
-                  <SelectItem value="Bank Reconciliation">Bank Reconciliation</SelectItem>
-                  <SelectItem value="CMA Reports">CMA Reports</SelectItem>
-                  <SelectItem value="DSCR Reports">DSCR Reports</SelectItem>
-                  <SelectItem value="Project Reports">Project Reports</SelectItem>
+                  <SelectItem value="all">All Report Types</SelectItem>
+                  <SelectItem value="bank-reconciliation">Bank Reconciliation</SelectItem>
+                  <SelectItem value="cma-reports">CMA Reports</SelectItem>
+                  <SelectItem value="dscr-reports">DSCR Reports</SelectItem>
+                  <SelectItem value="project-reports">Project Reports</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <Select value={statusFilter} onValueChange={handleStatusChange}>
                 <SelectTrigger>
                   <SelectValue placeholder="All Statuses" />
                 </SelectTrigger>
@@ -245,30 +310,31 @@ export default function ReportsPage() {
           <CardTitle>Reports Applications</CardTitle>
         </CardHeader>
         <CardContent>
-          {filteredForms.length === 0 ? (
+          {paginatedForms.length === 0 ? (
             <div className="text-center py-8">
               <FileText className="mx-auto h-12 w-12 text-gray-400" />
               <h3 className="mt-2 text-sm font-medium text-gray-900">No forms found</h3>
               <p className="mt-1 text-sm text-gray-500">No reports forms match your current filters.</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applicant</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Report Period</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Report Type</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredForms.map((form) => (
+            <>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applicant</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Report Period</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Report Type</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {paginatedForms.map((form) => (
                     <tr key={form._id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="text-sm font-medium text-gray-900">{form.service}</span>
@@ -312,6 +378,34 @@ export default function ReportsPage() {
                 </tbody>
               </table>
             </div>
+            {pagination && pagination.total > 0 && (
+              <div className="flex items-center justify-between mt-4">
+                <p className="text-sm text-muted-foreground">
+                  Showing {startIndex + 1} to {Math.min(endIndex, pagination.total)} of {pagination.total} forms
+                </p>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(page - 1)}
+                    disabled={page <= 1}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    Previous
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(page + 1)}
+                    disabled={page >= pagination.pages}
+                  >
+                    Next
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+            </>
           )}
         </CardContent>
       </Card>

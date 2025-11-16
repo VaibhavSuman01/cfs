@@ -35,7 +35,7 @@ export default function CompanyFormationPage() {
       {/* Hero Section */}
       <section
         className={`relative overflow-hidden ${getServicePageHeroBackground(
-          "Company Formation"
+          "Company Information"
         )} py-20`}
       >
         <div className="container mx-auto px-4">
@@ -44,7 +44,7 @@ export default function CompanyFormationPage() {
               Most Popular Service
             </Badge>
             <h1 className="text-5xl font-bold text-gray-900">
-              Company Formation
+              Company Information
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Start your Private Limited Company, Public Limited Company, or One
@@ -52,8 +52,8 @@ export default function CompanyFormationPage() {
             </p>
             <div className="flex justify-center space-x-4">
               <Link
-                href={`/dashboard/company-formation?service=${encodeURIComponent(
-                  "Company Formation"
+                href={`/dashboard/company-information?service=${encodeURIComponent(
+                  "Company Information"
                 )}`}
                 passHref
               >
@@ -211,7 +211,7 @@ export default function CompanyFormationPage() {
                         )}
                       </div>
                       <Link
-                        href={`/company-formation/${company.slug}`}
+                        href={`/company-information/${company.slug}`}
                         passHref
                       >
                         <Button
@@ -435,8 +435,8 @@ export default function CompanyFormationPage() {
               </p>
               <div className="flex justify-center space-x-4">
                 <Link
-                  href={`/dashboard/company-formation?service=${encodeURIComponent(
-                    "Company Formation"
+                  href={`/dashboard/company-information?service=${encodeURIComponent(
+                    "Company Information"
                   )}`}
                   passHref
                 >
@@ -445,8 +445,8 @@ export default function CompanyFormationPage() {
                   </Button>
                 </Link>
                 <Link
-                  href={`/dashboard/company-formation?service=${encodeURIComponent(
-                    "Company Formation"
+                  href={`/dashboard/company-information?service=${encodeURIComponent(
+                    "Company Information"
                   )}`}
                   passHref
                 >
