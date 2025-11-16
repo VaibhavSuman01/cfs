@@ -5,20 +5,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { User, Mail, Phone, Save, Lock, Loader2 } from "lucide-react";
+import { User, Mail, Phone, Save, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/providers/auth-provider";
-import api from "@/lib/api-client";
 
 export default function ProfilePage() {
   const { user, updateProfile } = useAuth();
   const [name, setName] = useState(user?.name || "");
   const [phone, setPhone] = useState(user?.phone || "");
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   const handleSaveProfile = async () => {
     setIsSaving(true);

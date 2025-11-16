@@ -72,7 +72,11 @@ export default function SupportChatPage() {
         setSelectedChat((prev) => (updated ? updated : prev));
       }
     } catch (err) {
-      if ((err as any)?.name !== "AbortError") console.error("fetchChats error", err);
+      if (err instanceof Error && err.name !== "AbortError") {
+        console.error("fetchChats error", err);
+      } else if (err && typeof err === "object" && "name" in err && err.name !== "AbortError") {
+        console.error("fetchChats error", err);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -111,7 +115,7 @@ export default function SupportChatPage() {
     if (selectedChat && selectedChat.messages.length > 0) {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
-  }, [selectedChat?.messages.length, selectedChat?._id]);
+  }, [selectedChat]);
 
   // memoized filtered list + simple debounce for search
   const filteredChats = useMemo(() => {

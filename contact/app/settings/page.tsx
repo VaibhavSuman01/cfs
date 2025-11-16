@@ -6,11 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Settings, Moon, Sun, Save, Loader2, Lock } from "lucide-react";
+import { Settings, Moon, Sun, Save, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useTheme } from "@/providers/theme-provider";
 import { useAuth } from "@/providers/auth-provider";
-import api from "@/lib/api-client";
 
 export default function SettingsPage() {
   const { theme, toggleTheme } = useTheme();
@@ -18,10 +17,6 @@ export default function SettingsPage() {
   const [name, setName] = useState(user?.name || "");
   const [phone, setPhone] = useState(user?.phone || "");
   const [isSaving, setIsSaving] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   const handleSave = async () => {
     setIsSaving(true);
