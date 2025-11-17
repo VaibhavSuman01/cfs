@@ -52,8 +52,10 @@ export default function SupportChatPage() {
     selectedChatIdRef.current = selectedChat?._id || null;
   }, [selectedChat]);
 
-  const fetchChats = useCallback(async () => {
-    setIsLoading(true);
+  const fetchChats = useCallback(async (isInitialLoad = false) => {
+    if (isInitialLoad) {
+      setIsLoading(true);
+    }
     try {
       fetchAbortRef.current?.abort();
       fetchAbortRef.current = new AbortController();
@@ -72,24 +74,47 @@ export default function SupportChatPage() {
         setSelectedChat((prev) => (updated ? updated : prev));
       }
     } catch (err) {
-      if (err instanceof Error && err.name !== "AbortError") {
-        console.error("fetchChats error", err);
-      } else if (err && typeof err === "object" && "name" in err && err.name !== "AbortError") {
-        console.error("fetchChats error", err);
+      // Ignore abort/cancel errors (expected during cleanup or request cancellation)
+      if (err instanceof Error) {
+        if (err.name === "AbortError" || err.name === "CanceledError" || (err as any).code === "ERR_CANCELED") {
+          return;
+        }
+      }
+      if (err && typeof err === "object") {
+        const errorObj = err as any;
+        if (errorObj.name === "AbortError" || errorObj.name === "CanceledError" || errorObj.code === "ERR_CANCELED") {
+          return;
+        }
+      }
+
+      // Log error for debugging (only if not a cancellation)
+      console.error("fetchChats error", err);
+
+      // Show user-friendly error message
+      const errorMessage =
+        err && typeof err === "object" && "response" in err
+          ? (err as { response?: { data?: { message?: string } } }).response?.data?.message || "Failed to load chats"
+          : "Failed to load chats";
+
+      // Only show toast on initial load to avoid spamming during polling
+      if (isInitialLoad) {
+        toast.error(errorMessage);
       }
     } finally {
-      setIsLoading(false);
+      if (isInitialLoad) {
+        setIsLoading(false);
+      }
     }
   }, []);
 
   // Polling only when window is focused to reduce noise
   useEffect(() => {
     if (!user) return;
-    fetchChats();
+    fetchChats(true); // Initial load
 
     const startPolling = () => {
       if (pollingRef.current) return;
-      pollingRef.current = window.setInterval(fetchChats, 7000);
+      pollingRef.current = window.setInterval(() => fetchChats(false), 7000);
     };
     const stopPolling = () => {
       if (pollingRef.current) {
@@ -132,6 +157,19 @@ export default function SupportChatPage() {
   const formatTime = (dateString: string) =>
     new Date(dateString).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
 
+  const getRoleDisplayName = (role: string) => {
+    const roleMap: Record<string, string> = {
+      company_information_support: 'Company Information',
+      taxation_support: 'Taxation',
+      roc_returns_support: 'ROC Returns',
+      other_registration_support: 'Registration',
+      advisory_support: 'Advisory',
+      reports_support: 'Reports',
+      live_support: 'Live Support',
+    };
+    return roleMap[role] || role;
+  };
+
   // optimistic UI for sending
   const handleSendMessage = async () => {
     if (!message.trim() || !selectedChat) return;
@@ -153,7 +191,7 @@ export default function SupportChatPage() {
 
     try {
       await api.post(`/api/support-team/chats/${selectedChat._id}/messages`, { message: trimmed });
-      await fetchChats(); // refresh to get server state
+      await fetchChats(false); // refresh to get server state (not initial load)
     } catch (error) {
       // rollback: remove last message if server failed
       setSelectedChat((prev) =>
@@ -214,7 +252,14 @@ export default function SupportChatPage() {
             </div>
 
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Support</h2>
+              <div>
+                <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Support</h2>
+                {user && user.role && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    {getRoleDisplayName(user.role)}
+                  </p>
+                )}
+              </div>
               <span className="text-xs text-gray-500 dark:text-gray-400">{filteredChats.length} chats</span>
             </div>
           </div>
@@ -270,7 +315,7 @@ export default function SupportChatPage() {
                     onValueChange={async (status) => {
                       try {
                         await api.put(`/api/support-team/chats/${selectedChat._id}/status`, { status });
-                        await fetchChats();
+                        await fetchChats(false); // refresh to get server state (not initial load)
                         toast.success("Chat status updated");
                       } catch (error) {
                         const errorMessage =

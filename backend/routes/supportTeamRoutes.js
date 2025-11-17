@@ -9,6 +9,29 @@ const { protect, admin } = require("../middleware/auth");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("../utils/email");
 
+// Helper function to map service to support role
+const mapServiceToRole = (service) => {
+  if (!service) return "live_support";
+  
+  const serviceLower = service.toLowerCase();
+  
+  if (serviceLower.includes("company information") || serviceLower.includes("company")) {
+    return "company_information_support";
+  } else if (serviceLower.includes("taxation") || serviceLower.includes("tax") || serviceLower.includes("gst") || serviceLower.includes("income tax") || serviceLower.includes("tds")) {
+    return "taxation_support";
+  } else if (serviceLower.includes("roc returns") || serviceLower.includes("roc")) {
+    return "roc_returns_support";
+  } else if (serviceLower.includes("other registration") || serviceLower.includes("registration") || serviceLower.includes("partnership")) {
+    return "other_registration_support";
+  } else if (serviceLower.includes("advisory")) {
+    return "advisory_support";
+  } else if (serviceLower.includes("report")) {
+    return "reports_support";
+  } else {
+    return "live_support";
+  }
+};
+
 // @route   POST /api/support-team/register
 // @desc    Register a new support team member (Admin only)
 // @access  Private/Admin
@@ -20,6 +43,24 @@ router.post("/register", protect, admin, async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "Name, email, and password are required",
+      });
+    }
+
+    // Validate role
+    const validRoles = [
+      "company_information_support",
+      "taxation_support",
+      "roc_returns_support",
+      "other_registration_support",
+      "advisory_support",
+      "reports_support",
+      "live_support",
+    ];
+    
+    if (role && !validRoles.includes(role)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid role. Must be one of: " + validRoles.join(", "),
       });
     }
 
@@ -37,7 +78,7 @@ router.post("/register", protect, admin, async (req, res) => {
       email,
       password,
       phone: phone || "",
-      role: role || "support",
+      role: role || "live_support",
       createdBy: req.user._id,
     });
 
@@ -549,10 +590,30 @@ router.put("/members/:id", protect, admin, async (req, res) => {
       });
     }
 
+    // Validate role if provided
+    if (role) {
+      const validRoles = [
+        "company_information_support",
+        "taxation_support",
+        "roc_returns_support",
+        "other_registration_support",
+        "advisory_support",
+        "reports_support",
+        "live_support",
+      ];
+      
+      if (!validRoles.includes(role)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid role. Must be one of: " + validRoles.join(", "),
+        });
+      }
+      member.role = role;
+    }
+    
     if (name) member.name = name;
     if (email) member.email = email;
     if (phone !== undefined) member.phone = phone;
-    if (role) member.role = role;
     if (isActive !== undefined) member.isActive = isActive;
 
     await member.save();
@@ -608,7 +669,7 @@ router.delete("/members/:id", protect, admin, async (req, res) => {
 });
 
 // @route   POST /api/support-team/send-email
-// @desc    Send email to contact form user
+// @desc    Send email to contact form user (with role-based access control)
 // @access  Private/Support
 router.post("/send-email", protect, async (req, res) => {
   try {
@@ -616,6 +677,14 @@ router.post("/send-email", protect, async (req, res) => {
       return res.status(403).json({
         success: false,
         message: "Access denied",
+      });
+    }
+
+    const supportMember = await SupportTeam.findById(req.user.id);
+    if (!supportMember) {
+      return res.status(404).json({
+        success: false,
+        message: "Support team member not found",
       });
     }
 
@@ -635,6 +704,26 @@ router.post("/send-email", protect, async (req, res) => {
         success: false,
         message: "Contact not found",
       });
+    }
+
+    // STRICT ROLE-BASED ACCESS: Check if user can access this contact
+    const contactRole = mapServiceToRole(contact.service);
+    if (supportMember.role === "live_support") {
+      // Live support: Only access contacts that map to live_support
+      if (contactRole !== "live_support") {
+        return res.status(403).json({
+          success: false,
+          message: "Access denied. This contact belongs to a specific service department.",
+        });
+      }
+    } else {
+      // Service-specific support: Only access contacts matching their role
+      if (contactRole !== supportMember.role) {
+        return res.status(403).json({
+          success: false,
+          message: "Access denied. This contact belongs to a different department.",
+        });
+      }
     }
 
     // Send email
@@ -672,7 +761,7 @@ Com Financial Services Support Team
 });
 
 // @route   GET /api/support-team/chats
-// @desc    Get all support chats
+// @desc    Get all support chats (filtered by role if applicable)
 // @access  Private/Support
 router.get("/chats", protect, async (req, res) => {
   try {
@@ -683,19 +772,44 @@ router.get("/chats", protect, async (req, res) => {
       });
     }
 
-    const chats = await SupportChat.find({
-      $or: [
-        { supportTeam: req.user.id },
-        { user: { $exists: true } },
-      ],
-    })
-      .populate("user", "name email")
-      .populate("supportTeam", "name email")
-      .sort({ lastMessageAt: -1 });
+    // Get support team member's role
+    const supportMember = await SupportTeam.findById(req.user.id);
+    if (!supportMember) {
+      return res.status(404).json({
+        success: false,
+        message: "Support team member not found",
+      });
+    }
+
+    // STRICT ROLE-BASED FILTERING: 
+    // - Live support: Only see chats assigned to them
+    // - Service-specific roles: Only see chats matching their service
+    let filteredChats = [];
+    
+    if (supportMember.role === "live_support") {
+      // Live support: ONLY see chats assigned to them (supportTeam field matches their ID)
+      filteredChats = await SupportChat.find({ supportTeam: req.user.id })
+        .populate("user", "name email")
+        .populate("supportTeam", "name email role")
+        .sort({ lastMessageAt: -1 });
+    } else {
+      // Service-specific support: ONLY see chats matching their service role
+      const allChats = await SupportChat.find({ user: { $exists: true } })
+        .populate("user", "name email")
+        .populate("supportTeam", "name email role")
+        .sort({ lastMessageAt: -1 });
+
+      // Filter: Only chats where subject/service matches this member's role
+      filteredChats = allChats.filter((chat) => {
+        if (!chat.subject) return false;
+        const chatRole = mapServiceToRole(chat.subject);
+        return chatRole === supportMember.role;
+      });
+    }
 
     res.json({
       success: true,
-      data: chats,
+      data: filteredChats,
     });
   } catch (error) {
     console.error("Get chats error:", error);
@@ -707,7 +821,7 @@ router.get("/chats", protect, async (req, res) => {
 });
 
 // @route   GET /api/support-team/chats/:chatId
-// @desc    Get specific chat
+// @desc    Get specific chat (with role-based access control)
 // @access  Private/Support
 router.get("/chats/:chatId", protect, async (req, res) => {
   try {
@@ -718,15 +832,49 @@ router.get("/chats/:chatId", protect, async (req, res) => {
       });
     }
 
+    const supportMember = await SupportTeam.findById(req.user.id);
+    if (!supportMember) {
+      return res.status(404).json({
+        success: false,
+        message: "Support team member not found",
+      });
+    }
+
     const chat = await SupportChat.findById(req.params.chatId)
       .populate("user", "name email")
-      .populate("supportTeam", "name email");
+      .populate("supportTeam", "name email role");
 
     if (!chat) {
       return res.status(404).json({
         success: false,
         message: "Chat not found",
       });
+    }
+
+    // STRICT ROLE-BASED ACCESS: Check if user can access this chat
+    if (supportMember.role === "live_support") {
+      // Live support: Only access chats assigned to them
+      if (chat.supportTeam && chat.supportTeam._id.toString() !== req.user.id.toString()) {
+        return res.status(403).json({
+          success: false,
+          message: "Access denied. This chat is not assigned to you.",
+        });
+      }
+    } else {
+      // Service-specific support: Only access chats matching their service
+      if (!chat.subject) {
+        return res.status(403).json({
+          success: false,
+          message: "Access denied. Chat does not have a valid subject.",
+        });
+      }
+      const chatRole = mapServiceToRole(chat.subject);
+      if (chatRole !== supportMember.role) {
+        return res.status(403).json({
+          success: false,
+          message: "Access denied. This chat belongs to a different department.",
+        });
+      }
     }
 
     res.json({
@@ -743,7 +891,7 @@ router.get("/chats/:chatId", protect, async (req, res) => {
 });
 
 // @route   POST /api/support-team/chats/:chatId/messages
-// @desc    Send message in chat
+// @desc    Send message in chat (with role-based access control)
 // @access  Private/Support
 router.post("/chats/:chatId/messages", protect, async (req, res) => {
   try {
@@ -751,6 +899,14 @@ router.post("/chats/:chatId/messages", protect, async (req, res) => {
       return res.status(403).json({
         success: false,
         message: "Access denied",
+      });
+    }
+
+    const supportMember = await SupportTeam.findById(req.user.id);
+    if (!supportMember) {
+      return res.status(404).json({
+        success: false,
+        message: "Support team member not found",
       });
     }
 
@@ -770,6 +926,32 @@ router.post("/chats/:chatId/messages", protect, async (req, res) => {
         success: false,
         message: "Chat not found",
       });
+    }
+
+    // STRICT ROLE-BASED ACCESS: Check if user can access this chat
+    if (supportMember.role === "live_support") {
+      // Live support: Only access chats assigned to them
+      if (chat.supportTeam.toString() !== req.user.id.toString()) {
+        return res.status(403).json({
+          success: false,
+          message: "Access denied. This chat is not assigned to you.",
+        });
+      }
+    } else {
+      // Service-specific support: Only access chats matching their service
+      if (!chat.subject) {
+        return res.status(403).json({
+          success: false,
+          message: "Access denied. Chat does not have a valid subject.",
+        });
+      }
+      const chatRole = mapServiceToRole(chat.subject);
+      if (chatRole !== supportMember.role) {
+        return res.status(403).json({
+          success: false,
+          message: "Access denied. This chat belongs to a different department.",
+        });
+      }
     }
 
     chat.messages.push({
@@ -856,7 +1038,7 @@ router.post("/chats", protect, async (req, res) => {
 });
 
 // @route   PUT /api/support-team/chats/:chatId/status
-// @desc    Update chat status (support team only)
+// @desc    Update chat status (with role-based access control)
 // @access  Private/Support
 router.put("/chats/:chatId/status", protect, async (req, res) => {
   try {
@@ -864,6 +1046,14 @@ router.put("/chats/:chatId/status", protect, async (req, res) => {
       return res.status(403).json({
         success: false,
         message: "Access denied",
+      });
+    }
+
+    const supportMember = await SupportTeam.findById(req.user.id);
+    if (!supportMember) {
+      return res.status(404).json({
+        success: false,
+        message: "Support team member not found",
       });
     }
 
@@ -883,6 +1073,32 @@ router.put("/chats/:chatId/status", protect, async (req, res) => {
         success: false,
         message: "Chat not found",
       });
+    }
+
+    // STRICT ROLE-BASED ACCESS: Check if user can access this chat
+    if (supportMember.role === "live_support") {
+      // Live support: Only access chats assigned to them
+      if (chat.supportTeam.toString() !== req.user.id.toString()) {
+        return res.status(403).json({
+          success: false,
+          message: "Access denied. This chat is not assigned to you.",
+        });
+      }
+    } else {
+      // Service-specific support: Only access chats matching their service
+      if (!chat.subject) {
+        return res.status(403).json({
+          success: false,
+          message: "Access denied. Chat does not have a valid subject.",
+        });
+      }
+      const chatRole = mapServiceToRole(chat.subject);
+      if (chatRole !== supportMember.role) {
+        return res.status(403).json({
+          success: false,
+          message: "Access denied. This chat belongs to a different department.",
+        });
+      }
     }
 
     chat.status = status;
@@ -924,11 +1140,28 @@ router.post("/user-chat", protect, async (req, res) => {
       });
     }
 
-    // Find an available support team member (preferably manager)
-    const supportMember = await SupportTeam.findOne({
+    // Extract service from subject if available, or use live_support
+    const serviceRole = mapServiceToRole(subject);
+    
+    // Find an available support team member matching the service role
+    // Priority: 1. Service-specific support, 2. Live support
+    let supportMember = await SupportTeam.findOne({
       isActive: true,
-      role: "support_manager",
-    }) || await SupportTeam.findOne({ isActive: true });
+      role: serviceRole,
+    });
+
+    // Fallback to live support if no service-specific support available
+    if (!supportMember) {
+      supportMember = await SupportTeam.findOne({
+        isActive: true,
+        role: "live_support",
+      });
+    }
+
+    // Final fallback to any active support member
+    if (!supportMember) {
+      supportMember = await SupportTeam.findOne({ isActive: true });
+    }
 
     if (!supportMember) {
       return res.status(503).json({

@@ -893,9 +893,19 @@ export default function UserDashboard() {
                             </div>
                             <div className="flex-1">
                               <h3 className="font-semibold text-gray-900 mb-2">Contact Form</h3>
-                              <p className="text-sm text-gray-600 mb-4">
+                              <p className="text-sm text-gray-600 mb-3">
                                 Send a message via contact form. We'll get back to you within 24 hours.
                               </p>
+                              <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
+                                <Mail className="h-4 w-4 text-purple-600" />
+                                <span>Or email us at:</span>
+                                <a 
+                                  href="mailto:info@comfinserv.co" 
+                                  className="text-purple-600 hover:text-purple-700 font-medium underline"
+                                >
+                                  info@comfinserv.co
+                                </a>
+                              </div>
                               <Button variant="outline" asChild className="w-full">
                                 <Link href="/contact">
                                   <Send className="mr-2 h-4 w-4" />
@@ -929,29 +939,6 @@ export default function UserDashboard() {
                         </CardContent>
                       </Card>
                     </div>
-
-                    <Card className="border-2 border-purple-100">
-                      <CardContent className="p-6">
-                        <div className="flex items-start space-x-4">
-                          <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                            <HelpCircle className="h-6 w-6 text-purple-600" />
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-gray-900 mb-2">Frequently Asked Questions</h3>
-                            <p className="text-sm text-gray-600 mb-4">
-                              Find quick answers to common questions about our services.
-                            </p>
-                            <Button variant="outline" className="w-full" asChild>
-                              <Link href="/contact#faq">
-                                <HelpCircle className="mr-2 h-4 w-4" />
-                                View FAQ
-                              </Link>
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                       <h4 className="font-semibold text-blue-900 mb-2">Office Hours</h4>
                       <p className="text-sm text-blue-700">

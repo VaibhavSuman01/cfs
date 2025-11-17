@@ -1,8 +1,32 @@
 const express = require("express");
 const router = express.Router();
 const Contact = require("../models/Contact");
+const SupportTeam = require("../models/SupportTeam");
 const { protect, admin } = require("../middleware/auth");
 const sendEmail = require("../utils/email");
+
+// Helper function to map service to support role
+const mapServiceToRole = (service) => {
+  if (!service) return "live_support";
+  
+  const serviceLower = service.toLowerCase();
+  
+  if (serviceLower.includes("company information") || serviceLower.includes("company")) {
+    return "company_information_support";
+  } else if (serviceLower.includes("taxation") || serviceLower.includes("tax") || serviceLower.includes("gst") || serviceLower.includes("income tax") || serviceLower.includes("tds")) {
+    return "taxation_support";
+  } else if (serviceLower.includes("roc returns") || serviceLower.includes("roc")) {
+    return "roc_returns_support";
+  } else if (serviceLower.includes("other registration") || serviceLower.includes("registration") || serviceLower.includes("partnership")) {
+    return "other_registration_support";
+  } else if (serviceLower.includes("advisory")) {
+    return "advisory_support";
+  } else if (serviceLower.includes("report")) {
+    return "reports_support";
+  } else {
+    return "live_support";
+  }
+};
 
 // @route   POST /api/support/contact
 // @desc    Send a support message (for blocked users or general support)
@@ -119,7 +143,7 @@ router.get("/block-details", protect, async (req, res) => {
 });
 
 // @route   GET /api/support/contacts
-// @desc    Get all contact form submissions (for support team/admin)
+// @desc    Get all contact form submissions (for support team/admin) - filtered by role
 // @access  Private/Support or Admin
 router.get("/contacts", protect, async (req, res) => {
   // Allow support team or admin
@@ -132,6 +156,15 @@ router.get("/contacts", protect, async (req, res) => {
   try {
     const { page = 1, limit = 20, status, search } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    // Get support team member's role if they are support team
+    let supportMemberRole = null;
+    if (req.user.type === "support") {
+      const supportMember = await SupportTeam.findById(req.user.id);
+      if (supportMember) {
+        supportMemberRole = supportMember.role;
+      }
+    }
 
     // Build query
     const query = {};
@@ -151,12 +184,46 @@ router.get("/contacts", protect, async (req, res) => {
       ];
     }
 
-    const contacts = await Contact.find(query)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(parseInt(limit));
+    // STRICT ROLE-BASED FILTERING: Each role sees only their department
+    let contacts = [];
+    let total = 0;
 
-    const total = await Contact.countDocuments(query);
+    if (supportMemberRole && supportMemberRole !== "live_support" && req.user.role !== "admin") {
+      // Service-specific support: Fetch all contacts and filter by role
+      const allContacts = await Contact.find(query).sort({ createdAt: -1 });
+      
+      // Filter contacts that match this member's role ONLY
+      const filteredContacts = allContacts.filter((contact) => {
+        const contactRole = mapServiceToRole(contact.service);
+        return contactRole === supportMemberRole;
+      });
+      
+      total = filteredContacts.length;
+      contacts = filteredContacts.slice(skip, skip + parseInt(limit));
+    } else if (supportMemberRole === "live_support") {
+      // Live support: ONLY see contacts that map to live_support (general/non-service-specific contacts)
+      const allContacts = await Contact.find(query).sort({ createdAt: -1 });
+      
+      // Filter contacts that map to live_support role (general inquiries, not service-specific)
+      const filteredContacts = allContacts.filter((contact) => {
+        const contactRole = mapServiceToRole(contact.service);
+        return contactRole === "live_support";
+      });
+      
+      total = filteredContacts.length;
+      contacts = filteredContacts.slice(skip, skip + parseInt(limit));
+    } else if (req.user.role === "admin") {
+      // Admin can see all contacts
+      contacts = await Contact.find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(parseInt(limit));
+      total = await Contact.countDocuments(query);
+    } else {
+      // No role found - return empty
+      contacts = [];
+      total = 0;
+    }
 
     res.json({
       success: true,
@@ -178,7 +245,7 @@ router.get("/contacts", protect, async (req, res) => {
 });
 
 // @route   GET /api/support/contacts/:id
-// @desc    Get a specific contact by ID
+// @desc    Get a specific contact by ID (with role-based access control)
 // @access  Private/Support or Admin
 router.get("/contacts/:id", protect, async (req, res) => {
   if (req.user.type !== "support" && req.user.role !== "admin") {
@@ -195,6 +262,31 @@ router.get("/contacts/:id", protect, async (req, res) => {
         success: false, 
         message: "Contact not found" 
       });
+    }
+
+    // STRICT ROLE-BASED ACCESS: Check if user can access this contact
+    if (req.user.type === "support" && req.user.role !== "admin") {
+      const supportMember = await SupportTeam.findById(req.user.id);
+      if (supportMember) {
+        const contactRole = mapServiceToRole(contact.service);
+        if (supportMember.role === "live_support") {
+          // Live support: Only access contacts that map to live_support
+          if (contactRole !== "live_support") {
+            return res.status(403).json({
+              success: false,
+              message: "Access denied. This contact belongs to a specific service department.",
+            });
+          }
+        } else {
+          // Service-specific support: Only access contacts matching their role
+          if (contactRole !== supportMember.role) {
+            return res.status(403).json({
+              success: false,
+              message: "Access denied. This contact belongs to a different department.",
+            });
+          }
+        }
+      }
     }
 
     res.json({
@@ -278,7 +370,7 @@ Com Financial Services Support Team
 });
 
 // @route   PUT /api/support/contacts/:id/mark-replied
-// @desc    Mark contact as replied without sending email
+// @desc    Mark contact as replied without sending email (with role-based access control)
 // @access  Private/Support or Admin
 router.put("/contacts/:id/mark-replied", protect, async (req, res) => {
   if (req.user.type !== "support" && req.user.role !== "admin") {
@@ -295,6 +387,31 @@ router.put("/contacts/:id/mark-replied", protect, async (req, res) => {
         success: false, 
         message: "Contact not found" 
       });
+    }
+
+    // STRICT ROLE-BASED ACCESS: Check if user can access this contact
+    if (req.user.type === "support" && req.user.role !== "admin") {
+      const supportMember = await SupportTeam.findById(req.user.id);
+      if (supportMember) {
+        const contactRole = mapServiceToRole(contact.service);
+        if (supportMember.role === "live_support") {
+          // Live support: Only access contacts that map to live_support
+          if (contactRole !== "live_support") {
+            return res.status(403).json({
+              success: false,
+              message: "Access denied. This contact belongs to a specific service department.",
+            });
+          }
+        } else {
+          // Service-specific support: Only access contacts matching their role
+          if (contactRole !== supportMember.role) {
+            return res.status(403).json({
+              success: false,
+              message: "Access denied. This contact belongs to a different department.",
+            });
+          }
+        }
+      }
     }
 
     contact.replied = true;

@@ -25,8 +25,16 @@ const SupportTeamSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["support", "support_manager"],
-      default: "support",
+      enum: [
+        "company_information_support",
+        "taxation_support",
+        "roc_returns_support",
+        "other_registration_support",
+        "advisory_support",
+        "reports_support",
+        "live_support",
+      ],
+      default: "live_support",
     },
     isActive: {
       type: Boolean,

@@ -59,7 +59,7 @@ export default function SupportTeamManagementPage() {
     email: "",
     password: "",
     phone: "",
-    role: "support",
+    role: "live_support",
   });
 
   useEffect(() => {
@@ -86,7 +86,7 @@ export default function SupportTeamManagementPage() {
       email: "",
       password: "",
       phone: "",
-      role: "support",
+      role: "live_support",
     });
     setIsDialogOpen(true);
   };
@@ -233,7 +233,14 @@ export default function SupportTeamManagementPage() {
                 )}
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-medium px-2 py-1 rounded bg-blue-100 text-blue-800">
-                    {member.role}
+                    {member.role === "company_information_support" && "Company Info"}
+                    {member.role === "taxation_support" && "Taxation"}
+                    {member.role === "roc_returns_support" && "ROC Returns"}
+                    {member.role === "other_registration_support" && "Registration"}
+                    {member.role === "advisory_support" && "Advisory"}
+                    {member.role === "reports_support" && "Reports"}
+                    {member.role === "live_support" && "Live Support"}
+                    {!["company_information_support", "taxation_support", "roc_returns_support", "other_registration_support", "advisory_support", "reports_support", "live_support"].includes(member.role) && member.role}
                   </span>
                   <span
                     className={`text-xs font-medium px-2 py-1 rounded ${
@@ -322,7 +329,7 @@ export default function SupportTeamManagementPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="role">Role</Label>
+              <Label htmlFor="role">Role *</Label>
               <Select
                 value={formData.role}
                 onValueChange={(value) =>
@@ -330,13 +337,35 @@ export default function SupportTeamManagementPage() {
                 }
               >
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue placeholder="Select a role" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="support">Support</SelectItem>
-                  <SelectItem value="support_manager">Support Manager</SelectItem>
+                  <SelectItem value="company_information_support">
+                    Company Information Support
+                  </SelectItem>
+                  <SelectItem value="taxation_support">
+                    Taxation Support
+                  </SelectItem>
+                  <SelectItem value="roc_returns_support">
+                    ROC Returns Support
+                  </SelectItem>
+                  <SelectItem value="other_registration_support">
+                    Other Registration Support
+                  </SelectItem>
+                  <SelectItem value="advisory_support">
+                    Advisory Support
+                  </SelectItem>
+                  <SelectItem value="reports_support">
+                    Reports Support
+                  </SelectItem>
+                  <SelectItem value="live_support">
+                    Live Support
+                  </SelectItem>
                 </SelectContent>
               </Select>
+              <p className="text-xs text-gray-500">
+                Select the service area this support member will handle
+              </p>
             </div>
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
