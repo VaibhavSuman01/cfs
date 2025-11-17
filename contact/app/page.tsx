@@ -34,7 +34,6 @@ import {
   AlertCircle,
   Send,
   Loader2,
-  Trash2,
   User,
 } from 'lucide-react';
 import { toast } from 'sonner';

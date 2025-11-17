@@ -76,12 +76,12 @@ export default function SupportChatPage() {
     } catch (err) {
       // Ignore abort/cancel errors (expected during cleanup or request cancellation)
       if (err instanceof Error) {
-        if (err.name === "AbortError" || err.name === "CanceledError" || (err as any).code === "ERR_CANCELED") {
+        if (err.name === "AbortError" || err.name === "CanceledError") {
           return;
         }
       }
       if (err && typeof err === "object") {
-        const errorObj = err as any;
+        const errorObj = err as { name?: string; code?: string };
         if (errorObj.name === "AbortError" || errorObj.name === "CanceledError" || errorObj.code === "ERR_CANCELED") {
           return;
         }
