@@ -53,25 +53,46 @@ interface ContactMessage {
   createdAt: string;
 }
 
+interface ChatMessage {
+  sender: string;
+  message: string;
+  timestamp: string;
+  read: boolean;
+}
+
+interface Chat {
+  _id: string;
+  user: {
+    _id: string;
+    name: string;
+    email: string;
+  };
+  subject: string;
+  status: 'open' | 'resolved' | 'closed';
+  messages: ChatMessage[];
+  lastMessageAt: string;
+}
+
 export default function SupportTeamDashboard() {
   const router = useRouter();
   const { user, isLoading: authLoading } = useAuth();
   const [contacts, setContacts] = useState<ContactMessage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [chats, setChats] = useState<any[]>([]);
+  const [chats, setChats] = useState<Chat[]>([]);
   const [isLoadingChats, setIsLoadingChats] = useState(false);
 
   // Helper function to get user roles
-  const getUserRoles = () => {
+  const getUserRoles = useCallback((): string[] => {
     if (!user) return [];
-    return (user as any).roles || ((user as any).role ? [(user as any).role] : []);
-  };
+    const userWithRoles = user as { roles?: string[]; role?: string };
+    return userWithRoles.roles || (userWithRoles.role ? [userWithRoles.role] : []);
+  }, [user]);
 
   // Helper function to check if user has live_support role
-  const hasLiveSupportRole = () => {
+  const hasLiveSupportRole = useCallback((): boolean => {
     const userRoles = getUserRoles();
     return userRoles.includes('live_support');
-  };
+  }, [getUserRoles]);
 
   // Fetch chats for live support users
   const fetchChats = useCallback(async () => {
@@ -88,7 +109,7 @@ export default function SupportTeamDashboard() {
     } finally {
       setIsLoadingChats(false);
     }
-  }, [user]);
+  }, [getUserRoles]);
 
   useEffect(() => {
     const userRoles = getUserRoles();
@@ -98,7 +119,7 @@ export default function SupportTeamDashboard() {
       const interval = setInterval(fetchChats, 5000);
       return () => clearInterval(interval);
     }
-  }, [user, fetchChats]);
+  }, [getUserRoles, fetchChats]);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -261,10 +282,10 @@ export default function SupportTeamDashboard() {
   if (isLiveSupport) {
     const chatStats = {
       total: chats.length,
-      open: chats.filter((c: any) => c.status === 'open').length,
-      resolved: chats.filter((c: any) => c.status === 'resolved').length,
-      closed: chats.filter((c: any) => c.status === 'closed').length,
-      unread: chats.filter((c: any) => {
+      open: chats.filter((c: Chat) => c.status === 'open').length,
+      resolved: chats.filter((c: Chat) => c.status === 'resolved').length,
+      closed: chats.filter((c: Chat) => c.status === 'closed').length,
+      unread: chats.filter((c: Chat) => {
         if (!c.messages || c.messages.length === 0) return false;
         const lastMessage = c.messages[c.messages.length - 1];
         return lastMessage.sender === 'user' && !lastMessage.read;
@@ -389,7 +410,7 @@ export default function SupportTeamDashboard() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {chats.slice(0, 5).map((chat: any) => {
+                  {chats.slice(0, 5).map((chat: Chat) => {
                     const lastMessage = chat.messages && chat.messages.length > 0 
                       ? chat.messages[chat.messages.length - 1] 
                       : null;
