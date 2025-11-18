@@ -8,7 +8,8 @@ interface SupportTeamMember {
   name: string;
   email: string;
   phone?: string;
-  role: string;
+  roles: string[];
+  role?: string; // For backward compatibility
   avatar?: string;
 }
 

@@ -43,7 +43,8 @@ interface SupportTeamMember {
   name: string;
   email: string;
   phone?: string;
-  role: string;
+  roles: string[];
+  role?: string; // For backward compatibility
   isActive: boolean;
   createdAt: string;
   lastLogin?: string;
@@ -59,8 +60,18 @@ export default function SupportTeamManagementPage() {
     email: "",
     password: "",
     phone: "",
-    role: "live_support",
+    roles: ["live_support"] as string[],
   });
+
+  const availableRoles = [
+    { value: "company_information_support", label: "Company Information Support" },
+    { value: "taxation_support", label: "Taxation Support" },
+    { value: "roc_returns_support", label: "ROC Returns Support" },
+    { value: "other_registration_support", label: "Other Registration Support" },
+    { value: "advisory_support", label: "Advisory Support" },
+    { value: "reports_support", label: "Reports Support" },
+    { value: "live_support", label: "Live Support" },
+  ];
 
   useEffect(() => {
     fetchMembers();
@@ -86,7 +97,7 @@ export default function SupportTeamManagementPage() {
       email: "",
       password: "",
       phone: "",
-      role: "live_support",
+      roles: ["live_support"],
     });
     setIsDialogOpen(true);
   };
@@ -98,9 +109,24 @@ export default function SupportTeamManagementPage() {
       email: member.email,
       password: "",
       phone: member.phone || "",
-      role: member.role,
+      roles: member.roles || (member.role ? [member.role] : ["live_support"]),
     });
     setIsDialogOpen(true);
+  };
+
+  const handleRoleToggle = (roleValue: string) => {
+    setFormData((prev) => {
+      const currentRoles = prev.roles || [];
+      if (currentRoles.includes(roleValue)) {
+        // Remove role if already selected
+        const newRoles = currentRoles.filter((r) => r !== roleValue);
+        // Ensure at least one role is selected
+        return { ...prev, roles: newRoles.length > 0 ? newRoles : ["live_support"] };
+      } else {
+        // Add role
+        return { ...prev, roles: [...currentRoles, roleValue] };
+      }
+    });
   };
 
   const handleSubmit = async () => {
@@ -120,11 +146,14 @@ export default function SupportTeamManagementPage() {
           name: formData.name,
           email: formData.email,
           phone: formData.phone,
-          role: formData.role,
+          roles: formData.roles,
         });
         toast.success("Member updated successfully");
       } else {
-        await api.post("/api/support-team/register", formData);
+        await api.post("/api/support-team/register", {
+          ...formData,
+          roles: formData.roles,
+        });
         toast.success("Member created successfully");
       }
       setIsDialogOpen(false);
@@ -231,17 +260,22 @@ export default function SupportTeamManagementPage() {
                     <span className="text-gray-600">{member.phone}</span>
                   </div>
                 )}
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium px-2 py-1 rounded bg-blue-100 text-blue-800">
-                    {member.role === "company_information_support" && "Company Info"}
-                    {member.role === "taxation_support" && "Taxation"}
-                    {member.role === "roc_returns_support" && "ROC Returns"}
-                    {member.role === "other_registration_support" && "Registration"}
-                    {member.role === "advisory_support" && "Advisory"}
-                    {member.role === "reports_support" && "Reports"}
-                    {member.role === "live_support" && "Live Support"}
-                    {!["company_information_support", "taxation_support", "roc_returns_support", "other_registration_support", "advisory_support", "reports_support", "live_support"].includes(member.role) && member.role}
-                  </span>
+                <div className="flex flex-wrap items-center gap-2">
+                  {(member.roles || (member.role ? [member.role] : [])).map((role) => (
+                    <span
+                      key={role}
+                      className="text-xs font-medium px-2 py-1 rounded bg-blue-100 text-blue-800"
+                    >
+                      {role === "company_information_support" && "Company Info"}
+                      {role === "taxation_support" && "Taxation"}
+                      {role === "roc_returns_support" && "ROC Returns"}
+                      {role === "other_registration_support" && "Registration"}
+                      {role === "advisory_support" && "Advisory"}
+                      {role === "reports_support" && "Reports"}
+                      {role === "live_support" && "Live Support"}
+                      {!["company_information_support", "taxation_support", "roc_returns_support", "other_registration_support", "advisory_support", "reports_support", "live_support"].includes(role) && role}
+                    </span>
+                  ))}
                   <span
                     className={`text-xs font-medium px-2 py-1 rounded ${
                       member.isActive
@@ -329,42 +363,29 @@ export default function SupportTeamManagementPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="role">Role *</Label>
-              <Select
-                value={formData.role}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, role: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="company_information_support">
-                    Company Information Support
-                  </SelectItem>
-                  <SelectItem value="taxation_support">
-                    Taxation Support
-                  </SelectItem>
-                  <SelectItem value="roc_returns_support">
-                    ROC Returns Support
-                  </SelectItem>
-                  <SelectItem value="other_registration_support">
-                    Other Registration Support
-                  </SelectItem>
-                  <SelectItem value="advisory_support">
-                    Advisory Support
-                  </SelectItem>
-                  <SelectItem value="reports_support">
-                    Reports Support
-                  </SelectItem>
-                  <SelectItem value="live_support">
-                    Live Support
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+              <Label>Roles *</Label>
+              <div className="space-y-2 border rounded-md p-4">
+                {availableRoles.map((role) => (
+                  <div key={role.value} className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id={`role-${role.value}`}
+                      checked={formData.roles.includes(role.value)}
+                      onChange={() => handleRoleToggle(role.value)}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <label
+                      htmlFor={`role-${role.value}`}
+                      className="text-sm font-medium text-gray-700 cursor-pointer"
+                    >
+                      {role.label}
+                    </label>
+                  </div>
+                ))}
+              </div>
               <p className="text-xs text-gray-500">
-                Select the service area this support member will handle
+                Select one or more service areas this support member will handle. 
+                At least one role must be selected.
               </p>
             </div>
             <div className="flex justify-end gap-2">

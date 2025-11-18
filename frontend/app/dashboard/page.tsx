@@ -892,13 +892,13 @@ export default function UserDashboard() {
                               <Send className="h-6 w-6 text-purple-600" />
                             </div>
                             <div className="flex-1">
-                              <h3 className="font-semibold text-gray-900 mb-2">Contact Form</h3>
+                              <h3 className="font-semibold text-gray-900 mb-2">Email Us</h3>
                               <p className="text-sm text-gray-600 mb-3">
-                                Send a message via contact form. We'll get back to you within 24 hours.
+                                Send an email to our support team. We'll get back to you within 24 hours.
                               </p>
                               <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
                                 <Mail className="h-4 w-4 text-purple-600" />
-                                <span>Or email us at:</span>
+                                <span>Email us at:</span>
                                 <a 
                                   href="mailto:info@comfinserv.co" 
                                   className="text-purple-600 hover:text-purple-700 font-medium underline"
@@ -907,9 +907,9 @@ export default function UserDashboard() {
                                 </a>
                               </div>
                               <Button variant="outline" asChild className="w-full">
-                                <Link href="/contact">
+                                <Link href="mailto:info@comfinserv.co">
                                   <Send className="mr-2 h-4 w-4" />
-                                  Send Message
+                                  Send Email
                                 </Link>
                               </Button>
                             </div>

@@ -32,12 +32,26 @@ const mapServiceToRole = (service) => {
   }
 };
 
+// Helper function to check if user has a specific role
+const hasRole = (userRoles, targetRole) => {
+  if (!userRoles || !Array.isArray(userRoles)) {
+    // Backward compatibility: if roles is not an array, treat as single role
+    return userRoles === targetRole;
+  }
+  return userRoles.includes(targetRole);
+};
+
+// Helper function to check if user has live_support role
+const hasLiveSupportRole = (userRoles) => {
+  return hasRole(userRoles, "live_support");
+};
+
 // @route   POST /api/support-team/register
 // @desc    Register a new support team member (Admin only)
 // @access  Private/Admin
 router.post("/register", protect, admin, async (req, res) => {
   try {
-    const { name, email, password, phone, role } = req.body;
+    const { name, email, password, phone, roles } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({
@@ -46,7 +60,7 @@ router.post("/register", protect, admin, async (req, res) => {
       });
     }
 
-    // Validate role
+    // Validate roles
     const validRoles = [
       "company_information_support",
       "taxation_support",
@@ -57,10 +71,29 @@ router.post("/register", protect, admin, async (req, res) => {
       "live_support",
     ];
     
-    if (role && !validRoles.includes(role)) {
+    // Handle both array and single role for backward compatibility
+    let rolesArray = [];
+    if (Array.isArray(roles)) {
+      rolesArray = roles;
+    } else if (roles) {
+      rolesArray = [roles];
+    } else {
+      rolesArray = ["live_support"];
+    }
+
+    // Validate all roles
+    const invalidRoles = rolesArray.filter(r => !validRoles.includes(r));
+    if (invalidRoles.length > 0) {
       return res.status(400).json({
         success: false,
-        message: "Invalid role. Must be one of: " + validRoles.join(", "),
+        message: "Invalid role(s): " + invalidRoles.join(", ") + ". Must be one of: " + validRoles.join(", "),
+      });
+    }
+
+    if (rolesArray.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "At least one role must be assigned",
       });
     }
 
@@ -78,7 +111,7 @@ router.post("/register", protect, admin, async (req, res) => {
       email,
       password,
       phone: phone || "",
-      role: role || "live_support",
+      roles: rolesArray,
       createdBy: req.user._id,
     });
 
@@ -91,7 +124,7 @@ router.post("/register", protect, admin, async (req, res) => {
         _id: supportMember._id,
         name: supportMember.name,
         email: supportMember.email,
-        role: supportMember.role,
+        roles: supportMember.roles,
       },
     });
   } catch (error) {
@@ -150,7 +183,7 @@ router.post("/login", async (req, res) => {
       {
         id: supportMember._id,
         email: supportMember.email,
-        role: supportMember.role,
+        roles: supportMember.roles,
         type: "support",
       },
       process.env.JWT_SECRET || "your-secret-key",
@@ -164,7 +197,7 @@ router.post("/login", async (req, res) => {
         _id: supportMember._id,
         name: supportMember.name,
         email: supportMember.email,
-        role: supportMember.role,
+        roles: supportMember.roles,
         phone: supportMember.phone,
         avatar: supportMember.avatar,
       },
@@ -251,7 +284,7 @@ router.put("/profile", protect, async (req, res) => {
         email: supportMember.email,
         phone: supportMember.phone,
         avatar: supportMember.avatar,
-        role: supportMember.role,
+        roles: supportMember.roles,
       },
     });
   } catch (error) {
@@ -561,9 +594,46 @@ router.get("/members", protect, admin, async (req, res) => {
       .populate("createdBy", "name email")
       .sort({ createdAt: -1 });
 
+    const validRoles = [
+      "company_information_support",
+      "taxation_support",
+      "roc_returns_support",
+      "other_registration_support",
+      "advisory_support",
+      "reports_support",
+      "live_support",
+    ];
+
+    // Clean and migrate member data
+    const cleanedMembers = members.map(member => {
+      const memberObj = member.toObject();
+      
+      // Migrate old role to roles if needed
+      if (!memberObj.roles || memberObj.roles.length === 0) {
+        if (memberObj.role && validRoles.includes(memberObj.role)) {
+          memberObj.roles = [memberObj.role];
+        } else {
+          memberObj.roles = ["live_support"];
+        }
+      }
+      
+      // Filter out any invalid roles
+      memberObj.roles = memberObj.roles.filter(r => validRoles.includes(r));
+      
+      // Ensure at least one role
+      if (memberObj.roles.length === 0) {
+        memberObj.roles = ["live_support"];
+      }
+      
+      // Remove old role field from response
+      delete memberObj.role;
+      
+      return memberObj;
+    });
+
     res.json({
       success: true,
-      data: members,
+      data: cleanedMembers,
     });
   } catch (error) {
     console.error("Get members error:", error);
@@ -579,7 +649,7 @@ router.get("/members", protect, admin, async (req, res) => {
 // @access  Private/Admin
 router.put("/members/:id", protect, admin, async (req, res) => {
   try {
-    const { name, email, phone, role, isActive } = req.body;
+    const { name, email, phone, roles, isActive } = req.body;
 
     const member = await SupportTeam.findById(req.params.id);
 
@@ -590,8 +660,12 @@ router.put("/members/:id", protect, admin, async (req, res) => {
       });
     }
 
-    // Validate role if provided
-    if (role) {
+    // Build update object
+    const updateData = {};
+    const unsetData = {};
+    
+    // Validate roles if provided
+    if (roles !== undefined) {
       const validRoles = [
         "company_information_support",
         "taxation_support",
@@ -602,32 +676,75 @@ router.put("/members/:id", protect, admin, async (req, res) => {
         "live_support",
       ];
       
-      if (!validRoles.includes(role)) {
-        return res.status(400).json({
-          success: false,
-          message: "Invalid role. Must be one of: " + validRoles.join(", "),
-        });
+      // Handle both array and single role for backward compatibility
+      let rolesArray = [];
+      if (Array.isArray(roles)) {
+        rolesArray = roles;
+      } else if (roles) {
+        rolesArray = [roles];
       }
-      member.role = role;
+
+      // Filter out invalid roles and keep only valid ones
+      const filteredRoles = rolesArray.filter(r => validRoles.includes(r));
+      
+      // If no valid roles after filtering, check if we need to use existing roles or default
+      if (filteredRoles.length === 0) {
+        // If member has existing valid roles, keep them; otherwise default to live_support
+        const existingRoles = member.roles || (member.role && validRoles.includes(member.role) ? [member.role] : []);
+        if (existingRoles.length > 0) {
+          updateData.roles = existingRoles;
+        } else {
+          updateData.roles = ["live_support"];
+        }
+        
+        // Log warning about invalid roles
+        const invalidRoles = rolesArray.filter(r => !validRoles.includes(r));
+        if (invalidRoles.length > 0) {
+          console.warn(`Invalid roles filtered out: ${invalidRoles.join(", ")}. Using default: ${updateData.roles.join(", ")}`);
+        }
+      } else {
+        updateData.roles = filteredRoles;
+        
+        // Log warning if some roles were filtered out
+        const invalidRoles = rolesArray.filter(r => !validRoles.includes(r));
+        if (invalidRoles.length > 0) {
+          console.warn(`Invalid roles filtered out: ${invalidRoles.join(", ")}. Using: ${filteredRoles.join(", ")}`);
+        }
+      }
     }
     
-    if (name) member.name = name;
-    if (email) member.email = email;
-    if (phone !== undefined) member.phone = phone;
-    if (isActive !== undefined) member.isActive = isActive;
+    if (name) updateData.name = name;
+    if (email) updateData.email = email;
+    if (phone !== undefined) updateData.phone = phone;
+    if (isActive !== undefined) updateData.isActive = isActive;
 
-    await member.save();
+    // Always remove old role field to prevent validation errors
+    unsetData.role = "";
+
+    // Use updateOne to update and remove old field in one operation
+    const updateQuery = {};
+    if (Object.keys(updateData).length > 0) {
+      updateQuery.$set = updateData;
+    }
+    if (Object.keys(unsetData).length > 0) {
+      updateQuery.$unset = unsetData;
+    }
+
+    await SupportTeam.updateOne({ _id: req.params.id }, updateQuery);
+    
+    // Fetch updated member
+    const updatedMember = await SupportTeam.findById(req.params.id);
 
     res.json({
       success: true,
       message: "Support team member updated successfully",
       data: {
-        _id: member._id,
-        name: member.name,
-        email: member.email,
-        phone: member.phone,
-        role: member.role,
-        isActive: member.isActive,
+        _id: updatedMember._id,
+        name: updatedMember.name,
+        email: updatedMember.email,
+        phone: updatedMember.phone,
+        roles: updatedMember.roles,
+        isActive: updatedMember.isActive,
       },
     });
   } catch (error) {
@@ -708,7 +825,9 @@ router.post("/send-email", protect, async (req, res) => {
 
     // STRICT ROLE-BASED ACCESS: Check if user can access this contact
     const contactRole = mapServiceToRole(contact.service);
-    if (supportMember.role === "live_support") {
+    const userRoles = supportMember.roles || (supportMember.role ? [supportMember.role] : []);
+    
+    if (hasLiveSupportRole(userRoles)) {
       // Live support: Only access contacts that map to live_support
       if (contactRole !== "live_support") {
         return res.status(403).json({
@@ -717,8 +836,8 @@ router.post("/send-email", protect, async (req, res) => {
         });
       }
     } else {
-      // Service-specific support: Only access contacts matching their role
-      if (contactRole !== supportMember.role) {
+      // Service-specific support: Only access contacts matching one of their roles
+      if (!hasRole(userRoles, contactRole)) {
         return res.status(403).json({
           success: false,
           message: "Access denied. This contact belongs to a different department.",
@@ -785,25 +904,26 @@ router.get("/chats", protect, async (req, res) => {
     // - Live support: Only see chats assigned to them
     // - Service-specific roles: Only see chats matching their service
     let filteredChats = [];
+    const userRoles = supportMember.roles || (supportMember.role ? [supportMember.role] : []);
     
-    if (supportMember.role === "live_support") {
+    if (hasLiveSupportRole(userRoles)) {
       // Live support: ONLY see chats assigned to them (supportTeam field matches their ID)
       filteredChats = await SupportChat.find({ supportTeam: req.user.id })
         .populate("user", "name email")
-        .populate("supportTeam", "name email role")
+        .populate("supportTeam", "name email roles")
         .sort({ lastMessageAt: -1 });
     } else {
-      // Service-specific support: ONLY see chats matching their service role
+      // Service-specific support: ONLY see chats matching one of their service roles
       const allChats = await SupportChat.find({ user: { $exists: true } })
         .populate("user", "name email")
-        .populate("supportTeam", "name email role")
+        .populate("supportTeam", "name email roles")
         .sort({ lastMessageAt: -1 });
 
-      // Filter: Only chats where subject/service matches this member's role
+      // Filter: Only chats where subject/service matches one of this member's roles
       filteredChats = allChats.filter((chat) => {
         if (!chat.subject) return false;
         const chatRole = mapServiceToRole(chat.subject);
-        return chatRole === supportMember.role;
+        return hasRole(userRoles, chatRole);
       });
     }
 
@@ -852,7 +972,9 @@ router.get("/chats/:chatId", protect, async (req, res) => {
     }
 
     // STRICT ROLE-BASED ACCESS: Check if user can access this chat
-    if (supportMember.role === "live_support") {
+    const userRoles = supportMember.roles || (supportMember.role ? [supportMember.role] : []);
+    
+    if (hasLiveSupportRole(userRoles)) {
       // Live support: Only access chats assigned to them
       if (chat.supportTeam && chat.supportTeam._id.toString() !== req.user.id.toString()) {
         return res.status(403).json({
@@ -861,7 +983,7 @@ router.get("/chats/:chatId", protect, async (req, res) => {
         });
       }
     } else {
-      // Service-specific support: Only access chats matching their service
+      // Service-specific support: Only access chats matching one of their service roles
       if (!chat.subject) {
         return res.status(403).json({
           success: false,
@@ -869,7 +991,7 @@ router.get("/chats/:chatId", protect, async (req, res) => {
         });
       }
       const chatRole = mapServiceToRole(chat.subject);
-      if (chatRole !== supportMember.role) {
+      if (!hasRole(userRoles, chatRole)) {
         return res.status(403).json({
           success: false,
           message: "Access denied. This chat belongs to a different department.",
@@ -929,7 +1051,9 @@ router.post("/chats/:chatId/messages", protect, async (req, res) => {
     }
 
     // STRICT ROLE-BASED ACCESS: Check if user can access this chat
-    if (supportMember.role === "live_support") {
+    const userRoles = supportMember.roles || (supportMember.role ? [supportMember.role] : []);
+    
+    if (hasLiveSupportRole(userRoles)) {
       // Live support: Only access chats assigned to them
       if (chat.supportTeam.toString() !== req.user.id.toString()) {
         return res.status(403).json({
@@ -938,7 +1062,7 @@ router.post("/chats/:chatId/messages", protect, async (req, res) => {
         });
       }
     } else {
-      // Service-specific support: Only access chats matching their service
+      // Service-specific support: Only access chats matching one of their service roles
       if (!chat.subject) {
         return res.status(403).json({
           success: false,
@@ -946,7 +1070,7 @@ router.post("/chats/:chatId/messages", protect, async (req, res) => {
         });
       }
       const chatRole = mapServiceToRole(chat.subject);
-      if (chatRole !== supportMember.role) {
+      if (!hasRole(userRoles, chatRole)) {
         return res.status(403).json({
           success: false,
           message: "Access denied. This chat belongs to a different department.",
@@ -1076,7 +1200,9 @@ router.put("/chats/:chatId/status", protect, async (req, res) => {
     }
 
     // STRICT ROLE-BASED ACCESS: Check if user can access this chat
-    if (supportMember.role === "live_support") {
+    const userRoles = supportMember.roles || (supportMember.role ? [supportMember.role] : []);
+    
+    if (hasLiveSupportRole(userRoles)) {
       // Live support: Only access chats assigned to them
       if (chat.supportTeam.toString() !== req.user.id.toString()) {
         return res.status(403).json({
@@ -1085,7 +1211,7 @@ router.put("/chats/:chatId/status", protect, async (req, res) => {
         });
       }
     } else {
-      // Service-specific support: Only access chats matching their service
+      // Service-specific support: Only access chats matching one of their service roles
       if (!chat.subject) {
         return res.status(403).json({
           success: false,
@@ -1093,7 +1219,7 @@ router.put("/chats/:chatId/status", protect, async (req, res) => {
         });
       }
       const chatRole = mapServiceToRole(chat.subject);
-      if (chatRole !== supportMember.role) {
+      if (!hasRole(userRoles, chatRole)) {
         return res.status(403).json({
           success: false,
           message: "Access denied. This chat belongs to a different department.",
@@ -1147,14 +1273,14 @@ router.post("/user-chat", protect, async (req, res) => {
     // Priority: 1. Service-specific support, 2. Live support
     let supportMember = await SupportTeam.findOne({
       isActive: true,
-      role: serviceRole,
+      roles: serviceRole,
     });
 
     // Fallback to live support if no service-specific support available
     if (!supportMember) {
       supportMember = await SupportTeam.findOne({
         isActive: true,
-        role: "live_support",
+        roles: "live_support",
       });
     }
 

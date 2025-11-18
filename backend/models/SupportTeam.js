@@ -23,8 +23,8 @@ const SupportTeamSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    role: {
-      type: String,
+    roles: {
+      type: [String],
       enum: [
         "company_information_support",
         "taxation_support",
@@ -34,7 +34,13 @@ const SupportTeamSchema = new mongoose.Schema(
         "reports_support",
         "live_support",
       ],
-      default: "live_support",
+      default: ["live_support"],
+      validate: {
+        validator: function(v) {
+          return v && v.length > 0;
+        },
+        message: "At least one role must be assigned"
+      }
     },
     isActive: {
       type: Boolean,
@@ -63,6 +69,37 @@ const SupportTeamSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+// Migration: Convert old single role to roles array and remove old role field
+SupportTeamSchema.pre("save", async function (next) {
+  // If document has old 'role' field but no 'roles' array, migrate it
+  if (this.role && (!this.roles || this.roles.length === 0)) {
+    const validRoles = [
+      "company_information_support",
+      "taxation_support",
+      "roc_returns_support",
+      "other_registration_support",
+      "advisory_support",
+      "reports_support",
+      "live_support",
+    ];
+    
+    // Only migrate if the old role is valid
+    if (validRoles.includes(this.role)) {
+      this.roles = [this.role];
+    } else {
+      // If invalid role, default to live_support
+      this.roles = ["live_support"];
+    }
+  }
+  
+  // Remove old role field to prevent validation errors
+  if (this.role !== undefined) {
+    this.set('role', undefined, { strict: false });
+  }
+  
+  next();
+});
 
 // Hash password before saving
 SupportTeamSchema.pre("save", async function (next) {
