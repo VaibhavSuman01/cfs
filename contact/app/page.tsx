@@ -50,6 +50,7 @@ export default function SupportTeamDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [chats, setChats] = useState<Chat[]>([]);
   const [isLoadingChats, setIsLoadingChats] = useState(false);
+  const [isInitialChatLoad, setIsInitialChatLoad] = useState(true);
 
   // Helper function to get user roles
   const getUserRoles = useCallback((): string[] => {
@@ -65,28 +66,42 @@ export default function SupportTeamDashboard() {
   }, [getUserRoles]);
 
   // Fetch chats for live support users
-  const fetchChats = useCallback(async () => {
+  // silent: if true, don't show loading state (for background refresh)
+  const fetchChats = useCallback(async (silent: boolean = false) => {
     const userRoles = getUserRoles();
     if (!userRoles.includes('live_support')) return;
     
     try {
-      setIsLoadingChats(true);
+      // Only show loading on initial load, not on background refresh
+      if (!silent) {
+        setIsLoadingChats(true);
+      }
       const response = await api.get('/api/support-team/chats');
       setChats(response.data.data || []);
+      // Mark initial load as complete after first successful fetch
+      if (isInitialChatLoad) {
+        setIsInitialChatLoad(false);
+      }
     } catch (error) {
       console.error('Failed to fetch chats:', error);
-      toast.error('Failed to load chats');
+      // Only show error toast on initial load, not on silent refresh
+      if (!silent) {
+        toast.error('Failed to load chats');
+      }
     } finally {
-      setIsLoadingChats(false);
+      if (!silent) {
+        setIsLoadingChats(false);
+      }
     }
-  }, [getUserRoles]);
+  }, [getUserRoles, isInitialChatLoad]);
 
   useEffect(() => {
     const userRoles = getUserRoles();
     if (userRoles.includes('live_support')) {
-      fetchChats();
-      // Poll for new chats every 5 seconds
-      const interval = setInterval(fetchChats, 5000);
+      // Initial load - show loading
+      fetchChats(false);
+      // Poll for new chats every 5 seconds - silent background refresh
+      const interval = setInterval(() => fetchChats(true), 5000);
       return () => clearInterval(interval);
     }
   }, [getUserRoles, fetchChats]);
@@ -210,7 +225,7 @@ export default function SupportTeamDashboard() {
           <div className="mb-12">
             <LiveSupportDashboard
               chats={chats}
-              isLoadingChats={isLoadingChats}
+              isLoadingChats={isLoadingChats && isInitialChatLoad}
               formatDate={formatDate}
             />
           </div>
