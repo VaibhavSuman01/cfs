@@ -202,8 +202,17 @@ router.get("/contacts", protect, async (req, res) => {
     let contacts = [];
     let total = 0;
 
-    if (supportMemberRoles && !hasLiveSupportRole(supportMemberRoles) && req.user.role !== "admin") {
-      // Service-specific support: Fetch all contacts and filter by roles
+    if (req.user.role === "admin") {
+      // Admin can see all contacts
+      contacts = await Contact.find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(parseInt(limit));
+      total = await Contact.countDocuments(query);
+    } else if (supportMemberRoles && supportMemberRoles.length > 0) {
+      // Support team member: Fetch all contacts and filter by their roles
+      // If user has multiple roles (e.g., live_support + company_information_support),
+      // they should see contacts matching ANY of their roles
       const allContacts = await Contact.find(query).sort({ createdAt: -1 });
       
       // Filter contacts that match one of this member's roles
@@ -214,25 +223,6 @@ router.get("/contacts", protect, async (req, res) => {
       
       total = filteredContacts.length;
       contacts = filteredContacts.slice(skip, skip + parseInt(limit));
-    } else if (supportMemberRoles && hasLiveSupportRole(supportMemberRoles)) {
-      // Live support: ONLY see contacts that map to live_support (general/non-service-specific contacts)
-      const allContacts = await Contact.find(query).sort({ createdAt: -1 });
-      
-      // Filter contacts that map to live_support role (general inquiries, not service-specific)
-      const filteredContacts = allContacts.filter((contact) => {
-        const contactRole = mapServiceToRole(contact.service);
-        return contactRole === "live_support";
-      });
-      
-      total = filteredContacts.length;
-      contacts = filteredContacts.slice(skip, skip + parseInt(limit));
-    } else if (req.user.role === "admin") {
-      // Admin can see all contacts
-      contacts = await Contact.find(query)
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(parseInt(limit));
-      total = await Contact.countDocuments(query);
     } else {
       // No role found - return empty
       contacts = [];
@@ -285,22 +275,13 @@ router.get("/contacts/:id", protect, async (req, res) => {
         const contactRole = mapServiceToRole(contact.service);
         const userRoles = supportMember.roles || (supportMember.role ? [supportMember.role] : []);
         
-        if (hasLiveSupportRole(userRoles)) {
-          // Live support: Only access contacts that map to live_support
-          if (contactRole !== "live_support") {
-            return res.status(403).json({
-              success: false,
-              message: "Access denied. This contact belongs to a specific service department.",
-            });
-          }
-        } else {
-          // Service-specific support: Only access contacts matching one of their roles
-          if (!hasRole(userRoles, contactRole)) {
-            return res.status(403).json({
-              success: false,
-              message: "Access denied. This contact belongs to a different department.",
-            });
-          }
+        // Check if user has the role that matches this contact's service
+        // If user has multiple roles, they can access contacts matching ANY of their roles
+        if (!hasRole(userRoles, contactRole)) {
+          return res.status(403).json({
+            success: false,
+            message: "Access denied. This contact belongs to a different department.",
+          });
         }
       }
     }
@@ -412,22 +393,13 @@ router.put("/contacts/:id/mark-replied", protect, async (req, res) => {
         const contactRole = mapServiceToRole(contact.service);
         const userRoles = supportMember.roles || (supportMember.role ? [supportMember.role] : []);
         
-        if (hasLiveSupportRole(userRoles)) {
-          // Live support: Only access contacts that map to live_support
-          if (contactRole !== "live_support") {
-            return res.status(403).json({
-              success: false,
-              message: "Access denied. This contact belongs to a specific service department.",
-            });
-          }
-        } else {
-          // Service-specific support: Only access contacts matching one of their roles
-          if (!hasRole(userRoles, contactRole)) {
-            return res.status(403).json({
-              success: false,
-              message: "Access denied. This contact belongs to a different department.",
-            });
-          }
+        // Check if user has the role that matches this contact's service
+        // If user has multiple roles, they can access contacts matching ANY of their roles
+        if (!hasRole(userRoles, contactRole)) {
+          return res.status(403).json({
+            success: false,
+            message: "Access denied. This contact belongs to a different department.",
+          });
         }
       }
     }

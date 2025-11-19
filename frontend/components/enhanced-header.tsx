@@ -413,12 +413,13 @@ export function EnhancedHeader() {
               </div>
             ))}
 
+           
             {/* Enhanced User section */}
-            {isAuthenticated ? (
+            <div 
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+              >{isAuthenticated ? (
               <div 
                 className="relative group"
-                onMouseEnter={() => setDropdownOpen(true)}
-                onMouseLeave={() => setDropdownOpen(false)}
               >
                 <button className="flex items-center space-x-3 text-gray-700 hover:text-blue-600 transition-all duration-300 py-2 px-3 rounded-lg hover:bg-blue-50/50 group">
                   {user?.avatarUrl ? (
@@ -483,7 +484,7 @@ export function EnhancedHeader() {
                   Get Started
                 </Button>
               </div>
-            )}
+            )}</div>
           </nav>
 
           {/* Enhanced Mobile Menu Button */}
