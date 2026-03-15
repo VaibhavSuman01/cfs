@@ -6,13 +6,14 @@ import { FadeInSection } from "@/components/fade-in-section"
 import { AnimatedBackground } from "@/components/animated-background"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
 import { Users, Award, Target, Heart, Shield, Zap, Globe, CheckCircle, Star } from "lucide-react"
 
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-white">
       <EnhancedHeader />
-
+      <main id="main-content" role="main">
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center pt-20">
         <AnimatedBackground />
@@ -61,9 +62,11 @@ export default function AboutPage() {
                     choice for businesses ranging from startups to large enterprises.
                   </p>
                 </div>
-                <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-full">
-                  Learn More About Our Services
-                </Button>
+                <Link href="/company-information">
+                  <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-full">
+                    Learn More About Our Services
+                  </Button>
+                </Link>
               </div>
 
               <div className="relative">
@@ -267,6 +270,7 @@ export default function AboutPage() {
       </FadeInSection>
 
       <EnhancedFooter />
+      </main>
     </div>
   )
 }

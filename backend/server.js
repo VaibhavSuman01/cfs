@@ -142,7 +142,13 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, "public")));
 
-// Routes
+// Routes - rewrite /registration to /other-registration so formRoutes (which has /other-registration handlers) also accepts /registration
+app.use("/api/forms", (req, res, next) => {
+  if (req.url && req.url.startsWith("/registration")) {
+    req.url = req.url.replace(/^\/registration/, "/other-registration");
+  }
+  next();
+});
 app.use("/api/forms", formRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/support", supportRoutes);

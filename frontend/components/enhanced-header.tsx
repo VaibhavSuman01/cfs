@@ -61,65 +61,65 @@ export function EnhancedHeader() {
       ],
     },
     {
-      name: "Other Registration",
-      href: "/other-registration",
+      name: "Registration",
+      href: "/registration",
       dropdown: [
         // Business Registrations (0-5)
         {
           name: "LLP Registration",
-          href: "/other-registration/llp-registration",
+          href: "/registration/llp-registration",
         },
         {
           name: "Partnership Firm",
-          href: "/other-registration/partnership-firm",
+          href: "/registration/partnership-firm",
         },
         {
           name: "Sole Proprietorship",
-          href: "/other-registration/sole-proprietorship",
+          href: "/registration/sole-proprietorship",
         },
         {
           name: "Digital Signature",
-          href: "/other-registration/digital-signature",
+          href: "/registration/digital-signature",
         },
         {
           name: "IEC Registration",
-          href: "/other-registration/iec-registration",
+          href: "/registration/iec-registration",
         },
         {
           name: "NGO Registration",
-          href: "/other-registration/ngo-registration",
+          href: "/registration/ngo-registration",
         },
         // Government Registrations (6-12)
         {
           name: "MSME/Udyam Registration",
-          href: "/other-registration/msme-udyam-registration",
+          href: "/registration/msme-udyam-registration",
         },
-        { name: "EPFO Registration", href: "/other-registration/epfo" },
-        { name: "ESIC Registration", href: "/other-registration/esic" },
+        { name: "EPFO Registration", href: "/registration/epfo" },
+        { name: "ESIC Registration", href: "/registration/esic" },
         {
           name: "Gumusta / Shop Registration",
-          href: "/other-registration/gumusta-shop-registration",
+          href: "/registration/gumusta-shop-registration",
         },
         {
           name: "Fassai (Food) Licence",
-          href: "/other-registration/fassai-food-license",
+          href: "/registration/fassai-food-license",
         },
         {
           name: "Industry Licence",
-          href: "/other-registration/industry-license",
+          href: "/registration/industry-license",
         },
         {
           name: "Start-up India Registration",
-          href: "/other-registration/startup-india-registration",
+          href: "/registration/startup-india-registration",
         },
         // Tax & Compliance (13-16)
         {
           name: "GST Registration",
-          href: "/other-registration/gst-registration",
+          href: "/registration/gst-registration",
         },
-        { name: "PT Tax Registration", href: "/other-registration/pt-tax" },
-        { name: "PAN Application", href: "/other-registration/pan-apply" },
-        { name: "TAN Application", href: "/other-registration/tan-apply" },
+        { name: "PT Tax Registration", href: "/registration/pt-tax" },
+        { name: "PAN Application", href: "/registration/pan-apply" },
+        { name: "TAN Application", href: "/registration/tan-apply" },
       ],
     },
     {
@@ -306,15 +306,15 @@ export function EnhancedHeader() {
                     className={`absolute top-full mt-2 bg-white rounded-xl shadow-2xl border border-gray-100 py-4 animate-fadeInUp z-[10000] ${
                       item.name === "Advisory" ? "right-0" : "left-0"
                     } ${
-                      item.name === "Other Registration"
+                      item.name === "Registration"
                         ? "w-max max-w-6xl"
                         : item.name === "Tools"
                         ? "w-max max-w-5xl"
                         : "w-72"
                     } max-h-[80vh] overflow-y-auto backdrop-blur-sm`}
                   >
-                    {item.name === "Other Registration" ? (
-                      // Mega Menu for Other Registration
+                    {item.name === "Registration" ? (
+                      // Mega Menu for Registration
                       <div className="px-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                           {/* Column 1: Business Registrations */}
@@ -548,8 +548,8 @@ export function EnhancedHeader() {
                             : "max-h-0 opacity-0"
                         }`}
                       >
-                        {item.name === "Other Registration" ? (
-                          // Mega Menu for Mobile - Other Registration
+                        {item.name === "Registration" ? (
+                          // Mega Menu for Mobile - Registration
                           <div className="ml-4 space-y-4 py-3 max-h-[500px] overflow-y-auto">
                             {/* Business Registrations */}
                             <div className="space-y-2">

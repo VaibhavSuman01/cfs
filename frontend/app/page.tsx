@@ -26,7 +26,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-white overflow-hidden">
       <EnhancedHeader />
-
+      <main id="main-content" className="min-h-screen" role="main">
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center pt-20">
         <AnimatedBackground />
@@ -130,8 +130,8 @@ export default function HomePage() {
                 },
                 {
                   icon: FileText,
-                  title: "Other Registration",
-                  href: "/other-registration",
+                  title: "Registration",
+                  href: "/registration",
                   description:
                     "LLP, Partnership, and other business structures",
                 },
@@ -271,6 +271,7 @@ export default function HomePage() {
       </FadeInSection>
 
       <EnhancedFooter />
+      </main>
     </div>
   );
 }

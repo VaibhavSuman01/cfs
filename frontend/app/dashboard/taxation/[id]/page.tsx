@@ -82,7 +82,7 @@ interface FormData {
     din: string;
   }>;
   
-  // Other Registration specific fields
+  // Registration specific fields
   businessName?: string;
   businessType?: string;
   businessAddress?: string;
@@ -212,7 +212,7 @@ export default function FormDetailPage() {
     const typeMap: Record<string, string> = {
       'TaxForm': 'Tax Filing',
       'CompanyForm': 'Company Information',
-      'OtherRegistrationForm': 'Other Registration',
+      'OtherRegistrationForm': 'Registration',
       'ROCForm': 'ROC Returns',
       'ReportsForm': 'Reports',
       'TrademarkISOForm': 'Trademark & ISO',
@@ -413,7 +413,7 @@ export default function FormDetailPage() {
                   </>
                 )}
 
-                {/* Other Registration specific fields */}
+                {/* Registration specific fields */}
                 {form.formType === 'OtherRegistrationForm' && (
                   <>
                     <Separator />

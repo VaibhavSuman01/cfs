@@ -14,21 +14,21 @@ export function EnhancedFooter() {
   ]
 
   const otherServices = [
-    { name: "LLP Registration", href: "/other-registration/llp" },
-    { name: "Partnership Firm", href: "/other-registration/partnership" },
-    { name: "GST Registration", href: "/other-registration/gst-registration" },
-    { name: "Sole Proprietorship", href: "/other-registration/sole-proprietorship" },
-    { name: "MSME/Udyam Registration", href: "/other-registration/msme" },
-    { name: "IEC Registration", href: "/other-registration/iec" },
-    { name: "FSSAI Food License", href: "/other-registration/fssai" },
-    { name: "Gumusta Shop Registration", href: "/other-registration/gumusta" },
-    { name: "Industry License", href: "/other-registration/industry-license" },
-    { name: "NGO Registration", href: "/other-registration/ngo" },
-    { name: "PAN Apply", href: "/other-registration/pan" },
-    { name: "TAN Apply", href: "/other-registration/tan" },
-    { name: "Startup India Registration", href: "/other-registration/startup-india" },
-    { name: "Digital Signature", href: "/other-registration/digital-signature" },
-    { name: "PT Tax", href: "/other-registration/pt-tax" },
+    { name: "LLP Registration", href: "/registration/llp-registration" },
+    { name: "Partnership Firm", href: "/registration/partnership-firm" },
+    { name: "GST Registration", href: "/registration/gst-registration" },
+    { name: "Sole Proprietorship", href: "/registration/sole-proprietorship" },
+    { name: "MSME/Udyam Registration", href: "/registration/msme-udyam-registration" },
+    { name: "IEC Registration", href: "/registration/iec-registration" },
+    { name: "FSSAI Food License", href: "/registration/fssai" },
+    { name: "Gumusta Shop Registration", href: "/registration/gumusta-shop-registration" },
+    { name: "Industry License", href: "/registration/industry-license" },
+    { name: "NGO Registration", href: "/registration/ngo-registration" },
+    { name: "PAN Apply", href: "/registration/pan-apply" },
+    { name: "TAN Apply", href: "/registration/tan-apply" },
+    { name: "Startup India Registration", href: "/registration/startup-india-registration" },
+    { name: "Digital Signature", href: "/registration/digital-signature" },
+    { name: "PT Tax", href: "/registration/pt-tax" },
   ]
 
   const taxationServices = [
@@ -155,7 +155,7 @@ export function EnhancedFooter() {
 
           {/* Other Services */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-blue-300">Other Registration</h3>
+            <h3 className="text-lg font-semibold text-blue-300">Registration</h3>
             <div className="space-y-2">
               {otherServices.map((service) => (
                 <Link

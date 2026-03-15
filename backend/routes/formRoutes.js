@@ -682,10 +682,10 @@ router.put("/roc-returns/:id", protect, upload.fields([
   }
 });
 
-// @route   GET /api/forms/other-registration/user-submissions
+// @route   GET /api/forms/other-registration/user-submissions (and /registration/user-submissions alias)
 // @desc    Get all other registration submissions for the logged-in user
 // @access  Private
-router.get("/other-registration/user-submissions", protect, async (req, res) => {
+const getOtherRegistrationUserSubmissions = async (req, res) => {
   try {
     const submissions = await OtherRegistrationForm.find({ user: req.user._id })
       .sort({ createdAt: -1 })
@@ -695,12 +695,14 @@ router.get("/other-registration/user-submissions", protect, async (req, res) => 
     console.error("Error fetching other registration submissions:", error);
     res.status(500).json({ message: "Server error" });
   }
-});
+};
+router.get("/other-registration/user-submissions", protect, getOtherRegistrationUserSubmissions);
+router.get("/registration/user-submissions", protect, getOtherRegistrationUserSubmissions);
 
-// @route   GET /api/forms/other-registration/:id
+// @route   GET /api/forms/other-registration/:id (and /registration/:id alias)
 // @desc    Get specific other registration submission
 // @access  Private
-router.get("/other-registration/:id", protect, async (req, res) => {
+const getOtherRegistrationById = async (req, res) => {
   try {
     const id = req.params.id;
     if (!isValidObjectId(id)) return res.status(400).json({ message: "Invalid form ID" });
@@ -719,12 +721,14 @@ router.get("/other-registration/:id", protect, async (req, res) => {
     console.error("Error fetching other registration details:", error);
     res.status(500).json({ message: "Server error" });
   }
-});
+};
+router.get("/other-registration/:id", protect, getOtherRegistrationById);
+router.get("/registration/:id", protect, getOtherRegistrationById);
 
-// @route   GET /api/forms/other-registration/download/:documentId
+// @route   GET /api/forms/other-registration/download/:documentId (and /registration/download/:documentId alias)
 // @desc    Download document from other registration submission
 // @access  Private
-router.get("/other-registration/download/:documentId", protect, async (req, res) => {
+const getOtherRegistrationDownload = async (req, res) => {
   try {
     const { documentId } = req.params;
     if (!isValidObjectId(documentId)) return res.status(400).json({ message: "Invalid document ID format. Must be a 24-character hex string." });
@@ -745,19 +749,23 @@ router.get("/other-registration/download/:documentId", protect, async (req, res)
     console.error("Error downloading other registration document:", error);
     res.status(500).json({ message: "Server error" });
   }
-});
+};
+router.get("/other-registration/download/:documentId", protect, getOtherRegistrationDownload);
+router.get("/registration/download/:documentId", protect, getOtherRegistrationDownload);
 
-// @route   DELETE /api/forms/other-registration/document/:documentId
+// @route   DELETE /api/forms/other-registration/document/:documentId (and /registration/document/:documentId alias)
 // @desc    Delete a document from other registration submission (disabled for users)
 // @access  Private
-router.delete("/other-registration/document/:documentId", protect, async (req, res) => {
+const deleteOtherRegistrationDocument = async (req, res) => {
   return res.status(403).json({ message: "Document deletion by users is disabled. Please contact admin." });
-});
+};
+router.delete("/other-registration/document/:documentId", protect, deleteOtherRegistrationDocument);
+router.delete("/registration/document/:documentId", protect, deleteOtherRegistrationDocument);
 
-// @route   POST /api/forms/other-registration/document/:formId
+// @route   POST /api/forms/other-registration/document/:formId (and /registration/document/:formId alias)
 // @desc    Upload a new document to other registration submission
 // @access  Private
-router.post("/other-registration/document/:formId", protect, upload.single("document"), handleMulterError, async (req, res) => {
+const postOtherRegistrationDocument = async (req, res) => {
   try {
     const { formId } = req.params;
     const { documentType } = req.body;
@@ -769,10 +777,7 @@ router.post("/other-registration/document/:formId", protect, upload.single("docu
       return res.status(403).json({ message: "Not authorized to update this form" });
     }
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
-    
-    // Get file data (works for both disk and memory storage)
     const fileData = getFileData(req.file);
-    
     const newDoc = {
       documentType: documentType || "other",
       fileName: generateUniqueFilename(req.file.originalname),
@@ -784,8 +789,6 @@ router.post("/other-registration/document/:formId", protect, upload.single("docu
       isEdited: true,
       uploadedBy: req.user.role === "admin" ? "admin" : "user",
     };
-    
-    // Clean up temporary files (only applies to disk storage)
     cleanupTempFiles([req.file]);
     form.documents.push(newDoc);
     await form.save();
@@ -803,7 +806,10 @@ router.post("/other-registration/document/:formId", protect, upload.single("docu
     console.error("Error uploading other registration document:", error);
     res.status(500).json({ message: "Server error" });
   }
-});
+};
+const uploadSingleDoc = upload.single("document");
+router.post("/other-registration/document/:formId", protect, uploadSingleDoc, handleMulterError, postOtherRegistrationDocument);
+router.post("/registration/document/:formId", protect, uploadSingleDoc, handleMulterError, postOtherRegistrationDocument);
 
 // @route   PUT /api/forms/other-registration/:id
 // @desc    Update an other registration submission
