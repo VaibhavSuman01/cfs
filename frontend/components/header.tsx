@@ -10,7 +10,7 @@ export function Header() {
 
   const navigation = [
     { name: "Company Information", href: "/company-information" },
-    { name: "Other Registration", href: "/other-registration" },
+    { name: "Registration", href: "/registration" },
     { name: "Taxation", href: "/taxation" },
     { name: "Trademark & ISO", href: "/trademark-iso" },
     { name: "ROC Returns/Company Management", href: "/roc-returns" },
@@ -37,7 +37,7 @@ export function Header() {
                 {item.name}
               </Link>
             ))}
-            <Button className="bg-blue-600 hover:bg-blue-700 ml-4">Contact Us</Button>
+            <Link href="/contact"><Button className="bg-blue-600 hover:bg-blue-700 ml-4">Contact Us</Button></Link>
           </nav>
 
           {/* Mobile Menu Button */}
@@ -60,7 +60,7 @@ export function Header() {
                   {item.name}
                 </Link>
               ))}
-              <Button className="bg-blue-600 hover:bg-blue-700 w-fit">Contact Us</Button>
+              <Link href="/contact"><Button className="bg-blue-600 hover:bg-blue-700 w-fit">Contact Us</Button></Link>
             </nav>
           </div>
         )}

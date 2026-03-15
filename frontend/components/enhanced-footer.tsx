@@ -32,40 +32,40 @@ export function EnhancedFooter() {
   ];
 
   const otherServices = [
-    { name: "GST Registration", href: "/other-registration/gst-registration" },
-    { name: "LLP Registration", href: "/other-registration/llp-registration" },
-    { name: "Partnership Firm", href: "/other-registration/partnership-firm" },
+    { name: "GST Registration", href: "/registration/gst-registration" },
+    { name: "LLP Registration", href: "/registration/llp-registration" },
+    { name: "Partnership Firm", href: "/registration/partnership-firm" },
     {
       name: "Sole Proprietorship",
-      href: "/other-registration/sole-proprietorship",
+      href: "/registration/sole-proprietorship",
     },
     {
       name: "MSME/Udyam Registration",
-      href: "/other-registration/msme-udyam-registration",
+      href: "/registration/msme-udyam-registration",
     },
-    { name: "EPFO Registration", href: "/other-registration/epfo" },
-    { name: "ESIC Registration", href: "/other-registration/esic" },
-    { name: "PT Tax Registration", href: "/other-registration/pt-tax" },
-    { name: "IEC Registration", href: "/other-registration/iec-registration" },
+    { name: "EPFO Registration", href: "/registration/epfo" },
+    { name: "ESIC Registration", href: "/registration/esic" },
+    { name: "PT Tax Registration", href: "/registration/pt-tax" },
+    { name: "IEC Registration", href: "/registration/iec-registration" },
     {
       name: "Gumusta / Shop Registration",
-      href: "/other-registration/gumusta-shop-registration",
+      href: "/registration/gumusta-shop-registration",
     },
     {
       name: "Fassai (Food) Licence",
-      href: "/other-registration/fassai-food-license",
+      href: "/registration/fassai-food-license",
     },
-    { name: "Industry Licence", href: "/other-registration/industry-license" },
-    { name: "NGO Registration", href: "/other-registration/ngo-registration" },
-    { name: "PAN Application", href: "/other-registration/pan-apply" },
-    { name: "TAN Application", href: "/other-registration/tan-apply" },
+    { name: "Industry Licence", href: "/registration/industry-license" },
+    { name: "NGO Registration", href: "/registration/ngo-registration" },
+    { name: "PAN Application", href: "/registration/pan-apply" },
+    { name: "TAN Application", href: "/registration/tan-apply" },
     {
       name: "Start-up India Registration",
-      href: "/other-registration/startup-india-registration",
+      href: "/registration/startup-india-registration",
     },
     {
       name: "Digital Signature",
-      href: "/other-registration/digital-signature",
+      href: "/registration/digital-signature",
     },
   ];
 
@@ -198,11 +198,11 @@ export function EnhancedFooter() {
             </div>
           </div>
 
-          {/* Other Registration */}
+          {/* Registration */}
           <div className="space-y-3">
             <div className="space-y-1">
               <h3 className="text-lg font-bold text-blue-300 tracking-tight">
-                Other Registration
+                Registration
               </h3>
               <div className="w-12 h-0.5 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
             </div>

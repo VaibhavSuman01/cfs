@@ -170,7 +170,7 @@ export default function FormsPage() {
     if (formType === 'companyform') {
       window.open(`/admin/forms/company-information/${form._id}`, '_blank');
     } else if (formType === 'otherregistrationform') {
-      window.open(`/admin/forms/other-registration/${form._id}`, '_blank');
+      window.open(`/admin/forms/registration/${form._id}`, '_blank');
     } else if (formType === 'rocform') {
       window.open(`/admin/forms/roc-returns/${form._id}`, '_blank');
     } else if (formType === 'trademarkisoform') {
@@ -258,7 +258,7 @@ export default function FormsPage() {
     const typeMap: Record<string, string> = {
       'TaxForm': 'Tax Filing',
       'CompanyForm': 'Company Information',
-      'OtherRegistrationForm': 'Other Registration',
+      'OtherRegistrationForm': 'Registration',
       'ROCForm': 'ROC Returns',
       'ReportsForm': 'Reports',
       'TrademarkISOForm': 'Trademark & ISO',
@@ -320,7 +320,7 @@ export default function FormsPage() {
               <SelectContent>
                 <SelectItem value="all">All Services</SelectItem>
                 <SelectItem value="Company Information">Company Information</SelectItem>
-                <SelectItem value="Other Registration">Other Registration</SelectItem>
+                <SelectItem value="Registration">Registration</SelectItem>
                 <SelectItem value="ROC Returns">ROC Returns</SelectItem>
                 <SelectItem value="Reports">Reports</SelectItem>
                 <SelectItem value="Trademark & ISO">Trademark & ISO</SelectItem>

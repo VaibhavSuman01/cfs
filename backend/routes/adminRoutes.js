@@ -119,7 +119,7 @@ router.delete("/service-forms/:id/reports/:reportId", async (req, res) => {
     let model;
     if (service === 'Company Information' || (service || '').includes('Company')) {
       model = CompanyForm;
-    } else if (service === 'Other Registration' || (service || '').includes('Registration')) {
+    } else if (service === 'Other Registration' || service === 'Registration' || (service || '').includes('Registration')) {
       model = OtherRegistrationForm;
     } else if (service === 'ROC Returns' || (service || '').includes('ROC')) {
       model = ROCForm;
@@ -1287,7 +1287,7 @@ router.get("/forms/service", admin, async (req, res) => {
     
     if (service === 'Company Information' || service.includes('Company')) {
       model = CompanyForm;
-    } else if (service === 'Other Registration' || service.includes('Registration') || service === 'Partnership Firm' || service.includes('Partnership')) {
+    } else if (service === 'Other Registration' || service === 'Registration' || (service && service.includes('Registration')) || service === 'Partnership Firm' || (service && service.includes('Partnership'))) {
       // Check if it's specifically Partnership Firm
       if (service === 'Partnership Firm' || service.includes('Partnership')) {
         model = PartnershipForm;

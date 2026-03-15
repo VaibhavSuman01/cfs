@@ -63,7 +63,7 @@ export const API_PATHS = {
     SERVICE: createUrl("/api/forms/service"),
     // Specific form endpoints
     COMPANY_FORMATION: createUrl("/api/forms/company-information"),
-    OTHER_REGISTRATION: createUrl("/api/forms/other-registration"),
+    OTHER_REGISTRATION: createUrl("/api/forms/registration"),
     PARTNERSHIP_FIRM: createUrl("/api/forms/partnership-firm"),
     ROC_RETURNS: createUrl("/api/forms/roc-returns"),
     REPORTS: createUrl("/api/forms/reports"),
@@ -77,12 +77,12 @@ export const API_PATHS = {
     COMPANY_FORMATION_UPLOAD_DOC: (formId: string) => createUrl(`/api/forms/company-information/document/${formId}`),
     COMPANY_FORMATION_DOWNLOAD_DOC: (documentId: string) => createUrl(`/api/forms/company-information/download/${documentId}`),
 
-    // Other Registration - user CRUD and documents
-    OTHER_REGISTRATION_USER_SUBMISSIONS: createUrl("/api/forms/other-registration/user-submissions"),
-    OTHER_REGISTRATION_DETAIL: (id: string) => createUrl(`/api/forms/other-registration/${id}`),
-    OTHER_REGISTRATION_UPDATE: (id: string) => createUrl(`/api/forms/other-registration/${id}`),
-    OTHER_REGISTRATION_UPLOAD_DOC: (formId: string) => createUrl(`/api/forms/other-registration/document/${formId}`),
-    OTHER_REGISTRATION_DOWNLOAD_DOC: (documentId: string) => createUrl(`/api/forms/other-registration/download/${documentId}`),
+    // Registration - user CRUD and documents (alias of former other-registration)
+    OTHER_REGISTRATION_USER_SUBMISSIONS: createUrl("/api/forms/registration/user-submissions"),
+    OTHER_REGISTRATION_DETAIL: (id: string) => createUrl(`/api/forms/registration/${id}`),
+    OTHER_REGISTRATION_UPDATE: (id: string) => createUrl(`/api/forms/registration/${id}`),
+    OTHER_REGISTRATION_UPLOAD_DOC: (formId: string) => createUrl(`/api/forms/registration/document/${formId}`),
+    OTHER_REGISTRATION_DOWNLOAD_DOC: (documentId: string) => createUrl(`/api/forms/registration/download/${documentId}`),
 
     // ROC Returns - user CRUD and documents
     ROC_RETURNS_USER_SUBMISSIONS: createUrl("/api/forms/roc-returns/user-submissions"),

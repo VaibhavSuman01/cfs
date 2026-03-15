@@ -42,8 +42,8 @@ const navigation = [
       { name: 'One Person Company', href: '/admin/services/opc' },
       { name: 'Section 8 Company', href: '/admin/services/section-8' },
       
-      // Other Registration
-      { name: 'Other Registration', header: true },
+      // Registration
+      { name: 'Registration', header: true },
       { name: 'GST Registration', href: '/admin/services/gst-registration' },
       { name: 'LLP Registration', href: '/admin/services/llp' },
       { name: 'Partnership Firm', href: '/admin/services/partnership' },

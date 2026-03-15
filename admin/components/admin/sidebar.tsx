@@ -48,15 +48,14 @@ const navigation: NavItem[] = [
     ]
   },
 
-  // Other Registration
+  // Registration
   {
-    name: 'Other Registration', icon: FileText,
+    name: 'Registration', icon: FileText,
     submenu: [
-      { name: 'All Forms', href: '/admin/forms/other-registration' },
-      { name: 'Pending Review', href: '/admin/forms/other-registration?status=Pending' },
-      { name: 'Reviewed', href: '/admin/forms/other-registration?status=Reviewed' },
-      { name: 'Filed', href: '/admin/forms/other-registration?status=Filed' },
-      
+      { name: 'All Forms', href: '/admin/forms/registration' },
+      { name: 'Pending Review', href: '/admin/forms/registration?status=Pending' },
+      { name: 'Reviewed', href: '/admin/forms/registration?status=Reviewed' },
+      { name: 'Filed', href: '/admin/forms/registration?status=Filed' },
     ]
   },
 

@@ -10,7 +10,7 @@ export function Header() {
 
   const navigation = [
     { name: "Company Information", href: "/company-information" },
-    { name: "Other Registration", href: "/other-registration" },
+    { name: "Registration", href: "/registration" },
     { name: "Taxation", href: "/taxation" },
     { name: "Trademark & ISO", href: "/trademark-iso" },
     { name: "ROC Returns/Company Management", href: "/roc-returns" },

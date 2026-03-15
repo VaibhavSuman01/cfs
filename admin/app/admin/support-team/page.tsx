@@ -67,7 +67,7 @@ export default function SupportTeamManagementPage() {
     { value: "company_information_support", label: "Company Information Support" },
     { value: "taxation_support", label: "Taxation Support" },
     { value: "roc_returns_support", label: "ROC Returns Support" },
-    { value: "other_registration_support", label: "Other Registration Support" },
+    { value: "other_registration_support", label: "Registration Support" },
     { value: "advisory_support", label: "Advisory Support" },
     { value: "reports_support", label: "Reports Support" },
     { value: "live_support", label: "Live Support" },

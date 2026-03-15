@@ -67,14 +67,14 @@ export function EnhancedHeader() {
       ],
     },
     {
-      name: "Other Registration",
-      href: "/other-registration",
+      name: "Registration",
+      href: "/registration",
       dropdown: [
-        { name: "LLP Registration", href: "/other-registration/llp" },
-        { name: "Partnership Firm", href: "/other-registration/partnership" },
+        { name: "LLP Registration", href: "/registration/llp-registration" },
+        { name: "Partnership Firm", href: "/registration/partnership-firm" },
         {
           name: "Sole Proprietorship",
-          href: "/other-registration/sole-proprietorship",
+          href: "/registration/sole-proprietorship",
         },
       ],
     },

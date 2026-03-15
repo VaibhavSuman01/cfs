@@ -42,7 +42,7 @@ const SERVICE_OPTIONS: Record<string, string[]> = {
     "Director Changes",
     "Other",
   ],
-  "Other Registration": [
+  "Registration": [
     "GST Registration",
     "MSME Udyam Registration",
     "IEC Registration",

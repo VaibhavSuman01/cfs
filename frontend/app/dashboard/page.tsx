@@ -263,7 +263,7 @@ export default function UserDashboard() {
     const typeMap: Record<string, string> = {
       'TaxForm': 'Tax Filing',
       'CompanyForm': 'Company Information',
-      'OtherRegistrationForm': 'Other Registration',
+      'OtherRegistrationForm': 'Registration',
       'ROCForm': 'ROC Returns',
       'ReportsForm': 'Reports',
       'TrademarkISOForm': 'Trademark & ISO',
@@ -276,7 +276,7 @@ export default function UserDashboard() {
     const typeMap: Record<string, string> = {
       'TaxForm': `/dashboard/taxation/${formId}`,
       'CompanyForm': `/dashboard/company-information/${formId}`,
-      'OtherRegistrationForm': `/dashboard/other-registration/${formId}`,
+      'OtherRegistrationForm': `/dashboard/registration/${formId}`,
       'ROCForm': `/dashboard/roc-returns/${formId}`,
       'ReportsForm': `/dashboard/reports/${formId}`,
       'TrademarkISOForm': `/dashboard/trademark-iso/${formId}`,
@@ -288,7 +288,7 @@ export default function UserDashboard() {
     const typeMap: Record<string, string> = {
       'TaxForm': `/dashboard/taxation/edit/${formId}`,
       'CompanyForm': `/dashboard/company-information/${formId}/edit`,
-      'OtherRegistrationForm': `/dashboard/other-registration/${formId}/edit`,
+      'OtherRegistrationForm': `/dashboard/registration/${formId}/edit`,
       'ROCForm': `/dashboard/roc-returns/${formId}/edit`,
       'ReportsForm': `/dashboard/reports/${formId}/edit`,
       'TrademarkISOForm': `/dashboard/trademark-iso/${formId}/edit`,
@@ -450,7 +450,7 @@ export default function UserDashboard() {
       "Corporate Tax Filing",
     ]},
     {
-      name: "Other Registration",
+      name: "Registration",
       items: [
         "GST Registration",
         "LLP Registration",
@@ -658,10 +658,10 @@ export default function UserDashboard() {
                                         <ChevronRight className="ml-2 h-4 w-4" />
                                       </Link>
                                     </Button>
-                                  ) : category.name === 'Other Registration' ? (
+                                  ) : category.name === 'Registration' ? (
                                     <Button variant="outline" size="sm" asChild>
                                       <Link
-                                        href={`/dashboard/other-registration?service=${encodeURIComponent(service)}`}
+                                        href={`/dashboard/registration?service=${encodeURIComponent(service)}`}
                                       >
                                         Apply Now{" "}
                                         <ChevronRight className="ml-2 h-4 w-4" />
