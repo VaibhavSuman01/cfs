@@ -3,7 +3,7 @@
  * Use SITE_URL in production; Next.js uses request host in dev.
  */
 
-export const SITE_NAME = "ComfinServ";
+export const SITE_NAME = "COM Financial Services";
 export const SITE_DESCRIPTION =
   "Getting your business started with simple, swift and reasonably priced legal services. Company registration, GST, taxation, trademark, ROC returns & advisory in India.";
 export const SITE_KEYWORDS = [
@@ -13,7 +13,7 @@ export const SITE_KEYWORDS = [
   "tax filing",
   "trademark registration",
   "ROC returns",
-  "ComfinServ",
+  "COM Financial Services",
   "financial services",
 ];
 
