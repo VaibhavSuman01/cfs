@@ -11,8 +11,11 @@ const inter = Inter({ subsets: ["latin"] });
 
 const baseUrl = getBaseUrl();
 
+const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
+
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
+  applicationName: SITE_NAME,
   title: {
     default: `${SITE_NAME} – Your Business Registration & Compliance Partner`,
     template: `%s | ${SITE_NAME}`,
@@ -28,6 +31,9 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
     },
   },
   openGraph: {
@@ -42,7 +48,8 @@ export const metadata: Metadata = {
         url: absoluteUrl("/og-image.png"),
         width: 1200,
         height: 630,
-        alt: SITE_NAME,
+        alt: `${SITE_NAME} – company registration, GST, tax & compliance India`,
+        type: "image/png",
       },
     ],
   },
@@ -50,9 +57,14 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: `${SITE_NAME} – Business Registration & Compliance`,
     description: SITE_DESCRIPTION,
+    images: [absoluteUrl("/og-image.png")],
   },
   alternates: {
     canonical: baseUrl,
+    languages: {
+      "en-IN": baseUrl,
+      en: baseUrl,
+    },
   },
   icons: {
     icon: "/favicon.ico",
@@ -60,6 +72,14 @@ export const metadata: Metadata = {
   },
   manifest: "/site.webmanifest",
   category: "Finance",
+  referrer: "strict-origin-when-cross-origin",
+  ...(googleVerification
+    ? { verification: { google: googleVerification } }
+    : {}),
+  other: {
+    "geo.region": "IN",
+    "geo.placename": "India",
+  },
 };
 
 export const viewport: Viewport = {

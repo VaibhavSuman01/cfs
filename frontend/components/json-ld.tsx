@@ -1,4 +1,4 @@
-import { getBaseUrl, SITE_NAME, SITE_DESCRIPTION, absoluteUrl } from "@/lib/seo";
+import { getBaseUrl, SITE_NAME, SITE_DESCRIPTION, SEO_SCHEMA_TOPICS, absoluteUrl } from "@/lib/seo";
 
 const baseUrl = getBaseUrl();
 
@@ -6,12 +6,14 @@ const baseUrl = getBaseUrl();
 export function OrganizationAndWebsiteJsonLd() {
   const organization = {
     "@context": "https://schema.org",
-    "@type": "Organization",
+    "@type": ["Organization", "ProfessionalService"],
     name: SITE_NAME,
     description: SITE_DESCRIPTION,
     url: baseUrl,
     logo: absoluteUrl("/android-chrome-512x512.png"),
-    sameAs: [],
+    sameAs: [] as string[],
+    areaServed: { "@type": "Country", name: "India" },
+    knowsAbout: SEO_SCHEMA_TOPICS,
   };
 
   const website = {
@@ -20,6 +22,7 @@ export function OrganizationAndWebsiteJsonLd() {
     name: SITE_NAME,
     description: SITE_DESCRIPTION,
     url: baseUrl,
+    inLanguage: "en-IN",
     publisher: { "@id": `${baseUrl}#organization` },
     potentialAction: {
       "@type": "SearchAction",
