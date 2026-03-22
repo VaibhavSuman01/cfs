@@ -4,9 +4,9 @@ import { absoluteUrl } from "@/lib/seo";
 export const metadata: Metadata = {
   title: "Reports – Project Reports, CMA, DSCR, Bank Reconciliation",
   description:
-    "Project reports, CMA reports, DSCR reports, bank reconciliation for loans and business. Professional financial reports by ComfinServ.",
+    "Project reports, CMA reports, DSCR reports, bank reconciliation for loans and business. Professional financial reports by COM Financial Services.",
   openGraph: {
-    title: "Business & Financial Reports | ComfinServ",
+    title: "Business & Financial Reports | COM Financial Services",
     url: absoluteUrl("/reports"),
   },
   alternates: { canonical: absoluteUrl("/reports") },

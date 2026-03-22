@@ -23,7 +23,7 @@ export function Header() {
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
             <Building2 className="h-8 w-8 text-blue-600" />
-            <span className="text-2xl font-bold text-gray-900">ComfinServ</span>
+            <span className="text-2xl font-bold text-gray-900">COM Financial Services</span>
           </Link>
 
           {/* Desktop Navigation */}

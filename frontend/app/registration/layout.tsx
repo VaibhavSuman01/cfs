@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description:
     "GST registration, LLP, partnership, MSME Udyam, FSSAI, PAN, TAN, Startup India, NGO, and more. Complete business registration services in India.",
   openGraph: {
-    title: "Business Registrations – GST, LLP, MSME | ComfinServ",
+    title: "Business Registrations – GST, LLP, MSME | COM Financial Services",
     url: absoluteUrl("/registration"),
   },
   alternates: { canonical: absoluteUrl("/registration") },
