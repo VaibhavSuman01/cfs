@@ -7,7 +7,7 @@ import { AuthProvider } from '@/providers/auth-provider';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'COM Financial Services - Your Business Registration Partner',
+  title: 'Com Financial Services - Your Business Registration Partner',
   description: 'Getting your business started with simple, swift and reasonably priced legal services, online.',
   generator: 'v0.dev',
   icons: {

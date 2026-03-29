@@ -104,7 +104,7 @@ export default function AuthPage() {
       // Switch to sign-in form and show success message
       setIsLogin(true);
       toast.success("🎉 Registration Completed Successfully!", {
-        description: "Welcome to COM Financial Services! You can now sign in with your credentials.",
+        description: "Welcome to Com Financial Services! You can now sign in with your credentials.",
         duration: 6000,
         style: {
           background: '#10B981',

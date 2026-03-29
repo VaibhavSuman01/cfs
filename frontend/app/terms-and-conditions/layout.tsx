@@ -1,12 +1,7 @@
 import type { Metadata } from "next";
-import { absoluteUrl } from "@/lib/seo";
+import { pageMetadata } from "@/lib/seo-pages";
 
-export const metadata: Metadata = {
-  title: "Terms and Conditions",
-  description: "Terms and conditions of use for COM Financial Services services and website.",
-  robots: { index: true, follow: true },
-  alternates: { canonical: absoluteUrl("/terms-and-conditions") },
-};
+export const metadata: Metadata = pageMetadata("/terms-and-conditions");
 
 export default function TermsLayout({
   children,

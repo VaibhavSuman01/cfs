@@ -1,11 +1,7 @@
 import type { Metadata } from "next";
-import { absoluteUrl } from "@/lib/seo";
+import { pageMetadata } from "@/lib/seo-pages";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy",
-  description: "COM Financial Services privacy policy. How we collect, use, and protect your data.",
-  alternates: { canonical: absoluteUrl("/privacy-policy") },
-};
+export const metadata: Metadata = pageMetadata("/privacy-policy");
 
 export default function PrivacyLayout({
   children,

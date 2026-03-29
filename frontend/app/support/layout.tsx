@@ -1,12 +1,7 @@
 import type { Metadata } from "next";
-import { absoluteUrl } from "@/lib/seo";
+import { pageMetadata } from "@/lib/seo-pages";
 
-export const metadata: Metadata = {
-  title: "Support – Help & Customer Care",
-  description:
-    "Get help with company registration, tax filing, and compliance. COM Financial Services support and customer care.",
-  alternates: { canonical: absoluteUrl("/support") },
-};
+export const metadata: Metadata = pageMetadata("/support");
 
 export default function SupportLayout({
   children,

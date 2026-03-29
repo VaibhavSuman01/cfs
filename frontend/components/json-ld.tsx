@@ -1,19 +1,46 @@
-import { getBaseUrl, SITE_NAME, SITE_DESCRIPTION, SEO_SCHEMA_TOPICS, absoluteUrl } from "@/lib/seo";
+import {
+  getBaseUrl,
+  SITE_NAME,
+  SITE_ALTERNATE_NAMES,
+  SITE_DESCRIPTION,
+  SEO_SCHEMA_TOPICS,
+  absoluteUrl,
+} from "@/lib/seo";
+import { getServiceOffersForSchema } from "@/lib/seo-pages";
 
 const baseUrl = getBaseUrl();
 
 /** Organization + WebSite schema for homepage and brand. Injected in root layout. */
 export function OrganizationAndWebsiteJsonLd() {
+  const catalogItems = getServiceOffersForSchema().map((item, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    item: {
+      "@type": "Offer",
+      itemOffered: {
+        "@type": "Service",
+        name: item.name,
+        url: item.url,
+      },
+    },
+  }));
+
   const organization = {
     "@context": "https://schema.org",
     "@type": ["Organization", "ProfessionalService"],
     name: SITE_NAME,
+    alternateName: [...SITE_ALTERNATE_NAMES],
     description: SITE_DESCRIPTION,
     url: baseUrl,
     logo: absoluteUrl("/android-chrome-512x512.png"),
     sameAs: [] as string[],
     areaServed: { "@type": "Country", name: "India" },
     knowsAbout: SEO_SCHEMA_TOPICS,
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: `${SITE_NAME} services`,
+      itemListElement: catalogItems,
+    },
   };
 
   const website = {
@@ -74,6 +101,8 @@ export function ServiceJsonLd({
     description,
     url,
     provider: { "@id": `${baseUrl}#organization` },
+    areaServed: { "@type": "Country", name: "India" },
+    availableLanguage: ["English", "Hindi"],
   };
 
   if (breadcrumbItems && breadcrumbItems.length > 0) {
