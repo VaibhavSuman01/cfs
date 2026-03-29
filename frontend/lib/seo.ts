@@ -6,11 +6,18 @@
  * and internal consistency. Prefer unique phrases over repetition (keyword stuffing hurts).
  */
 
-export const SITE_NAME = "COM Financial Services";
+import type { Metadata } from "next";
+
+export const SITE_NAME = "Com Financial Services";
+
+/** Short names and spellings used in search; also surfaced as Organization `alternateName` in JSON-LD. */
+export const SITE_ALTERNATE_NAMES = ["CFS", "cfs", "Com Fin Serv"] as const;
+
 export const SITE_DESCRIPTION =
-  "Company registration, GST, income tax, TDS, trademark & ROC filing in India. Simple, swift legal and compliance services for startups and SMEs.";
+  "Com Financial Services (CFS) – company registration, GST registration & GST filing, income tax / ITR, TDS, trademark, ISO, FSSAI, MSME Udyam, and ROC / MCA compliance across India. Online filings with expert support for startups and SMEs.";
 export const SITE_KEYWORDS: string[] = [
-  "COM Financial Services",
+  "Com Financial Services",
+  ...SITE_ALTERNATE_NAMES,
   "business registration India",
   "company registration India",
   "private limited company registration",
@@ -66,8 +73,8 @@ export const SITE_KEYWORDS: string[] = [
   "online legal services India",
 ];
 
-/** Subset for schema.org `knowsAbout` (keep JSON-LD focused). */
-export const SEO_SCHEMA_TOPICS = SITE_KEYWORDS.slice(0, 28);
+/** Subset for schema.org `knowsAbout` (keep JSON-LD focused; +3 for brand alternates). */
+export const SEO_SCHEMA_TOPICS = SITE_KEYWORDS.slice(0, 31);
 
 /** Base URL for canonical and OG. Set in env or default for dev. */
 export function getBaseUrl(): string {
@@ -84,4 +91,58 @@ export function absoluteUrl(path: string): string {
   const base = getBaseUrl();
   const p = path.startsWith("/") ? path : `/${path}`;
   return `${base}${p}`;
+}
+
+export type BuildPageMetadataInput = {
+  path: string;
+  title: string;
+  description: string;
+  /** Omit to inherit root `keywords` from the root layout merge. */
+  keywords?: string[];
+};
+
+/** Consistent per-page metadata: canonical, Open Graph, Twitter, hreflang-style alternates. */
+export function buildPageMetadata({
+  path,
+  title,
+  description,
+  keywords,
+}: BuildPageMetadataInput): Metadata {
+  const canonical = absoluteUrl(path);
+  const ogTitle = `${title} | ${SITE_NAME}`;
+  return {
+    title,
+    description,
+    ...(keywords && keywords.length > 0 ? { keywords } : {}),
+    openGraph: {
+      type: "website",
+      locale: "en_IN",
+      url: canonical,
+      siteName: SITE_NAME,
+      title: ogTitle,
+      description,
+      images: [
+        {
+          url: absoluteUrl("/og-image.png"),
+          width: 1200,
+          height: 630,
+          alt: `${title} – ${SITE_NAME}, India`,
+          type: "image/png",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: ogTitle,
+      description,
+      images: [absoluteUrl("/og-image.png")],
+    },
+    alternates: {
+      canonical,
+      languages: {
+        "en-IN": canonical,
+        en: canonical,
+      },
+    },
+  };
 }
