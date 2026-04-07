@@ -206,7 +206,7 @@ export default function PrivacyPolicyPage() {
                   </p>
                   <div className="space-y-2 text-gray-600">
                     <p><strong>Email:</strong> info@comfinserv.co</p>
-                    <p><strong>Phone:</strong> 0612-4535604</p>
+                    <p><strong>Phone:</strong> Office landline: +91 612-4575362</p>
                     <p><strong>Address:</strong> 211, NP EXHIBITION ROAD, PATNA, BIHAR-800001</p>
                   </div>
                 </CardContent>

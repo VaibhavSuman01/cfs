@@ -4,6 +4,7 @@ import Link from "next/link";
 import {
   Building2,
   Phone,
+  MessageCircle,
   Mail,
   MapPin,
   Facebook,
@@ -11,6 +12,7 @@ import {
   Linkedin,
   Instagram,
 } from "lucide-react";
+import { getWhatsAppHref } from "@/lib/contact";
 
 export function EnhancedFooter() {
   const companyServices = [
@@ -406,13 +408,39 @@ export function EnhancedFooter() {
                 Get in Touch
               </h4>
               <div className="flex flex-wrap gap-4 md:gap-6">
-                <a href="tel:06124535604" className="flex items-start space-x-3 group cursor-pointer">
+                <a
+                  href="tel:+916124575362"
+                  className="flex items-start space-x-3 group cursor-pointer"
+                >
                   <div className="w-8 h-8 bg-blue-600/20 rounded-lg flex items-center justify-center group-hover:bg-blue-600/30 group-hover:scale-110 transition-all duration-300">
                     <Phone className="h-4 w-4 text-blue-400 group-hover:text-blue-300" />
                   </div>
                   <div>
-                    <p className="text-gray-300 font-medium text-sm group-hover:text-blue-300 transition-colors">Phone</p>
-                    <p className="text-gray-400 text-xs group-hover:text-blue-200 transition-colors">0612-4535604</p>
+                    <p className="text-gray-300 font-medium text-sm group-hover:text-blue-300 transition-colors">
+                      Office landline
+                    </p>
+                    <p className="text-gray-400 text-xs group-hover:text-blue-200 transition-colors">
+                      Office landline: +91 612-4575362
+                    </p>
+                  </div>
+                </a>
+
+                <a
+                  href={getWhatsAppHref("Hi! I want to know more about your services.")}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start space-x-3 group cursor-pointer"
+                >
+                  <div className="w-8 h-8 bg-blue-600/20 rounded-lg flex items-center justify-center group-hover:bg-blue-600/30 group-hover:scale-110 transition-all duration-300">
+                    <MessageCircle className="h-4 w-4 text-blue-400 group-hover:text-blue-300" />
+                  </div>
+                  <div>
+                    <p className="text-gray-300 font-medium text-sm group-hover:text-blue-300 transition-colors">
+                      WhatsApp
+                    </p>
+                    <p className="text-gray-400 text-xs group-hover:text-blue-200 transition-colors">
+                      Chat on WhatsApp
+                    </p>
                   </div>
                 </a>
 

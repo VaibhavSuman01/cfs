@@ -12,9 +12,10 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Phone, Mail, MapPin, Clock, Send, Loader2 } from "lucide-react"
+import { Phone, Mail, MapPin, Clock, Send, Loader2, MessageCircle, ArrowRight } from "lucide-react"
 import { toast } from "sonner"
 import api from "@/lib/api-client"
+import { getWhatsAppHref } from "@/lib/contact"
 
 // Service -> Sub-services mapping (extend as needed)
 const SERVICE_OPTIONS: Record<string, string[]> = {
@@ -404,7 +405,9 @@ export default function ContactPage() {
                         </div>
                         <div className="flex-1">
                           <h3 className="font-semibold text-gray-900 mb-2">Call Us</h3>
-                          <p className="text-lg text-blue-600 font-medium mb-1">0612-4535604</p>
+                          <p className="text-lg text-blue-600 font-medium mb-1">
+                            Office landline: +91 612-4575362
+                          </p>
                           <p className="text-gray-600 text-sm">Mon-Sat 10AM-7PM</p>
                         </div>
                       </div>
@@ -422,6 +425,32 @@ export default function ContactPage() {
                           <h3 className="font-semibold text-gray-900 mb-2">Email Us</h3>
                           <p className="text-lg text-blue-600 font-medium mb-1">info@comfinserv.co</p>
                           <p className="text-gray-600 text-sm">We'll respond promptly</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* WhatsApp */}
+                  <Card className="border-2 border-blue-100 shadow-xl hover:shadow-2xl transition-all duration-300">
+                    <CardContent className="p-6">
+                      <div className="flex items-start space-x-4">
+                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                          <MessageCircle className="h-6 w-6 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-900 mb-2">WhatsApp Us</h3>
+                          <p className="text-gray-600 text-sm mb-4">
+                            Tap to chat with our team on WhatsApp.
+                          </p>
+                          <a
+                            href={getWhatsAppHref("Hi! I need help with registration / filings.")}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+                          >
+                            Open WhatsApp
+                            <ArrowRight className="ml-2 h-5 w-5" />
+                          </a>
                         </div>
                       </div>
                     </CardContent>

@@ -929,9 +929,9 @@ export default function UserDashboard() {
                                 Call us directly for immediate assistance during business hours.
                               </p>
                               <Button variant="outline" className="w-full" asChild>
-                                <a href="tel:0612-4535604">
+                                <a href="tel:+916124575362">
                                   <Phone className="mr-2 h-4 w-4" />
-                                  0612-4535604
+                                  Office landline: +91 612-4575362
                                 </a>
                               </Button>
                             </div>

@@ -545,7 +545,7 @@ export default function NidhiCompanyPage() {
               <div className="grid md:grid-cols-3 gap-8 mt-16">
                 <div className="flex items-center justify-center space-x-3">
                   <Phone className="h-6 w-6 text-blue-200" />
-                  <span className="text-blue-100">0612-4535604</span>
+                  <span className="text-blue-100">Office landline: +91 612-4575362</span>
                 </div>
                 <div className="flex items-center justify-center space-x-3">
                   <Mail className="h-6 w-6 text-blue-200" />
