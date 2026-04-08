@@ -1,5 +1,6 @@
-export const OFFICE_LANDLINE_DISPLAY = "Office landline: +91 612-4575362";
-export const OFFICE_LANDLINE_TEL = "+916124575362";
+// export const OFFICE_LANDLINE_DISPLAY = "Office landline: +91 612-4575362";
+export const OFFICE_LANDLINE_DISPLAY = "Office landline: +91 92631 23455";
+export const OFFICE_LANDLINE_TEL = "+919263123455";
 
 function digitsOnly(value: string): string {
   return value.replace(/[^\d]/g, "");
@@ -26,4 +27,3 @@ export function getWhatsAppHref(message: string): string {
   const text = encodeURIComponent(message);
   return `https://wa.me/${number}?text=${text}`;
 }
-

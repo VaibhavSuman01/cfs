@@ -1,21 +1,36 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useSearchParams } from 'next/navigation'
-import { EnhancedHeader } from "@/components/enhanced-header"
-import { EnhancedFooter } from "@/components/enhanced-footer"
-import { FadeInSection } from "@/components/fade-in-section"
-import { AnimatedBackground } from "@/components/animated-background"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Phone, Mail, MapPin, Clock, Send, Loader2, MessageCircle, ArrowRight } from "lucide-react"
-import { toast } from "sonner"
-import api from "@/lib/api-client"
-import { getWhatsAppHref } from "@/lib/contact"
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { EnhancedHeader } from "@/components/enhanced-header";
+import { EnhancedFooter } from "@/components/enhanced-footer";
+import { FadeInSection } from "@/components/fade-in-section";
+import { AnimatedBackground } from "@/components/animated-background";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Phone,
+  Mail,
+  MapPin,
+  Clock,
+  Send,
+  Loader2,
+  MessageCircle,
+  ArrowRight,
+} from "lucide-react";
+import { toast } from "sonner";
+import api from "@/lib/api-client";
+import { getWhatsAppHref } from "@/lib/contact";
 
 // Service -> Sub-services mapping (extend as needed)
 const SERVICE_OPTIONS: Record<string, string[]> = {
@@ -29,7 +44,7 @@ const SERVICE_OPTIONS: Record<string, string[]> = {
     "Partnership Firm Registration",
     "Other",
   ],
-  "Taxation": [
+  Taxation: [
     "GST Filing",
     "Income Tax Filing",
     "TDS Returns",
@@ -38,12 +53,8 @@ const SERVICE_OPTIONS: Record<string, string[]> = {
     "PT Tax Filing",
     "Other",
   ],
-  "ROC Returns": [
-    "ROC Annual Filing",
-    "Director Changes",
-    "Other",
-  ],
-  "Registration": [
+  "ROC Returns": ["ROC Annual Filing", "Director Changes", "Other"],
+  Registration: [
     "GST Registration",
     "MSME Udyam Registration",
     "IEC Registration",
@@ -57,7 +68,7 @@ const SERVICE_OPTIONS: Record<string, string[]> = {
     "PT Tax",
     "Other",
   ],
-  "Advisory": [
+  Advisory: [
     "Digital Transformation",
     "Business Strategy Consulting",
     "Financial Planning & Analysis",
@@ -69,7 +80,7 @@ const SERVICE_OPTIONS: Record<string, string[]> = {
     "Other Finance Related Services",
     "Other",
   ],
-  "Reports": [
+  Reports: [
     "CMA Reports",
     "Project Reports",
     "DSCR Reports",
@@ -81,58 +92,56 @@ const SERVICE_OPTIONS: Record<string, string[]> = {
     "Copyright Registration",
     "Other",
   ],
-  "Other": [
-    "Other",
-  ],
-}
+  Other: ["Other"],
+};
 
 export default function ContactPage() {
-  const searchParams = useSearchParams()
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
-  const [service, setService] = useState('')
-  const [subService, setSubService] = useState('')
-  const [message, setMessage] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSuccess, setIsSuccess] = useState(false)
+  const searchParams = useSearchParams();
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [service, setService] = useState("");
+  const [subService, setSubService] = useState("");
+  const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   useEffect(() => {
-    const serviceParam = searchParams.get('service');
-    const subServiceParam = searchParams.get('subService');
-    
+    const serviceParam = searchParams.get("service");
+    const subServiceParam = searchParams.get("subService");
+
     if (serviceParam) {
       // If service is "Advisory", set it directly
-      if (serviceParam === 'Advisory') {
-        setService('Advisory')
+      if (serviceParam === "Advisory") {
+        setService("Advisory");
         if (subServiceParam) {
-          setSubService(subServiceParam)
+          setSubService(subServiceParam);
         }
       } else {
         // Try to find which service category this belongs to
-        const entries = Object.entries(SERVICE_OPTIONS)
-        let matchedParent: string | null = null
+        const entries = Object.entries(SERVICE_OPTIONS);
+        let matchedParent: string | null = null;
         for (const [parent, subs] of entries) {
           if (subs.includes(serviceParam)) {
-            matchedParent = parent
-            break
+            matchedParent = parent;
+            break;
           }
         }
         if (matchedParent) {
-          setService(matchedParent)
-          setSubService(serviceParam)
+          setService(matchedParent);
+          setSubService(serviceParam);
         } else {
           // Check if it's a direct service category name
           if (Object.keys(SERVICE_OPTIONS).includes(serviceParam)) {
-            setService(serviceParam)
+            setService(serviceParam);
             if (subServiceParam) {
-              setSubService(subServiceParam)
+              setSubService(subServiceParam);
             }
           } else {
             // If not found in predefined list, set as service and subService
-            setService('Other')
-            setSubService(serviceParam)
+            setService("Other");
+            setSubService(serviceParam);
           }
         }
       }
@@ -141,55 +150,63 @@ export default function ContactPage() {
 
   const handleSubmit = async () => {
     // Validate form
-    if (!firstName || !lastName || !email || !phone || !service || !subService || !message) {
-      toast.error('Please fill in all required fields')
-      return
+    if (
+      !firstName ||
+      !lastName ||
+      !email ||
+      !phone ||
+      !service ||
+      !subService ||
+      !message
+    ) {
+      toast.error("Please fill in all required fields");
+      return;
     }
 
     // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      toast.error('Please enter a valid email address')
-      return
+      toast.error("Please enter a valid email address");
+      return;
     }
 
     // Phone validation
-    const phoneRegex = /^[0-9]{10}$/
+    const phoneRegex = /^[0-9]{10}$/;
     if (!phoneRegex.test(phone)) {
-      toast.error('Please enter a valid 10-digit phone number')
-      return
+      toast.error("Please enter a valid 10-digit phone number");
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     try {
-      const composedService = `${service}${subService ? ' - ' + subService : ''}`
-      await api.post('/api/forms/contact', {
+      const composedService = `${service}${subService ? " - " + subService : ""}`;
+      await api.post("/api/forms/contact", {
         name: `${firstName} ${lastName}`,
         email,
         phone,
         service: composedService,
-        message
-      })
+        message,
+      });
 
-      toast.success('Your message has been sent successfully!')
-      setIsSuccess(true)
-      
+      toast.success("Your message has been sent successfully!");
+      setIsSuccess(true);
+
       // Reset form
-      setFirstName('')
-      setLastName('')
-      setEmail('')
-      setPhone('')
-      setService('')
-      setSubService('')
-      setMessage('')
+      setFirstName("");
+      setLastName("");
+      setEmail("");
+      setPhone("");
+      setService("");
+      setSubService("");
+      setMessage("");
     } catch (error) {
-      console.error('Error submitting contact form:', error)
-      toast.error('Failed to send message. Please try again later.')
+      console.error("Error submitting contact form:", error);
+      toast.error("Failed to send message. Please try again later.");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -211,8 +228,8 @@ export default function ContactPage() {
               </span>
             </h1>
             <p className="text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto">
-              Get in touch with our business experts for personalized guidance and support. We're here to help you
-              succeed.
+              Get in touch with our business experts for personalized guidance
+              and support. We're here to help you succeed.
             </p>
           </FadeInSection>
         </div>
@@ -230,7 +247,8 @@ export default function ContactPage() {
                     Send Us a Message
                   </h2>
                   <p className="text-gray-600">
-                    Fill out the form below and our team will get back to you within 24 hours.
+                    Fill out the form below and our team will get back to you
+                    within 24 hours.
                   </p>
                 </div>
 
@@ -239,14 +257,30 @@ export default function ContactPage() {
                     <CardContent className="p-8 text-center">
                       <div className="space-y-6">
                         <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-8 w-8 text-white"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M5 13l4 4L19 7"
+                            />
                           </svg>
                         </div>
-                        <h3 className="text-2xl font-bold text-blue-700">Message Sent Successfully!</h3>
-                        <p className="text-blue-600">Thank you for contacting us. Our team will get back to you within 24 hours.</p>
-                        <Button 
-                          onClick={() => setIsSuccess(false)} 
+                        <h3 className="text-2xl font-bold text-blue-700">
+                          Message Sent Successfully!
+                        </h3>
+                        <p className="text-blue-600">
+                          Thank you for contacting us. Our team will get back to
+                          you within 24 hours.
+                        </p>
+                        <Button
+                          onClick={() => setIsSuccess(false)}
                           className="bg-blue-600 hover:bg-blue-700 text-white"
                         >
                           Send Another Message
@@ -258,129 +292,172 @@ export default function ContactPage() {
                   <Card className="border-2 border-blue-100 shadow-xl">
                     <CardContent className="p-8">
                       <div className="space-y-6">
-                      <div className="grid md:grid-cols-2 gap-6">
+                        <div className="grid md:grid-cols-2 gap-6">
+                          <div>
+                            <Label
+                              htmlFor="firstName"
+                              className="text-gray-700 font-medium"
+                            >
+                              First Name*
+                            </Label>
+                            <Input
+                              id="firstName"
+                              placeholder="Enter your first name"
+                              className="mt-2 border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
+                              value={firstName}
+                              onChange={(e) => setFirstName(e.target.value)}
+                              required
+                            />
+                          </div>
+                          <div>
+                            <Label
+                              htmlFor="lastName"
+                              className="text-gray-700 font-medium"
+                            >
+                              Last Name*
+                            </Label>
+                            <Input
+                              id="lastName"
+                              placeholder="Enter your last name"
+                              className="mt-2 border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
+                              value={lastName}
+                              onChange={(e) => setLastName(e.target.value)}
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-6">
+                          <div>
+                            <Label
+                              htmlFor="email"
+                              className="text-gray-700 font-medium"
+                            >
+                              Email*
+                            </Label>
+                            <Input
+                              id="email"
+                              type="email"
+                              placeholder="Enter your email"
+                              className="mt-2 border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
+                              required
+                            />
+                          </div>
+                          <div>
+                            <Label
+                              htmlFor="phone"
+                              className="text-gray-700 font-medium"
+                            >
+                              Phone*
+                            </Label>
+                            <Input
+                              id="phone"
+                              placeholder="Enter your phone number"
+                              className="mt-2 border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
+                              value={phone}
+                              onChange={(e) => setPhone(e.target.value)}
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-6">
+                          <div className="grid gap-2">
+                            <Label htmlFor="service">Service*</Label>
+                            <Select
+                              value={service}
+                              onValueChange={(v) => {
+                                setService(v);
+                                setSubService("");
+                              }}
+                            >
+                              <SelectTrigger
+                                id="service"
+                                className="border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                              >
+                                <SelectValue placeholder="Select a service" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {Object.keys(SERVICE_OPTIONS).map((svc) => (
+                                  <SelectItem key={svc} value={svc}>
+                                    {svc}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="grid gap-2">
+                            <Label htmlFor="subService">Sub-service*</Label>
+                            <Select
+                              value={subService}
+                              onValueChange={setSubService}
+                              disabled={!service}
+                            >
+                              <SelectTrigger
+                                id="subService"
+                                className="border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                              >
+                                <SelectValue
+                                  placeholder={
+                                    service
+                                      ? "Select a sub-service"
+                                      : "Select service first"
+                                  }
+                                />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {(SERVICE_OPTIONS[service] || ["Other"]).map(
+                                  (ss) => (
+                                    <SelectItem key={ss} value={ss}>
+                                      {ss}
+                                    </SelectItem>
+                                  ),
+                                )}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+
                         <div>
-                          <Label htmlFor="firstName" className="text-gray-700 font-medium">
-                            First Name*
+                          <Label
+                            htmlFor="message"
+                            className="text-gray-700 font-medium"
+                          >
+                            Message*
                           </Label>
-                          <Input
-                            id="firstName"
-                            placeholder="Enter your first name"
+                          <Textarea
+                            id="message"
+                            placeholder="Tell us about your requirements..."
                             className="mt-2 border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
-                            value={firstName}
-                            onChange={(e) => setFirstName(e.target.value)}
+                            rows={5}
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value)}
                             required
                           />
                         </div>
-                        <div>
-                          <Label htmlFor="lastName" className="text-gray-700 font-medium">
-                            Last Name*
-                          </Label>
-                          <Input
-                            id="lastName"
-                            placeholder="Enter your last name"
-                            className="mt-2 border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
-                            value={lastName}
-                            onChange={(e) => setLastName(e.target.value)}
-                            required
-                          />
-                        </div>
-                      </div>
 
-                      <div className="grid md:grid-cols-2 gap-6">
-                        <div>
-                          <Label htmlFor="email" className="text-gray-700 font-medium">
-                            Email*
-                          </Label>
-                          <Input
-                            id="email"
-                            type="email"
-                            placeholder="Enter your email"
-                            className="mt-2 border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="phone" className="text-gray-700 font-medium">
-                            Phone*
-                          </Label>
-                          <Input
-                            id="phone"
-                            placeholder="Enter your phone number"
-                            className="mt-2 border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            required
-                          />
-                        </div>
+                        <Button
+                          onClick={handleSubmit}
+                          className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                          disabled={isSubmitting}
+                        >
+                          {isSubmitting ? (
+                            <>
+                              <span className="mr-2">Sending...</span>
+                              <Loader2 className="h-5 w-5 animate-spin" />
+                            </>
+                          ) : (
+                            <>
+                              Send Message
+                              <Send className="ml-2 h-5 w-5" />
+                            </>
+                          )}
+                        </Button>
                       </div>
-
-                      <div className="grid md:grid-cols-2 gap-6">
-                        <div className="grid gap-2">
-                          <Label htmlFor="service">Service*</Label>
-                          <Select value={service} onValueChange={(v) => { setService(v); setSubService('') }}>
-                            <SelectTrigger id="service" className="border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
-                              <SelectValue placeholder="Select a service" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {Object.keys(SERVICE_OPTIONS).map((svc) => (
-                                <SelectItem key={svc} value={svc}>{svc}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="grid gap-2">
-                          <Label htmlFor="subService">Sub-service*</Label>
-                          <Select value={subService} onValueChange={setSubService} disabled={!service}>
-                            <SelectTrigger id="subService" className="border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
-                              <SelectValue placeholder={service ? 'Select a sub-service' : 'Select service first'} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {(SERVICE_OPTIONS[service] || ["Other"]).map((ss) => (
-                                <SelectItem key={ss} value={ss}>{ss}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-
-                      <div>
-                        <Label htmlFor="message" className="text-gray-700 font-medium">
-                          Message*
-                        </Label>
-                        <Textarea
-                          id="message"
-                          placeholder="Tell us about your requirements..."
-                          className="mt-2 border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
-                          rows={5}
-                          value={message}
-                          onChange={(e) => setMessage(e.target.value)}
-                          required
-                        />
-                      </div>
-
-                      <Button 
-                        onClick={handleSubmit}
-                        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                        disabled={isSubmitting}
-                      >
-                        {isSubmitting ? (
-                          <>
-                            <span className="mr-2">Sending...</span>
-                            <Loader2 className="h-5 w-5 animate-spin" />
-                          </>
-                        ) : (
-                          <>
-                            Send Message
-                            <Send className="ml-2 h-5 w-5" />
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
                 )}
               </div>
 
@@ -404,11 +481,15 @@ export default function ContactPage() {
                           <Phone className="h-6 w-6 text-white" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900 mb-2">Call Us</h3>
+                          <h3 className="font-semibold text-gray-900 mb-2">
+                            Call Us
+                          </h3>
                           <p className="text-lg text-blue-600 font-medium mb-1">
                             Office landline: +91 612-4575362
                           </p>
-                          <p className="text-gray-600 text-sm">Mon-Sat 10AM-7PM</p>
+                          <p className="text-gray-600 text-sm">
+                            Mon-Sat 10AM-7PM
+                          </p>
                         </div>
                       </div>
                     </CardContent>
@@ -422,9 +503,15 @@ export default function ContactPage() {
                           <Mail className="h-6 w-6 text-white" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900 mb-2">Email Us</h3>
-                          <p className="text-lg text-blue-600 font-medium mb-1">info@comfinserv.co</p>
-                          <p className="text-gray-600 text-sm">We'll respond promptly</p>
+                          <h3 className="font-semibold text-gray-900 mb-2">
+                            Email Us
+                          </h3>
+                          <p className="text-lg text-blue-600 font-medium mb-1">
+                            info@comfinserv.co
+                          </p>
+                          <p className="text-gray-600 text-sm">
+                            We'll respond promptly
+                          </p>
                         </div>
                       </div>
                     </CardContent>
@@ -438,15 +525,19 @@ export default function ContactPage() {
                           <MessageCircle className="h-6 w-6 text-white" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900 mb-2">WhatsApp Us</h3>
+                          <h3 className="font-semibold text-gray-900 mb-2">
+                            WhatsApp Us
+                          </h3>
                           <p className="text-gray-600 text-sm mb-4">
                             Tap to chat with our team on WhatsApp.
                           </p>
                           <a
-                            href={getWhatsAppHref("Hi! I need help with registration / filings.")}
+                            href={getWhatsAppHref(
+                              "Hi! I need help with registration / filings.",
+                            )}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center justify-center w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+                            className="inline-flex items-center justify-center w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
                           >
                             Open WhatsApp
                             <ArrowRight className="ml-2 h-5 w-5" />
@@ -464,7 +555,9 @@ export default function ContactPage() {
                           <MapPin className="h-6 w-6 text-white" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900 mb-2">Head Office</h3>
+                          <h3 className="font-semibold text-gray-900 mb-2">
+                            Head Office
+                          </h3>
                           <p className="text-gray-600">
                             211, NP EXHIBITION ROAD
                             <br />
@@ -483,7 +576,9 @@ export default function ContactPage() {
                           <Clock className="h-6 w-6 text-white" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900 mb-2">Office Hours</h3>
+                          <h3 className="font-semibold text-gray-900 mb-2">
+                            Office Hours
+                          </h3>
                           <p className="text-gray-600">
                             Monday - Saturday: 10:00 AM - 7:00 PM
                             <br />
@@ -502,5 +597,5 @@ export default function ContactPage() {
 
       <EnhancedFooter />
     </div>
-  )
+  );
 }
