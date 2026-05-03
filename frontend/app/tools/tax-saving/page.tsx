@@ -11,6 +11,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { Calculator, Target, TrendingUp, DollarSign, FileText } from "lucide-react";
+import {
+  FINANCIAL_YEAR_OPTIONS,
+  getDefaultIndianFinancialYearLabel,
+} from "@/lib/india-financial-years";
 
 interface TaxSavingResults {
   annualIncome: number;
@@ -28,7 +32,7 @@ interface TaxSavingResults {
 }
 
 export default function TaxSavingCalculator() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(() => ({
     annualIncome: 800000,
     age: 30,
     currentInvestments: {
@@ -42,8 +46,8 @@ export default function TaxSavingCalculator() {
       hra: 0,
       standardDeduction: 50000,
     },
-    financialYear: "2024-25",
-  });
+    financialYear: getDefaultIndianFinancialYearLabel(),
+  }));
 
   const [results, setResults] = useState<TaxSavingResults | null>(null);
 
@@ -252,6 +256,26 @@ export default function TaxSavingCalculator() {
                         <span>₹20,00,000</span>
                       </div>
                     </div>
+                  </div>
+
+                  {/* Financial year (for context; slabs use illustrative new regime) */}
+                  <div className="space-y-2">
+                    <Label htmlFor="financialYear">Financial Year</Label>
+                    <Select
+                      value={formData.financialYear}
+                      onValueChange={(value) => handleInputChange("financialYear", value)}
+                    >
+                      <SelectTrigger id="financialYear">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {FINANCIAL_YEAR_OPTIONS.map((fy) => (
+                          <SelectItem key={fy} value={fy}>
+                            {fy}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   {/* Age */}

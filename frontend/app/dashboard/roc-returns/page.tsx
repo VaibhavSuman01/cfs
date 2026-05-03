@@ -17,6 +17,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { PersonalInformationDropdown } from "@/components/ui/personal-information-dropdown";
+import { FINANCIAL_YEAR_OPTIONS } from "@/lib/india-financial-years";
 
 const rocReturnsSchema = z.object({
   returnType: z.string().min(1, "Return type is required"),
@@ -290,11 +291,11 @@ export default function ROCReturnsPage() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="2024-25">2024-25</SelectItem>
-                            <SelectItem value="2023-24">2023-24</SelectItem>
-                            <SelectItem value="2022-23">2022-23</SelectItem>
-                            <SelectItem value="2021-22">2021-22</SelectItem>
-                            <SelectItem value="2020-21">2020-21</SelectItem>
+                            {FINANCIAL_YEAR_OPTIONS.map((fy) => (
+                              <SelectItem key={fy} value={fy}>
+                                {fy}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />

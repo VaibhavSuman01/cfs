@@ -10,6 +10,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Search, FileText, CheckCircle, XCircle, Clock, AlertCircle } from "lucide-react";
+import {
+  FINANCIAL_YEAR_OPTIONS,
+  getDefaultIndianFinancialYearLabel,
+} from "@/lib/india-financial-years";
 
 interface RefundStatus {
   ackNumber: string;
@@ -25,11 +29,11 @@ interface RefundStatus {
 }
 
 export default function ITRefundStatus() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(() => ({
     ackNumber: "",
     pan: "",
-    assessmentYear: "2024-25",
-  });
+    assessmentYear: getDefaultIndianFinancialYearLabel(),
+  }));
 
   const [refundStatus, setRefundStatus] = useState<RefundStatus | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -221,10 +225,11 @@ export default function ITRefundStatus() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="2024-25">2024-25</SelectItem>
-                        <SelectItem value="2023-24">2023-24</SelectItem>
-                        <SelectItem value="2022-23">2022-23</SelectItem>
-                        <SelectItem value="2021-22">2021-22</SelectItem>
+                        {FINANCIAL_YEAR_OPTIONS.map((ay) => (
+                          <SelectItem key={ay} value={ay}>
+                            {ay}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>

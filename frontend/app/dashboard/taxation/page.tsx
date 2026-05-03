@@ -18,6 +18,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { PersonalInformationDropdown } from '@/components/ui/personal-information-dropdown';
+import { CALENDAR_YEAR_OPTIONS, FINANCIAL_YEAR_OPTIONS } from '@/lib/india-financial-years';
 
 const taxFormSchema = z.object({
   service: z.string().min(1, 'Please select a service'),
@@ -99,13 +100,7 @@ export default function NewFormPage() {
     { value: '12', label: 'December' },
   ];
 
-  const years = [
-    { value: '2024', label: '2024' },
-    { value: '2023', label: '2023' },
-    { value: '2022', label: '2022' },
-    { value: '2021', label: '2021' },
-    { value: '2020', label: '2020' },
-  ];
+  const years = CALENDAR_YEAR_OPTIONS.map((y) => ({ value: y, label: y }));
 
   // Suggested required documents by service
   const serviceDocMap: Record<string, string[]> = useMemo(() => ({
@@ -500,11 +495,11 @@ export default function NewFormPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="2024-25">2024-25</SelectItem>
-                          <SelectItem value="2023-24">2023-24</SelectItem>
-                          <SelectItem value="2022-23">2022-23</SelectItem>
-                          <SelectItem value="2021-22">2021-22</SelectItem>
-                          <SelectItem value="2020-21">2020-21</SelectItem>
+                          {FINANCIAL_YEAR_OPTIONS.map((fy) => (
+                            <SelectItem key={fy} value={fy}>
+                              {fy}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       <FormMessage />

@@ -31,6 +31,7 @@ import {
 import { toast } from "sonner";
 import api from "@/lib/api-client";
 import { getWhatsAppHref } from "@/lib/contact";
+import { FINANCIAL_YEAR_OPTIONS } from "@/lib/india-financial-years";
 
 // Service -> Sub-services mapping (extend as needed)
 const SERVICE_OPTIONS: Record<string, string[]> = {
@@ -103,6 +104,7 @@ export default function ContactPage() {
   const [phone, setPhone] = useState("");
   const [service, setService] = useState("");
   const [subService, setSubService] = useState("");
+  const [financialYear, setFinancialYear] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -148,6 +150,9 @@ export default function ContactPage() {
     }
   }, [searchParams]);
 
+  const showFinancialYear =
+    service === "Taxation" || service === "ROC Returns";
+
   const handleSubmit = async () => {
     // Validate form
     if (
@@ -187,6 +192,9 @@ export default function ContactPage() {
         phone,
         service: composedService,
         message,
+        ...(showFinancialYear && financialYear.trim()
+          ? { financialYear: financialYear.trim() }
+          : {}),
       });
 
       toast.success("Your message has been sent successfully!");

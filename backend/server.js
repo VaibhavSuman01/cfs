@@ -17,6 +17,8 @@ const OtherRegistrationForm = require("./models/OtherRegistrationForm");
 const ReportsForm = require("./models/ReportsForm");
 const TrademarkISOForm = require("./models/TrademarkISOForm");
 const AdvisoryForm = require("./models/AdvisoryForm");
+const JobPosting = require("./models/JobPosting");
+const JobApplication = require("./models/JobApplication");
 
 // Import routes
 const formRoutes = require("./routes/formRoutes");
@@ -25,6 +27,7 @@ const authRoutes = require("./routes/authRoutes");
 const passwordResetRoutes = require("./routes/passwordResetRoutes");
 const supportRoutes = require("./routes/supportRoutes");
 const supportTeamRoutes = require("./routes/supportTeamRoutes");
+const jobsRoutes = require("./routes/jobsRoutes");
 const PasswordResetToken = require("./models/PasswordResetToken");
 
 // Initialize express app
@@ -153,6 +156,7 @@ app.use("/api/forms", formRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/support", supportRoutes);
 app.use("/api/support-team", supportTeamRoutes);
+app.use("/api/jobs", jobsRoutes);
 
 // Apply profile-specific rate limiting to profile routes
 app.use("/api/auth/profile", profileLimiter);
@@ -276,6 +280,8 @@ const syncAllIndexes = async () => {
     { name: "ReportsForm", model: ReportsForm },
     { name: "TrademarkISOForm", model: TrademarkISOForm },
     { name: "AdvisoryForm", model: AdvisoryForm },
+    { name: "JobPosting", model: JobPosting },
+    { name: "JobApplication", model: JobApplication },
   ];
 
   for (const { name, model } of models) {

@@ -10,29 +10,45 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calculator, TrendingUp, Info } from "lucide-react";
+import {
+  FINANCIAL_YEAR_OPTIONS,
+  getDefaultIndianFinancialYearLabel,
+  getLatestListedFinancialYearLabel,
+} from "@/lib/india-financial-years";
 
-const taxSlabs = {
-  "2024-25": [
-    { min: 0, max: 300000, rate: 0, description: "Up to ₹3,00,000" },
-    { min: 300000, max: 600000, rate: 5, description: "₹3,00,001 - ₹6,00,000" },
-    { min: 600000, max: 900000, rate: 10, description: "₹6,00,001 - ₹9,00,000" },
-    { min: 900000, max: 1200000, rate: 15, description: "₹9,00,001 - ₹12,00,000" },
-    { min: 1200000, max: 1500000, rate: 20, description: "₹12,00,001 - ₹15,00,000" },
-    { min: 1500000, max: Infinity, rate: 30, description: "Above ₹15,00,000" }
-  ],
-  "2023-24": [
-    { min: 0, max: 250000, rate: 0, description: "Up to ₹2,50,000" },
-    { min: 250000, max: 500000, rate: 5, description: "₹2,50,001 - ₹5,00,000" },
-    { min: 500000, max: 1000000, rate: 20, description: "₹5,00,001 - ₹10,00,000" },
-    { min: 1000000, max: Infinity, rate: 30, description: "Above ₹10,00,000" }
-  ]
-};
+const newRegimeSlabs = [
+  { min: 0, max: 300000, rate: 0, description: "Up to ₹3,00,000" },
+  { min: 300000, max: 600000, rate: 5, description: "₹3,00,001 - ₹6,00,000" },
+  { min: 600000, max: 900000, rate: 10, description: "₹6,00,001 - ₹9,00,000" },
+  { min: 900000, max: 1200000, rate: 15, description: "₹9,00,001 - ₹12,00,000" },
+  { min: 1200000, max: 1500000, rate: 20, description: "₹12,00,001 - ₹15,00,000" },
+  { min: 1500000, max: Infinity, rate: 30, description: "Above ₹15,00,000" },
+] as const;
+
+const oldRegimeSlabs202324 = [
+  { min: 0, max: 250000, rate: 0, description: "Up to ₹2,50,000" },
+  { min: 250000, max: 500000, rate: 5, description: "₹2,50,001 - ₹5,00,000" },
+  { min: 500000, max: 1000000, rate: 20, description: "₹5,00,001 - ₹10,00,000" },
+  { min: 1000000, max: Infinity, rate: 30, description: "Above ₹10,00,000" },
+] as const;
+
+const taxSlabs: Record<string, readonly { min: number; max: number; rate: number; description: string }[]> =
+  FINANCIAL_YEAR_OPTIONS.filter((fy) => fy !== "2023-24").reduce(
+    (acc, fy) => {
+      acc[fy] = newRegimeSlabs;
+      return acc;
+    },
+    {} as Record<string, typeof newRegimeSlabs>
+  );
+
+taxSlabs["2023-24"] = oldRegimeSlabs202324;
 
 export default function IncomeTaxCalculatorPage() {
-  const [formData, setFormData] = useState({
+  const maxFyLabel = getLatestListedFinancialYearLabel();
+  const [formData, setFormData] = useState(() => ({
     annualIncome: "",
     age: "",
-    financialYear: "2024-25",
+    financialYear: getDefaultIndianFinancialYearLabel(),
     deductions: {
       standardDeduction: 50000,
       hra: "",
@@ -43,7 +59,7 @@ export default function IncomeTaxCalculatorPage() {
       ppf: "",
       otherDeductions: ""
     }
-  });
+  }));
 
   const [results, setResults] = useState<{
     grossIncome: number;
@@ -168,7 +184,7 @@ export default function IncomeTaxCalculatorPage() {
                   Income Tax Calculator
                 </h1>
                 <p className="text-xl text-gray-600">
-                  Calculate your income tax liability for FY 2024-25 and plan your taxes efficiently
+                  Calculate your income tax liability for recent financial years up to FY {maxFyLabel} (illustrative new-regime slabs) and plan your taxes efficiently
                 </p>
               </div>
 
@@ -221,8 +237,11 @@ export default function IncomeTaxCalculatorPage() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="2024-25">2024-25</SelectItem>
-                            <SelectItem value="2023-24">2023-24</SelectItem>
+                            {FINANCIAL_YEAR_OPTIONS.map((fy) => (
+                              <SelectItem key={fy} value={fy}>
+                                {fy}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       </div>

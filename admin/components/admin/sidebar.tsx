@@ -17,6 +17,7 @@ import {
   HelpCircle,
   Menu,
   X,
+  Briefcase,
 } from 'lucide-react'
 
 export type NavItem = {
@@ -105,6 +106,16 @@ const navigation: NavItem[] = [
       { name: 'Filed', href: '/admin/tax-forms?status=Filed' },
       
     ]
+  },
+
+  // Careers
+  {
+    name: 'Careers',
+    icon: Briefcase,
+    submenu: [
+      { name: 'Jobs', href: '/admin/jobs' },
+      { name: 'Applications', href: '/admin/job-applications' },
+    ],
   },
 
   { name: 'Contact Messages', href: '/admin/contact-messages', icon: MessageSquare },

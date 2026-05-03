@@ -155,6 +155,7 @@ export function EnhancedFooter() {
   const quickLinks = [
     { name: "About Us", href: "/about" },
     { name: "Contact Us", href: "/contact" },
+    { name: "Careers", href: "/careers" },
   ];
 
   return (

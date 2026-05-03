@@ -1,4 +1,66 @@
 const emailTemplates = {
+  // Careers: applicant confirmation (optional)
+  jobApplicationConfirmation: (applicantName, jobTitle, jobUrl) => ({
+    subject: `Application received – ${jobTitle}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background-color: #2563eb; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+          <h1 style="margin: 0; font-size: 22px;">Application Received</h1>
+        </div>
+        <div style="background-color: #f9fafb; padding: 28px; border-radius: 0 0 8px 8px;">
+          <p style="font-size: 16px; margin-bottom: 16px;">Dear ${applicantName},</p>
+          <p style="font-size: 14px; line-height: 1.6; margin-bottom: 16px;">
+            Thank you for applying for <strong>${jobTitle}</strong>. We’ve received your application and our team will review it shortly.
+          </p>
+          ${
+            jobUrl
+              ? `<p style="font-size: 14px; line-height: 1.6; margin-bottom: 18px;">
+                   Job link: <a href="${jobUrl}" target="_blank" rel="noopener noreferrer">${jobUrl}</a>
+                 </p>`
+              : ""
+          }
+          <p style="font-size: 14px; line-height: 1.6;">
+            If your profile matches our requirements, we’ll reach out via email.
+          </p>
+          <p style="font-size: 12px; color: #6b7280; margin-top: 26px;">
+            Com Financial Services Team
+          </p>
+        </div>
+      </div>
+    `,
+    text: `Dear ${applicantName},\n\nThank you for applying for ${jobTitle}. We’ve received your application and our team will review it shortly.\n\n${
+      jobUrl ? `Job link: ${jobUrl}\n\n` : ""
+    }If your profile matches our requirements, we’ll reach out via email.\n\nCom Financial Services Team`,
+  }),
+
+  // Careers: admin reply to applicant
+  jobApplicationAdminReply: (applicantName, jobTitle, message, fromName) => ({
+    subject: `Re: Your application – ${jobTitle}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background-color: #111827; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+          <h1 style="margin: 0; font-size: 20px;">Regarding your application</h1>
+        </div>
+        <div style="background-color: #f9fafb; padding: 28px; border-radius: 0 0 8px 8px;">
+          <p style="font-size: 16px; margin-bottom: 16px;">Dear ${applicantName},</p>
+          <p style="font-size: 14px; line-height: 1.6; margin-bottom: 16px;">
+            Thank you for your interest in <strong>${jobTitle}</strong>.
+          </p>
+          <div style="background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; white-space: pre-line;">
+            ${message}
+          </div>
+          <p style="font-size: 14px; line-height: 1.6; margin-top: 18px;">
+            Best regards,<br />
+            ${fromName || "Com Financial Services"}
+          </p>
+        </div>
+      </div>
+    `,
+    text: `Dear ${applicantName},\n\nThank you for your interest in ${jobTitle}.\n\n${message}\n\nBest regards,\n${
+      fromName || "Com Financial Services"
+    }`,
+  }),
+
   // User blocking notification
   userBlocked: (userName, reason, adminName) => ({
     subject: "Account Blocked - Com Finance",

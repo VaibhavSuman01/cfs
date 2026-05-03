@@ -46,6 +46,22 @@ export const API_PATHS = {
     ROC_RETURNS_STATUS_UPDATE: (id: string) => createUrl(`/api/admin/roc-returns/${id}/status`),
     ROC_RETURNS_DOWNLOAD: (id: string, documentId: string) => createUrl(`/api/admin/roc-returns/${id}/download/${documentId}`),
     SEND_WEEKLY_REPORT: createUrl("/api/admin/send-weekly-report"),
+
+    // Careers Admin Routes
+    JOBS: createUrl("/api/admin/jobs"),
+    JOB_DETAIL: (id: string) => createUrl(`/api/admin/jobs/${id}`),
+    JOB_PUBLISH: (id: string) => createUrl(`/api/admin/jobs/${id}/publish`),
+    JOB_UNPUBLISH: (id: string) => createUrl(`/api/admin/jobs/${id}/unpublish`),
+    JOB_ARCHIVE: (id: string) => createUrl(`/api/admin/jobs/${id}/archive`),
+    JOB_DELETE: (id: string) => createUrl(`/api/admin/jobs/${id}`),
+    JOB_APPLICATIONS: createUrl("/api/admin/job-applications"),
+    JOB_APPLICATION_DETAIL: (id: string) => createUrl(`/api/admin/job-applications/${id}`),
+    JOB_APPLICATION_RESUME: (id: string) => createUrl(`/api/admin/job-applications/${id}/resume`),
+    JOB_APPLICATION_STATUS: (id: string) => createUrl(`/api/admin/job-applications/${id}/status`),
+    JOB_APPLICATION_NOTES: (id: string) => createUrl(`/api/admin/job-applications/${id}/notes`),
+    JOB_APPLICATION_EMAIL: (id: string) => createUrl(`/api/admin/job-applications/${id}/email`),
+    JOB_APPLICATION_DELETE: (id: string) => createUrl(`/api/admin/job-applications/${id}`),
+    JOB_APPLICATIONS_FOR_JOB: (jobId: string) => createUrl(`/api/admin/jobs/${jobId}/applications`),
   },
   FORMS: {
     TAX: createUrl("/api/forms/tax"),

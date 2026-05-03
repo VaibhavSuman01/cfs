@@ -23,6 +23,8 @@ const ReportsForm = require("../models/ReportsForm");
 const TrademarkISOForm = require("../models/TrademarkISOForm");
 const AdvisoryForm = require("../models/AdvisoryForm");
 const PartnershipForm = require("../models/PartnershipForm");
+const JobPosting = require("../models/JobPosting");
+const JobApplication = require("../models/JobApplication");
 
 // Apply auth middleware to all admin routes
 router.use(protect);
@@ -1671,6 +1673,476 @@ router.post("/forms/:formId/reports", upload.array("documents", 10), async (req,
   } catch (error) {
     console.error("Error creating admin report:", error);
     res.status(500).json({ message: "Server error" });
+  }
+});
+
+// -----------------------------
+// Careers (Jobs + Applications)
+// -----------------------------
+
+const normalizeString = (value, { max = 200, lower = false } = {}) => {
+  if (typeof value !== "string") return "";
+  const trimmed = value.trim();
+  const cut = trimmed.length > max ? trimmed.slice(0, max) : trimmed;
+  return lower ? cut.toLowerCase() : cut;
+};
+
+const slugify = (value) =>
+  normalizeString(value, { max: 200, lower: true })
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 200);
+
+// @route   GET /api/admin/jobs
+// @desc    Get all jobs (incl drafts)
+// @access  Private/Admin
+router.get("/jobs", async (req, res) => {
+  try {
+    const { page = 1, limit = 20, search, status, includeArchived = "true" } = req.query;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    const filter = {};
+    if (includeArchived !== "true") {
+      filter.isArchived = { $ne: true };
+    }
+
+    if (status === "published") filter.isPublished = true;
+    if (status === "draft") filter.isPublished = false;
+    if (status === "archived") filter.isArchived = true;
+
+    if (search) {
+      const q = String(search);
+      const rx = { $regex: q, $options: "i" };
+      filter.$or = [{ title: rx }, { slug: rx }, { department: rx }, { location: rx }];
+    }
+
+    const jobs = await JobPosting.find(filter)
+      .sort({ updatedAt: -1 })
+      .skip(skip)
+      .limit(parseInt(limit))
+      .populate("createdBy", "name email")
+      .populate("updatedBy", "name email");
+
+    const total = await JobPosting.countDocuments(filter);
+
+    return res.json({
+      success: true,
+      jobs,
+      pagination: {
+        total,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        pages: Math.ceil(total / parseInt(limit)),
+      },
+    });
+  } catch (error) {
+    console.error("Admin jobs list error:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// @route   GET /api/admin/jobs/:id
+// @desc    Get job posting by id
+// @access  Private/Admin
+router.get("/jobs/:id", validateObjectId(), async (req, res) => {
+  try {
+    const job = await JobPosting.findById(req.params.id)
+      .populate("createdBy", "name email")
+      .populate("updatedBy", "name email");
+    if (!job) return res.status(404).json({ success: false, message: "Job not found" });
+    return res.json({ success: true, job });
+  } catch (error) {
+    console.error("Admin job detail error:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// @route   POST /api/admin/jobs
+// @desc    Create job posting
+// @access  Private/Admin
+router.post("/jobs", async (req, res) => {
+  try {
+    const title = normalizeString(req.body.title, { max: 200 });
+    const slug = normalizeString(req.body.slug, { max: 200, lower: true }) || slugify(title);
+
+    if (!title) return res.status(400).json({ success: false, message: "Title is required" });
+    if (!slug) return res.status(400).json({ success: false, message: "Slug is required" });
+
+    const payload = {
+      title,
+      slug,
+      department: normalizeString(req.body.department, { max: 120 }) || undefined,
+      location: normalizeString(req.body.location, { max: 120 }) || undefined,
+      employmentType: normalizeString(req.body.employmentType, { max: 80 }) || undefined,
+      experienceLevel: normalizeString(req.body.experienceLevel, { max: 80 }) || undefined,
+      description: normalizeString(req.body.description, { max: 50000 }) || undefined,
+      requirements: Array.isArray(req.body.requirements)
+        ? req.body.requirements.map((s) => normalizeString(s, { max: 500 })).filter(Boolean)
+        : undefined,
+      benefits: Array.isArray(req.body.benefits)
+        ? req.body.benefits.map((s) => normalizeString(s, { max: 500 })).filter(Boolean)
+        : undefined,
+      closingDate: req.body.closingDate ? new Date(req.body.closingDate) : undefined,
+      createdBy: req.user?._id,
+      updatedBy: req.user?._id,
+    };
+
+    const job = await JobPosting.create(payload);
+    return res.status(201).json({ success: true, job });
+  } catch (error) {
+    console.error("Admin create job error:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// @route   PUT /api/admin/jobs/:id
+// @desc    Update job posting
+// @access  Private/Admin
+router.put("/jobs/:id", validateObjectId(), async (req, res) => {
+  try {
+    const id = req.params.id;
+    const job = await JobPosting.findById(id);
+    if (!job) return res.status(404).json({ success: false, message: "Job not found" });
+
+    const title = typeof req.body.title === "string" ? normalizeString(req.body.title, { max: 200 }) : undefined;
+    const slugRaw =
+      typeof req.body.slug === "string"
+        ? normalizeString(req.body.slug, { max: 200, lower: true })
+        : undefined;
+    const slug = slugRaw !== undefined ? slugify(slugRaw) : undefined;
+
+    if (title !== undefined && !title) {
+      return res.status(400).json({ success: false, message: "Title is required" });
+    }
+    if (slug !== undefined && !slug) {
+      return res.status(400).json({ success: false, message: "Slug is required" });
+    }
+
+    if (title !== undefined) job.title = title;
+    if (slug !== undefined) job.slug = slug;
+    if (req.body.department !== undefined) job.department = normalizeString(req.body.department, { max: 120 }) || "";
+    if (req.body.location !== undefined) job.location = normalizeString(req.body.location, { max: 120 }) || "";
+    if (req.body.employmentType !== undefined)
+      job.employmentType = normalizeString(req.body.employmentType, { max: 80 }) || "";
+    if (req.body.experienceLevel !== undefined)
+      job.experienceLevel = normalizeString(req.body.experienceLevel, { max: 80 }) || "";
+    if (req.body.description !== undefined) job.description = normalizeString(req.body.description, { max: 50000 }) || "";
+
+    if (req.body.requirements !== undefined) {
+      job.requirements = Array.isArray(req.body.requirements)
+        ? req.body.requirements.map((s) => normalizeString(s, { max: 500 })).filter(Boolean)
+        : [];
+    }
+    if (req.body.benefits !== undefined) {
+      job.benefits = Array.isArray(req.body.benefits)
+        ? req.body.benefits.map((s) => normalizeString(s, { max: 500 })).filter(Boolean)
+        : [];
+    }
+
+    if (req.body.closingDate !== undefined) {
+      job.closingDate = req.body.closingDate ? new Date(req.body.closingDate) : null;
+    }
+
+    job.updatedBy = req.user?._id;
+    await job.save();
+    return res.json({ success: true, job });
+  } catch (error) {
+    console.error("Admin update job error:", error);
+    if (error?.name === "ValidationError") {
+      const errors = Object.values(error.errors || {}).map((e) => e.message);
+      return res.status(400).json({ success: false, message: "Validation Error", errors });
+    }
+    if (error?.code === 11000) {
+      return res.status(400).json({ success: false, message: "slug already exists" });
+    }
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// @route   PUT /api/admin/jobs/:id/publish
+router.put("/jobs/:id/publish", validateObjectId(), async (req, res) => {
+  try {
+    const job = await JobPosting.findById(req.params.id);
+    if (!job) return res.status(404).json({ success: false, message: "Job not found" });
+    if (job.isArchived) return res.status(400).json({ success: false, message: "Archived jobs cannot be published" });
+
+    job.isPublished = true;
+    if (!job.publishedAt) job.publishedAt = new Date();
+    job.updatedBy = req.user?._id;
+    await job.save();
+    return res.json({ success: true, job });
+  } catch (error) {
+    console.error("Admin publish job error:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// @route   PUT /api/admin/jobs/:id/unpublish
+router.put("/jobs/:id/unpublish", validateObjectId(), async (req, res) => {
+  try {
+    const job = await JobPosting.findById(req.params.id);
+    if (!job) return res.status(404).json({ success: false, message: "Job not found" });
+    job.isPublished = false;
+    job.updatedBy = req.user?._id;
+    await job.save();
+    return res.json({ success: true, job });
+  } catch (error) {
+    console.error("Admin unpublish job error:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// @route   PUT /api/admin/jobs/:id/archive
+router.put("/jobs/:id/archive", validateObjectId(), async (req, res) => {
+  try {
+    const job = await JobPosting.findById(req.params.id);
+    if (!job) return res.status(404).json({ success: false, message: "Job not found" });
+    job.isArchived = true;
+    job.archivedAt = new Date();
+    job.isPublished = false;
+    job.updatedBy = req.user?._id;
+    await job.save();
+    return res.json({ success: true, job });
+  } catch (error) {
+    console.error("Admin archive job error:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// @route   DELETE /api/admin/jobs/:id
+// @desc    Permanently delete an archived job (safety)
+// @access  Private/Admin
+router.delete("/jobs/:id", validateObjectId(), async (req, res) => {
+  try {
+    const job = await JobPosting.findById(req.params.id);
+    if (!job) return res.status(404).json({ success: false, message: "Job not found" });
+    if (!job.isArchived) {
+      return res.status(400).json({
+        success: false,
+        message: "Only archived jobs can be permanently deleted. Archive it first.",
+      });
+    }
+
+    const appsCount = await JobApplication.countDocuments({ jobId: job._id });
+    if (appsCount > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot delete a job that has applications. Archive it instead.",
+      });
+    }
+
+    await JobPosting.deleteOne({ _id: job._id });
+    return res.json({ success: true });
+  } catch (error) {
+    console.error("Admin delete job error:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// @route   GET /api/admin/job-applications
+// @desc    List applications with filters
+// @access  Private/Admin
+router.get("/job-applications", async (req, res) => {
+  try {
+    const { page = 1, limit = 20, status, job, search, startDate, endDate } = req.query;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    const filter = {};
+    if (status) filter.status = String(status);
+    if (job && isValidObjectId(String(job))) filter.jobId = new mongoose.Types.ObjectId(String(job));
+
+    if (startDate || endDate) {
+      filter.createdAt = {};
+      if (startDate) filter.createdAt.$gte = new Date(String(startDate));
+      if (endDate) filter.createdAt.$lte = new Date(String(endDate));
+    }
+
+    if (search) {
+      const q = String(search);
+      const rx = { $regex: q, $options: "i" };
+      filter.$or = [{ fullName: rx }, { email: rx }, { phone: rx }];
+    }
+
+    const applications = await JobApplication.find(filter)
+      .select("-resume.fileData")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(parseInt(limit))
+      .populate("jobId", "title slug department location")
+      .populate("adminNotes.addedBy", "name email")
+      .populate("emailLog.sentBy", "name email");
+
+    const total = await JobApplication.countDocuments(filter);
+
+    return res.json({
+      success: true,
+      applications,
+      pagination: {
+        total,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        pages: Math.ceil(total / parseInt(limit)),
+      },
+    });
+  } catch (error) {
+    console.error("Admin applications list error:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// @route   GET /api/admin/jobs/:id/applications
+router.get("/jobs/:id/applications", validateObjectId(), async (req, res) => {
+  try {
+    const job = await JobPosting.findById(req.params.id).select("title slug");
+    if (!job) return res.status(404).json({ success: false, message: "Job not found" });
+
+    const applications = await JobApplication.find({ jobId: job._id })
+      .select("-resume.fileData")
+      .sort({ createdAt: -1 });
+
+    return res.json({ success: true, job, applications });
+  } catch (error) {
+    console.error("Admin job applications error:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// @route   GET /api/admin/job-applications/:id
+router.get("/job-applications/:id", validateObjectId(), async (req, res) => {
+  try {
+    const application = await JobApplication.findById(req.params.id)
+      .select("-resume.fileData")
+      .populate("jobId", "title slug department location employmentType experienceLevel")
+      .populate("adminNotes.addedBy", "name email")
+      .populate("emailLog.sentBy", "name email");
+
+    if (!application) return res.status(404).json({ success: false, message: "Application not found" });
+    return res.json({ success: true, application });
+  } catch (error) {
+    console.error("Admin application detail error:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// @route   GET /api/admin/job-applications/:id/resume
+router.get("/job-applications/:id/resume", validateObjectId(), async (req, res) => {
+  try {
+    const application = await JobApplication.findById(req.params.id).select("resume fullName email");
+    if (!application) return res.status(404).json({ success: false, message: "Application not found" });
+    if (!application.resume || !application.resume.fileData) {
+      return res.status(404).json({ success: false, message: "Resume not found" });
+    }
+
+    const filename = application.resume.originalName || application.resume.fileName || "resume";
+    res.set({
+      "Content-Type": application.resume.contentType || "application/octet-stream",
+      "Content-Disposition": `attachment; filename="${filename}"`,
+    });
+    return res.send(application.resume.fileData);
+  } catch (error) {
+    console.error("Admin resume download error:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// @route   PUT /api/admin/job-applications/:id/status
+router.put("/job-applications/:id/status", validateObjectId(), async (req, res) => {
+  try {
+    const { status, note } = req.body;
+    const allowed = new Set(["Applied", "InReview", "Shortlisted", "Rejected", "Hired"]);
+    if (!allowed.has(status)) {
+      return res.status(400).json({ success: false, message: "Invalid status" });
+    }
+
+    const application = await JobApplication.findById(req.params.id);
+    if (!application) return res.status(404).json({ success: false, message: "Application not found" });
+
+    application.status = status;
+    if (typeof note === "string" && note.trim()) {
+      application.adminNotes.push({ note: note.trim().slice(0, 5000), addedBy: req.user._id, addedAt: new Date() });
+    }
+    await application.save();
+
+    return res.json({ success: true, application: application.toObject({ getters: true }) });
+  } catch (error) {
+    console.error("Admin update application status error:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// @route   POST /api/admin/job-applications/:id/notes
+router.post("/job-applications/:id/notes", validateObjectId(), async (req, res) => {
+  try {
+    const note = typeof req.body.note === "string" ? req.body.note.trim() : "";
+    if (!note) return res.status(400).json({ success: false, message: "Note is required" });
+
+    const application = await JobApplication.findById(req.params.id);
+    if (!application) return res.status(404).json({ success: false, message: "Application not found" });
+
+    application.adminNotes.push({ note: note.slice(0, 5000), addedBy: req.user._id, addedAt: new Date() });
+    await application.save();
+    return res.status(201).json({ success: true });
+  } catch (error) {
+    console.error("Admin add note error:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// @route   POST /api/admin/job-applications/:id/email
+router.post("/job-applications/:id/email", validateObjectId(), async (req, res) => {
+  try {
+    const subject = normalizeString(req.body.subject, { max: 300 });
+    const message = normalizeString(req.body.message, { max: 20000 });
+
+    if (!subject) return res.status(400).json({ success: false, message: "Subject is required" });
+    if (!message) return res.status(400).json({ success: false, message: "Message is required" });
+
+    const application = await JobApplication.findById(req.params.id).populate("jobId", "title");
+    if (!application) return res.status(404).json({ success: false, message: "Application not found" });
+
+    const adminUser = await User.findById(req.user._id).select("name email");
+    const tpl = emailTemplates.jobApplicationAdminReply(
+      application.fullName,
+      application.jobId?.title || "your application",
+      message,
+      adminUser?.name || "Com Financial Services"
+    );
+
+    await sendEmail({
+      email: application.email,
+      subject: subject || tpl.subject,
+      html: tpl.html,
+      text: tpl.text,
+    });
+
+    application.emailLog.push({
+      subject,
+      message,
+      sentAt: new Date(),
+      sentBy: req.user._id,
+    });
+    await application.save();
+
+    return res.status(201).json({ success: true });
+  } catch (error) {
+    console.error("Admin email applicant error:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// @route   DELETE /api/admin/job-applications/:id
+// @desc    Permanently delete an application
+// @access  Private/Admin
+router.delete("/job-applications/:id", validateObjectId(), async (req, res) => {
+  try {
+    const application = await JobApplication.findById(req.params.id).select("_id");
+    if (!application) return res.status(404).json({ success: false, message: "Application not found" });
+
+    await JobApplication.deleteOne({ _id: application._id });
+    return res.json({ success: true });
+  } catch (error) {
+    console.error("Admin delete application error:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 });
 
