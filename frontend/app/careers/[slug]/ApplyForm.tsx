@@ -27,13 +27,12 @@ export function ApplyForm({ jobId }: { jobId: string }) {
     if (!form.fullName.trim()) return "Full name is required.";
     if (!form.email.trim()) return "Email is required.";
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) return "Enter a valid email.";
-    if (resume) {
-      const max = 10 * 1024 * 1024;
-      if (resume.size > max) return "Resume too large. Maximum size is 10MB.";
-      const allowed = [".pdf", ".doc", ".docx"];
-      const name = resume.name.toLowerCase();
-      if (!allowed.some((ext) => name.endsWith(ext))) return "Resume must be PDF, DOC, or DOCX.";
-    }
+    if (!resume) return "Resume is required.";
+    const max = 10 * 1024 * 1024;
+    if (resume.size > max) return "Resume too large. Maximum size is 10MB.";
+    const allowed = [".pdf", ".doc", ".docx"];
+    const name = resume.name.toLowerCase();
+    if (!allowed.some((ext) => name.endsWith(ext))) return "Resume must be PDF, DOC, or DOCX.";
     return null;
   };
 
@@ -44,6 +43,9 @@ export function ApplyForm({ jobId }: { jobId: string }) {
       return;
     }
 
+    const resumeFile = resume;
+    if (!resumeFile) return;
+
     setIsSubmitting(true);
     try {
       const fd = new FormData();
@@ -53,7 +55,7 @@ export function ApplyForm({ jobId }: { jobId: string }) {
       if (form.linkedIn.trim()) fd.append("linkedIn", form.linkedIn.trim());
       if (form.portfolio.trim()) fd.append("portfolio", form.portfolio.trim());
       if (form.coverLetter.trim()) fd.append("coverLetter", form.coverLetter.trim());
-      if (resume) fd.append("resume", resume);
+      fd.append("resume", resumeFile);
 
       await api.post(`/api/jobs/${jobId}/apply`, fd);
 
@@ -150,11 +152,12 @@ export function ApplyForm({ jobId }: { jobId: string }) {
           />
         </div>
         <div className="grid gap-2">
-          <Label htmlFor="resume">Resume (optional, PDF/DOC/DOCX, max 10MB)</Label>
+          <Label htmlFor="resume">Resume* (PDF/DOC/DOCX, max 10MB)</Label>
           <Input
             id="resume"
             type="file"
             accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            aria-required="true"
             onChange={(e) => setResume(e.target.files?.[0] || null)}
           />
         </div>

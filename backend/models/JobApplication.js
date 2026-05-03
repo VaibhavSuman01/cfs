@@ -40,7 +40,7 @@ const JobApplicationSchema = new mongoose.Schema(
     linkedIn: { type: String, trim: true, maxlength: 500 },
     portfolio: { type: String, trim: true, maxlength: 500 },
     coverLetter: { type: String, trim: true, maxlength: 20000 },
-    resume: { type: ResumeSchema },
+    resume: { type: ResumeSchema, required: true },
     status: {
       type: String,
       enum: ["Applied", "InReview", "Shortlisted", "Rejected", "Hired"],
